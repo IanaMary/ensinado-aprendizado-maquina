@@ -7,9 +7,10 @@ import { ItemColetaDado } from '../../models/item-coleta-dado.model';
 })
 export class DashboardService {
   private itensColetasDados = new BehaviorSubject<ItemColetaDado[]>([
-    { icon: 'arquivo.svg', label: 'CSV', movido: false }
+    { icon: 'arquivo.svg', label: 'CSV', movido: false },
+    { icon: 'arquivo.svg', label: 'JSON', movido: false }
   ]);
-  private itemsEmExecucao  = new BehaviorSubject<ItemColetaDado[]>([]);
+  private itemsEmExecucao = new BehaviorSubject<ItemColetaDado[]>([]);
 
 
   getItensColetasDados() {
@@ -21,12 +22,13 @@ export class DashboardService {
     return this.itemsEmExecucao.asObservable();
   }
 
-  
+
   movendoItemExecucao(item: ItemColetaDado) {
-    const currentItensColetasDados = this.itensColetasDados.value.filter(i => i.label !== item.label);
-    const currentItemsEmExecucao = [...this.itemsEmExecucao .value, item];
-    this.itemsEmExecucao .next(currentItemsEmExecucao);
+    const currentItemsEmExecucao = [...this.itemsEmExecucao.value, item];
+    this.itemsEmExecucao.next(currentItemsEmExecucao);
   }
 
-
+  jaFoiMovido(item: ItemColetaDado): boolean {
+    return this.itemsEmExecucao.value.some(i => i.label === item.label);
+  }
 }

@@ -14,7 +14,7 @@ export class ColetaDeDadosComponent implements OnInit {
   itens: ItemColetaDado[] = [];
 
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private dashboardService: DashboardService) { }
 
   ngOnInit() {
     this.dashboardService.getItensColetasDados().subscribe(itens => {
@@ -25,7 +25,8 @@ export class ColetaDeDadosComponent implements OnInit {
   // Manipulando o evento de soltar
   onItemDropped(event: any) {
     const item = event.item.data;
-    this.dashboardService.movendoItemExecucao(item);  
+    event.item.data.movido = true;
+    this.dashboardService.movendoItemExecucao(item);
   }
 
 }
