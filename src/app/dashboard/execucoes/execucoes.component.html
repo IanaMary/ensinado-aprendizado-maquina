@@ -1,6 +1,6 @@
-<nav cdkDropList [cdkDropListData]="itens" (cdkDropListDropped)="onDrop($event)" id="execucaoList">
+<nav cdkDropList [cdkDropListData]="itens" (cdkDropListDropped)="onDrop($event)" id="execucaoList" class="opcoesPipeline">
   <nav *ngFor="let item of itens" cdkDrag>
-    <mat-card class="example-card" appearance="outlined">
+    <mat-card appearance="outlined">
       <mat-card-header>
         <mat-card-title><img [src]="'assets/icons/' + item.icon" width="16" /></mat-card-title>
       </mat-card-header>
