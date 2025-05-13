@@ -1,0 +1,42 @@
+/* You can add global styles to this file, and also import other style files */
+html, body {
+  height: 100%;
+  margin: 0;
+  width: 100%;
+  overflow-x: hidden;  // Impede rolagem horizontal
+}
+
+/* Classe para garantir que o elemento ocupe 100% de altura */
+.full-height {
+  height: 100%;
+}
+
+// ::ng-deep .cdk-drag-placeholder {
+//   display: none !important;
+// }
+
+// ::ng-deep .cdk-drag-preview {
+//   opacity: 0.5;
+//   pointer-events: none;
+// }
+
+
+// ::ng-deep .cdk-drop-list-receiving .cdk-drag-placeholder {
+//   display: none !important;
+// }
+
+// ::ng-deep .cdk-drag-preview {
+//   display: none !important;
+// }
+
+.opcoesPipeline {
+  display: flex;
+  flex-wrap: wrap; // Permite a quebra de linha
+  justify-content: flex-start; // Alinha à esquerda
+  width: 100%;
+  gap: 16px; // Espaço entre os itens
+
+  .mat-mdc-card-header {
+    justify-content: center;
+  }
+}
