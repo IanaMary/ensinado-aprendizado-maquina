@@ -1,0 +1,27 @@
+<div class="modal">
+  <div class="modal-header">
+    <h2>Importar Dados</h2>
+    <button mat-icon-button class="close-button" (click)="fecharModal()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <input type="file" (change)="onArquivoSelecionado($event)" accept=".xlsx" />
+
+  <div *ngIf="erro" style="color: red; margin-top: 1rem;">{{ erro }}</div>
+
+  <div *ngIf="dados.length > 0" class="tabela-container">
+    <table mat-table [dataSource]="dados" class="mat-elevation-z1">
+      <!-- Colunas dinâmicas -->
+      <ng-container *ngFor="let coluna of colunas" [matColumnDef]="coluna">
+        <th mat-header-cell *matHeaderCellDef> {{ coluna }} </th>
+        <td mat-cell *matCellDef="let elemento"> {{ elemento[coluna] }} </td>
+      </ng-container>
+
+      <tr class="thead" mat-header-row *matHeaderRowDef="colunas; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas;"></tr>
+    </table>
+  </div>
+
+  
+</div>

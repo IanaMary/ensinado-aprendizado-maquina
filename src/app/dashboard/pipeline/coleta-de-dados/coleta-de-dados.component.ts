@@ -1,7 +1,7 @@
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { Component, Input, OnInit } from '@angular/core';
 import { DashboardService } from '../../service/dashboard.service';
-import { ItemColetaDado } from '../../../models/item-coleta-dado.model';
+import { ItemPipeline } from '../../../models/item-coleta-dado.model';
 
 @Component({
   selector: 'app-coleta-de-dados',
@@ -11,7 +11,7 @@ import { ItemColetaDado } from '../../../models/item-coleta-dado.model';
 })
 export class ColetaDeDadosComponent implements OnInit {
 
-  itens: ItemColetaDado[] = [];
+  itens: ItemPipeline[] = [];
 
 
   constructor(private dashboardService: DashboardService) { }
