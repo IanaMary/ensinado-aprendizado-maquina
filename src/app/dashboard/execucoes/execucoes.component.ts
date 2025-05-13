@@ -13,7 +13,11 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class ExecucoesComponent implements OnInit {
 
-  dadosExcel: any[] = [];
+  dados: any[] = [];
+  colunas: string[] = [];
+  tipos: { [key: string]: string } = {};
+  atributos: { [key: string]: boolean } = {}; // Para armazenar se a coluna é marcada como atributo
+  target?: string; // Coluna escolhida como "target"
   itens: ItemPipeline[] = [];
 
   constructor(private dashboardService: DashboardService,
@@ -28,14 +32,30 @@ export class ExecucoesComponent implements OnInit {
 
   onDrop(event: CdkDragDrop<any[]>) {}
 
-  abrirExecucao(item : ItemPipeline) {
+  abrirExecucao(item: ItemPipeline): void {
     const dialogRef = this.dialog.open(ModalColetaDadoComponent, {
-      data: { dados: this.dadosExcel }
+      data: {
+        dados: this.dados,
+        colunas: this.colunas,
+        tipos: this.tipos,
+        atributos: this.atributos,
+        target: this.target
+      }
     });
-
-    dialogRef.afterClosed().subscribe((resultado: any[]) => {
-      if (resultado?.length) {
-        this.dadosExcel = resultado;
+  
+    dialogRef.afterClosed().subscribe((resultado: {
+      dados: any[],
+      colunas: string[],
+      tipos: { [key: string]: string },
+      atributos: { [key: string]: boolean },
+      target: string
+    }) => {
+      if (resultado?.dados?.length) {
+        this.dados = resultado.dados;
+        this.colunas = resultado.colunas;
+        this.tipos = resultado.tipos;
+        this.atributos = resultado.atributos;
+        this.target = resultado.target;
       }
     });
   }

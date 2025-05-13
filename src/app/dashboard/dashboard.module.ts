@@ -1,16 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DashboardComponent } from './dashboard.component';
-import { PipelineComponent } from './pipeline/pipeline.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { ExecucoesComponent } from './execucoes/execucoes.component';
-import { ColetaDeDadosComponent } from './pipeline/coleta-de-dados/coleta-de-dados.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
-import { ModalColetaDadoComponent } from './execucoes/modals/modal-coleta-dado/modal-coleta-dado.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button'; 
+import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms'; // Importe o FormsModule
+
+import { DashboardComponent } from './dashboard.component';
+import { PipelineComponent } from './pipeline/pipeline.component';
+import { ExecucoesComponent } from './execucoes/execucoes.component';
+import { ColetaDeDadosComponent } from './pipeline/coleta-de-dados/coleta-de-dados.component';
+import { ModalColetaDadoComponent } from './execucoes/modals/modal-coleta-dado/modal-coleta-dado.component';
+
 
 
 @NgModule({
@@ -27,7 +33,12 @@ import { MatButtonModule } from '@angular/material/button';
     MatDialogModule,
     MatTableModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatDividerModule,
+    MatRadioModule,
+    MatCheckboxModule,
+    FormsModule,
+    MatTableModule
   ]
 })
 export class DashboardModule { }

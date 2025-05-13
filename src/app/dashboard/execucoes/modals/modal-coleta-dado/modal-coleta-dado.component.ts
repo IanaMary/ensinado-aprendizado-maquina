@@ -9,20 +9,45 @@ import { PlanilhaService } from '../../../../service/planilha.service';
   standalone: false
 })
 export class ModalColetaDadoComponent {
+
   dados: any[] = [];
   colunas: string[] = [];
+  tipos: { [key: string]: string } = {};
+  atributos: { [key: string]: boolean } = {}; // Para armazenar se a coluna é marcada como atributo
+  target?: string; // Coluna escolhida como "target"
   erro?: string;
 
   constructor(
     public dialogRef: MatDialogRef<ModalColetaDadoComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { dados?: any[] },
+    @Inject(MAT_DIALOG_DATA) public data: any,
     private planilhaService: PlanilhaService
   ) {
-    if (data?.dados?.length) {
-      console.log("ee ,=", data)
-      this.dados = data.dados;
-      this.colunas = this.obterColunas(data.dados);
+
+    if (data) {
+      if (data.dados?.length) {
+        this.dados = data.dados;
+      }
+  
+      if (data.colunas?.length) {
+        this.colunas = data.colunas;
+      } else {
+        this.colunas = this.obterColunas(this.dados);
+      }
+  
+      if (data.tipos) {
+        this.tipos = data.tipos;
+      } else {
+        this.tipos = this.detectarTipos(this.dados);
+      }
+
+      if (data.target) {
+        this.target = data.target;
+      }
+      if (data.atributos) {
+        this.atributos = data.atributos;
+      }
     }
+
   }
 
   onArquivoSelecionado(event: Event): void {
@@ -50,6 +75,7 @@ export class ModalColetaDadoComponent {
       } else {
         this.dados = dados;
         this.colunas = this.obterColunas(dados);
+        this.tipos = this.detectarTipos(dados);
       }
     }).catch((e) => {
       this.erro = 'Erro ao processar o arquivo. Verifique se é uma planilha válida.';
@@ -61,7 +87,26 @@ export class ModalColetaDadoComponent {
     return dados.length > 0 ? Object.keys(dados[0]) : [];
   }
 
+  detectarTipos(dados: any[]): { [key: string]: string } {
+    const tipos: { [key: string]: string } = {};
+    if (dados.length > 0) {
+      this.colunas.forEach(coluna => {
+        // Verifica o tipo de cada valor na coluna e determina o tipo mais frequente
+        const tiposColuna = dados.map(item => typeof item[coluna]);
+        tipos[coluna] = tiposColuna.length ? tiposColuna[0] : 'unknown'; // Atribui 'unknown' caso não consiga determinar
+      });
+    }
+    return tipos;
+  }
+
   fecharModal(): void {
-    this.dialogRef.close(this.dados);
+    const resultado = {
+      dados: this.dados,
+      colunas: this.colunas,
+      tipos: this.tipos,
+      target: this.target,
+      atributos: this.atributos
+    };
+    this.dialogRef.close(resultado);
   }
 }

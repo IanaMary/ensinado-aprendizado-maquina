@@ -6,10 +6,53 @@
     </button>
   </div>
 
+  <!-- Input para seleção do arquivo -->
   <input type="file" (change)="onArquivoSelecionado($event)" accept=".xlsx" />
+  
+  <!-- Exibe erro se houver algum -->
+  <div *ngIf="erro" class="erro">{{ erro }}</div>
 
-  <div *ngIf="erro" style="color: red; margin-top: 1rem;">{{ erro }}</div>
+  <mat-divider></mat-divider>
 
+  <!-- Tabela de configuração das colunas -->
+  <div class="tipos-container">
+    <table mat-table [dataSource]="colunas" class="tipos-tabela">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let coluna">{{ coluna }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipo">
+        <th mat-header-cell *matHeaderCellDef>Tipo</th>
+        <td mat-cell *matCellDef="let coluna">{{ tipos[coluna] }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="target">
+        <th mat-header-cell *matHeaderCellDef>Target</th>
+        <td mat-cell *matCellDef="let coluna">
+          <mat-radio-group [(ngModel)]="target" name="target">
+            <mat-radio-button [value]="coluna"></mat-radio-button>
+          </mat-radio-group>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="atributos">
+        <th mat-header-cell *matHeaderCellDef>Atributos</th>
+        <td mat-cell *matCellDef="let coluna">
+          <mat-checkbox
+          [disabled]="!target || coluna === target"
+          [checked]="coluna === target || atributos[coluna]" [(ngModel)]="atributos[coluna]"></mat-checkbox>
+        </td>
+      </ng-container>
+
+      <tr class="thead" mat-header-row *matHeaderRowDef="['nome', 'tipo', 'target', 'atributos']; sticky: true" ></tr>
+      <tr mat-row *matRowDef="let row; columns: ['nome', 'tipo', 'target', 'atributos'];"></tr>
+    </table>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Tabela para mostrar dados da planilha -->
   <div *ngIf="dados.length > 0" class="tabela-container">
     <table mat-table [dataSource]="dados" class="mat-elevation-z1">
       <!-- Colunas dinâmicas -->
@@ -22,6 +65,4 @@
       <tr mat-row *matRowDef="let row; columns: colunas;"></tr>
     </table>
   </div>
-
-  
 </div>

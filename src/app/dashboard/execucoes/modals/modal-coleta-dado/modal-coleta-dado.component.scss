@@ -25,12 +25,19 @@
 }
 
 .close-button mat-icon {
-  font-size: 30px;  /* Ajuste o tamanho do ícone */
+  font-size: 30px; /* Ajuste o tamanho do ícone */
 }
 
+.tipos-container {
+  flex: 0 1 50%; /* Tabela de configuração ocupa 50% da altura do modal */
+  overflow: auto;
+  margin-top: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
 
 .tabela-container {
-  flex: 1;
+  flex: 0 1 50%; /* Tabela de dados ocupa 50% da altura do modal */
   overflow: auto;
   margin-top: 1rem;
   border: 1px solid #ccc;
@@ -45,8 +52,13 @@
 .thead {
   position: sticky;
   top: 0;
-  background-color: #fff; /* Garante que o conteúdo de baixo não apareça */
-  z-index: 10;            /* Fica acima dos <td> */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* (opcional) separa visualmente */
+  background-color: #fff;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   font-weight: 600;
+}
+
+.erro {
+  color: red;
+  margin-top: 1rem;
 }
