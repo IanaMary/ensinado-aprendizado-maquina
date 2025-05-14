@@ -14,7 +14,7 @@ export class ModalColetaDadoComponent {
   colunas: string[] = [];
   tipos: { [key: string]: string } = {};
   atributos: { [key: string]: boolean } = {}; // Para armazenar se a coluna é marcada como atributo
-  target?: string; // Coluna escolhida como "target"
+  target: string = ''; // Coluna escolhida como "target"
   erro?: string;
 
   constructor(
@@ -108,5 +108,11 @@ export class ModalColetaDadoComponent {
       atributos: this.atributos
     };
     this.dialogRef.close(resultado);
+  }
+
+  selecaoTarget() {
+    if(this.atributos.hasOwnProperty(this.target)) {
+      this.atributos[this.target] = false
+    }
   }
 }
