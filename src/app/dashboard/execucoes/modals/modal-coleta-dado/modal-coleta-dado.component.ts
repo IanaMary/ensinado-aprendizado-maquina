@@ -176,4 +176,9 @@ export class ModalColetaDadoComponent implements OnInit {
     this.atributos[this.target] = false;
     this.aplicarFiltro();
   }
+
+  onFiltroChange(coluna: string, valor: string) {
+    this.filtros[coluna] = valor.trim().toLowerCase();
+    this.aplicarFiltro();
+  }
 }

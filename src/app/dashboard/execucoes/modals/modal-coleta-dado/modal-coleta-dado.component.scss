@@ -25,11 +25,13 @@
 }
 
 .close-button mat-icon {
-  font-size: 30px; /* Ajuste o tamanho do ícone */
+  font-size: 30px;
+  /* Ajuste o tamanho do ícone */
 }
 
 .tipos-container {
-  flex: 0 1 50%; /* Tabela de configuração ocupa 50% da altura do modal */
+  flex: 0 1 50%;
+  /* Tabela de configuração ocupa 50% da altura do modal */
   overflow: auto;
   margin-top: 1rem;
   border: 1px solid #ccc;
@@ -37,7 +39,8 @@
 }
 
 .tabela-container {
-  flex: 0 1 50%; /* Tabela de dados ocupa 50% da altura do modal */
+  flex: 0 1 50%;
+  /* Tabela de dados ocupa 50% da altura do modal */
   overflow: auto;
   margin-top: 1rem;
   border: 1px solid #ccc;
@@ -68,4 +71,6 @@
   display: flex;
   flex-direction: row;
   gap: 8px;
+  align-content: center;
+  align-items: center;
 }

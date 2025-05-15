@@ -23,13 +23,12 @@
         <th mat-header-cell *matHeaderCellDef>
           <nav class="titulo">
             Nome
-            <nav class="filtro-container">
-              <select id="filtro-nome" (change)="onFiltroSelectChange('nome', $event)" [value]="filtros['nome'] || ''"
-                class="filtro-select">
-                <option value="">Todos</option>
-                <option *ngFor="let opcao of opcoesNome" [value]="opcao">{{ opcao }}</option>
-              </select>
-            </nav>
+            <app-filtro-coluna id="filtro-nome" 
+              [label]="'Nome'" 
+              [opcoes]="opcoesNome" 
+              [value]="filtros['nome'] || ''"
+              (valueChange)="onFiltroChange('nome', $event)">
+            </app-filtro-coluna>
           </nav>
         </th>
         <td mat-cell *matCellDef="let linha"> {{ linha.nome }} </td>
@@ -40,13 +39,12 @@
         <th mat-header-cell *matHeaderCellDef>
           <nav class="titulo">
             Tipo
-            <nav class="filtro-container">
-              <select id="filtro-tipo" (change)="onFiltroSelectChange('tipo', $event)" [value]="filtros['tipo'] || ''"
-                class="filtro-select">
-                <option value="">Todos</option>
-                <option *ngFor="let opcao of opcoesTipo" [value]="opcao">{{ opcao }}</option>
-              </select>
-            </nav>
+            <app-filtro-coluna id="filtro-nome" 
+              [label]="'Tipo'" 
+              [opcoes]="opcoesTipo" 
+              [value]="filtros['tipo'] || ''"
+              (valueChange)="onFiltroChange('tipo', $event)">
+            </app-filtro-coluna>
           </nav>
         </th>
         <td mat-cell *matCellDef="let linha"> {{ linha.tipo }} </td>
@@ -57,14 +55,12 @@
         <th mat-header-cell *matHeaderCellDef>
           <nav class="titulo">
             Target
-            <nav class="filtro-container">
-              <select id="filtro-target" (change)="onFiltroSelectChange('target', $event)"
-                [value]="filtros['target'] || ''" class="filtro-select">
-                <option value="">Todos</option>
-                <option value="sim">Sim</option>
-                <option value="nao">Não</option>
-              </select>
-            </nav>
+            <app-filtro-coluna id="filtro-nome" 
+              [label]="'Target'" 
+              [opcoes]="['Sim', 'Não']" 
+              [value]="filtros['target'] || ''"
+              (valueChange)="onFiltroChange('target', $event)">
+            </app-filtro-coluna>
           </nav>
         </th>
         <td mat-cell *matCellDef="let linha">
@@ -79,16 +75,13 @@
         <th mat-header-cell *matHeaderCellDef>
           <nav class="titulo">
             Atributos
-            <nav class="filtro-container">
-              <select id="filtro-atributos" (change)="onFiltroSelectChange('atributos', $event)"
-                [value]="filtros['atributos'] || ''" class="filtro-select">
-                <option value="">Todos</option>
-                <option value="marcado">Marcados</option>
-                <option value="desmarcado">Desmarcados</option>
-              </select>
-            </nav>
+            <app-filtro-coluna id="filtro-nome" 
+              [label]="'Atributos'" 
+              [opcoes]="['Marcados', 'Desmarcados']" 
+              [value]="filtros['atributos'] || ''"
+              (valueChange)="onFiltroChange('atributos', $event)">
+            </app-filtro-coluna>
           </nav>
-
         </th>
         <td mat-cell *matCellDef="let linha">
           <mat-checkbox [disabled]="!target || linha.nome === target" [(ngModel)]="atributos[linha.nome]">

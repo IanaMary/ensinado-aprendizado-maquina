@@ -1,0 +1,14 @@
+<nav class="filtro-container">
+  <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Filtrar opções">
+    <mat-icon>filter_list</mat-icon>
+  </button>
+
+  <mat-menu #menu="matMenu" class="filtro">
+    <button mat-menu-item (click)="onChangeManual('')">
+      <span>Todos</span>
+    </button>
+    <button mat-menu-item *ngFor="let opcao of opcoes" (click)="onChangeManual(opcao)">
+      <span>{{ opcao }}</span>
+    </button>
+  </mat-menu>
+</nav>

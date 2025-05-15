@@ -11,13 +11,14 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms'; // Importe o FormsModule
 import { MatSelectModule } from '@angular/material/select';
-
+import { MatMenuModule } from '@angular/material/menu';
 
 import { DashboardComponent } from './dashboard.component';
 import { PipelineComponent } from './pipeline/pipeline.component';
 import { ExecucoesComponent } from './execucoes/execucoes.component';
 import { ColetaDeDadosComponent } from './pipeline/coleta-de-dados/coleta-de-dados.component';
 import { ModalColetaDadoComponent } from './execucoes/modals/modal-coleta-dado/modal-coleta-dado.component';
+import { FiltroColunaComponent } from './execucoes/filtro-coluna/filtro-coluna.component';
 
 
 
@@ -27,7 +28,8 @@ import { ModalColetaDadoComponent } from './execucoes/modals/modal-coleta-dado/m
     PipelineComponent,
     ExecucoesComponent,
     ColetaDeDadosComponent,
-    ModalColetaDadoComponent
+    ModalColetaDadoComponent,
+    FiltroColunaComponent
   ],
   imports: [CommonModule,
     DragDropModule,
@@ -40,7 +42,8 @@ import { ModalColetaDadoComponent } from './execucoes/modals/modal-coleta-dado/m
     MatRadioModule,
     MatCheckboxModule,
     FormsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatMenuModule
   ]
 })
 export class DashboardModule { }
