@@ -62,3 +62,10 @@
   color: red;
   margin-top: 1rem;
 }
+
+
+.titulo {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}

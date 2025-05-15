@@ -10,6 +10,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms'; // Importe o FormsModule
+import { MatSelectModule } from '@angular/material/select';
+
 
 import { DashboardComponent } from './dashboard.component';
 import { PipelineComponent } from './pipeline/pipeline.component';
@@ -38,7 +40,7 @@ import { ModalColetaDadoComponent } from './execucoes/modals/modal-coleta-dado/m
     MatRadioModule,
     MatCheckboxModule,
     FormsModule,
-    MatTableModule
+    MatSelectModule
   ]
 })
 export class DashboardModule { }
