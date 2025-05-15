@@ -1,14 +1,17 @@
 .modal {
-  width: 500px;
-  height: 500px;
-  max-width: 500px;
-  max-height: 500px;
+  width: 700px;
+  height: 700px;
+  max-width: 100%;
+  max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 1.5rem;
   box-sizing: border-box;
   margin: 0 auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .modal-header {
@@ -21,56 +24,78 @@
   padding: 0;
   margin: 0;
   font-size: 24px;
-  color: #000;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .close-button mat-icon {
   font-size: 30px;
-  /* Ajuste o tamanho do ícone */
 }
 
-.tipos-container {
-  flex: 0 1 50%;
-  /* Tabela de configuração ocupa 50% da altura do modal */
-  overflow: auto;
-  margin-top: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
 }
 
+.tipos-container,
 .tabela-container {
-  flex: 0 1 50%;
-  /* Tabela de dados ocupa 50% da altura do modal */
+  flex: 1;
   overflow: auto;
   margin-top: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #fafafa;
+  // padding: 0.5rem;
 }
 
 .mat-table {
   width: 100%;
   table-layout: fixed;
+  border-collapse: collapse;
 }
 
 .thead {
   position: sticky;
   top: 0;
-  background-color: #fff;
+  background-color: #f0f0f0;
   z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .erro {
-  color: red;
-  margin-top: 1rem;
+  color: #d32f2f;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
 }
 
+input[type="file"] {
+  position: relative;
+  width: 100%;
+  color: transparent;
 
-.titulo {
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  align-content: center;
-  align-items: center;
+  &::file-selector-button {
+    color: #000;
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  &::file-selector-button:hover {
+    background-color: #d5d5d5;
+  }
+}
+
+small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #444;
+  font-size: 0.85rem;
 }
