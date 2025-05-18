@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ItemPipeline } from '../../models/item-coleta-dado.model';
+import { environment } from '../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +13,22 @@ export class DashboardService {
     { icon: 'arquivo.svg', label: 'JSON', movido: false, tipoItem: 'coleta-dado' }
   ]);
   private itemsEmExecucao = new BehaviorSubject<ItemPipeline[]>([]);
+
+
+  url = environment.apiUrl;
+
+  private readonly endpointClassificador: string = 'classificador';
+
+
+  constructor(private http: HttpClient) {}
+
+  classificadorTreino(body: any) {
+    return this.http.post(`${this.url}${this.endpointClassificador}/treinamento`, body);
+  }
+
+  classificadorPrever(body: any) {
+    return this.http.post(`${this.url}${this.endpointClassificador}/prever`, body);
+  }
 
 
   getItensColetasDados() {

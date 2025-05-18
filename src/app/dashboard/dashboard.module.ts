@@ -19,6 +19,7 @@ import { ExecucoesComponent } from './execucoes/execucoes.component';
 import { ColetaDeDadosComponent } from './pipeline/coleta-de-dados/coleta-de-dados.component';
 import { ModalColetaDadoComponent } from './execucoes/modals/modal-coleta-dado/modal-coleta-dado.component';
 import { FiltroColunaComponent } from './execucoes/filtro-coluna/filtro-coluna.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 
@@ -43,7 +44,8 @@ import { FiltroColunaComponent } from './execucoes/filtro-coluna/filtro-coluna.c
     MatCheckboxModule,
     FormsModule,
     MatSelectModule,
-    MatMenuModule
+    MatMenuModule,
+    HttpClientModule
   ]
 })
 export class DashboardModule { }

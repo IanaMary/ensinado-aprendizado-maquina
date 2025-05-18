@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { Component, Input, OnInit } from '@angular/core';
-import { DashboardService } from '../../service/dashboard.service';
+import { DashboardService } from '../../services/dashboard.service';
 import { ItemPipeline } from '../../../models/item-coleta-dado.model';
 
 @Component({

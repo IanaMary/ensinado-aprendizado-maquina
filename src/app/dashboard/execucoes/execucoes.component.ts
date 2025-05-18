@@ -1,23 +1,9 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-
-import { DashboardService } from '../service/dashboard.service';
-import { ItemPipeline } from '../../models/item-coleta-dado.model';
+import { DashboardService } from '../services/dashboard.service';
+import { ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
 import { ModalColetaDadoComponent } from './modals/modal-coleta-dado/modal-coleta-dado.component';
-
-interface ResultadoColetaDado {
-  dados: any[];
-  colunas: string[];
-  tipos: { [key: string]: string };
-  atributos: { [key: string]: boolean };
-  target: string;
-  dadosTeste: any[];
-  colunasTeste: string[];
-  erroTeste?: string;
-  nomeArquivoTreino?: string;
-  nomeArquivoTeste?: string;
-}
 
 @Component({
   selector: 'app-execucoes',
@@ -31,22 +17,23 @@ export class ExecucoesComponent implements OnInit {
   colunas: string[] = [];
   tipos: { [key: string]: string } = {};
   atributos: { [key: string]: boolean } = {};
-  target?: string;
+  target: string = '';
 
   dadosTeste: any[] = [];
   colunasTeste: string[] = [];
+  dadosPrever: any[] = [];
 
-  erroTeste?: string;  // <-- aqui
+  erroTeste?: string;
 
-  nomeArquivoTreino?: string;  // opcional
-  nomeArquivoTeste?: string;   // opcional
+  nomeArquivoTreino?: string;  
+  nomeArquivoTeste?: string; 
 
   itens: ItemPipeline[] = [];
 
   constructor(
     private dashboardService: DashboardService,
     public dialog: MatDialog
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.dashboardService.getItemsEmExecucao().subscribe(itens => {
@@ -89,7 +76,49 @@ export class ExecucoesComponent implements OnInit {
         this.erroTeste = resultado.erroTeste;               // atualiza aqui
         this.nomeArquivoTreino = resultado.nomeArquivoTreino;
         this.nomeArquivoTeste = resultado.nomeArquivoTeste;
+
+        this.classificadorTreino();
       }
     });
   }
+
+
+  classificadorTreino() {
+    const body = {
+      dados_treino: this.dados,
+      dados_teste: this.dadosTeste,
+      target: this.target,
+      atributos: Object.keys(this.atributos).filter(chave => this.atributos[chave])
+    }
+    this.dashboardService.classificadorTreino(body).subscribe(
+      (res: any) => {
+        console.log('Modelo treinado - classificador')
+      },
+      (error: any) => {
+         console.log('Erro ao treinar o modelo - classificador')
+       }
+    );
+  }
+
+  classificadorPrever() {
+    const dadosSemTarget = this.dadosPrever.map(item => {
+      const novoItem = { ...item };
+      delete novoItem[this.target];  // Remove a propriedade target
+      return novoItem;
+    });
+
+    const body = {
+      dados: dadosSemTarget
+    };
+    
+    this.dashboardService.classificadorPrever(body).subscribe(
+      (res: any) => {
+        console.log("Prever ", res);
+      },
+      (error: any) => {
+        console.error(error);
+      }
+    );
+  }
+
 }
