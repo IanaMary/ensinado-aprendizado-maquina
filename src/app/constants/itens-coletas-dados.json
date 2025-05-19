@@ -1,0 +1,30 @@
+{
+  "itensColetasDados": [
+    {
+      "icon": "arquivo.svg",
+      "label": "XLXS",
+      "movido": false,
+      "tipoItem": "coleta-dado"
+    },
+    {
+      "icon": "arquivo.svg",
+      "label": "CSV",
+      "movido": false,
+      "tipoItem": "coleta-dado"
+    },
+    {
+      "icon": "arquivo.svg",
+      "label": "JSON",
+      "movido": false,
+      "tipoItem": "coleta-dado"
+    }
+  ],
+  "itensTreino": [
+    {
+      "icon": "arquivo.svg",
+      "label": "CLASSIFICADOR",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste"
+    }
+  ]
+}

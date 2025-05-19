@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
 import { ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
 import { ModalColetaDadoComponent } from './modals/modal-coleta-dado/modal-coleta-dado.component';
+import { ModalClasificadorComponent } from './modals/modal-classificador/modal-classificador.component';
 
 @Component({
   selector: 'app-execucoes',
@@ -45,7 +46,25 @@ export class ExecucoesComponent implements OnInit {
     // lógica futura
   }
 
-  abrirExecucao(item: ItemPipeline): void {
+
+  executarAcao(item: ItemPipeline) {
+  switch (item.tipoItem) {
+    case 'coleta-dado':
+      this.abrirColetaDado(item);
+      break;
+    case 'pre-processamento':
+      this.abrirPreProcessamento(item);
+      break;
+    case 'treino-validacao-teste':
+      this.abrirClassificador(item);
+      break;
+    default:
+      console.warn('Tipo de item não reconhecido:', item.tipoItem);
+  }
+}
+
+
+  abrirColetaDado(item: ItemPipeline): void {
     const dialogRef = this.dialog.open(ModalColetaDadoComponent, {
       data: {
         dados: this.dados,
@@ -76,29 +95,34 @@ export class ExecucoesComponent implements OnInit {
         this.erroTeste = resultado.erroTeste;               // atualiza aqui
         this.nomeArquivoTreino = resultado.nomeArquivoTreino;
         this.nomeArquivoTeste = resultado.nomeArquivoTeste;
+      }
+    });
+  }
 
-        this.classificadorTreino();
+  abrirPreProcessamento(item: ItemPipeline): void { 
+    
+  }
+
+
+   abrirClassificador(item: ItemPipeline): void {
+    const dialogRef = this.dialog.open(ModalClasificadorComponent, {
+      data: {
+        dados: this.dados,
+        target: this.target,
+        atributos: this.atributos,
+        dadosTeste: this.dadosTeste,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((resultado: ResultadoColetaDado | undefined) => {
+      if (resultado) {
+        console.log("abrirClassificador ",)
       }
     });
   }
 
 
-  classificadorTreino() {
-    const body = {
-      dados_treino: this.dados,
-      dados_teste: this.dadosTeste,
-      target: this.target,
-      atributos: Object.keys(this.atributos).filter(chave => this.atributos[chave])
-    }
-    this.dashboardService.classificadorTreino(body).subscribe(
-      (res: any) => {
-        console.log('Modelo treinado - classificador')
-      },
-      (error: any) => {
-         console.log('Erro ao treinar o modelo - classificador')
-       }
-    );
-  }
+
 
   classificadorPrever() {
     const dadosSemTarget = this.dadosPrever.map(item => {

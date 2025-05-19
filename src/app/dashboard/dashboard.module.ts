@@ -20,6 +20,8 @@ import { ColetaDeDadosComponent } from './pipeline/coleta-de-dados/coleta-de-dad
 import { ModalColetaDadoComponent } from './execucoes/modals/modal-coleta-dado/modal-coleta-dado.component';
 import { FiltroColunaComponent } from './execucoes/filtro-coluna/filtro-coluna.component';
 import { HttpClientModule } from '@angular/common/http';
+import { TreinoValidacaoTesteComponent } from './pipeline/treino-validacao-teste/treino-validacao-teste.component';
+import { ModalClasificadorComponent } from './execucoes/modals/modal-classificador/modal-classificador.component';
 
 
 
@@ -30,7 +32,9 @@ import { HttpClientModule } from '@angular/common/http';
     ExecucoesComponent,
     ColetaDeDadosComponent,
     ModalColetaDadoComponent,
-    FiltroColunaComponent
+    FiltroColunaComponent,
+    TreinoValidacaoTesteComponent,
+    ModalClasificadorComponent
   ],
   imports: [CommonModule,
     DragDropModule,

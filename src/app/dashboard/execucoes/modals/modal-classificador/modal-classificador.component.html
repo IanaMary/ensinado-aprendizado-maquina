@@ -1,0 +1,27 @@
+<nav class="modal">
+  <header class="modal-header">
+    <h2>Treinamento</h2>
+    <button mat-icon-button class="close-button" (click)="fecharModal()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <mat-divider></mat-divider>
+
+  <section class="acoes">
+    <button mat-raised-button color="primary" (click)="enviarParaClassificador()">
+      Enviar para Classificador
+    </button>
+  </section>
+
+  <section *ngIf="resultadoClassificador" class="resultado-classificador">
+    <h3>{{ resultadoClassificador.status }}</h3>
+    <p><strong>Target:</strong> {{ resultadoClassificador.target }}</p>
+    <p><strong>Atributos:</strong> {{ resultadoClassificador.atributos?.join(', ') }}</p>
+    <p><strong>Classes:</strong> {{ resultadoClassificador.classes?.join(', ') }}</p>
+    <p><strong>Total Amostras Treino:</strong> {{ resultadoClassificador.total_amostras_treino }}</p>
+    <p><strong>Total Amostras Teste:</strong> {{ resultadoClassificador.total_amostras_teste }}</p>
+    <p><strong>Acurácia (Treino):</strong> {{ resultadoClassificador.acuracia_treino }}</p>
+    <p><strong>Acurácia (Teste):</strong> {{ resultadoClassificador.acuracia_teste }}</p>
+  </section>
+</nav>

@@ -3,15 +3,23 @@ import { BehaviorSubject } from 'rxjs';
 import { ItemPipeline } from '../../models/item-coleta-dado.model';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import itensPipeline from '../../../app/constants/itens-coletas-dados.json'
+
+
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class DashboardService {
-  private itensColetasDados = new BehaviorSubject<ItemPipeline[]>([
-    { icon: 'arquivo.svg', label: 'CSV', movido: false, tipoItem: 'coleta-dado' },
-    { icon: 'arquivo.svg', label: 'JSON', movido: false, tipoItem: 'coleta-dado' }
-  ]);
+
+
+  todosItensColetasDados = itensPipeline.itensColetasDados as ItemPipeline[];
+  todosItensTreino = itensPipeline.itensTreino as ItemPipeline[];
+
+
+  private itensColetasDados = new BehaviorSubject<ItemPipeline[]>(this.todosItensColetasDados);
+  private itensTreino = new BehaviorSubject<ItemPipeline[]>(this.todosItensTreino);
   private itemsEmExecucao = new BehaviorSubject<ItemPipeline[]>([]);
 
 
@@ -33,6 +41,10 @@ export class DashboardService {
 
   getItensColetasDados() {
     return this.itensColetasDados.asObservable();
+  }
+
+  getItensTreino() {
+    return this.itensTreino.asObservable();
   }
 
 
