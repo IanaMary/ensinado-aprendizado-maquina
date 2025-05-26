@@ -16,3 +16,15 @@ export interface ResultadoColetaDado {
   nomeArquivoTreino?: string;
   nomeArquivoTeste?: string;
 }
+
+export interface DadosArquivo {
+  nomeArquivo: string;
+  erro: string;
+  dados: any[];       // Pode ser tipado melhor, dependendo da sua estrutura
+  colunas: string[];
+}
+
+export interface InformacoesDados {
+  treino: DadosArquivo;
+  teste: DadosArquivo;
+}
