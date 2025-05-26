@@ -1,0 +1,49 @@
+<nav class="modal-execucao">
+  <nav class="modal-header">
+    <h2>{{ titulos[etapaAtual] }}</h2>
+    <button mat-icon-button class="close-button" (click)="fechar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </nav>
+  <mat-divider></mat-divider>
+
+  <section class="conteudo-modal">
+    <ng-container [ngSwitch]="etapaAtual">
+
+      <!-- Etapa 0: Coleta de Dados -->
+      <ng-container *ngSwitchCase="0">
+        <app-coleta-dado
+          [resultadoColetaDado]="resultadoColetaDado"
+          (resultadoColetaDadoModificado)="atualizarResultado($event)">
+        </app-coleta-dado>
+      </ng-container>
+
+
+      <!-- Etapa 1: Selecionar Classificador -->
+      <ng-container *ngSwitchCase="1">
+        <app-tipos-classificadores 
+          [tipoTarget]="tipoTargetSelecionado"
+          [modeloSelecionado]="modeloSelecionado"
+          (selecaoModelo)="atualizarModelo($event)">
+        </app-tipos-classificadores>
+      </ng-container>
+
+      <!-- Etapa 2: Visualizar Dados -->
+      <ng-container *ngSwitchCase="2">
+        <app-classificador 
+          [resultadoColetaDado]="resultadoColetaDado"
+          [modeloSelecionado]="modeloSelecionado">
+        </app-classificador>
+      </ng-container>
+
+    </ng-container>
+  </section>
+  <mat-divider></mat-divider>
+
+  <div class="modal-footer">
+    <button mat-button (click)="anterior()" [disabled]="etapaAtual === 0">Anterior</button>
+    <button mat-raised-button color="primary" (click)="proximo()" [disabled]="proximaEtapaDesaabilitada">
+      Próximo
+    </button>
+  </div>
+</nav>

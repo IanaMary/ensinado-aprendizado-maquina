@@ -1,0 +1,50 @@
+@import '../../../../../styles/colores.scss';
+
+.modal-execucao {
+  width: 100%;
+  max-width: 720px;
+  min-height: 720px;         // Garante o espaço mínimo para o conteúdo interno
+  max-height: 90vh;
+  margin: 0 auto;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-button {
+  padding: 0;
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.close-button mat-icon {
+  font-size: 30px;
+}
+
+.conteudo-modal {
+  flex: 1;
+  overflow-y: auto;
+  margin: 1rem 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  gap: 1rem;
+}

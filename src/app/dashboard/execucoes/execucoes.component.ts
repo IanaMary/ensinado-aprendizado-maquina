@@ -2,9 +2,8 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
-import { ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
-import { ModalColetaDadoComponent } from './modals/modal-coleta-dado/modal-coleta-dado.component';
-import { ModalClasificadorComponent } from './modals/modal-classificador/modal-classificador.component';
+import { ItemPipeline, Modelo, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
+import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.component';
 
 @Component({
   selector: 'app-execucoes',
@@ -14,22 +13,11 @@ import { ModalClasificadorComponent } from './modals/modal-classificador/modal-c
 })
 export class ExecucoesComponent implements OnInit {
 
-  dados: any[] = [];
-  colunas: string[] = [];
-  tipos: { [key: string]: string } = {};
-  atributos: { [key: string]: boolean } = {};
-  target: string = '';
-
-  dadosTeste: any[] = [];
-  colunasTeste: string[] = [];
-  dadosPrever: any[] = [];
-
-  erroTeste?: string;
-
-  nomeArquivoTreino?: string;  
-  nomeArquivoTeste?: string; 
-
   itens: ItemPipeline[] = [];
+
+  resultadoColetaDado?: ResultadoColetaDado;
+  modeloSelecionado?: Modelo;
+
 
   constructor(
     private dashboardService: DashboardService,
@@ -47,102 +35,26 @@ export class ExecucoesComponent implements OnInit {
   }
 
 
-  executarAcao(item: ItemPipeline) {
-  switch (item.tipoItem) {
-    case 'coleta-dado':
-      this.abrirColetaDado(item);
-      break;
-    case 'pre-processamento':
-      this.abrirPreProcessamento(item);
-      break;
-    case 'treino-validacao-teste':
-      this.abrirClassificador(item);
-      break;
-    default:
-      console.warn('Tipo de item não reconhecido:', item.tipoItem);
-  }
-}
-
-
-  abrirColetaDado(item: ItemPipeline): void {
-    const dialogRef = this.dialog.open(ModalColetaDadoComponent, {
+  abrirModalExecucao(tipoItem: ItemPipeline): void {
+    const dialogRef = this.dialog.open(ModalExecucaoComponent, {
       data: {
-        dados: this.dados,
-        colunas: this.colunas,
-        tipos: this.tipos,
-        target: this.target,
-        atributos: this.atributos,
-        dadosTeste: this.dadosTeste,
-        colunasTeste: this.colunasTeste,
-        erroTeste: this.erroTeste,           // passa pro modal
-        nomeArquivoTreino: this.nomeArquivoTreino,
-        nomeArquivoTeste: this.nomeArquivoTeste,
+        etapa: tipoItem.tipoItem,
+        resultadoColetaDado: this.resultadoColetaDado,
+        modeloSelecionado: this.modeloSelecionado
       }
     });
 
-    dialogRef.afterClosed().subscribe((resultado: ResultadoColetaDado | undefined) => {
-      if (resultado) {
-        if (resultado.dados?.length) {
-          this.dados = resultado.dados;
-          this.colunas = resultado.colunas;
-          this.tipos = resultado.tipos;
-          this.atributos = resultado.atributos;
-          this.target = resultado.target;
-          this.dadosTeste = resultado.dadosTeste;
-          this.colunasTeste = resultado.colunasTeste;
-        }
-
-        this.erroTeste = resultado.erroTeste;               // atualiza aqui
-        this.nomeArquivoTreino = resultado.nomeArquivoTreino;
-        this.nomeArquivoTeste = resultado.nomeArquivoTeste;
-      }
-    });
-  }
-
-  abrirPreProcessamento(item: ItemPipeline): void { 
-    
-  }
-
-
-   abrirClassificador(item: ItemPipeline): void {
-    const dialogRef = this.dialog.open(ModalClasificadorComponent, {
-      data: {
-        dados: this.dados,
-        target: this.target,
-        atributos: this.atributos,
-        dadosTeste: this.dadosTeste,
-      }
-    });
-
-    dialogRef.afterClosed().subscribe((resultado: ResultadoColetaDado | undefined) => {
-      if (resultado) {
-        console.log("abrirClassificador ",)
-      }
+    dialogRef.afterClosed().subscribe((resultado: any) => {
+      this.resultadoColetaDado = resultado.resultadoColetaDado
+      this.modeloSelecionado = resultado.modeloSelecionado
     });
   }
 
 
+  abrirPreProcessamento(item: ItemPipeline): void {}
 
+  abrirClassificador(item: ItemPipeline): void { }
 
-  classificadorPrever() {
-    const dadosSemTarget = this.dadosPrever.map(item => {
-      const novoItem = { ...item };
-      delete novoItem[this.target];  // Remove a propriedade target
-      return novoItem;
-    });
-
-    const body = {
-      dados: dadosSemTarget
-    };
-    
-    this.dashboardService.classificadorPrever(body).subscribe(
-      (res: any) => {
-        console.log("Prever ", res);
-      },
-      (error: any) => {
-        console.error(error);
-      }
-    );
-  }
+  classificadorPrever() { }
 
 }

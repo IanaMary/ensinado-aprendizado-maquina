@@ -1,0 +1,20 @@
+<!-- modal-tipos-classificadores.component.html -->
+<div class="modal-container">
+  <h2>
+    {{ tipoTarget === 'string' ? 'Classificadores' : 'Regressores' }}
+  </h2>
+
+  <mat-radio-group [(ngModel)]="modeloValor" (change)="emitSelecaoModelo()">
+    <mat-radio-button *ngFor="let model of modelosDisponiveis" [value]="model.valor">
+      {{ model.nome }}
+    </mat-radio-button>
+  </mat-radio-group>
+
+
+
+
+  <div class="resumo" *ngIf="modelo">
+    <h3>Resumo: {{ modelo.nome }}</h3>
+    <p>{{ modelo.resumo }}</p>
+  </div>
+</div>

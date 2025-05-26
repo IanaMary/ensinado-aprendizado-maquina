@@ -30,8 +30,8 @@ export class DashboardService {
 
   constructor(private http: HttpClient) {}
 
-  classificadorTreino(body: any) {
-    return this.http.post(`${this.url}${this.endpointClassificador}/treinamento`, body);
+  classificadorTreino(tipoClassficador: string, body: any) {
+    return this.http.post(`${this.url}${this.endpointClassificador}/treinamento/${tipoClassficador}`, body);
   }
 
   classificadorPrever(body: any) {

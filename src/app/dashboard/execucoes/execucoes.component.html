@@ -1,6 +1,6 @@
 <nav cdkDropList [cdkDropListData]="itens" (cdkDropListDropped)="onDrop($event)" id="execucaoList" class="opcoesPipeline">
   <nav *ngFor="let item of itens" cdkDrag>
-    <button (click)="executarAcao(item)">
+    <button (click)="abrirModalExecucao(item)">
       <mat-card-title>
         <img [src]="'assets/icons/' + item.icon" width="16" />
       </mat-card-title>

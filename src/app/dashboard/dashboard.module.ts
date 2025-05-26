@@ -17,11 +17,13 @@ import { DashboardComponent } from './dashboard.component';
 import { PipelineComponent } from './pipeline/pipeline.component';
 import { ExecucoesComponent } from './execucoes/execucoes.component';
 import { ColetaDeDadosComponent } from './pipeline/coleta-de-dados/coleta-de-dados.component';
-import { ModalColetaDadoComponent } from './execucoes/modals/modal-coleta-dado/modal-coleta-dado.component';
 import { FiltroColunaComponent } from './execucoes/filtro-coluna/filtro-coluna.component';
 import { HttpClientModule } from '@angular/common/http';
 import { TreinoValidacaoTesteComponent } from './pipeline/treino-validacao-teste/treino-validacao-teste.component';
-import { ModalClasificadorComponent } from './execucoes/modals/modal-classificador/modal-classificador.component';
+import { ClasificadorComponent } from './execucoes/modals/classificador/classificador.component';
+import { ColetaDadoComponent } from './execucoes/modals/coleta-dado/coleta-dado.component';
+import { TiposClassificadoresComponent } from './execucoes/modals/tipos-classificadores/tipos-classificadores.component';
+import { ModalExecucaoComponent } from './execucoes/modals/modal-execucao/modal-execucao.component';
 
 
 
@@ -31,10 +33,12 @@ import { ModalClasificadorComponent } from './execucoes/modals/modal-classificad
     PipelineComponent,
     ExecucoesComponent,
     ColetaDeDadosComponent,
-    ModalColetaDadoComponent,
+    ColetaDadoComponent,
     FiltroColunaComponent,
     TreinoValidacaoTesteComponent,
-    ModalClasificadorComponent
+    ClasificadorComponent,
+    ModalExecucaoComponent,
+    TiposClassificadoresComponent,
   ],
   imports: [CommonModule,
     DragDropModule,

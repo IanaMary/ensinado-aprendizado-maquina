@@ -1,30 +1,57 @@
+// Tipos e constantes
+export type TipoItem = 'coleta-dado' | 'pre-processamento' | 'treino-validacao-teste';
+export type TipoTarget = 'number' | 'string' | 'boolean' | undefined;
+export type TipoDado = 'Texto' | 'Número' | 'Booleano';
+
+
+export const labelParaTipoTargetMap: Record<TipoDado, TipoTarget> = {
+  'Número': 'number',
+  'Texto': 'string',
+  'Booleano': 'boolean'
+};
+
+export const tipoLabels: Record<string, string> = {
+  number: 'Número',
+  string: 'Texto',
+  boolean: 'Booleano'
+};
+
+export interface Modelo {
+  nome: string;
+  valor: string;
+  resumo: string;
+  tipo: TipoTarget;
+}
+
+// Interfaces principais
 export interface ItemPipeline {
   icon: string;
   label: string;
   movido: boolean;
-  tipoItem: 'coleta-dado' | 'pre-processamento' | 'treino-validacao-teste';
-}
-export interface ResultadoColetaDado {
-  dados: any[];
-  colunas: string[];
-  tipos: { [key: string]: string };
-  atributos: { [key: string]: boolean };
-  target: string;
-  dadosTeste: any[];
-  colunasTeste: string[];
-  erroTeste?: string;
-  nomeArquivoTreino?: string;
-  nomeArquivoTeste?: string;
+  tipoItem: TipoItem;
 }
 
-export interface DadosArquivo {
-  nomeArquivo: string;
-  erro: string;
-  dados: any[];       // Pode ser tipado melhor, dependendo da sua estrutura
-  colunas: string[];
+export interface ResultadoColetaDado {
+  treino: InformacoesDados;
+  teste?: InformacoesDados;
 }
 
 export interface InformacoesDados {
-  treino: DadosArquivo;
-  teste: DadosArquivo;
+  dados: unknown[];
+  colunas: string[];
+  tipos: Record<string, TipoDado>;           // Corrigido aqui
+  atributos: Record<string, boolean>;
+  target: string;
+  tipoTarget: TipoTarget;
+  erro?: string;
+  nomeArquivo?: string;
+  tipoItem?: TipoItem;
+}
+
+
+export function formatarValor(valor: unknown): string {
+  if (typeof valor === 'boolean') {
+    return valor ? 'Sim' : 'Não';
+  }
+  return String(valor ?? '');
 }

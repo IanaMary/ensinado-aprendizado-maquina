@@ -1,32 +1,26 @@
 <nav class="modal">
-  <nav class="modal-header">
-    <h2>Importar Dados</h2>
-    <button mat-icon-button class="close-button" (click)="fecharModal()">
-      <mat-icon>close</mat-icon>
-    </button>
-  </nav>
-  <mat-divider></mat-divider>
+
 
   <!-- Input para seleção do arquivo treino -->
   <label for="arquivo-treino">Planilha de Treino (obrigatória)</label>
   <input id="arquivo-treino" type="file" (change)="onArquivoSelecionado($event, 'treino')" accept=".xlsx" />
-  <nav *ngIf="informacoesDados.treino.erro" class="erro">{{ informacoesDados.treino.erro }}</nav>
-  <div *ngIf="informacoesDados.treino.nomeArquivo">
-    <small>Arquivo selecionado: {{ informacoesDados.treino.nomeArquivo }}</small>
+  <nav *ngIf="treino.erro" class="erro">{{ treino.erro }}</nav>
+  <div *ngIf="treino.nomeArquivo">
+    <small>Arquivo selecionado: {{ treino.nomeArquivo }}</small>
   </div>
 
   <!-- Input para seleção do arquivo teste -->
   <label for="arquivo-teste">Planilha de Teste (opcional)</label>
   <input id="arquivo-teste" type="file" (change)="onArquivoSelecionado($event, 'teste')" accept=".xlsx" />
-  <nav *ngIf="informacoesDados.teste.erro" class="erro">{{ informacoesDados.teste.erro }}</nav>
-  <div *ngIf="informacoesDados.teste.nomeArquivo">
-    <small>Arquivo selecionado: {{ informacoesDados.teste.nomeArquivo }}</small>
+  <nav *ngIf="teste.erro" class="erro">{{ teste.erro }}</nav>
+  <div *ngIf="teste.nomeArquivo">
+    <small>Arquivo selecionado: {{ teste.nomeArquivo }}</small>
   </div>
 
   <mat-divider></mat-divider>
 
   <!-- Tabela de configuração das colunas TREINO -->
-  <ng-container *ngIf="informacoesDados.treino.dados.length > 0">
+  <ng-container *ngIf="treino.dados.length > 0">
     Configuração do dataset de treino
     <nav class="tipos-container">
       <table mat-table [dataSource]="dataSourceColunas" class="mat-table">
@@ -101,7 +95,7 @@
             </nav>
           </th>
           <td mat-cell *matCellDef="let linha">
-            <mat-checkbox [disabled]="!target || linha.nome === target" [(ngModel)]="atributos[linha.nome]">
+            <mat-checkbox  (change)="emitirResultadoColetaDado()" [disabled]="!treino.target || linha.nome === treino.target" [(ngModel)]="treino.atributos[linha.nome]">
             </mat-checkbox>
           </td>
         </ng-container>
@@ -115,19 +109,19 @@
   <mat-divider></mat-divider>
 
   <!-- Tabela para mostrar dados da planilha TREINO -->
-  <ng-container *ngIf="informacoesDados.treino.dados.length > 0">
+  <ng-container *ngIf="treino.dados.length > 0">
     Tabela dos dados de treino
     <nav class="tabela-container">
-      <table mat-table [dataSource]="informacoesDados.treino.dados" class="mat-table mat-elevation-z1">
+      <table mat-table [dataSource]="treino.dados" class="mat-table mat-elevation-z1">
 
         <!-- Colunas dinâmicas -->
-        <ng-container *ngFor="let coluna of informacoesDados.treino.colunas" [matColumnDef]="coluna">
+        <ng-container *ngFor="let coluna of treino.colunas" [matColumnDef]="coluna">
           <th mat-header-cell *matHeaderCellDef> {{ coluna }} </th>
           <td mat-cell *matCellDef="let elemento"> {{ elemento[coluna] }} </td>
         </ng-container>
 
-        <tr class="thead" mat-header-row *matHeaderRowDef="informacoesDados.treino.colunas; sticky: true"></tr>
-        <tr mat-row *matRowDef="let row; columns: informacoesDados.treino.colunas;"></tr>
+        <tr class="thead" mat-header-row *matHeaderRowDef="treino.colunas; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: treino.colunas;"></tr>
       </table>
     </nav>
   </ng-container>

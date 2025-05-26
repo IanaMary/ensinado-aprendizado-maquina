@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalClasificadorComponent } from './modal-classificador.component';
+import { ModalClasificadorComponent } from './classificador.component';
 
 describe('ModalClasificadorComponent', () => {
   let component: ModalClasificadorComponent;
