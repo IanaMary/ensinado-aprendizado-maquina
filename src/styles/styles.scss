@@ -22,3 +22,20 @@ html, body {
     justify-content: center;
   }
 }
+
+
+.item-habilitado {
+  border: 2px solid #4caf50; /* verde */
+  background-color: #e8f5e9;
+}
+
+.item-movido {
+  border: 2px solid #1452da; /* verde */
+  background-color: #8c98dd;
+}
+
+
+.item-desabilitado {
+  border: 2px dashed #ccc;
+  background-color: #f5f5f5;
+}

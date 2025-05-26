@@ -29,6 +29,7 @@ export interface ItemPipeline {
   label: string;
   movido: boolean;
   tipoItem: TipoItem;
+  habilitado: boolean;
 }
 
 export interface ResultadoColetaDado {

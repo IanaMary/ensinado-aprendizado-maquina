@@ -4,19 +4,22 @@
       "icon": "arquivo.svg",
       "label": "XLXS",
       "movido": false,
-      "tipoItem": "coleta-dado"
+      "tipoItem": "coleta-dado",
+      "habilitado": true
     },
     {
       "icon": "arquivo.svg",
       "label": "CSV",
       "movido": false,
-      "tipoItem": "coleta-dado"
+      "tipoItem": "coleta-dado",
+      "habilitado": true
     },
     {
       "icon": "arquivo.svg",
       "label": "JSON",
       "movido": false,
-      "tipoItem": "coleta-dado"
+      "tipoItem": "coleta-dado",
+      "habilitado": true
     }
   ],
   "itensTreino": [
@@ -24,7 +27,8 @@
       "icon": "arquivo.svg",
       "label": "CLASSIFICADOR",
       "movido": false,
-      "tipoItem": "treino-validacao-teste"
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": true
     }
   ]
 }

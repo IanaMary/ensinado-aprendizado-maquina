@@ -28,7 +28,7 @@ export class DashboardService {
   private readonly endpointClassificador: string = 'classificador';
 
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   classificadorTreino(tipoClassficador: string, body: any) {
     return this.http.post(`${this.url}${this.endpointClassificador}/treinamento/${tipoClassficador}`, body);
@@ -54,6 +54,17 @@ export class DashboardService {
 
 
   movendoItemExecucao(item: ItemPipeline) {
+
+    const itensAtualizados = this.itensColetasDados.value.map(i => {
+      if (i.label === item.label) {
+        return { ...i, movido: true };
+      } else {
+        return { ...i, habilitado: false };
+      }
+    });
+
+    this.itensColetasDados.next(itensAtualizados);
+
     const currentItemsEmExecucao = [...this.itemsEmExecucao.value, item];
     this.itemsEmExecucao.next(currentItemsEmExecucao);
   }
