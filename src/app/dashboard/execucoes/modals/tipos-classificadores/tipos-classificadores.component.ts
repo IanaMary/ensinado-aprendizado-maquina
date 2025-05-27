@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { Modelo, TipoTarget } from '../../../../models/item-coleta-dado.model';
-
+import { ItemPipeline, TipoTarget } from '../../../../models/item-coleta-dado.model';
+import itensPipeline  from '../../../../constants/itens-coletas-dados.json'
+import { DashboardService } from '../../../services/dashboard.service';
 
 
 @Component({
@@ -12,24 +13,19 @@ import { Modelo, TipoTarget } from '../../../../models/item-coleta-dado.model';
 export class TiposClassificadoresComponent implements OnChanges {
 
   @Input() tipoTarget: TipoTarget = undefined;
-  @Input() modeloSelecionado: Modelo | undefined;
-  @Output() selecaoModelo = new EventEmitter<Modelo>();
+  @Input() modeloSelecionado: ItemPipeline | undefined;
+  @Output() selecaoModelo = new EventEmitter<ItemPipeline>();
 
 
-  todosModelos: Modelo[] = [
-    { nome: 'K-Nearest Neighbors (k-NN)', valor: 'knn', resumo: 'k-NN é um classificador baseado em instâncias que classifica um dado novo com base na maioria dos k vizinhos mais próximos.', tipo: 'string' },
-    { nome: 'Árvore de Decisão', valor: 'arvore-decisao', resumo: 'Árvore de Decisão cria um modelo em forma de árvore para tomar decisões baseadas em características dos dados.', tipo: 'string' },
-    { nome: 'Support Vector Machine (SVM)', valor: 'svm', resumo: 'SVM busca um hiperplano que separa as classes com a maior margem possível no espaço de características.', tipo: 'string' },
-    { nome: 'Regressão Linear', valor: 'regressao-linear', resumo: 'Regressão Linear ajusta uma reta que minimiza o erro quadrático médio entre as previsões e os valores reais.', tipo: 'number' },
-    { nome: 'Regressão Logística', valor: 'regressao-logistica', resumo: 'Regressão Logística modela a probabilidade de uma classe binária usando a função logística.', tipo: 'number' },
-    { nome: 'Support Vector Regression (SVR)', valor: 'svr', resumo: 'SVR aplica o conceito de SVM para regressão, procurando um tubo onde a maioria dos pontos caiba.', tipo: 'number' }
-  ];
+  todosModelos = itensPipeline.itensTreino as ItemPipeline[];
 
-  modelosDisponiveis: Modelo[] = [];
-  modelo!: Modelo | undefined;
+  modelosDisponiveis: ItemPipeline[] = [];
+  modelo!: ItemPipeline | undefined;
   modeloValor: string | undefined;
 
   target: TipoTarget = undefined;
+
+  constructor(private dashboardService: DashboardService) { }
 
   ngOnChanges(changes: SimpleChanges): void {
  

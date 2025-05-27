@@ -25,10 +25,53 @@
   "itensTreino": [
     {
       "icon": "arquivo.svg",
-      "label": "CLASSIFICADOR",
+      "label": "k-NN",
       "movido": false,
       "tipoItem": "treino-validacao-teste",
-      "habilitado": true
+      "habilitado": false,
+      "valor": "knn",
+      "resumo":"k-NN é um classificador baseado em instâncias que classifica um dado novo com base na maioria dos k vizinhos mais próximos.",
+      "tipo": "string"
+    },
+    {
+      "icon": "arquivo.svg",
+      "label": "Árvore de Decisão",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "arvore-decisao",
+      "resumo":"Árvore de Decisão cria um modelo em forma de árvore para tomar decisões baseadas em características dos dados.",
+      "tipo": "string"
+    },
+    {
+      "icon": "arquivo.svg",
+      "label": "SVM",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "svm",
+      "resumo":"SVM busca um hiperplano que separa as classes com a maior margem possível no espaço de características.",
+      "tipo": "string"
+    },
+    {
+      "icon": "arquivo.svg",
+      "label": "Regressão Linear",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "regressao-linear",
+      "resumo":"Regressão Linear ajusta uma reta que minimiza o erro quadrático médio entre as previsões e os valores reais.",
+      "tipo": "number"
+    },
+    {
+      "icon": "arquivo.svg",
+      "label": "Regressão Logística",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "regressao-logistica",
+      "resumo":"Regressão Logística modela a probabilidade de uma classe binária usando a função logística.",
+      "tipo": "number"
     }
   ]
 }

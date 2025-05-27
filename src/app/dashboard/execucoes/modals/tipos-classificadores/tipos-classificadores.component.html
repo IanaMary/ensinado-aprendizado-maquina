@@ -6,7 +6,7 @@
 
   <mat-radio-group [(ngModel)]="modeloValor" (change)="emitSelecaoModelo()">
     <mat-radio-button *ngFor="let model of modelosDisponiveis" [value]="model.valor">
-      {{ model.nome }}
+      {{ model.label }}
     </mat-radio-button>
   </mat-radio-group>
 
@@ -14,7 +14,7 @@
 
 
   <div class="resumo" *ngIf="modelo">
-    <h3>Resumo: {{ modelo.nome }}</h3>
+    <h3>Resumo: {{ modelo.label }}</h3>
     <p>{{ modelo.resumo }}</p>
   </div>
 </div>

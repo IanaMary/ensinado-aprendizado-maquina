@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { Modelo, ResultadoColetaDado, TipoTarget } from '../../../../models/item-coleta-dado.model';
+import { ItemPipeline, ResultadoColetaDado, TipoTarget } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { DashboardService } from '../../../services/dashboard.service';
 
 @Component({
   selector: 'modal-execucao',
@@ -15,13 +16,14 @@ export class ModalExecucaoComponent implements OnInit {
   proximaEtapaDesaabilitada = true;
 
   resultadoColetaDado?: ResultadoColetaDado | undefined;
-  modeloSelecionado?: Modelo;
+  modeloSelecionado?: ItemPipeline;
 
   tipoTargetSelecionado: TipoTarget = undefined;
 
   titulos = ['Importar Planilha', 'Selecionar Classificador', 'Treino Teste'];
 
   constructor(
+    private dashboardService: DashboardService,
     public dialogRef: MatDialogRef<ModalExecucaoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -45,6 +47,11 @@ export class ModalExecucaoComponent implements OnInit {
     if (this.etapaAtual < this.nEtapas) {
       this.etapaAtual++;
     }
+    if (this.etapaAtual > 1) {
+      if (this.modeloSelecionado) {
+        this.dashboardService.atualizarModeloSelecionado(this.modeloSelecionado.valor, this.modeloSelecionado.tipo);
+      }
+    }
     this.proximaEtapaDesaabilitada = true;
   }
 
@@ -60,11 +67,21 @@ export class ModalExecucaoComponent implements OnInit {
     this.tipoTargetSelecionado = event.treino.tipoTarget;
 
     const att = event.treino.atributos;
-    let attVazio = Object.keys(att).length === 0 || Object.values(att).every(v => v === false);
-    this.proximaEtapaDesaabilitada = this.tipoTargetSelecionado === undefined || attVazio;
+    const attVazio = Object.keys(att).length === 0 || Object.values(att).every(v => v === false);
+
+    const erroTreino = !!event.treino.erro;
+    const erroTeste = !!event.teste?.erro;
+    const tipoTargetNaoSelecionado = this.tipoTargetSelecionado === undefined;
+
+    this.proximaEtapaDesaabilitada = erroTreino || erroTeste || tipoTargetNaoSelecionado || attVazio;
+
+    this.dashboardService.atualizarItensTreinoPorTipo(
+      this.tipoTargetSelecionado,
+      !this.proximaEtapaDesaabilitada
+    );
   }
 
-  atualizarModelo(event: Modelo) {
+  atualizarModelo(event: ItemPipeline) {
     this.modeloSelecionado = event;
     this.proximaEtapaDesaabilitada = false
   }

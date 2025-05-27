@@ -2,7 +2,7 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
-import { ItemPipeline, Modelo, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
+import { ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
 import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.component';
 
 @Component({
@@ -16,7 +16,7 @@ export class ExecucoesComponent implements OnInit {
   itens: ItemPipeline[] = [];
 
   resultadoColetaDado?: ResultadoColetaDado;
-  modeloSelecionado?: Modelo;
+  modeloSelecionado?: ItemPipeline;
 
 
   constructor(

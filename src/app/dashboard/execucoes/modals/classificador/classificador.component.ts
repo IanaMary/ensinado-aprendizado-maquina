@@ -1,7 +1,6 @@
-import { Component, Inject, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { DashboardService } from '../../../services/dashboard.service';
-import { Modelo, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
+import { ItemPipeline, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
 
 @Component({
   selector: 'app-classificador',
@@ -11,7 +10,7 @@ import { Modelo, ResultadoColetaDado } from '../../../../models/item-coleta-dado
 })
 export class ClasificadorComponent implements OnChanges {
 
-  @Input() modeloSelecionado: Modelo | undefined;
+  @Input() modeloSelecionado: ItemPipeline | undefined;
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
   resultadoClassificador: any;
 

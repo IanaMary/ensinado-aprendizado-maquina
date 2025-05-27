@@ -30,6 +30,9 @@ export interface ItemPipeline {
   movido: boolean;
   tipoItem: TipoItem;
   habilitado: boolean;
+  valor?: string;
+  resumo?: string;
+  tipo?: TipoTarget;
 }
 
 export interface ResultadoColetaDado {
