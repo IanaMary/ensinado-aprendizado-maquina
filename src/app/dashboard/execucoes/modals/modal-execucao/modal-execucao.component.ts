@@ -89,4 +89,10 @@ export class ModalExecucaoComponent implements OnInit {
   fechar(): void {
     this.dialogRef.close({ resultadoColetaDado: this.resultadoColetaDado, modeloSelecionado: this.modeloSelecionado });
   }
+
+  getClasseLinhaPipe(idx: number): string {
+    if (idx < this.etapaAtual) return 'visitada';
+    if (idx === this.etapaAtual) return 'atual';
+    return 'desabilitada';
+  }
 }

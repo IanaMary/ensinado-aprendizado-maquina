@@ -3,7 +3,7 @@
 .modal-execucao {
   width: 100%;
   max-width: 720px;
-  min-height: 720px;         // Garante o espaço mínimo para o conteúdo interno
+  min-height: 720px; // Garante o espaço mínimo para o conteúdo interno
   max-height: 90vh;
   margin: 0 auto;
   padding: 1.5rem;
@@ -20,6 +20,57 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-direction: column;
+
+  .box-linha {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-content: center;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .titulo {
+    justify-content: space-between;
+  }
+
+  .breadcrumb {
+    justify-content: center;
+
+    .bolinha {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      margin: 0 5px;
+    }
+
+    .linha {
+      height: 4px;
+      width: 50px;
+      border-radius: 2px;
+    }
+
+    .visitada {
+      background-color: $azul-claro;
+      color: $azul-escuro;
+    }
+
+    .atual {
+      background-color: $verde-claro;
+      color: $verde-medio;
+    }
+
+    .desabilitada {
+      background-color: $cinza-claro;
+      color: $cinza-escuro;
+    }
+  }
 }
 
 .close-button {

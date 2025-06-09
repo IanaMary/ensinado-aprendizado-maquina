@@ -1,9 +1,24 @@
 <nav class="modal-execucao">
   <nav class="modal-header">
-    <h2>{{ titulos[etapaAtual] }}</h2>
-    <button mat-icon-button class="close-button" (click)="fechar()">
-      <mat-icon>close</mat-icon>
-    </button>
+    <nav class="box-linha breadcrumb">
+      <ng-container *ngFor="let item of titulos; let idx = index">
+        <!-- Bolinha -->
+        <div class="bolinha" [ngClass]="getClasseLinhaPipe(idx)">
+          {{ idx + 1 }}
+        </div>
+
+        <!-- Linha (só aparece se não for a última bolinha) -->
+        <div *ngIf="idx < titulos.length - 1" class="linha" [ngClass]="getClasseLinhaPipe(idx)">
+        </div>
+      </ng-container>
+    </nav>
+    <nav class="box-linha titulo">
+      <h2>{{ titulos[etapaAtual] }}</h2>
+      <button mat-icon-button class="close-button" (click)="fechar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </nav>
+
   </nav>
   <mat-divider></mat-divider>
 
@@ -12,8 +27,7 @@
 
       <!-- Etapa 0: Coleta de Dados -->
       <ng-container *ngSwitchCase="0">
-        <app-coleta-dado
-          [resultadoColetaDado]="resultadoColetaDado"
+        <app-coleta-dado [resultadoColetaDado]="resultadoColetaDado"
           (resultadoColetaDadoModificado)="atualizarResultado($event)">
         </app-coleta-dado>
       </ng-container>
@@ -21,18 +35,14 @@
 
       <!-- Etapa 1: Selecionar Classificador -->
       <ng-container *ngSwitchCase="1">
-        <app-tipos-classificadores 
-          [tipoTarget]="tipoTargetSelecionado"
-          [modeloSelecionado]="modeloSelecionado"
+        <app-tipos-classificadores [tipoTarget]="tipoTargetSelecionado" [modeloSelecionado]="modeloSelecionado"
           (selecaoModelo)="atualizarModelo($event)">
         </app-tipos-classificadores>
       </ng-container>
 
       <!-- Etapa 2: Visualizar Dados -->
       <ng-container *ngSwitchCase="2">
-        <app-classificador 
-          [resultadoColetaDado]="resultadoColetaDado"
-          [modeloSelecionado]="modeloSelecionado">
+        <app-classificador [resultadoColetaDado]="resultadoColetaDado" [modeloSelecionado]="modeloSelecionado">
         </app-classificador>
       </ng-container>
 
