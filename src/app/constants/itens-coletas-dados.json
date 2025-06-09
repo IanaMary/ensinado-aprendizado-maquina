@@ -31,7 +31,15 @@
       "habilitado": false,
       "valor": "knn",
       "resumo":"k-NN é um classificador baseado em instâncias que classifica um dado novo com base na maioria dos k vizinhos mais próximos.",
-      "tipo": "string"
+      "tipo": "string",
+      "hiperparametros": [
+        {
+          "label": "Número de vizinhos",
+          "nomeHiperparametro": "n_neighbors", 
+          "valorPadrao": 5,
+          "tipo": "int"
+        }
+      ]
     },
     {
       "icon": "arquivo.svg",
@@ -41,7 +49,8 @@
       "habilitado": false,
       "valor": "arvore-decisao",
       "resumo":"Árvore de Decisão cria um modelo em forma de árvore para tomar decisões baseadas em características dos dados.",
-      "tipo": "string"
+      "tipo": "string",
+      "hiperparametros": []
     },
     {
       "icon": "arquivo.svg",
@@ -51,17 +60,8 @@
       "habilitado": false,
       "valor": "svm",
       "resumo":"SVM busca um hiperplano que separa as classes com a maior margem possível no espaço de características.",
-      "tipo": "string"
-    },
-    {
-      "icon": "arquivo.svg",
-      "label": "Regressão Linear",
-      "movido": false,
-      "tipoItem": "treino-validacao-teste",
-      "habilitado": false,
-      "valor": "regressao-linear",
-      "resumo":"Regressão Linear ajusta uma reta que minimiza o erro quadrático médio entre as previsões e os valores reais.",
-      "tipo": "number"
+      "tipo": "string",
+      "hiperparametros": []
     },
     {
       "icon": "arquivo.svg",
@@ -71,7 +71,19 @@
       "habilitado": false,
       "valor": "regressao-logistica",
       "resumo":"Regressão Logística modela a probabilidade de uma classe binária usando a função logística.",
-      "tipo": "number"
+      "tipo": "string",
+      "hiperparametros": []
+    },
+    {
+      "icon": "arquivo.svg",
+      "label": "Regressão Linear",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "regressao-linear",
+      "resumo":"Regressão Linear ajusta uma reta que minimiza o erro quadrático médio entre as previsões e os valores reais.",
+      "tipo": "number",
+      "hiperparametros": []
     }
   ]
 }

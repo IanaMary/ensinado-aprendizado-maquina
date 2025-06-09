@@ -33,6 +33,7 @@ export interface ItemPipeline {
   valor?: string;
   resumo?: string;
   tipo?: TipoTarget;
+  hiperparametros?: any[];
 }
 
 export interface ResultadoColetaDado {

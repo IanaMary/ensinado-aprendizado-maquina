@@ -3,7 +3,7 @@
     <nav class="box-linha breadcrumb">
       <ng-container *ngFor="let item of titulos; let idx = index">
         <!-- Bolinha -->
-        <div [matTooltip]="item" matTooltipPosition="above"  class="bolinha" [ngClass]="getClasseLinhaPipe(idx)">
+        <div [matTooltip]="item" matTooltipPosition="above" class="bolinha" [ngClass]="getClasseLinhaPipe(idx)">
           {{ idx + 1 }}
         </div>
 
@@ -12,6 +12,9 @@
         </div>
       </ng-container>
     </nav>
+
+  <mat-divider></mat-divider>
+
     <nav class="box-linha titulo">
       <h2>{{ titulos[etapaAtual] }}</h2>
       <button mat-icon-button class="close-button" (click)="fechar()">
