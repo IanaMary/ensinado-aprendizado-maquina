@@ -1,5 +1,7 @@
-@import '../../../../styles/colores.scss';
+
+@use "../../../../styles/colores.scss"  as *;
+
 
 ::ng-deep .filtro {
-  background: #f4f4f4 !important;
+  background: $cinza-claro !important;
 }

@@ -1,4 +1,4 @@
-@import '../../../../../styles/colores.scss';
+@use "../../../../../styles/colores.scss"  as *;
 
 .modal-execucao {
   width: 100%;

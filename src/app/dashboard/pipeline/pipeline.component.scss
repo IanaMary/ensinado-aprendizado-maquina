@@ -1,4 +1,4 @@
-@import '../dashboard.component.scss';
+@use '../dashboard.component' as *;
 
 .container {
   width: 100%;
