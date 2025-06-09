@@ -95,7 +95,7 @@
             </nav>
           </th>
           <td mat-cell *matCellDef="let linha">
-            <mat-checkbox  (change)="emitirResultadoColetaDado()" [disabled]="!treino.target || linha.nome === treino.target" [(ngModel)]="treino.atributos[linha.nome]">
+            <mat-checkbox   (change)="emitirResultadoColetaDado()" [disabled]="!treino.target || linha.nome === treino.target" [(ngModel)]="treino.atributos[linha.nome]">
             </mat-checkbox>
           </td>
         </ng-container>

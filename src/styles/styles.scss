@@ -21,6 +21,13 @@ body {
   @include mat.tooltip-overrides((
     container-color: $cinza-claro,
   ));
+
+
+  /* checkbox disabled */
+  --mdc-checkbox-disabled-selected-checkmark-color: $preto;
+  --mdc-checkbox-disabled-unselected-icon-color: lightgray;
+  --mdc-checkbox-disabled-selected-icon-color: $preto;
+
 }
 
 
@@ -34,6 +41,17 @@ body {
   .mat-mdc-card-header {
     justify-content: center;
   }
+}
+
+
+/* Botão desabilitado */
+button[disabled],
+.mat-button[disabled] {
+  color: $cinza-escuro !important;        
+  border: 1px solid $cinza-escuro !important; 
+  background-color: $cinza-claro !important; 
+  cursor: not-allowed !important;
+  opacity: 1 !important;
 }
 
 
