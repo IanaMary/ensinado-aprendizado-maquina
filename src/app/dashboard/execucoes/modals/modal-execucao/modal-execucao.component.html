@@ -3,7 +3,7 @@
     <nav class="box-linha breadcrumb">
       <ng-container *ngFor="let item of titulos; let idx = index">
         <!-- Bolinha -->
-        <div class="bolinha" [ngClass]="getClasseLinhaPipe(idx)">
+        <div [matTooltip]="item" matTooltipPosition="above"  class="bolinha" [ngClass]="getClasseLinhaPipe(idx)">
           {{ idx + 1 }}
         </div>
 

@@ -12,6 +12,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms'; // Importe o FormsModule
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { DashboardComponent } from './dashboard.component';
 import { PipelineComponent } from './pipeline/pipeline.component';
@@ -53,6 +54,7 @@ import { ModalExecucaoComponent } from './execucoes/modals/modal-execucao/modal-
     FormsModule,
     MatSelectModule,
     MatMenuModule,
+    MatTooltipModule,
     HttpClientModule
   ]
 })

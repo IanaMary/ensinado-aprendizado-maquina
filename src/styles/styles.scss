@@ -1,21 +1,33 @@
+
+@use '@angular/material' as mat;
 @import "../styles/colores.scss";
 
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   width: 100%;
-  overflow-x: hidden; 
+  overflow-x: hidden;
 }
 
 .full-height {
   height: 100%;
 }
 
+
+// Personalize o tooltip globalmente
+:root {
+  @include mat.tooltip-overrides((
+    container-color: $cinza-claro,
+  ));
+}
+
+
 .opcoesPipeline {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start; 
+  justify-content: flex-start;
   width: 100%;
   gap: 16px; // Espaço entre os itens
 
@@ -26,7 +38,7 @@ html, body {
 
 
 .item-habilitado {
-  border: 2px solid $verde-medio; 
+  border: 2px solid $verde-medio;
   background-color: $verde-claro;
 }
 
@@ -40,3 +52,4 @@ html, body {
   border: 2px dashed $cinza-escuro;
   background-color: $cinza-claro;
 }
+
