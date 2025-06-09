@@ -25,6 +25,8 @@ import { ClasificadorComponent } from './execucoes/modals/classificador/classifi
 import { ColetaDadoComponent } from './execucoes/modals/coleta-dado/coleta-dado.component';
 import { TiposClassificadoresComponent } from './execucoes/modals/tipos-classificadores/tipos-classificadores.component';
 import { ModalExecucaoComponent } from './execucoes/modals/modal-execucao/modal-execucao.component';
+import { SelecaoMetricasComponent } from './execucoes/modals/selecao-metricas/selecao-metricas.component';
+import { MetricasComponent } from './pipeline/metricas/metricas.component';
 
 
 
@@ -40,6 +42,8 @@ import { ModalExecucaoComponent } from './execucoes/modals/modal-execucao/modal-
     ClasificadorComponent,
     ModalExecucaoComponent,
     TiposClassificadoresComponent,
+    SelecaoMetricasComponent,
+    MetricasComponent
   ],
   imports: [CommonModule,
     DragDropModule,

@@ -10,8 +10,22 @@ import { DashboardService } from '../../../services/dashboard.service';
   standalone: false
 })
 export class ModalExecucaoComponent implements OnInit {
-  etapaAtual = 0;
-  nEtapas = 0
+  etapaAtual: number = 0;
+  nEtapas: number = 0;
+
+  etapas: { [key: string]: number } = {
+    'coleta-dado': 0,  
+    'selecao-do-modelo': 1,          
+    'treino-validacao-teste': 2,    
+    'metricas': 3                
+  };
+
+  titulos: string[] = [
+    'Importar Planilha',   
+    'Seleção do modelo',          
+    'Treinamento',                   
+    'Metricas'                       
+  ];
 
   proximaEtapaDesaabilitada = true;
 
@@ -20,15 +34,19 @@ export class ModalExecucaoComponent implements OnInit {
 
   tipoTargetSelecionado: TipoTarget = undefined;
 
-  titulos = ['Importar Planilha', 'Selecionar Classificador', 'Treino Teste'];
+
+
 
   constructor(
     private dashboardService: DashboardService,
     public dialogRef: MatDialogRef<ModalExecucaoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    console.log("www ,", this.data)
+    this.etapaAtual = this.etapas[data.etapa] ?? 0;
 
     if (data?.resultadoColetaDado) {
+
       this.resultadoColetaDado = data.resultadoColetaDado;
       this.tipoTargetSelecionado = data.resultadoColetaDado?.tipoTarget ?? undefined;
       this.proximaEtapaDesaabilitada = false;

@@ -1,21 +1,18 @@
 {
   "itensColetasDados": [
     {
-      "icon": "arquivo.svg",
       "label": "XLXS",
       "movido": false,
       "tipoItem": "coleta-dado",
       "habilitado": true
     },
     {
-      "icon": "arquivo.svg",
       "label": "CSV",
       "movido": false,
       "tipoItem": "coleta-dado",
       "habilitado": true
     },
     {
-      "icon": "arquivo.svg",
       "label": "JSON",
       "movido": false,
       "tipoItem": "coleta-dado",
@@ -24,66 +21,103 @@
   ],
   "itensTreino": [
     {
-      "icon": "arquivo.svg",
       "label": "k-NN",
       "movido": false,
       "tipoItem": "treino-validacao-teste",
       "habilitado": false,
       "valor": "knn",
-      "resumo":"k-NN é um classificador baseado em instâncias que classifica um dado novo com base na maioria dos k vizinhos mais próximos.",
+      "resumo": "k-NN é um classificador baseado em instâncias que classifica um dado novo com base na maioria dos k vizinhos mais próximos.",
       "tipo": "string",
       "hiperparametros": [
         {
           "label": "Número de vizinhos",
-          "nomeHiperparametro": "n_neighbors", 
+          "nomeHiperparametro": "n_neighbors",
           "valorPadrao": 5,
           "tipo": "int"
         }
       ]
     },
     {
-      "icon": "arquivo.svg",
       "label": "Árvore de Decisão",
       "movido": false,
       "tipoItem": "treino-validacao-teste",
       "habilitado": false,
       "valor": "arvore-decisao",
-      "resumo":"Árvore de Decisão cria um modelo em forma de árvore para tomar decisões baseadas em características dos dados.",
+      "resumo": "Árvore de Decisão cria um modelo em forma de árvore para tomar decisões baseadas em características dos dados.",
       "tipo": "string",
       "hiperparametros": []
     },
     {
-      "icon": "arquivo.svg",
       "label": "SVM",
       "movido": false,
       "tipoItem": "treino-validacao-teste",
       "habilitado": false,
       "valor": "svm",
-      "resumo":"SVM busca um hiperplano que separa as classes com a maior margem possível no espaço de características.",
+      "resumo": "SVM busca um hiperplano que separa as classes com a maior margem possível no espaço de características.",
       "tipo": "string",
       "hiperparametros": []
     },
     {
-      "icon": "arquivo.svg",
       "label": "Regressão Logística",
       "movido": false,
       "tipoItem": "treino-validacao-teste",
       "habilitado": false,
       "valor": "regressao-logistica",
-      "resumo":"Regressão Logística modela a probabilidade de uma classe binária usando a função logística.",
+      "resumo": "Regressão Logística modela a probabilidade de uma classe binária usando a função logística.",
       "tipo": "string",
       "hiperparametros": []
     },
     {
-      "icon": "arquivo.svg",
       "label": "Regressão Linear",
       "movido": false,
       "tipoItem": "treino-validacao-teste",
       "habilitado": false,
       "valor": "regressao-linear",
-      "resumo":"Regressão Linear ajusta uma reta que minimiza o erro quadrático médio entre as previsões e os valores reais.",
+      "resumo": "Regressão Linear ajusta uma reta que minimiza o erro quadrático médio entre as previsões e os valores reais.",
       "tipo": "number",
       "hiperparametros": []
+    }
+  ],
+  "itensMetricas": [
+    {
+      "label": "Acurácia",
+      "resumo": "Proporção de acertos",
+      "valor": "accuracy_score",
+      "movido": false,
+      "tipoItem": "metrica",
+      "habilitado": false
+    },
+    {
+      "label": "Precisão",
+      "resumo": "Positivos corretos / Total de positivos previstos",
+      "valor": "precision_score",
+      "movido": false,
+      "tipoItem": "metrica",
+      "habilitado": false
+    },
+    {
+      "label": "Recall",
+      "resumo": "Positivos corretos / Total de positivos reais",
+      "valor": "recall_score",
+      "movido": false,
+      "tipoItem": "metrica",
+      "habilitado": false
+    },
+    {
+      "label": "F1-Score",
+      "resumo": "Razão entre Precisão e Recall",
+      "valor": "f1_score",
+      "movido": false,
+      "tipoItem": "metrica",
+      "habilitado": false
+    },
+    {
+      "label": "Matriz de Confusão",
+      "resumo": "Quantidade de acertos e erros por classe",
+      "valor": "confusion_matrix",
+      "movido": false,
+      "tipoItem": "metrica",
+      "habilitado": false
     }
   ]
 }

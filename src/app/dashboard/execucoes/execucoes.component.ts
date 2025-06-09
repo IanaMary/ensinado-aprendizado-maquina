@@ -47,6 +47,8 @@ export class ExecucoesComponent implements OnInit {
     dialogRef.afterClosed().subscribe((resultado: any) => {
       this.resultadoColetaDado = resultado.resultadoColetaDado
       this.modeloSelecionado = resultado.modeloSelecionado
+      this.dashboardService.moverItensEmExecucao();
+
     });
   }
 

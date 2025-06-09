@@ -15,10 +15,12 @@ export class DashboardService {
 
   todosItensColetasDados = itensPipeline.itensColetasDados as ItemPipeline[];
   todosItensTreino = itensPipeline.itensTreino as ItemPipeline[];
+  todosItensMetricas = itensPipeline.itensMetricas  as any[];
 
 
   private itensColetasDados = new BehaviorSubject<ItemPipeline[]>(this.todosItensColetasDados);
   private itensTreino = new BehaviorSubject<ItemPipeline[]>(this.todosItensTreino);
+  private itensMetricas = new BehaviorSubject<ItemPipeline[]>(this.todosItensMetricas);
   private itemsEmExecucao = new BehaviorSubject<ItemPipeline[]>([]);
 
 
@@ -46,6 +48,10 @@ export class DashboardService {
     return this.itensTreino.asObservable();
   }
 
+  getItensMetricas() {
+    return this.itensMetricas.asObservable();
+  }
+
 
   getItemsEmExecucao() {
     return this.itemsEmExecucao.asObservable();
@@ -69,6 +75,15 @@ export class DashboardService {
       habilitado: false
     }));
     this.itensTreino.next(itensTreinoAtualizados);
+  }
+
+  moverItensEmExecucao() {
+    const itensMovidos = [
+      ...this.itensColetasDados.value.filter(item => item.movido),
+      ...this.itensTreino.value.filter(item => item.movido)
+    ];
+
+    this.itemsEmExecucao.next(itensMovidos);
   }
 
 
