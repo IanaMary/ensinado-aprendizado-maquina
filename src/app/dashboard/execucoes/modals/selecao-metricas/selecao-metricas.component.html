@@ -1,27 +1,7 @@
-<!-- modal-tipos-classificadores.component.html -->
-<div class="modal-container">
-  <h2>
-    {{ tipoTarget === 'string' ? 'Classificadores' : 'Regressores' }}
-  </h2>
-
-  <mat-radio-group [(ngModel)]="modeloValor" (change)="emitSelecaoModelo()">
-    <mat-radio-button *ngFor="let model of modelosDisponiveis" [value]="model.valor">
-      {{ model.label }}
-    </mat-radio-button>
-  </mat-radio-group>
-
-
-  <div class="resumo" *ngIf="modelo">
-    <h3>Resumo: {{ modelo.label }}</h3>
-    <p>{{ modelo.resumo }}</p>
-    <h3>Hiperparâmetro</h3>
-    <ng-container *ngFor="let hiperparametro of modelo.hiperparametros; let idx = index">
-      <nav>
-        <p>{{hiperparametro.label}}</p>
-
-        <input matInput type="number" maxlength="5" [(ngModel)]="hiperparametro.valorPadrao">
-      </nav>
-    </ng-container>
-  </div>
-
+<div *ngFor="let metrica of metricasDisponiveis">
+  <mat-checkbox
+    [checked]="metrica.habilitado"
+    (change)="toggleMetrica(metrica)">
+    {{ metrica.label }}
+  </mat-checkbox>
 </div>

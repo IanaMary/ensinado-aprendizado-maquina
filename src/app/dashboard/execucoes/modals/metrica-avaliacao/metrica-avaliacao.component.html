@@ -1,0 +1,41 @@
+<nav class="modal">
+
+  <div class="resultado-container" *ngIf="resultadosDasAvaliacoes?.resultados">
+
+    <h2>Status da Avaliação</h2>
+    <p>{{ resultadosDasAvaliacoes.status }}</p>
+
+    <h3>Métricas Avaliadas</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Métrica</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let metrica of metricas">
+          <td>{{ metrica }}</td>
+          <td *ngIf="isNumber(resultadosDasAvaliacoes.resultados[metrica]); else texto">
+            {{ resultadosDasAvaliacoes.resultados[metrica] | number: '1.2-4' }}
+          </td>
+          <ng-template #texto>
+            <td>{{ resultadosDasAvaliacoes.resultados[metrica] }}</td>
+          </ng-template>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <div *ngIf="!resultadosDasAvaliacoes?.resultados">
+    <p>Nenhuma avaliação realizada ainda.</p>
+  </div>
+
+  <section class="acoes">
+    <button mat-raised-button color="primary" (click)="postAvaliacao()">
+      Gerar avaliações
+    </button>
+  </section>
+
+</nav>

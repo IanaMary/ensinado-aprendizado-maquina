@@ -28,6 +28,11 @@ html, body {
 
 }
 
+.mat-checkbox-label {
+  white-space: normal !important; /* permite quebra de linha */
+  word-break: break-word;         /* quebra palavras longas */
+}
+
 
 .opcoesPipeline {
   display: flex;

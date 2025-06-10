@@ -1,8 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { ItemPipeline, TipoTarget } from '../../../../models/item-coleta-dado.model';
-import itensPipeline  from '../../../../constants/itens-coletas-dados.json'
+import { ItemPipeline } from '../../../../models/item-coleta-dado.model';
 import { DashboardService } from '../../../services/dashboard.service';
-
 
 @Component({
   selector: 'app-selecao-metricas',
@@ -12,37 +10,35 @@ import { DashboardService } from '../../../services/dashboard.service';
 })
 export class SelecaoMetricasComponent implements OnChanges {
 
-  @Input() tipoTarget: TipoTarget = undefined;
-  @Input() modeloSelecionado: ItemPipeline | undefined;
-  @Output() selecaoModelo = new EventEmitter<ItemPipeline>();
-
-
-  todosModelos = itensPipeline.itensTreino as ItemPipeline[];
-
-  modelosDisponiveis: ItemPipeline[] = [];
-  modelo!: ItemPipeline | undefined;
-  modeloValor: string | undefined;
-
-  target: TipoTarget = undefined;
+  @Input() metricasDisponiveis: ItemPipeline[] = [];
+  @Input() metricasSelecionadas: ItemPipeline[] = [];
+  @Output() selecaoMetricas = new EventEmitter<ItemPipeline[]>();
 
   constructor(private dashboardService: DashboardService) { }
 
   ngOnChanges(changes: SimpleChanges): void {
- 
-    if (changes['tipoTarget']?.currentValue) {
-      this.target = changes['tipoTarget'].currentValue
+    this.sincronizarMetricas();
+  }
+
+  sincronizarMetricas() {
+    this.metricasDisponiveis.forEach(metrica => {
+      metrica.habilitado = this.metricasSelecionadas.some(selecionada => selecionada.valor === metrica.valor);
+    });
+  }
+
+  toggleMetrica(metrica: ItemPipeline) {
+    metrica.movido = !metrica.movido;
+
+    if (metrica.movido) {
+      this.metricasSelecionadas.push(metrica);
     } else {
-      this.target = this.modeloSelecionado ? this.modeloSelecionado.tipo : this.tipoTarget;
+      this.metricasSelecionadas = this.metricasSelecionadas.filter(m => m.valor !== metrica.valor);
     }
-    this.modelosDisponiveis = this.todosModelos.filter(m => m.tipo === this.target);
-    this.modeloValor = this.modeloSelecionado ? this.modeloSelecionado.valor : this.modelosDisponiveis[0].valor;
-    setTimeout(() => this.emitSelecaoModelo());
+    this.dashboardService.selecionarMetricas(metrica);
+    this.emitSelecaoMetricas();
   }
 
-  emitSelecaoModelo() {
-    this.modelo = this.modelosDisponiveis.find(m => m.valor === this.modeloValor);
-    this.selecaoModelo.emit(this.modelo);
+  emitSelecaoMetricas() {
+    this.selecaoMetricas.emit( this.metricasSelecionadas);
   }
-
-
 }

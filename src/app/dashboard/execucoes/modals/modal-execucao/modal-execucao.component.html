@@ -36,7 +36,7 @@
       </ng-container>
 
 
-      <!-- Etapa 1: Selecionar Classificador -->
+      <!-- Etapa 1: Selecionar modelo -->
       <ng-container *ngSwitchCase="1">
         <app-tipos-classificadores [tipoTarget]="tipoTargetSelecionado" [modeloSelecionado]="modeloSelecionado"
           (selecaoModelo)="atualizarModelo($event)">
@@ -45,8 +45,23 @@
 
       <!-- Etapa 2: Visualizar Dados -->
       <ng-container *ngSwitchCase="2">
-        <app-classificador [resultadoColetaDado]="resultadoColetaDado" [modeloSelecionado]="modeloSelecionado">
+        <app-classificador [resultadoTreinamento]="resultadoTreinamento" [resultadoColetaDado]="resultadoColetaDado" [modeloSelecionado]="modeloSelecionado"
+          (atualizarResultadoTreinamento)="atualizarResultadoTreinamento($event)">
         </app-classificador>
+      </ng-container>
+
+      <!-- Etapa 3: Seleção de métricas -->
+      <ng-container *ngSwitchCase="3">
+        <app-selecao-metricas [metricasDisponiveis]="metricasDisponiveis" [metricasSelecionadas]="metricasSelecionadas"
+          (selecaoMetricas)="atualizarMetricasSelecionadas($event)">
+        </app-selecao-metricas>
+      </ng-container>
+
+      <!-- Etapa 4: avaliações -->
+      <ng-container *ngSwitchCase="4">
+        <app-metrica-avaliacao [resultadosDasAvaliacoes]="resultadosDasAvaliacoes" [metricasSelecionadas]="metricasSelecionadas" [resultadoTreinamento]="resultadoTreinamento"
+          (atualizarResultadoAvaliacoes)="atualizarResultadoAvaliacoes($event)" >
+        </app-metrica-avaliacao>
       </ng-container>
 
     </ng-container>
@@ -54,8 +69,8 @@
   <mat-divider></mat-divider>
 
   <div class="modal-footer">
-    <button mat-button (click)="anterior()" [disabled]="etapaAtual === 0">Anterior</button>
-    <button mat-raised-button color="primary" (click)="proximo()" [disabled]="proximaEtapaDesaabilitada">
+    <button *ngIf="etapaAtual"  mat-button (click)="anterior()" [disabled]="etapaAtual === 0">Anterior</button>
+    <button *ngIf="etapaAtual < nEtapas-1" mat-raised-button color="primary" (click)="proximo()" [disabled]="proximaEtapaDesaabilitada">
       Próximo
     </button>
   </div>

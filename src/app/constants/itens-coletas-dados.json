@@ -35,6 +35,12 @@
           "valorPadrao": 5,
           "tipo": "int"
         }
+      ],
+      "metricas": [
+        "precision_score",
+        "recall_score",
+        "f1_score",
+        "confusion_matrix"
       ]
     },
     {
@@ -45,7 +51,14 @@
       "valor": "arvore-decisao",
       "resumo": "Árvore de Decisão cria um modelo em forma de árvore para tomar decisões baseadas em características dos dados.",
       "tipo": "string",
-      "hiperparametros": []
+      "hiperparametros": [],
+      "metricas": [
+        "accuracy_score",
+        "precision_score",
+        "recall_score",
+        "f1_score",
+        "confusion_matrix"
+      ]
     },
     {
       "label": "SVM",
@@ -55,7 +68,14 @@
       "valor": "svm",
       "resumo": "SVM busca um hiperplano que separa as classes com a maior margem possível no espaço de características.",
       "tipo": "string",
-      "hiperparametros": []
+      "hiperparametros": [],
+      "metricas": [
+        "accuracy_score",
+        "precision_score",
+        "recall_score",
+        "f1_score",
+        "confusion_matrix"
+      ]
     },
     {
       "label": "Regressão Logística",
@@ -65,7 +85,14 @@
       "valor": "regressao-logistica",
       "resumo": "Regressão Logística modela a probabilidade de uma classe binária usando a função logística.",
       "tipo": "string",
-      "hiperparametros": []
+      "hiperparametros": [],
+      "metricas": [
+        "accuracy_score",
+        "precision_score",
+        "recall_score",
+        "f1_score",
+        "confusion_matrix"
+      ]
     },
     {
       "label": "Regressão Linear",

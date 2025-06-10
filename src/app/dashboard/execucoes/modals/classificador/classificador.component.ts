@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ItemPipeline, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
 
@@ -10,9 +10,11 @@ import { ItemPipeline, ResultadoColetaDado } from '../../../../models/item-colet
 })
 export class ClasificadorComponent implements OnChanges {
 
+  @Input() resultadoTreinamento: any;
   @Input() modeloSelecionado: ItemPipeline | undefined;
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
-  resultadoClassificador: any;
+  @Output() atualizarResultadoTreinamento = new EventEmitter<any>();
+
 
   constructor(
     private dashboardService: DashboardService
@@ -21,31 +23,48 @@ export class ClasificadorComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {}
 
-  enviarParaClassificador() {
+  async enviarParaClassificador() {
     const tipoClassficador = this.modeloSelecionado?.valor ?? '';
-    const hiperparametros = this.modeloSelecionado?.hiperparametros?.reduce((obj, hp) => {
+    const body = await this.criarBody()
+
+    this.dashboardService.classificadorTreino(tipoClassficador, body).subscribe({
+      next: (res) => {
+        this.atualizarResultadoTreinamento.emit(res)
+        this.resultadoTreinamento = res;
+      },
+      error: (err) => { }
+    });
+  }
+
+  async criarBody(): Promise<any> {
+
+    const hiperparametros = this.modeloSelecionado?.hiperparametros?.reduce((obj: Record<string, any>, hp: any) => {
       obj[hp.nomeHiperparametro] = hp.valorPadrao;
       return obj;
     }, {}) ?? {};
 
-    const att = this.resultadoColetaDado?.treino.atributos ?? {};
-    const body = {
+    const atributosMap = this.resultadoColetaDado?.treino.atributos ?? {};
+
+    return {
       dados_treino: this.resultadoColetaDado?.treino.dados,
       dados_teste: this.resultadoColetaDado?.teste?.dados,
       target: this.resultadoColetaDado?.treino.target,
-      atributos: Object.keys(att).filter(chave => att[chave]),
+      atributos: Object.keys(atributosMap).filter(chave => atributosMap[chave]),
       hiperparametros
     };
-
-    this.dashboardService.classificadorTreino(tipoClassficador, body).subscribe({
-      next: (res) => {
-        this.resultadoClassificador = res;
-      },
-      error: (err) => {
-        console.error('Erro ao treinar o modelo - classificador', err);
-      }
-    });
   }
 
+
+
+  get atributosFormatados(): string {
+    const atributos = this.resultadoColetaDado?.treino?.atributos;
+    if (!atributos) {
+      return 'Nenhum atributo disponível';
+    }
+
+    const selecionados = Object.keys(atributos).filter(chave => atributos[chave]);
+
+    return selecionados.length ? selecionados.join(', ') : 'Nenhum atributo disponível';
+  }
 
 }

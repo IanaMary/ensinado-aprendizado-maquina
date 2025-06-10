@@ -17,7 +17,9 @@ export class ExecucoesComponent implements OnInit {
 
   resultadoColetaDado?: ResultadoColetaDado;
   modeloSelecionado?: ItemPipeline;
-
+  resultadoTreinamento?: any;
+  metricasSelecionadas: ItemPipeline[] = [];
+  resultadosDasAvaliacoes: any = {};
 
   constructor(
     private dashboardService: DashboardService,
@@ -40,23 +42,22 @@ export class ExecucoesComponent implements OnInit {
       data: {
         etapa: tipoItem.tipoItem,
         resultadoColetaDado: this.resultadoColetaDado,
-        modeloSelecionado: this.modeloSelecionado
+        modeloSelecionado: this.modeloSelecionado,
+        resultadoTreinamento: this.resultadoTreinamento,
+        metricasSelecionadas: this.metricasSelecionadas,
+        resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
       }
     });
 
     dialogRef.afterClosed().subscribe((resultado: any) => {
       this.resultadoColetaDado = resultado.resultadoColetaDado
       this.modeloSelecionado = resultado.modeloSelecionado
+      this.resultadoTreinamento = resultado.resultadoTreinamento;
+      this.metricasSelecionadas = resultado.metricasSelecionadas;
+      this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes
       this.dashboardService.moverItensEmExecucao();
-
     });
   }
 
-
-  abrirPreProcessamento(item: ItemPipeline): void {}
-
-  abrirClassificador(item: ItemPipeline): void { }
-
-  classificadorPrever() { }
 
 }

@@ -2,7 +2,8 @@
 
 .modal-execucao {
   width: 100%;
-  max-width: 720px;
+  min-width: 500px;
+  max-width: 500px;
   min-height: 720px; // Garante o espaço mínimo para o conteúdo interno
   max-height: 90vh;
   margin: 0 auto;
