@@ -14,6 +14,9 @@ import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.c
 export class ExecucoesComponent implements OnInit {
 
   itens: ItemPipeline[] = [];
+  colunaColeta: ItemPipeline[] = [];
+  colunaTreino: ItemPipeline[] = [];
+  colunaMetrica: ItemPipeline[] = [];
 
   resultadoColetaDado?: ResultadoColetaDado;
   modeloSelecionado?: ItemPipeline;
@@ -29,6 +32,11 @@ export class ExecucoesComponent implements OnInit {
   ngOnInit(): void {
     this.dashboardService.getItemsEmExecucao().subscribe(itens => {
       this.itens = [...itens];
+
+
+      this.colunaColeta = itens.filter(i => i.tipoItem === 'coleta-dado');
+      this.colunaTreino = itens.filter(i => i.tipoItem === 'treino-validacao-teste');
+      this.colunaMetrica = itens.filter(i => i.tipoItem === 'metrica');
     });
   }
 
@@ -50,12 +58,14 @@ export class ExecucoesComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((resultado: any) => {
-      this.resultadoColetaDado = resultado.resultadoColetaDado
-      this.modeloSelecionado = resultado.modeloSelecionado
-      this.resultadoTreinamento = resultado.resultadoTreinamento;
-      this.metricasSelecionadas = resultado.metricasSelecionadas;
-      this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes
-      this.dashboardService.moverItensEmExecucao();
+      if (resultado) {
+        this.resultadoColetaDado = resultado.resultadoColetaDado
+        this.modeloSelecionado = resultado.modeloSelecionado
+        this.resultadoTreinamento = resultado.resultadoTreinamento;
+        this.metricasSelecionadas = resultado.metricasSelecionadas;
+        this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes
+        this.dashboardService.moverItensEmExecucao();
+      }
     });
   }
 

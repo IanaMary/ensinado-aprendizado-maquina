@@ -1,1 +1,44 @@
 @use '../../../styles/styles.scss'  as *;
+
+
+.opcoesPipeline {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* distância entre itens vertical */
+  width: 150px; /* largura fixa para coluna */
+}
+
+.coluna nav[cdkdrag] {
+  height: 60px;
+  background: $verde-claro;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px  $verde-medio;
+  display: flex;
+  align-items: center;
+  padding: 0  1rem ;
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+/* Botão estilizado */
+.coluna nav[cdkdrag] button {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.coluna nav[cdkdrag]:active {
+  cursor: grabbing;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.24);
+}
