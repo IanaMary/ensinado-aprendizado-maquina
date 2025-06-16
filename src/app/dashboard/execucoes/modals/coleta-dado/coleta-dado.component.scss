@@ -34,12 +34,22 @@
   font-size: 30px;
 }
 
+
+label {
+  font-weight: 600;
+  margin-top: 1rem;
+  display: block;
+}
+
 .titulo {
   display: flex;
   align-items: center;
   gap: 8px;
   font-weight: bold;
+  font-size: 1rem;
+  color: #333;
 }
+
 
 .tipos-container,
 .tabela-container {
@@ -54,7 +64,7 @@
 
 .mat-table {
   width: 100%;
-  table-layout: fixed;
+  // table-layout: fixed;
   border-collapse: collapse;
 }
 
@@ -92,10 +102,22 @@ input[type="file"] {
     background-color: #d5d5d5;
   }
 }
-
 small {
   display: block;
   margin-top: 0.25rem;
   color: #444;
   font-size: 0.85rem;
+}
+
+mat-divider {
+  margin: 1.5rem 0;
+}
+
+mat-radio-button {
+  margin-right: 0.5rem;
+}
+
+mat-checkbox {
+  margin: 0 auto;
+  display: block;
 }

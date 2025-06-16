@@ -17,12 +17,11 @@
     <small>Arquivo selecionado: {{ teste.nomeArquivo }}</small>
   </div>
 
-  <mat-divider></mat-divider>
-
   <!-- Tabela de configuração das colunas TREINO -->
   <ng-container *ngIf="treino.dados.length > 0">
+    <mat-divider></mat-divider> 
     Configuração do dataset de treino
-    <nav class="tipos-container">
+    <nav class="tabela-container">
       <table mat-table [dataSource]="dataSourceColunas" class="mat-table">
 
         <!-- Nome -->
@@ -110,7 +109,7 @@
 
   <!-- Tabela para mostrar dados da planilha TREINO -->
   <ng-container *ngIf="treino.dados.length > 0">
-    Tabela dos dados de treino
+    Dataset de treino
     <nav class="tabela-container">
       <table mat-table [dataSource]="treino.dados" class="mat-table mat-elevation-z1">
 
