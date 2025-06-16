@@ -68,10 +68,18 @@ export class DashboardService {
       ...i,
       habilitado: false
     }));
+    
     this.itensTreino.next(itensTreinoAtualizados);
+
+      const itenssMetricaAtualizados = this.itensMetricas.value.map(i => ({
+      ...i,
+      habilitado: false
+    }));
+    this.itensMetricas.next(itenssMetricaAtualizados);
   }
 
   moverItensEmExecucao() {
+
     const itensMovidos = [
       ...this.itensColetasDados.value.filter(item => item.movido),
       ...this.itensTreino.value.filter(item => item.movido),

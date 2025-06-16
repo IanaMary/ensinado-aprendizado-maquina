@@ -15,13 +15,14 @@
       </thead>
       <tbody>
         <tr *ngFor="let metrica of metricas">
-          <td>{{ metrica }}</td>
-          <td *ngIf="isNumber(resultadosDasAvaliacoes.resultados[metrica]); else texto">
-            {{ resultadosDasAvaliacoes.resultados[metrica] | number: '1.2-4' }}
+          <td>{{ getLabel(metrica) }}</td>
+          <td>
+            {{ 
+              isNumber(resultadosDasAvaliacoes.resultados[metrica]) 
+              ? (resultadosDasAvaliacoes.resultados[metrica] | number:'1.2-4') 
+              : resultadosDasAvaliacoes.resultados[metrica] 
+            }}
           </td>
-          <ng-template #texto>
-            <td>{{ resultadosDasAvaliacoes.resultados[metrica] }}</td>
-          </ng-template>
         </tr>
       </tbody>
     </table>

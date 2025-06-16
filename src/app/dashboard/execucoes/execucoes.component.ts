@@ -1,4 +1,4 @@
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
@@ -32,17 +32,15 @@ export class ExecucoesComponent implements OnInit {
   ngOnInit(): void {
     this.dashboardService.getItemsEmExecucao().subscribe(itens => {
       this.itens = [...itens];
-
-
       this.colunaColeta = itens.filter(i => i.tipoItem === 'coleta-dado');
       this.colunaTreino = itens.filter(i => i.tipoItem === 'treino-validacao-teste');
       this.colunaMetrica = itens.filter(i => i.tipoItem === 'metrica');
+
+      this.metricasSelecionadas = this.colunaMetrica.filter(i => i.movido);
     });
   }
 
-  onDrop(event: CdkDragDrop<ItemPipeline[]>): void {
-    // lógica futura
-  }
+ 
 
 
   abrirModalExecucao(tipoItem: ItemPipeline): void {

@@ -4,6 +4,14 @@ export type TipoTarget = 'number' | 'string' | 'boolean' | undefined;
 export type TipoDado = 'Texto' | 'Número' | 'Booleano';
 
 
+export const nomeDasMetricas: Record<string, string> = {
+  accuracy_score: 'Acurácia',
+  precision_score: 'Precisão',
+  recall_score: 'Recall',
+  f1_score: 'F1-Score',
+  confusion_matrix: 'Matriz de Confusão',
+};
+
 export const labelParaTipoTargetMap: Record<TipoDado, TipoTarget> = {
   'Número': 'number',
   'Texto': 'string',
