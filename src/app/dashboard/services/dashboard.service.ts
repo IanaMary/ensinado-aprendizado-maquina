@@ -29,7 +29,7 @@ export class DashboardService {
   }
 
   postMetricas(body: any) {
-    return this.http.post(`${this.url}${this.endpointClassificador}/avaliar`, body);
+    return this.http.post(`${this.url}${this.endpointClassificador}/avaliar-multiplos`, body);
   }
 
   classificadorPrever(body: any) {
@@ -52,6 +52,39 @@ export class DashboardService {
     return this.itemsEmExecucao.asObservable();
   }
 
+
+  getModelosPorTipo(tipo: string | undefined): ItemPipeline[] {
+    if (!tipo) {
+      return [];
+    }
+
+    // Retorna os itens do tipo informado (objetos completos)
+    return this.itensTreino.value.filter(item => item.tipo === tipo);
+  }
+
+
+  getMetricasPorModelo(modelo: string, considerarMovido: boolean = false): string[] {
+    const itemTreino = this.itensTreino.value.find(item => item.valor === modelo);
+
+    // Se não encontrar ou não tiver métricas, retorna array vazio
+    const metricasDoModelo = itemTreino?.metricas ?? [];
+
+    if (considerarMovido) {
+      // Filtra métricas movidas que pertençam ao modelo
+      const metricasMovidas = this.itensMetricas.value
+        .filter(item => item.movido && metricasDoModelo.includes(item.valor))
+        .map(item => item.valor);
+
+      if (metricasMovidas.length) {
+        return metricasMovidas;
+      }
+
+      return [];
+    }
+
+    return metricasDoModelo;
+  }
+
   movendoItemExecucao(item: ItemPipeline) {
     this.itemsEmExecucao.next([
       ...this.itemsEmExecucao.value,
@@ -66,14 +99,14 @@ export class DashboardService {
 
     const itensTreinoAtualizados = this.itensTreino.value.map(i => ({
       ...i,
-      habilitado: false
+      // habilitado: false
     }));
-    
+
     this.itensTreino.next(itensTreinoAtualizados);
 
-      const itenssMetricaAtualizados = this.itensMetricas.value.map(i => ({
+    const itenssMetricaAtualizados = this.itensMetricas.value.map(i => ({
       ...i,
-      habilitado: false
+      // habilitado: false
     }));
     this.itensMetricas.next(itenssMetricaAtualizados);
   }
@@ -94,21 +127,19 @@ export class DashboardService {
   }
 
   habilitadarModelos(tipoTargetSelecionado: TipoTarget, habilitado: boolean) {
-    const itensAtualizados = this.todosItensTreino.map(item => ({
+    const itensAtualizados = this.itensTreino.value.map(item => ({
       ...item,
-      habilitado: item.tipo === tipoTargetSelecionado ? habilitado : false
+      habilitado: item.tipo === tipoTargetSelecionado
     }));
-
     this.itensTreino.next(itensAtualizados);
   }
 
-  selecionarModelo(modeloSelecionado: ItemPipeline) {
-    const itensAtualizados = this.todosItensTreino.map(item => ({
+  selecionarModelo(modeloSelecionado: any) {
+    const itensAtualizados = this.itensTreino.value.map(item => ({
       ...item,
-      habilitado: false,
-      movido: item.tipo === modeloSelecionado.tipo && item.valor === modeloSelecionado.valor
+      habilitado: item.habilitado,
+      movido: item.valor === modeloSelecionado.valor ? true : item.movido
     }));
-
     this.itensTreino.next(itensAtualizados);
   }
 

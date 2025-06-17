@@ -1,18 +1,36 @@
 <nav class="modal">
 
-  <section *ngIf="resultadoTreinamento" class="resultado-container">
-    <h2>Status do Treinamento</h2> 
-    <p><strong>Target:</strong> {{ resultadoTreinamento.teste?.target || resultadoTreinamento.target }}</p>
-    <p><strong>Atributos:</strong> {{ resultadoTreinamento.atributos?.join(', ') || atributosFormatados }}</p>
-    <p><strong>Classes:</strong> {{ resultadoTreinamento?.classes?.join(', ') }}</p>
-    <p><strong>Total Amostras Teste:</strong> {{ resultadoTreinamento?.total_amostras_teste }}</p>
-    <p><strong>Total Amostras Treino:</strong> {{ resultadoTreinamento?.total_amostras_treino }}</p>
+  <!-- Botão para treinar o modelo atual -->
+  <section class="acoes" *ngIf="modeloSelecionado">
+    <button
+      mat-raised-button
+      (click)="enviarParaClassificador(modeloSelecionado.valor)">
+      Treinar {{modeloSelecionado.label}}
+    </button>
   </section>
 
-  <section class="acoes">
-    <button mat-raised-button color="primary" (click)="enviarParaClassificador()">
-      Treinar
-    </button>
+  <!-- Visualização dos detalhes para todos os modelos treinados -->
+  <section class="resultado-container" *ngIf="resultadoTreinamento">
+
+    <ng-container *ngFor="let modeloValor of getModelosComResultado()">
+      
+      <h2>Status do Treinamento - {{ getLabel(modeloValor) }}</h2>
+
+      <p><strong>Status:</strong> {{ resultadoTreinamento[modeloValor].status }}</p>
+      <p><strong>Target:</strong> {{ resultadoTreinamento[modeloValor].target }}</p>
+      <p><strong>Atributos:</strong> {{ resultadoTreinamento[modeloValor].atributos?.join(', ') }}</p>
+      <p><strong>Classes:</strong> {{ resultadoTreinamento[modeloValor].classes?.join(', ') }}</p>
+      <p><strong>Total Amostras Treino:</strong> {{ resultadoTreinamento[modeloValor].total_amostras_treino }}</p>
+      <p><strong>Total Amostras Teste:</strong> {{ resultadoTreinamento[modeloValor].total_amostras_teste }}</p>
+
+       <button
+        mat-raised-button
+        (click)="enviarParaClassificador(modeloValor)">
+        Treinar {{ getLabel(modeloValor) }}
+      </button>
+       <mat-divider></mat-divider>
+    </ng-container>
+
   </section>
 
 </nav>

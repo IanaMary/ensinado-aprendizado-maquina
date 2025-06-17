@@ -1,26 +1,30 @@
 <nav class="modal">
 
-  <div class="resultado-container" *ngIf="resultadosDasAvaliacoes?.resultados">
+  <div class="resultado-container" *ngIf="resultadosDasAvaliacoes && (modelosAvaliados.length > 0)">
 
-    <h2>Status da Avaliação</h2>
-    <p>{{ resultadosDasAvaliacoes.status }}</p>
+    <h2>Status das Avaliações</h2>
 
-    <h3>Métricas Avaliadas</h3>
     <table>
       <thead>
         <tr>
           <th>Métrica</th>
-          <th>Valor</th>
+          <th *ngFor="let modelo of modelosAvaliados">{{ modelo | uppercase }}</th>
+        </tr>
+        <tr>
+          <th>Status</th>
+          <th *ngFor="let modelo of modelosAvaliados">
+            {{ resultadosDasAvaliacoes[modelo]?.status || 'Sem status' }}
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let metrica of metricas">
-          <td>{{ getLabel(metrica) }}</td>
-          <td>
-            {{ 
-              isNumber(resultadosDasAvaliacoes.resultados[metrica]) 
-              ? (resultadosDasAvaliacoes.resultados[metrica] | number:'1.2-4') 
-              : resultadosDasAvaliacoes.resultados[metrica] 
+        <tr *ngFor="let metrica of metricsAvaliadas">
+          <td>{{ metrica }}</td>
+          <td *ngFor="let modelo of modelosAvaliados">
+            {{
+              isNumber(resultadosDasAvaliacoes[modelo]?.resultados?.[metrica])
+                ? (resultadosDasAvaliacoes[modelo].resultados[metrica] | number:'1.2-4')
+                : '-'
             }}
           </td>
         </tr>
@@ -29,7 +33,7 @@
 
   </div>
 
-  <div *ngIf="!resultadosDasAvaliacoes?.resultados">
+  <div *ngIf="!resultadosDasAvaliacoes || !modelosAvaliados || modelosAvaliados.length === 0">
     <p>Nenhuma avaliação realizada ainda.</p>
   </div>
 

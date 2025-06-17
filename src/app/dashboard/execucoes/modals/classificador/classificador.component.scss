@@ -1,45 +1,76 @@
-@use "../../../../../styles/colores.scss"  as *;
+@use "../../../../../styles/colores.scss" as *;
 
 .modal {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  max-width: 700px;
+  max-height: 80vh;
+  padding: 1.5rem 2rem;
   box-sizing: border-box;
-  margin: 0 auto;
-  /* Sem width ou height fixos aqui */
+  background-color: #fff;
+  border-radius: 8px;
+  color: #333;
 }
 
 .acoes {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .resultado-container {
-  background-color: #f9f9f9;
+  background-color: #f7f9fc;
+  border-radius: 6px;
+  padding: 1.5rem 2rem;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+}
+
+.resultado-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.resultado-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.resultado-container::-webkit-scrollbar-thumb {
+  background-color: #bbb;
   border-radius: 4px;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  overflow-y: auto;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-  text-align: left;
-}
-
-th {
-  background-color: #eee;
-  font-weight: 600;
+h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  color: #222;
+  border-bottom: 2px solid #1976d2;
+  padding-bottom: 0.3rem;
 }
 
 p {
-  margin: 0.25rem 0;
+  margin: 0.3rem 0;
+  font-size: 1rem;
+  line-height: 1.4;
+  strong {
+    color: #555;
+  }
+}
+
+mat-divider {
+  margin: 1.5rem 0;
+  border-color: #ddd !important;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .modal {
+    width: 95%;
+    padding: 1rem 1.2rem;
+    max-height: 90vh;
+  }
+
+  .acoes {
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
 }

@@ -4,12 +4,20 @@ export type TipoTarget = 'number' | 'string' | 'boolean' | undefined;
 export type TipoDado = 'Texto' | 'Número' | 'Booleano';
 
 
-export const nomeDasMetricas: Record<string, string> = {
+export const nomeMetricas: Record<string, string> = {
   accuracy_score: 'Acurácia',
   precision_score: 'Precisão',
   recall_score: 'Recall',
   f1_score: 'F1-Score',
   confusion_matrix: 'Matriz de Confusão',
+};
+
+export const nomeModelos: Record<string, string> = {
+  knn: 'k-NN',
+  arvore_decisao: 'Árvore de Decisão',
+  svm: 'SVM',
+  regressao_logistica: 'Regressão Logística',
+  regressao_linear: 'Regressão Linear',
 };
 
 export const labelParaTipoTargetMap: Record<TipoDado, TipoTarget> = {
@@ -38,7 +46,7 @@ export interface ItemPipeline {
   movido: boolean;
   tipoItem: TipoItem;
   habilitado: boolean;
-  valor?: string;
+  valor: string;
   resumo?: string;
   tipo?: TipoTarget;
   hiperparametros?: any[];

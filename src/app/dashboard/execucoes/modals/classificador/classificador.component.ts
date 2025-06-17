@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { DashboardService } from '../../../services/dashboard.service';
-import { ItemPipeline, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
+import { ItemPipeline, ResultadoColetaDado, nomeModelos } from '../../../../models/item-coleta-dado.model';
 
 @Component({
   selector: 'app-classificador',
@@ -23,14 +23,18 @@ export class ClasificadorComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {}
 
-  async enviarParaClassificador() {
-    const tipoClassficador = this.modeloSelecionado?.valor ?? '';
+  async enviarParaClassificador(classificador: string) {
+    const tipoClassficador = classificador ?? '';
     const body = await this.criarBody()
 
     this.dashboardService.classificadorTreino(tipoClassficador, body).subscribe({
-      next: (res) => {
-        this.atualizarResultadoTreinamento.emit(res)
-        this.resultadoTreinamento = res;
+      next: (res: any) => {
+        const modelo = res.modelo
+        this.resultadoTreinamento = {
+          ...this.resultadoTreinamento,
+          [modelo]: res
+        };
+        this.atualizarResultadoTreinamento.emit(this.resultadoTreinamento)
       },
       error: (err) => { }
     });
@@ -61,10 +65,19 @@ export class ClasificadorComponent implements OnChanges {
     if (!atributos) {
       return 'Nenhum atributo disponível';
     }
-
     const selecionados = Object.keys(atributos).filter(chave => atributos[chave]);
-
     return selecionados.length ? selecionados.join(', ') : 'Nenhum atributo disponível';
   }
 
+  getLabel(valor: string): string {
+    return nomeModelos[valor] ?? valor;
+  }
+
+
+  getModelosComResultado(): string[] {
+    if (!this.resultadoTreinamento) {
+      return [];
+    }
+    return Object.keys(this.resultadoTreinamento);
+  }
 }

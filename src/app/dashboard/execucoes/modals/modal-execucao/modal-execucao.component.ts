@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { ItemPipeline, ResultadoColetaDado, TipoTarget } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
-import itensPipeline from '../../../../constants/itens-coletas-dados.json'
+import itensPipeline from '../../../../constants/itens-coletas-dados.json';
 
 @Component({
   selector: 'modal-execucao',
@@ -11,30 +11,25 @@ import itensPipeline from '../../../../constants/itens-coletas-dados.json'
   standalone: false
 })
 export class ModalExecucaoComponent implements OnInit {
-  etapaAtual: number = 0;
-  nEtapas: number = 0;
 
-  etapas: { [key: string]: number } = {
-    'coleta-dado': 0,
-    'selecao-do-modelo': 1,
-    'treino-validacao-teste': 2,
-    'selecao-das-metricas': 3,
-    'metrica': 4
+  etapas: Record<string, { indice: number; proximo: boolean; titulo: string; }> = {
+    'coleta-dado': { indice: 0, proximo: true, titulo: 'Importar Planilha' },
+    'selecao-do-modelo': { indice: 1, proximo: true, titulo: 'Seleção do Modelo' },
+    'treino-validacao-teste': { indice: 2, proximo: true, titulo: 'Treinamento' },
+    'selecao-das-metricas': { indice: 3, proximo: true, titulo: 'Seleção das Métricas' },
+    'metrica': { indice: 4, proximo: true, titulo: 'Visualizar Avaliações' }
   };
 
-  titulos: string[] = [
-    'Importar Planilha',
-    'Seleção do Modelo',
-    'Treinamento',
-    'Seleção das Métricas',
-    'Visualizar Avaliações'
-  ];
+  etapaKeys = Object.keys(this.etapas);
+  nEtapas = this.etapaKeys.length;
 
-  proximaEtapaDesaabilitada = true;
+  ordemEtapas = Object.keys(this.etapas);
+  etapaAtual: string = 'coleta-dado';
 
   resultadoColetaDado?: ResultadoColetaDado | undefined;
   resultadoTreinamento?: any;
   modeloSelecionado?: ItemPipeline;
+  modelosDisponiveis: ItemPipeline[] = [];
 
   tipoTargetSelecionado: TipoTarget = undefined;
 
@@ -48,48 +43,55 @@ export class ModalExecucaoComponent implements OnInit {
     public dialogRef: MatDialogRef<ModalExecucaoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-
     this.atualizarVariaveis(data);
   }
 
-  ngOnInit(): void {
-    this.nEtapas = this.titulos.length
-  }
+  ngOnInit(): void { }
 
   proximo(): void {
-    if (this.etapaAtual < this.nEtapas - 1) {
-      this.etapaAtual++;
+    const indiceAtual = this.etapas[this.etapaAtual].indice;
+
+    if (indiceAtual < this.ordemEtapas.length - 1) {
+      this.etapaAtual = this.ordemEtapas[indiceAtual + 1];
     }
-    switch (this.etapaAtual) {
-      case 0:
-        this.proximaEtapaDesaabilitada = !this.resultadoColetaDado;
-        break;
-      case 1:
-        this.tipoTargetSelecionado = this.resultadoColetaDado?.treino.tipoTarget ?? undefined;
-        this.proximaEtapaDesaabilitada = !this.modeloSelecionado;
-        break;
-      case 2:
-        this.proximaEtapaDesaabilitada = !this.resultadoTreinamento || this.metricasDisponiveis.length === 0;
-        break;
-      case 3:
-        this.proximaEtapaDesaabilitada = this.metricasSelecionadas.length === 0;
-        break;
-      case 4:
-        this.proximaEtapaDesaabilitada = false;
-        break;
-      default:
-        this.proximaEtapaDesaabilitada = true;
-    }
+
+    this.validarProximaEtapa();
   }
 
   anterior(): void {
-    if (this.etapaAtual > 0) {
-      this.etapaAtual--;
+    const indiceAtual = this.etapas[this.etapaAtual].indice;
+
+    if (indiceAtual > 0) {
+      this.etapaAtual = this.ordemEtapas[indiceAtual - 1];
     }
-    this.proximaEtapaDesaabilitada = false;
+
+    this.validarProximaEtapa();
   }
 
-  atualizarResultado(event: ResultadoColetaDado) {
+  validarProximaEtapa(): void {
+    switch (this.etapaAtual) {
+      case 'coleta-dado':
+        this.etapas[this.etapaAtual].proximo = !!this.resultadoColetaDado;
+        break;
+      case 'selecao-do-modelo':
+        this.tipoTargetSelecionado = this.resultadoColetaDado?.treino?.tipoTarget ?? undefined;
+        this.etapas[this.etapaAtual].proximo = !!this.modeloSelecionado;
+        break;
+      case 'treino-validacao-teste':
+        this.etapas[this.etapaAtual].proximo = !!this.resultadoTreinamento && this.metricasDisponiveis.length > 0;
+        break;
+      case 'selecao-das-metricas':
+        this.etapas[this.etapaAtual].proximo = this.metricasSelecionadas.length > 0;
+        break;
+      case 'metrica':
+        this.etapas[this.etapaAtual].proximo = true;
+        break;
+      default:
+        this.etapas[this.etapaAtual].proximo = false;
+    }
+  }
+
+  atualizarResultadoCOleta(event: ResultadoColetaDado) {
     this.resultadoColetaDado = event;
     this.tipoTargetSelecionado = event.treino.tipoTarget;
 
@@ -100,24 +102,27 @@ export class ModalExecucaoComponent implements OnInit {
     const erroTeste = !!event.teste?.erro;
     const tipoTargetNaoSelecionado = this.tipoTargetSelecionado === undefined;
 
-    this.proximaEtapaDesaabilitada = erroTreino || erroTeste || tipoTargetNaoSelecionado || attVazio;
+    this.etapas[this.etapaAtual].proximo = !(erroTreino || erroTeste || tipoTargetNaoSelecionado || attVazio);
 
     this.dashboardService.habilitadarModelos(
       this.tipoTargetSelecionado,
-      !this.proximaEtapaDesaabilitada
+      this.etapas[this.etapaAtual].proximo
     );
+
+    this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(this.tipoTargetSelecionado);
+    this.modeloSelecionado = this.modelosDisponiveis[0];
   }
 
   atualizarModelo(event: ItemPipeline) {
     this.modeloSelecionado = event;
-    this.dashboardService.selecionarModelo(this.modeloSelecionado);
-    this.proximaEtapaDesaabilitada = false
+    this.etapas[this.etapaAtual].proximo = true;
   }
 
   atualizarResultadoTreinamento(event: any) {
     this.resultadoTreinamento = event;
+    this.dashboardService.selecionarModelo(this.modeloSelecionado);
     this.inicializarMetricasDisponiveis();
-    this.proximaEtapaDesaabilitada = this.metricasDisponiveis.length === 0
+    this.etapas[this.etapaAtual].proximo = this.metricasDisponiveis.length > 0;
   }
 
   inicializarMetricasDisponiveis() {
@@ -131,44 +136,43 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   atualizarMetricasSelecionadas(event: any) {
-    this.proximaEtapaDesaabilitada = this.metricasSelecionadas.length == 0;
+    this.etapas[this.etapaAtual].proximo = this.metricasSelecionadas.length > 0;
   }
 
-
   atualizarVariaveis(data: any) {
-    this.etapaAtual = this.etapas[data?.etapa] ?? 0;
-
-
-    if (data?.resultadoColetaDado) {
-
-      const { resultadoColetaDado } = data;
-      this.resultadoColetaDado = resultadoColetaDado;
-      this.tipoTargetSelecionado = resultadoColetaDado.tipoTarget ?? undefined;
+    if (data?.etapa) {
+      this.etapaAtual = data.etapa;
     }
 
+    this.etapas['coleta-dado'].proximo = !!data?.resultadoColetaDado;
+    this.etapas['selecao-do-modelo'].proximo = !!data?.modeloSelecionado;
+    this.etapas['treino-validacao-teste'].proximo = !!data?.resultadoTreinamento;
+    this.etapas['selecao-das-metricas'].proximo = !!data?.metricasSelecionadas;
+    this.etapas['metrica'].proximo = !!data?.resultadosDasAvaliacoes;
 
-    if (data?.modeloSelecionado) {
+    if (this.etapas['coleta-dado'].proximo) {
+      this.resultadoColetaDado = data.resultadoColetaDado;
+      this.tipoTargetSelecionado = data.resultadoColetaDado?.treino?.tipoTarget ?? undefined;
+      this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(this.tipoTargetSelecionado);
+      this.modeloSelecionado = data.modeloSelecionado ? data.modeloSelecionado : this.modelosDisponiveis[0];
+    }
+
+    if (this.etapas['selecao-do-modelo'].proximo) {
       this.modeloSelecionado = data.modeloSelecionado;
     }
 
-
-    if (data?.resultadoTreinamento) {
+    if (this.etapas['treino-validacao-teste'].proximo) {
       this.resultadoTreinamento = data.resultadoTreinamento;
     }
 
-
-    if (data?.metricasSelecionadas) {
+    if (this.etapas['selecao-das-metricas'].proximo) {
       this.metricasSelecionadas = data.metricasSelecionadas;
       this.inicializarMetricasDisponiveis();
     }
 
-    if (data?.resultadosDasAvaliacoes) {
+    if (this.etapas['metrica'].proximo) {
       this.resultadosDasAvaliacoes = data.resultadosDasAvaliacoes;
     }
-
-    const temDados = data?.resultadoColetaDado || data?.modeloSelecionado || data?.resultadoTreinamento || data.metricasSelecionadas;
-    this.proximaEtapaDesaabilitada = !temDados;
-
   }
 
   atualizarResultadoAvaliacoes(event: any) {
@@ -182,12 +186,15 @@ export class ModalExecucaoComponent implements OnInit {
       resultadoTreinamento: this.resultadoTreinamento,
       metricasSelecionadas: this.metricasSelecionadas,
       resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
+      etapa: this.etapaAtual
     });
   }
 
   getClasseLinhaPipe(idx: number): string {
-    if (idx < this.etapaAtual) return 'visitada';
-    if (idx === this.etapaAtual) return 'atual';
+    const indiceAtual = this.etapas[this.etapaAtual].indice;
+
+    if (idx < indiceAtual) return 'visitada';
+    if (idx === indiceAtual) return 'atual';
     return 'desabilitada';
   }
 }

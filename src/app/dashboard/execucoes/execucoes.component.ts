@@ -35,20 +35,17 @@ export class ExecucoesComponent implements OnInit {
       this.colunaColeta = itens.filter(i => i.tipoItem === 'coleta-dado');
       this.colunaTreino = itens.filter(i => i.tipoItem === 'treino-validacao-teste');
       this.colunaMetrica = itens.filter(i => i.tipoItem === 'metrica');
-
       this.metricasSelecionadas = this.colunaMetrica.filter(i => i.movido);
     });
   }
 
- 
 
-
-  abrirModalExecucao(tipoItem: ItemPipeline): void {
+  abrirModalExecucao(item: ItemPipeline): void {
     const dialogRef = this.dialog.open(ModalExecucaoComponent, {
       data: {
-        etapa: tipoItem.tipoItem,
+        etapa: item.tipoItem,
         resultadoColetaDado: this.resultadoColetaDado,
-        modeloSelecionado: this.modeloSelecionado,
+        modeloSelecionado: item.tipoItem === 'treino-validacao-teste' ? item : this.modeloSelecionado,
         resultadoTreinamento: this.resultadoTreinamento,
         metricasSelecionadas: this.metricasSelecionadas,
         resultadosDasAvaliacoes: this.resultadosDasAvaliacoes

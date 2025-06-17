@@ -1,22 +1,22 @@
 <nav class="modal-execucao">
   <nav class="modal-header">
     <nav class="box-linha breadcrumb">
-      <ng-container *ngFor="let item of titulos; let idx = index">
+      <ng-container *ngFor="let key of etapaKeys; let idx = index">
         <!-- Bolinha -->
-        <div [matTooltip]="item" matTooltipPosition="above" class="bolinha" [ngClass]="getClasseLinhaPipe(idx)">
+        <div [matTooltip]="etapas[key].titulo" matTooltipPosition="above" class="bolinha" [ngClass]="getClasseLinhaPipe(idx)">
           {{ idx + 1 }}
         </div>
 
         <!-- Linha (só aparece se não for a última bolinha) -->
-        <div *ngIf="idx < titulos.length - 1" class="linha" [ngClass]="getClasseLinhaPipe(idx)">
+        <div *ngIf="idx < etapaKeys.length - 1" class="linha" [ngClass]="getClasseLinhaPipe(idx)">
         </div>
       </ng-container>
     </nav>
 
-  <mat-divider></mat-divider>
+    <mat-divider></mat-divider>
 
     <nav class="box-linha titulo">
-      <h2>{{ titulos[etapaAtual] }}</h2>
+      <h2>{{ etapas[etapaAtual].titulo }}</h2>
       <button mat-icon-button class="close-button" (click)="fechar()">
         <mat-icon>close</mat-icon>
       </button>
@@ -26,38 +26,32 @@
   <mat-divider></mat-divider>
 
   <section class="conteudo-modal">
-    <ng-container [ngSwitch]="etapaAtual">
+    <ng-container [ngSwitch]="etapas[etapaAtual].indice">
 
-      <!-- Etapa 0: Coleta de Dados -->
       <ng-container *ngSwitchCase="0">
         <app-coleta-dado [resultadoColetaDado]="resultadoColetaDado"
-          (resultadoColetaDadoModificado)="atualizarResultado($event)">
+          (resultadoColetaDadoModificado)="atualizarResultadoCOleta($event)">
         </app-coleta-dado>
       </ng-container>
 
-
-      <!-- Etapa 1: Selecionar modelo -->
       <ng-container *ngSwitchCase="1">
-        <app-tipos-classificadores [tipoTarget]="tipoTargetSelecionado" [modeloSelecionado]="modeloSelecionado"
+        <app-tipos-classificadores [modelosDisponiveis]="modelosDisponiveis" [modeloSelecionado]="modeloSelecionado"
           (selecaoModelo)="atualizarModelo($event)">
         </app-tipos-classificadores>
       </ng-container>
 
-      <!-- Etapa 2: Visualizar Dados -->
       <ng-container *ngSwitchCase="2">
         <app-classificador [resultadoTreinamento]="resultadoTreinamento" [resultadoColetaDado]="resultadoColetaDado" [modeloSelecionado]="modeloSelecionado"
           (atualizarResultadoTreinamento)="atualizarResultadoTreinamento($event)">
         </app-classificador>
       </ng-container>
 
-      <!-- Etapa 3: Seleção de métricas -->
       <ng-container *ngSwitchCase="3">
         <app-selecao-metricas [metricasDisponiveis]="metricasDisponiveis" [metricasSelecionadas]="metricasSelecionadas"
           (selecaoMetricas)="atualizarMetricasSelecionadas($event)">
         </app-selecao-metricas>
       </ng-container>
 
-      <!-- Etapa 4: avaliações -->
       <ng-container *ngSwitchCase="4">
         <app-metrica-avaliacao [resultadosDasAvaliacoes]="resultadosDasAvaliacoes" [metricasSelecionadas]="metricasSelecionadas" [resultadoTreinamento]="resultadoTreinamento"
           (atualizarResultadoAvaliacoes)="atualizarResultadoAvaliacoes($event)" >
@@ -69,8 +63,8 @@
   <mat-divider></mat-divider>
 
   <div class="modal-footer">
-    <button *ngIf="etapaAtual"  mat-button (click)="anterior()" [disabled]="etapaAtual === 0">Anterior</button>
-    <button *ngIf="etapaAtual < nEtapas-1" mat-raised-button color="primary" (click)="proximo()" [disabled]="proximaEtapaDesaabilitada">
+    <button *ngIf="etapas[etapaAtual].indice" mat-button (click)="anterior()" [disabled]="etapas[etapaAtual].indice === 0">Anterior</button>
+    <button *ngIf="etapas[etapaAtual].indice < nEtapas - 1" mat-raised-button color="primary" (click)="proximo()" [disabled]="!etapas[etapaAtual].proximo">
       Próximo
     </button>
   </div>
