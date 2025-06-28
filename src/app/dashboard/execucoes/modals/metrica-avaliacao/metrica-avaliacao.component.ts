@@ -68,7 +68,6 @@ export class MetricaAvaliacaoComponent implements OnChanges {
 
   async criarBody(): Promise<any> {
 
-
     const modelosNomes = Object.keys(this.resultadoTreinamento);
 
     // Filtra apenas as métricas habilitadas
@@ -84,7 +83,8 @@ export class MetricaAvaliacaoComponent implements OnChanges {
 
       return {
         modelo_nome: modeloNome,
-        metricas: metricasModelo
+        metricas: metricasModelo,
+        mlflow_run_id_modelo: this.resultadoTreinamento[modeloNome]?.mlflow_run_id_modelo || null
       };
     });
 

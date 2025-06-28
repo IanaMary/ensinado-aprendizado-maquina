@@ -21,7 +21,7 @@ export class ClasificadorComponent implements OnChanges {
   ) { }
 
 
-  ngOnChanges(changes: SimpleChanges): void {}
+  ngOnChanges(changes: SimpleChanges): void { }
 
   async enviarParaClassificador(classificador: string) {
     const tipoClassficador = classificador ?? '';

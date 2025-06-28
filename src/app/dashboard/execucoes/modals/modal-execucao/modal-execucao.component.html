@@ -63,7 +63,7 @@
   <mat-divider></mat-divider>
 
   <div class="modal-footer">
-    <button *ngIf="etapas[etapaAtual].indice" mat-button (click)="anterior()" [disabled]="etapas[etapaAtual].indice === 0">Anterior</button>
+    <button *ngIf="etapas[etapaAtual].indice" mat-raised-button (click)="anterior()" [disabled]="etapas[etapaAtual].indice === 0">Anterior</button>
     <button *ngIf="etapas[etapaAtual].indice < nEtapas - 1" mat-raised-button color="primary" (click)="proximo()" [disabled]="!etapas[etapaAtual].proximo">
       Próximo
     </button>
