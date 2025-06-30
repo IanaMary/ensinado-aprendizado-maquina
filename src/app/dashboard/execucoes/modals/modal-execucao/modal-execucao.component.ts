@@ -31,7 +31,7 @@ export class ModalExecucaoComponent implements OnInit {
   modeloSelecionado?: ItemPipeline;
   modelosDisponiveis: ItemPipeline[] = [];
 
-  tipoTargetSelecionado: TipoTarget = undefined;
+  tipoTargetSelecionado: TipoTarget = null;
 
   todasMetricas = itensPipeline.itensMetricas as ItemPipeline[];
   metricasDisponiveis: ItemPipeline[] = [];
@@ -74,7 +74,7 @@ export class ModalExecucaoComponent implements OnInit {
         this.etapas[this.etapaAtual].proximo = !!this.resultadoColetaDado;
         break;
       case 'selecao-do-modelo':
-        this.tipoTargetSelecionado = this.resultadoColetaDado?.treino?.tipoTarget ?? undefined;
+        this.tipoTargetSelecionado = this.resultadoColetaDado?.treino?.tipoTarget ?? null;
         this.etapas[this.etapaAtual].proximo = !!this.modeloSelecionado;
         break;
       case 'treino-validacao-teste':
@@ -91,7 +91,7 @@ export class ModalExecucaoComponent implements OnInit {
     }
   }
 
-  atualizarResultadoCOleta(event: ResultadoColetaDado) {
+  atualizarResultadoColeta(event: ResultadoColetaDado) {
     this.resultadoColetaDado = event;
     this.tipoTargetSelecionado = event.treino.tipoTarget;
 
@@ -178,6 +178,8 @@ export class ModalExecucaoComponent implements OnInit {
   atualizarResultadoAvaliacoes(event: any) {
     this.resultadosDasAvaliacoes = event;
   }
+
+  selecaoTarget() { }
 
   fechar(): void {
     this.dialogRef.close({

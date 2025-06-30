@@ -36,6 +36,26 @@ body {
   /* quebra palavras longas */
 }
 
+.mat-mdc-select-panel {
+  background-color: $cinza-claro !important;
+}
+
+.mat-mdc-text-field-wrapper {
+  width: 50% !important;
+}
+
+.mat-mdc-select-trigger {
+  width: 95% !important;
+}
+
+.mat-mdc-select-value {
+  width: 95% !important;
+  padding-left: 8px;
+}
+
+.mat-mdc-form-field-subscript-wrapper {
+  height: 0;
+}
 
 .opcoesPipeline {
   display: flex;

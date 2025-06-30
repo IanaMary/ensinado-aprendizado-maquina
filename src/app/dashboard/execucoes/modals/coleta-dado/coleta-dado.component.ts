@@ -18,23 +18,26 @@ import { InformacoesDados, labelParaTipoTargetMap, ResultadoColetaDado, TipoDado
   standalone: false
 })
 export class ColetaDadoComponent implements OnChanges, OnInit {
-  
+
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
   @Output() resultadoColetaDadoModificado = new EventEmitter<ResultadoColetaDado>();
 
 
-  treino: InformacoesDados = { dados: [], colunas: [], tipos: {}, atributos: {}, target: '', tipoTarget: undefined };
-  teste: InformacoesDados = { dados: [], colunas: [], tipos: {}, atributos: {}, target: '', tipoTarget: undefined };
+  treino: InformacoesDados = { dados: [], colunas: [], tipos: {}, atributos: {}, target: '', tipoTarget: null };
+  teste: InformacoesDados = { dados: [], colunas: [], tipos: {}, atributos: {}, target: '', tipoTarget: null };
 
+  colunasTabela = ['nome', 'tipo', 'atributos'];
 
   filtros: Record<string, string> = { nome: '', tipo: '', target: '', atributos: '' };
   opcoesNome: string[] = [];
   opcoesTipo: string[] = [];
+  opcoesTarget: string[] = [];
+  target: string | null = '';
+
 
   dataSourceColunas = new MatTableDataSource<{ nome: string; tipo: string }>([]);
   dataSourceColunasTeste = new MatTableDataSource<{ nome: string; tipo: string }>([]);
 
-  target: string = '';
 
   constructor(private planilhaService: PlanilhaService) { }
 
@@ -125,8 +128,6 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
         this.teste.tipos = tiposTeste;
       }
 
-
-
       this.emitirResultadoColetaDado();
 
       this.atualizarDataSource(tipo);
@@ -141,16 +142,19 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   onFiltroChange(coluna: string, valor: string) {
     this.filtros[coluna] = valor.toLowerCase();
-    this.dataSourceColunas.filter = JSON.stringify(this.filtros);
+    if (coluna === 'target') {
+      this.target = valor === '-' ? null : valor;
+
+    } else {
+      this.dataSourceColunas.filter = JSON.stringify(this.filtros);
+    }
   }
 
-  selecaoTarget(nomeColuna: string) {
-    this.treino.target = nomeColuna;
-
-    const tipoDado = this.treino.tipos[nomeColuna];
-    this.treino.tipoTarget = tipoDado ? labelParaTipoTargetMap[tipoDado] : undefined;
-    this.treino.atributos[nomeColuna] = false;
-    this.dataSourceColunas.filter = JSON.stringify(this.filtros);
+  selecaoTarget() {
+    const label = this.treino.target
+    const tipoLabel = this.treino.tipos[label]
+    this.treino.tipoTarget = labelParaTipoTargetMap[tipoLabel as TipoDado] ?? null
+    this.treino.atributos[label] = false;
     this.emitirResultadoColetaDado();
   }
 
@@ -188,9 +192,13 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       this.dataSourceColunas.data = rows;
       this.opcoesNome = [...new Set(rows.map(r => r.nome))].sort();
       this.opcoesTipo = [...new Set(rows.map(r => r.tipo))].sort();
+
+      this.opcoesTarget = ['-'].concat(this.opcoesNome);
     } else {
       this.dataSourceColunasTeste.data = rows;
     }
+
+
   }
 
   configurarFiltro() {

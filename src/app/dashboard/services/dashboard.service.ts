@@ -53,12 +53,7 @@ export class DashboardService {
   }
 
 
-  getModelosPorTipo(tipo: string | undefined): ItemPipeline[] {
-    if (!tipo) {
-      return [];
-    }
-
-    // Retorna os itens do tipo informado (objetos completos)
+  getModelosPorTipo(tipo: string | null): ItemPipeline[] {
     return this.itensTreino.value.filter(item => item.tipo === tipo);
   }
 

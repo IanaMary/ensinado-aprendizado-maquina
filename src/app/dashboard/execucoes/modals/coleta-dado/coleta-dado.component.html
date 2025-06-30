@@ -19,8 +19,19 @@
 
   <!-- Tabela de configuração das colunas TREINO -->
   <ng-container *ngIf="treino.dados.length > 0">
-    <mat-divider></mat-divider> 
+    <mat-divider></mat-divider>
     Configuração do dataset de treino
+
+    <mat-divider></mat-divider>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Seleção do target</mat-label>
+      <mat-select (selectionChange)="selecaoTarget()" [(ngModel)]="treino.target">
+        <mat-option [value]="opTarget" *ngFor="let opTarget of opcoesTarget">{{opTarget}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+
     <nav class="tabela-container">
       <table mat-table [dataSource]="dataSourceColunas" class="mat-table">
 
@@ -29,11 +40,7 @@
           <th mat-header-cell *matHeaderCellDef>
             <nav class="titulo">
               Nome
-              <app-filtro-coluna
-                id="filtro-nome"
-                [label]="'Nome'"
-                [opcoes]="opcoesNome"
-                [value]="filtros['nome'] || ''"
+              <app-filtro-coluna id="filtro-nome" [opcoes]="opcoesNome" [value]="filtros['nome'] || ''"
                 (valueChange)="onFiltroChange('nome', $event)">
               </app-filtro-coluna>
             </nav>
@@ -46,11 +53,7 @@
           <th mat-header-cell *matHeaderCellDef>
             <nav class="titulo">
               Tipo
-              <app-filtro-coluna
-                id="filtro-tipo"
-                [label]="'Tipo'"
-                [opcoes]="opcoesTipo"
-                [value]="filtros['tipo'] || ''"
+              <app-filtro-coluna id="filtro-tipo" [opcoes]="opcoesTipo" [value]="filtros['tipo'] || ''"
                 (valueChange)="onFiltroChange('tipo', $event)">
               </app-filtro-coluna>
             </nav>
@@ -58,49 +61,25 @@
           <td mat-cell *matCellDef="let linha"> {{ linha.tipo }} </td>
         </ng-container>
 
-        <!-- Target -->
-        <ng-container matColumnDef="target">
-          <th mat-header-cell *matHeaderCellDef>
-            <nav class="titulo">
-              Target
-              <app-filtro-coluna
-                id="filtro-target"
-                [label]="'Target'"
-                [opcoes]="['Sim', 'Não']"
-                [value]="filtros['target'] || ''"
-                (valueChange)="onFiltroChange('target', $event)">
-              </app-filtro-coluna>
-            </nav>
-          </th>
-          <td mat-cell *matCellDef="let linha">
-            <mat-radio-group (change)="selecaoTarget(linha.nome)" [(ngModel)]="target" name="target">
-              <mat-radio-button [value]="linha.nome"></mat-radio-button>
-            </mat-radio-group>
-          </td>
-        </ng-container>
-
         <!-- Atributos -->
         <ng-container matColumnDef="atributos">
           <th mat-header-cell *matHeaderCellDef>
             <nav class="titulo">
               Atributos
-              <app-filtro-coluna
-                id="filtro-atributos"
-                [label]="'Atributos'"
-                [opcoes]="['Marcados', 'Desmarcados']"
-                [value]="filtros['atributos'] || ''"
-                (valueChange)="onFiltroChange('atributos', $event)">
+              <app-filtro-coluna id="filtro-atributos" [opcoes]="['Marcados', 'Desmarcados']"
+                [value]="filtros['atributos'] || ''" (valueChange)="onFiltroChange('atributos', $event)">
               </app-filtro-coluna>
             </nav>
           </th>
           <td mat-cell *matCellDef="let linha">
-            <mat-checkbox   (change)="emitirResultadoColetaDado()" [disabled]="!treino.target || linha.nome === treino.target" [(ngModel)]="treino.atributos[linha.nome]">
+            <mat-checkbox (change)="emitirResultadoColetaDado()" [disabled]="linha.nome === treino.target"
+              [(ngModel)]="treino.atributos[linha.nome]">
             </mat-checkbox>
           </td>
         </ng-container>
 
-        <tr class="thead" mat-header-row *matHeaderRowDef="['nome', 'tipo', 'target', 'atributos']; sticky: true"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['nome', 'tipo', 'target', 'atributos'];"></tr>
+        <tr class="thead" mat-header-row *matHeaderRowDef="colunasTabela; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: colunasTabela;"></tr>
       </table>
     </nav>
   </ng-container>

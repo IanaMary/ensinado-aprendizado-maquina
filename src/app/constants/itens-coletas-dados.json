@@ -103,6 +103,26 @@
       "resumo": "Regressão Linear ajusta uma reta que minimiza o erro quadrático médio entre as previsões e os valores reais.",
       "tipo": "number",
       "hiperparametros": []
+    },
+    {
+      "label": "K-means",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "k_means",
+      "resumo": "K-means é um algoritmo de agrupamento que particiona os dados em k grupos com base na similaridade.",
+      "tipo": null,
+      "hiperparametros": []
+    },
+    {
+      "label": "PCA",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "pca",
+      "resumo": "PCA (Análise de Componentes Principais) é uma técnica de redução de dimensionalidade que transforma os dados em um novo sistema de coordenadas.",
+      "tipo": null,
+      "hiperparametros": []
     }
   ],
   "itensMetricas": [
