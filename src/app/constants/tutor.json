@@ -1,0 +1,43 @@
+{
+  "itensColetasDados": [
+    {
+      "texto": "Vamos começar escolhendo um formato para coletar os dados. Existem algumas opções disponíveis, como arquivos .xlsx, .csv e .json. Cada um desses formatos possui características específicas, então é importante entender as diferenças para decidir qual se adapta melhor ao seu objetivo.",
+      "itens": [
+        "O .xlsx é o formato padrão de planilhas do Excel, ideal quando os dados estão organizados em tabelas e podem conter múltiplas abas.",
+        "O .csv é uma versão mais simples, onde os dados são separados por vírgulas — excelente para quando você precisa de um arquivo leve e fácil de processar.",
+        "Já o .json é um formato muito usado em aplicações web e APIs, ideal para dados mais estruturados ou hierárquicos."
+      ]
+    }
+  ],
+  "itensTreino": [
+    {
+      "texto": "Depois de carregar os dados, o próximo passo é selecionar quais atributos (ou colunas) vamos utilizar no nosso modelo. Esses atributos são as informações que ajudarão o algoritmo a identificar padrões e aprender com os dados.",
+      "itens": []
+    },
+    {
+      "texto": "Agora, é importante decidir se vamos ou não definir uma variável alvo, também chamada de target:",
+      "itens": [
+        "Se não escolhermos um target, estamos lidando com um problema de aprendizado não supervisionado. Isso significa que o modelo tentará encontrar padrões ou grupos nos dados sem saber a resposta certa. Um exemplo clássico é a clusterização.",
+        "Se escolhermos um target, entramos no campo do aprendizado supervisionado, onde o modelo aprende com base em entradas e saídas já conhecidas."
+      ]
+    },
+    {
+      "texto": "Aqui entra uma distinção importante:",
+      "itens": [
+        "Se o target for uma string (texto ou categoria), estamos tratando de um problema de classificação. O modelo aprenderá a identificar a qual categoria um novo dado pertence.",
+        "Se o target for numérico, estamos diante de um problema de regressão, onde o modelo tentará prever um valor contínuo, como o preço de um produto ou a temperatura de um dia."
+      ]
+    },
+    {
+      "texto": "Portanto, pense com atenção: você quer ensinar o modelo a prever algo (supervisionado) ou deixá-lo explorar os dados por conta própria (não supervisionado)? E, se for supervisionado, qual é o tipo de informação que ele deve prever.",
+      "itens": []
+    }
+  ],
+  "resumos": {
+    "target": [
+      "Sem target: Aprendizado não supervisionado",
+      "Com target do tipo texto: Aprendizado supervisionado - classificação",
+      "Com target do tipo numérico: Aprendizado supervisionado - Regressão"
+    ]
+  }
+}

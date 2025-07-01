@@ -28,6 +28,7 @@ import { ModalExecucaoComponent } from './execucoes/modals/modal-execucao/modal-
 import { SelecaoMetricasComponent } from './execucoes/modals/selecao-metricas/selecao-metricas.component';
 import { MetricasComponent } from './pipeline/metricas/metricas.component';
 import { MetricaAvaliacaoComponent } from './execucoes/modals/metrica-avaliacao/metrica-avaliacao.component';
+import { TutorComponent } from './tutor/tutor.component';
 
 
 
@@ -45,7 +46,8 @@ import { MetricaAvaliacaoComponent } from './execucoes/modals/metrica-avaliacao/
     TiposClassificadoresComponent,
     SelecaoMetricasComponent,
     MetricasComponent,
-    MetricaAvaliacaoComponent
+    MetricaAvaliacaoComponent,
+    TutorComponent
   ],
   imports: [CommonModule,
     DragDropModule,

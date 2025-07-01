@@ -1,27 +1,42 @@
-@use '../../../styles/styles.scss'  as *;
+@use '../../../styles/styles.scss' as *;
 
 
-.opcoesPipeline {
+.opcoesPipelineExecucao {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem;
+  width: 100%;
+
+  .coluna {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 20%;
+  }
+
 }
 
-.coluna {
+
+.colunaTutor {
   display: flex;
-  flex-direction: column;
-  gap: 4px; /* distância entre itens vertical */
-  width: 150px; /* largura fixa para coluna */
+  flex-wrap: wrap;
+  width: 300px !important;
+  border: 1px solid $vermelho-escuro;
+  border-radius: 4px;
+  background-color: $vermelho-claro;
+  color: $vermelho-escuro;
+  padding: 8px;
 }
 
 .coluna nav[cdkdrag] {
   height: 60px;
   background: $verde-claro;
   border-radius: 6px;
-  box-shadow: 0 1px 4px  $verde-medio;
+  box-shadow: 0 1px 4px $verde-medio;
   display: flex;
   align-items: center;
-  padding: 0  1rem ;
+  padding: 0 1rem;
   cursor: grab;
   user-select: none;
   transition: box-shadow 0.2s ease;
@@ -40,5 +55,5 @@
 
 .coluna nav[cdkdrag]:active {
   cursor: grabbing;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.24);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.24);
 }

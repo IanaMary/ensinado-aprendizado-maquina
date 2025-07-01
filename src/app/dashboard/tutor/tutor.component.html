@@ -1,0 +1,28 @@
+<div class="informacoes">
+  <ng-container *ngIf="resumo.length">
+    <div class="wrapper">
+      <mat-icon [svgIcon]="'tutor'"></mat-icon>
+      <div class="balao">
+        <li *ngFor="let item of resumo ">
+          {{item}}
+        </li>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="tutorColeta">
+    <ng-container *ngFor="let tutor of tutor.itensColetasDados">
+      <p>{{tutor.texto}}</p>
+      <li *ngFor="let item of tutor.itens ">
+        {{item}}
+      </li>
+    </ng-container>
+  </ng-container>
+  <ng-container *ngIf="tutorTreinamento">
+    <ng-container *ngFor="let tutor of tutor.itensTreino">
+      <p>{{tutor.texto}}</p>
+      <li *ngFor="let item of tutor.itens ">
+        {{item}}
+      </li>
+    </ng-container>
+  </ng-container>
+</div>

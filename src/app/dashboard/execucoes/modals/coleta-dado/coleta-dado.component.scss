@@ -1,8 +1,6 @@
 @import '../../../../../styles/styles.scss';
 
 
-
-
 .modal {
   width: 700px;
   height: 700px;
@@ -107,6 +105,7 @@ input[type="file"] {
     background-color: #d5d5d5;
   }
 }
+
 small {
   display: block;
   margin-top: 0.25rem;
@@ -114,15 +113,10 @@ small {
   font-size: 0.85rem;
 }
 
-mat-divider {
-  margin: 1.5rem 0;
-}
-
-mat-radio-button {
-  margin-right: 0.5rem;
-}
-
-mat-checkbox {
-  margin: 0 auto;
-  display: block;
+.target {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: center;
+  flex-direction: row;
 }

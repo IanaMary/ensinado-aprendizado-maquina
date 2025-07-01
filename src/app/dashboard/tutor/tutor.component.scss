@@ -1,0 +1,31 @@
+@use "../../../styles/styles.scss" as *;
+
+
+.informacoes {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+
+.wrapper {
+  position: relative;
+  display: inline-block;
+
+  .balao {
+    display: none;
+    position: absolute;
+    padding: 1rem;
+    width: 200px;
+    border: 1px solid $vermelho-escuro;
+    border-radius: 4px;
+    background-color: $vermelho-claro;
+    color: $vermelho-escuro;
+    padding: 8px;
+    z-index: 11;
+  }
+
+  &:hover .balao {
+    display: block;
+  }
+}

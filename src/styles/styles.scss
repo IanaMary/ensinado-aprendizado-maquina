@@ -14,6 +14,13 @@ body {
   display: flex;
 }
 
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 // Personalize o tooltip globalmente
 :root {
 
@@ -103,4 +110,17 @@ button[mat-raised-button] {
 .item-desabilitado {
   border: 2px dashed $cinza-escuro;
   background-color: $cinza-claro;
+}
+
+mat-divider {
+  margin: 1.5rem 0;
+}
+
+mat-radio-button {
+  margin-right: 0.5rem;
+}
+
+mat-checkbox {
+  margin: 0 auto;
+  display: block;
 }

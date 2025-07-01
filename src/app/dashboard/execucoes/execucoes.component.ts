@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
 import { ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
 import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.component';
+import tutor from '../../constants/tutor.json';
+
 
 @Component({
   selector: 'app-execucoes',
@@ -12,6 +14,8 @@ import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.c
   standalone: false,
 })
 export class ExecucoesComponent implements OnInit {
+
+  tutor = tutor;
 
   itens: ItemPipeline[] = [];
   colunaColeta: ItemPipeline[] = [];

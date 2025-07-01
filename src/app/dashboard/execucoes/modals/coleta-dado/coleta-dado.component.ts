@@ -10,6 +10,7 @@ import {
 import { PlanilhaService } from '../../../../service/planilha.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { InformacoesDados, labelParaTipoTargetMap, ResultadoColetaDado, TipoDado } from '../../../../models/item-coleta-dado.model';
+import tutor from '../../../../constants/tutor.json';
 
 @Component({
   selector: 'app-coleta-dado',
@@ -18,6 +19,8 @@ import { InformacoesDados, labelParaTipoTargetMap, ResultadoColetaDado, TipoDado
   standalone: false
 })
 export class ColetaDadoComponent implements OnChanges, OnInit {
+  tutor = tutor.resumos;
+
 
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
   @Output() resultadoColetaDadoModificado = new EventEmitter<ResultadoColetaDado>();

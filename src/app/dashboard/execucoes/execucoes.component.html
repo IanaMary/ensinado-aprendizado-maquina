@@ -1,14 +1,15 @@
-<div class="opcoesPipeline">
+<div class="opcoesPipelineExecucao">
+
+  <mat-divider></mat-divider>
+
+  <mat-divider></mat-divider>
 
   <!-- Coluna Coleta -->
-  <div
-    cdkDropList
-    [cdkDropListData]="colunaColeta"
-    [cdkDropListConnectedTo]="['treinoList', 'metricaList']"
-    class="coluna"
-    id="coletaList"
-  >
+  <div cdkDropList [cdkDropListData]="colunaColeta" [cdkDropListConnectedTo]="['treinoList', 'metricaList']"
+    class="coluna" id="coletaList">
     <h3>Coleta</h3>
+
+
     <nav *ngFor="let item of colunaColeta" cdkDrag>
       <button (click)="abrirModalExecucao(item)">
         <mat-card-title>
@@ -20,14 +21,8 @@
   </div>
 
   <!-- Coluna Treino -->
-  <div
-    cdkDropList
-    #treinoList="cdkDropList"
-    [cdkDropListData]="colunaTreino"
-    [cdkDropListConnectedTo]="['coletaList', 'metricaList']"
-    class="coluna"
-    id="treinoList"
-  >
+  <div cdkDropList #treinoList="cdkDropList" [cdkDropListData]="colunaTreino"
+    [cdkDropListConnectedTo]="['coletaList', 'metricaList']" class="coluna" id="treinoList">
     <h3>Treinamento</h3>
     <nav *ngFor="let item of colunaTreino" cdkDrag>
       <button (click)="abrirModalExecucao(item)">
@@ -40,14 +35,8 @@
   </div>
 
   <!-- Coluna Métrica -->
-  <div
-    cdkDropList
-    #metricaList="cdkDropList"
-    [cdkDropListData]="colunaMetrica"
-    [cdkDropListConnectedTo]="['coletaList', 'treinoList']"
-    class="coluna"
-    id="metricaList"
-  >
+  <div cdkDropList #metricaList="cdkDropList" [cdkDropListData]="colunaMetrica"
+    [cdkDropListConnectedTo]="['coletaList', 'treinoList']" class="coluna" id="metricaList">
     <h3>Métrica</h3>
     <nav *ngFor="let item of colunaMetrica" cdkDrag>
       <button (click)="abrirModalExecucao(item)">
@@ -57,6 +46,14 @@
         {{ item.label }}
       </button>
     </nav>
+  </div>
+
+  <div class="example-box" cdkDrag class="coluna colunaTutor">
+    <h3>Tutor</h3>
+    <div>
+      <app-tutor [tutorColeta]="!colunaColeta.length" [tutorTreinamento]="!colunaTreino.length"></app-tutor>
+    </div>
+
   </div>
 
 </div>

@@ -20,9 +20,14 @@
   <!-- Tabela de configuração das colunas TREINO -->
   <ng-container *ngIf="treino.dados.length > 0">
     <mat-divider></mat-divider>
-    Configuração do dataset de treino
 
+    <div class="target">
+      Configuração do dataset de treino
+      <app-tutor [resumo]="tutor.target"></app-tutor>
+    </div>
     <mat-divider></mat-divider>
+
+
 
     <mat-form-field appearance="outline">
       <mat-label>Seleção do target</mat-label>
@@ -30,7 +35,6 @@
         <mat-option [value]="opTarget" *ngFor="let opTarget of opcoesTarget">{{opTarget}}</mat-option>
       </mat-select>
     </mat-form-field>
-
 
     <nav class="tabela-container">
       <table mat-table [dataSource]="dataSourceColunas" class="mat-table">
