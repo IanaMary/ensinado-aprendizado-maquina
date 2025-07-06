@@ -1,10 +1,17 @@
 @use "../../../styles/styles.scss" as *;
 
 
-.informacoes {
+.tutor {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+
+  border: 1px solid $vermelho-escuro;
+  border-radius: 4px;
+  background-color: $vermelho-claro;
+  color: $vermelho-escuro;
+
+  padding: 8px;
 }
 
 

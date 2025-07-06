@@ -1,59 +1,70 @@
 <div class="opcoesPipelineExecucao">
 
-  <mat-divider></mat-divider>
-
-  <mat-divider></mat-divider>
-
   <!-- Coluna Coleta -->
   <div cdkDropList [cdkDropListData]="colunaColeta" [cdkDropListConnectedTo]="['treinoList', 'metricaList']"
-    class="coluna" id="coletaList">
-    <h3>Coleta</h3>
-
-
-    <nav *ngFor="let item of colunaColeta" cdkDrag>
-      <button (click)="abrirModalExecucao(item)">
-        <mat-card-title>
-          <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
-        </mat-card-title>
-        {{ item.label }}
-      </button>
+    class="coluna coluna-20" id="coletaList">
+    <nav class="titulo">
+      <h3>Coleta</h3>
     </nav>
+    <nav class="conteudo">
+
+      <ng-container *ngFor="let item of colunaColeta" cdkDrag>
+        <button (click)="abrirModalExecucao(item)">
+          <mat-card-title>
+            <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+          </mat-card-title>
+          {{ item.label }}
+        </button>
+      </ng-container>
+    </nav>
+
   </div>
 
   <!-- Coluna Treino -->
   <div cdkDropList #treinoList="cdkDropList" [cdkDropListData]="colunaTreino"
-    [cdkDropListConnectedTo]="['coletaList', 'metricaList']" class="coluna" id="treinoList">
-    <h3>Treinamento</h3>
-    <nav *ngFor="let item of colunaTreino" cdkDrag>
-      <button (click)="abrirModalExecucao(item)">
-        <mat-card-title>
-          <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
-        </mat-card-title>
-        {{ item.label }}
-      </button>
+    [cdkDropListConnectedTo]="['coletaList', 'metricaList']" class="coluna coluna-20" id="treinoList">
+    <nav class="titulo">
+      <h3>Treinamento</h3>
     </nav>
+    <nav class="conteudo">
+      <ng-container *ngFor="let item of colunaTreino" cdkDrag>
+        <button (click)="abrirModalExecucao(item)">
+          <mat-card-title>
+            <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+          </mat-card-title>
+          {{ item.label }}
+        </button>
+      </ng-container>
+    </nav>
+
   </div>
 
   <!-- Coluna Métrica -->
   <div cdkDropList #metricaList="cdkDropList" [cdkDropListData]="colunaMetrica"
-    [cdkDropListConnectedTo]="['coletaList', 'treinoList']" class="coluna" id="metricaList">
-    <h3>Métrica</h3>
-    <nav *ngFor="let item of colunaMetrica" cdkDrag>
-      <button (click)="abrirModalExecucao(item)">
-        <mat-card-title>
-          <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
-        </mat-card-title>
-        {{ item.label }}
-      </button>
+    [cdkDropListConnectedTo]="['coletaList', 'treinoList']" class="coluna coluna-20" id="metricaList">
+    <nav class="titulo">
+      <h3>Métrica</h3>
     </nav>
-  </div>
-
-  <div class="example-box" cdkDrag class="coluna colunaTutor">
-    <h3>Tutor</h3>
-    <div>
-      <app-tutor [tutorColeta]="!colunaColeta.length" [tutorTreinamento]="!colunaTreino.length"></app-tutor>
+    <div class="conteudo">
+      <ng-container *ngFor="let item of colunaMetrica" cdkDrag>
+        <button (click)="abrirModalExecucao(item)">
+          <mat-card-title>
+            <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+          </mat-card-title>
+          {{ item.label }}
+        </button>
+      </ng-container>
     </div>
 
+  </div>
+
+  <div cdkDrag class="coluna coluna-40">
+    <nav class="titulo">
+      <h3>Tutor</h3>
+    </nav>
+    <div class="conteudo">
+      <app-tutor [tutorColeta]="!colunaColeta.length" [tutorTreinamento]="!colunaTreino.length"></app-tutor>
+    </div>
   </div>
 
 </div>
