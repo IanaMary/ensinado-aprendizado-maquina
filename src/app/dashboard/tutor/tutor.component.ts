@@ -11,7 +11,9 @@ export class TutorComponent implements OnChanges {
 
   @Input() tutorColeta = false;
   @Input() tutorTreinamento = false;
+  @Input() tutorModelo = false;
   @Input() resumo: string[] = [];
+  @Input() explicacao: string[] = [];
 
   tutor = tutor;
   ngOnChanges(): void { }

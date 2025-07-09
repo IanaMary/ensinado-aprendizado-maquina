@@ -1,102 +1,326 @@
-@use "../../../../../styles/colores.scss"  as *;
+@use "../../../../../styles/styles.scss" as *;
 
-.modal-execucao {
-  width: 100%;
-  min-width: 500px;
-  max-width: 500px;
-  min-height: 720px; // Garante o espaço mínimo para o conteúdo interno
-  max-height: 90vh;
-  margin: 0 auto;
-  padding: 1.5rem;
-  box-sizing: border-box;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
+
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding: 0 !important;
+  background: transparent;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
-.modal-header {
+// Estilo principal do modal
+::ng-deep .modal-layout {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: column;
+  height: 900px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #fff;
+  padding: 1rem;
 
-  .box-linha {
+  // Gaveta aberta → largura total: 900px
+  &.expanded {
+    width: 900px !important;
+  }
+
+  // Gaveta fechada → só a main-content: 650px
+  &:not(.expanded) {
+    width: 650px !important;
+  }
+
+  .main-content {
     display: flex;
-    flex-direction: row;
-    width: 100%;
-    align-content: center;
-    flex-wrap: nowrap;
-    align-items: center;
-  }
-
-  .titulo {
+    flex-direction: column;
+    width: 650px;
+    box-sizing: border-box;
     justify-content: space-between;
+    // overflow: auto;
+
+    .conteudo-modal {
+      // display: flex;
+      padding: 4px 0 4px 0;
+      overflow: auto;
+      width: 100%;
+      height: 80%;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      padding: 4px 0 4px 0;
+      gap: 1rem;
+    }
+
+    .box-linha {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      align-content: center;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+
+    .titulo {
+      justify-content: space-between;
+    }
+
+    .breadcrumb {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 0.5rem;
+      // width: 100%;
+
+      .bolinha {
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        margin: 0 5px;
+      }
+
+      .linha {
+        height: 4px;
+        width: 5%;
+        border-radius: 2px;
+      }
+
+      .visitada {
+        background-color: $azul-claro;
+        color: $azul-escuro;
+      }
+
+      .atual {
+        background-color: $verde-claro;
+        color: $verde-medio;
+      }
+
+      .desabilitada {
+        background-color: $cinza-claro;
+        color: $cinza-escuro;
+      }
+    }
+
   }
 
-  .breadcrumb {
-    justify-content: center;
-    border-bottom: 0.25px solid $preto;
-    .bolinha {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: white;
-      margin: 0 5px;
-    }
-
-    .linha {
-      height: 4px;
-      width: 50px;
-      border-radius: 2px;
-    }
-
-    .visitada {
-      background-color: $azul-claro;
-      color: $azul-escuro;
-    }
-
-    .atual {
-      background-color: $verde-claro;
-      color: $verde-medio;
-    }
-
-    .desabilitada {
-      background-color: $cinza-claro;
-      color: $cinza-escuro;
-    }
+  .side-drawer {
+    width: 250px;
+    // background-color: #f5f5f5;
+    padding: 1rem;
+    box-sizing: border-box;
+    border-left: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
   }
 }
 
-.close-button {
-  padding: 0;
-  margin: 0;
-  font-size: 24px;
-  color: #333;
-  background: none;
+
+
+
+
+/* botão puxador */
+.drawer-toggle {
+  // position: absolute;
+  // // top: 16px;
+  // // right: 0;
+  // z-index: 10;
+  // width: 30px;
+  // height: 60px;
   border: none;
+  border-radius: 4px 0 0 4px;
   cursor: pointer;
 }
 
-.close-button mat-icon {
-  font-size: 30px;
-}
 
-.conteudo-modal {
-  flex: 1;
-  overflow-y: auto;
-  margin: 1rem 0;
-}
 
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-  gap: 1rem;
-}
+// .modal-execucao {
+//   width: 100%;
+//   min-width: 500px;
+//   max-width: 500px;
+//   min-height: 720px; // Garante o espaço mínimo para o conteúdo interno
+//   max-height: 90vh;
+//   margin: 0 auto;
+//   padding: 1.5rem;
+//   box-sizing: border-box;
+//   background-color: #fff;
+//   border-radius: 8px;
+//   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+//   display: flex;
+//   flex-direction: column;
+//   overflow: hidden;
+// }
+
+// .modal-header {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   flex-direction: column;
+
+
+
+
+
+
+// }
+
+// .close-button {
+//   padding: 0;
+//   margin: 0;
+//   font-size: 24px;
+//   color: #333;
+//   background: none;
+//   border: none;
+//   cursor: pointer;
+// }
+
+// .close-button mat-icon {
+//   font-size: 30px;
+// }
+
+// .conteudo-modal {
+//   flex: 1;
+//   overflow-y: auto;
+//   margin: 1rem 0;
+// }
+
+// .modal-footer {
+//   display: flex;
+//   justify-content: flex-end;
+//   margin-top: 1rem;
+//   gap: 1rem;
+// }
+
+
+// .modal-content,
+// .mat-mdc-dialog-surface {
+//   min-width: 500px;
+//   max-width: 500px;
+//   min-height: 720px; // Garante o espaço mínimo para o conteúdo interno
+//   padding: 16px;
+//   box-sizing: border-box;
+//   background-color: #fff;
+//   border-radius: 8px;
+//   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+//   display: flex;
+//   flex-direction: column;
+//   // overflow: hidden;
+
+//   .main-content {
+//     // flex: 1;
+//     // padding: 1rem;
+//     // overflow-y: auto;
+
+//     .box-linha {
+//       display: flex;
+//       flex-direction: row;
+//       width: 100%;
+//       align-content: center;
+//       flex-wrap: nowrap;
+//       align-items: center;
+//     }
+
+//     .breadcrumb {
+//       border-bottom: 0.25px solid $preto;
+
+
+//       .bolinha {
+//         width: 30px;
+//         height: 30px;
+//         border-radius: 50%;
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         font-weight: bold;
+//         color: white;
+//         margin: 0 5px;
+//       }
+
+//       .linha {
+//         height: 4px;
+//         width: 50px;
+//         border-radius: 2px;
+//       }
+
+//       .visitada {
+//         background-color: $azul-claro;
+//         color: $azul-escuro;
+//       }
+
+//       .atual {
+//         background-color: $verde-claro;
+//         color: $verde-medio;
+//       }
+
+//       .desabilitada {
+//         background-color: $cinza-claro;
+//         color: $cinza-escuro;
+//       }
+//     }
+
+//     .titulo {
+//       justify-content: space-between;
+//       height: 64px;
+//     }
+
+//     .conteudo-modal {
+//       height: 680px;
+//       overflow-x: auto;
+//     }
+
+//     .modal-botoes {
+//       height: 64px;
+//       height: 64px;
+//       display: flex;
+//       align-items: center;
+//       justify-content: flex-end;
+//     }
+//   }
+// }
+
+
+
+
+// .side-drawer {
+//   width: 250px;
+//   background: #f1f1f1;
+//   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+//   position: absolute;
+//   top: 0;
+//   right: -250px;
+//   /* Escondido */
+//   height: 100%;
+//   padding: 1rem;
+//   transition: right 0.3s ease;
+//   z-index: 10;
+//   display: none;
+// }
+
+// .side-drawer.open {
+//   right: 0;
+//   display: flex;
+//   /* Abre deslizando */
+// }
+
+// /* Botão puxador fixo na lateral direita */
+// .drawer-toggle {
+//   position: absolute;
+//   top: 1rem;
+//   right: 0;
+//   width: 30px;
+//   height: 60px;
+//   border-radius: 4px 0 0 4px;
+//   border: none;
+//   background: #007bff;
+//   color: white;
+//   font-size: 1.5rem;
+//   cursor: pointer;
+//   z-index: 20;
+//   user-select: none;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 0;
+// }

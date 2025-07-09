@@ -9,20 +9,36 @@
       </div>
     </div>
   </ng-container>
-  <ng-container *ngIf="tutorColeta">
-    <ng-container *ngFor="let tutor of tutor.itensColetasDados">
-      <p>{{tutor.texto}}</p>
-      <li *ngFor="let item of tutor.itens ">
-        {{item}}
-      </li>
+  <div class="tutor-painel">
+    <ng-container *ngIf="tutorColeta">
+      <ng-container *ngFor="let tutor of tutor.itensColetasDados">
+        <p>{{tutor.texto}}</p>
+        <li *ngFor="let item of tutor.itens ">
+          {{item}}
+        </li>
+      </ng-container>
     </ng-container>
-  </ng-container>
-  <ng-container *ngIf="tutorTreinamento">
-    <ng-container *ngFor="let tutor of tutor.itensTreino">
-      <p>{{tutor.texto}}</p>
-      <li *ngFor="let item of tutor.itens ">
-        {{item}}
-      </li>
+    <ng-container *ngIf="tutorTreinamento">
+      <ng-container *ngFor="let tutor of tutor.itensTreino">
+        <p>{{tutor.texto}}</p>
+        <li *ngFor="let item of tutor.itens ">
+          {{item}}
+        </li>
+      </ng-container>
     </ng-container>
-  </ng-container>
+    <ng-container *ngIf="tutorModelo">
+      <ng-container *ngFor="let tutor of tutor.modelo">
+        <p>{{tutor.texto}}</p>
+        <li *ngFor="let item of tutor.itens ">
+          {{item}}
+        </li>
+      </ng-container>
+    </ng-container>
+    <ng-container *ngIf="explicacao.length">
+      <ng-container *ngFor="let tutor of explicacao">
+        <p>{{tutor}}</p>
+      </ng-container>
+    </ng-container>
+  </div>
+
 </div>

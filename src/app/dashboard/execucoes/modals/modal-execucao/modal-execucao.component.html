@@ -1,71 +1,92 @@
-<nav class="modal-execucao">
-  <nav class="modal-header">
-    <nav class="box-linha breadcrumb">
-      <ng-container *ngFor="let key of etapaKeys; let idx = index">
-        <!-- Bolinha -->
-        <div [matTooltip]="etapas[key].titulo" matTooltipPosition="above" class="bolinha" [ngClass]="getClasseLinhaPipe(idx)">
-          {{ idx + 1 }}
-        </div>
+<div class="modal-layout" [class.expanded]="drawerOpen">
+  <!-- Coluna principal -->
+  <div class="main-content">
 
-        <!-- Linha (só aparece se não for a última bolinha) -->
-        <div *ngIf="idx < etapaKeys.length - 1" class="linha" [ngClass]="getClasseLinhaPipe(idx)">
-        </div>
-      </ng-container>
+    <nav class="modal-header">
+      <nav class="box-linha breadcrumb">
+        <ng-container *ngFor="let key of etapaKeys; let idx = index">
+          <div [matTooltip]="etapas[key].titulo" matTooltipPosition="above" class="bolinha"
+            [ngClass]="getClasseLinhaPipe(idx)">
+            {{ idx + 1 }}
+          </div>
+          <div *ngIf="idx < etapaKeys.length - 1" class="linha" [ngClass]="getClasseLinhaPipe(idx)"></div>
+        </ng-container>
+
+        <button class="tutor drawer-toggle" (click)="toggleDrawer()">
+          <mat-icon [svgIcon]="'tutor'"></mat-icon>
+        </button>
+      </nav>
+
+      <mat-divider></mat-divider>
+
+      <nav class="box-linha titulo">
+        <h2>{{ etapas[etapaAtual].titulo }}</h2>
+        <button mat-icon-button class="close-button" (click)="fechar()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </nav>
+
     </nav>
+
 
     <mat-divider></mat-divider>
 
-    <nav class="box-linha titulo">
-      <h2>{{ etapas[etapaAtual].titulo }}</h2>
-      <button mat-icon-button class="close-button" (click)="fechar()">
-        <mat-icon>close</mat-icon>
+
+    <section class="conteudo-modal">
+      <ng-container [ngSwitch]="etapas[etapaAtual].indice">
+
+        <ng-container *ngSwitchCase="0">
+          <app-coleta-dado [resultadoColetaDado]="resultadoColetaDado"
+            (resultadoColetaDadoModificado)="atualizarResultadoColeta($event)">
+          </app-coleta-dado>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="1">
+          <app-tipos-classificadores [modelosDisponiveis]="modelosDisponiveis" [modeloSelecionado]="modeloSelecionado"
+            (selecaoModelo)="atualizarModelo($event)">
+          </app-tipos-classificadores>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="2">
+          <app-classificador [resultadoTreinamento]="resultadoTreinamento" [resultadoColetaDado]="resultadoColetaDado"
+            [modeloSelecionado]="modeloSelecionado"
+            (atualizarResultadoTreinamento)="atualizarResultadoTreinamento($event)">
+          </app-classificador>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="3">
+          <app-selecao-metricas [metricasDisponiveis]="metricasDisponiveis"
+            [metricasSelecionadas]="metricasSelecionadas" (selecaoMetricas)="atualizarMetricasSelecionadas($event)">
+          </app-selecao-metricas>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="4">
+          <app-metrica-avaliacao [resultadosDasAvaliacoes]="resultadosDasAvaliacoes"
+            [metricasSelecionadas]="metricasSelecionadas" [resultadoTreinamento]="resultadoTreinamento"
+            (atualizarResultadoAvaliacoes)="atualizarResultadoAvaliacoes($event)">
+          </app-metrica-avaliacao>
+        </ng-container>
+
+      </ng-container>
+    </section>
+
+    <mat-divider></mat-divider>
+
+    <div class="modal-footer">
+      <button *ngIf="etapas[etapaAtual].indice" mat-raised-button (click)="anterior()"
+        [disabled]="etapas[etapaAtual].indice === 0">Anterior</button>
+      <button *ngIf="etapas[etapaAtual].indice < nEtapas - 1" mat-raised-button color="primary" (click)="proximo()"
+        [disabled]="!etapas[etapaAtual].proximo">
+        Próximo
       </button>
-    </nav>
-
-  </nav>
-  <mat-divider></mat-divider>
-
-  <section class="conteudo-modal">
-    <ng-container [ngSwitch]="etapas[etapaAtual].indice">
-
-      <ng-container *ngSwitchCase="0">
-        <app-coleta-dado [resultadoColetaDado]="resultadoColetaDado"
-          (resultadoColetaDadoModificado)="atualizarResultadoColeta($event)">
-        </app-coleta-dado>
-      </ng-container>
-
-      <ng-container *ngSwitchCase="1">
-        <app-tipos-classificadores [modelosDisponiveis]="modelosDisponiveis" [modeloSelecionado]="modeloSelecionado"
-          (selecaoModelo)="atualizarModelo($event)">
-        </app-tipos-classificadores>
-      </ng-container>
-
-      <ng-container *ngSwitchCase="2">
-        <app-classificador [resultadoTreinamento]="resultadoTreinamento" [resultadoColetaDado]="resultadoColetaDado" [modeloSelecionado]="modeloSelecionado"
-          (atualizarResultadoTreinamento)="atualizarResultadoTreinamento($event)">
-        </app-classificador>
-      </ng-container>
-
-      <ng-container *ngSwitchCase="3">
-        <app-selecao-metricas [metricasDisponiveis]="metricasDisponiveis" [metricasSelecionadas]="metricasSelecionadas"
-          (selecaoMetricas)="atualizarMetricasSelecionadas($event)">
-        </app-selecao-metricas>
-      </ng-container>
-
-      <ng-container *ngSwitchCase="4">
-        <app-metrica-avaliacao [resultadosDasAvaliacoes]="resultadosDasAvaliacoes" [metricasSelecionadas]="metricasSelecionadas" [resultadoTreinamento]="resultadoTreinamento"
-          (atualizarResultadoAvaliacoes)="atualizarResultadoAvaliacoes($event)" >
-        </app-metrica-avaliacao>
-      </ng-container>
-
-    </ng-container>
-  </section>
-  <mat-divider></mat-divider>
-
-  <div class="modal-footer">
-    <button *ngIf="etapas[etapaAtual].indice" mat-raised-button (click)="anterior()" [disabled]="etapas[etapaAtual].indice === 0">Anterior</button>
-    <button *ngIf="etapas[etapaAtual].indice < nEtapas - 1" mat-raised-button color="primary" (click)="proximo()" [disabled]="!etapas[etapaAtual].proximo">
-      Próximo
-    </button>
+    </div>
   </div>
-</nav>
+
+  <!-- Gaveta lateral -->
+  <div class="side-drawer" *ngIf="drawerOpen">
+    <app-tutor [explicacao]="explicacaoAtual">
+    </app-tutor>
+  </div>
+</div>
+
+<!-- Botão puxador (dentro da main-content ou fixo no canto direito) -->

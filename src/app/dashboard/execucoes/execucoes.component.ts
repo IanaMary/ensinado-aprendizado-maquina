@@ -46,6 +46,8 @@ export class ExecucoesComponent implements OnInit {
 
   abrirModalExecucao(item: ItemPipeline): void {
     const dialogRef = this.dialog.open(ModalExecucaoComponent, {
+      maxWidth: 'none',
+      width: 'auto',
       data: {
         etapa: item.tipoItem,
         resultadoColetaDado: this.resultadoColetaDado,
@@ -62,7 +64,7 @@ export class ExecucoesComponent implements OnInit {
         this.modeloSelecionado = resultado.modeloSelecionado
         this.resultadoTreinamento = resultado.resultadoTreinamento;
         this.metricasSelecionadas = resultado.metricasSelecionadas;
-        this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes
+        this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
         this.dashboardService.moverItensEmExecucao();
       }
     });

@@ -1,17 +1,10 @@
 @use "../../../styles/styles.scss" as *;
 
 
-.tutor {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-
-  border: 1px solid $vermelho-escuro;
-  border-radius: 4px;
-  background-color: $vermelho-claro;
-  color: $vermelho-escuro;
-
-  padding: 8px;
+.tutor-painel {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
 }
 
 

@@ -33,11 +33,49 @@
       "itens": []
     }
   ],
+  "modelo": [
+    {
+      "texto": "Modelo com target do tipo texto (string): aprendizado supervisionado - classificação.",
+      "itens": [
+        "O modelo aprende a prever rótulos ou classes com base nos dados de entrada."
+      ]
+    },
+    {
+      "texto": "Modelo com target do tipo numérico: aprendizado supervisionado - regressão.",
+      "itens": [
+        "O modelo aprende a prever valores contínuos com base nos atributos fornecidos."
+      ]
+    },
+    {
+      "texto": "Modelo sem target: aprendizado não supervisionado - exemplo: clusterização.",
+      "itens": [
+        "Não há uma resposta certa a ser aprendida; o modelo busca estruturas ou padrões nos dados."
+      ]
+    }
+  ],
   "resumos": {
     "target": [
       "Sem target: Aprendizado não supervisionado",
       "Com target do tipo texto: Aprendizado supervisionado - classificação",
       "Com target do tipo numérico: Aprendizado supervisionado - Regressão"
+    ],
+    "modelo-classificacao": [
+      "Aprendizado supervisionado: o modelo aprende com base em exemplos com entrada e saída conhecidas.",
+      "Target do tipo texto (categorias, rótulos): como 'sim/não', 'alto/médio/baixo', 'cliente fiel', etc.",
+      "Objetivo: classificar novas entradas em categorias."
+    ],
+    "modelo-regressao": [
+      "Aprendizado supervisionado com saída contínua.",
+      "Target numérico: como preço, idade, temperatura, nota de prova.",
+      "Objetivo: prever valores contínuos com base nos atributos."
+    ],
+    "modelo-exploratorio": [
+      "Aprendizado não supervisionado: o modelo busca padrões sem saber a resposta certa.",
+      "Sem target definido.",
+      "Objetivo: identificar estruturas nos dados, como em agrupamentos ou segmentações."
+    ],
+    "xlsx": [
+      "O formato .xlsx é o padrão do Excel, adequado para dados em tabelas com múltiplas abas. Ao trabalhar com esses dados, é importante decidir se haverá uma variável alvo (target):"
     ]
   }
 }

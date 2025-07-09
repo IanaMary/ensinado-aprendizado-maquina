@@ -3,6 +3,7 @@ import { ItemPipeline, ResultadoColetaDado, TipoTarget } from '../../../../model
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import itensPipeline from '../../../../constants/itens-coletas-dados.json';
+import tutor from '../../../../constants/tutor.json';
 
 @Component({
   selector: 'modal-execucao',
@@ -11,6 +12,8 @@ import itensPipeline from '../../../../constants/itens-coletas-dados.json';
   standalone: false
 })
 export class ModalExecucaoComponent implements OnInit {
+
+  tutor = tutor;
 
   etapas: Record<string, { indice: number; proximo: boolean; titulo: string; }> = {
     'coleta-dado': { indice: 0, proximo: true, titulo: 'Importar Planilha' },
@@ -32,6 +35,7 @@ export class ModalExecucaoComponent implements OnInit {
   modelosDisponiveis: ItemPipeline[] = [];
 
   tipoTargetSelecionado: TipoTarget = null;
+  tutorModeloTarget: string[] = [];
 
   todasMetricas = itensPipeline.itensMetricas as ItemPipeline[];
   metricasDisponiveis: ItemPipeline[] = [];
@@ -93,7 +97,10 @@ export class ModalExecucaoComponent implements OnInit {
 
   atualizarResultadoColeta(event: ResultadoColetaDado) {
     this.resultadoColetaDado = event;
-    this.tipoTargetSelecionado = event.treino.tipoTarget;
+    this.tipoTargetSelecionado = event.treino.tipoTarget
+    this.tutorModeloTarget = this.tipoTargetSelecionado === 'string' ? tutor.resumos['modelo-classificacao'] :
+      this.tipoTargetSelecionado === 'number' ? tutor.resumos['modelo-regressao'] :
+        tutor.resumos['modelo-exploratorio'];
 
     const att = event.treino.atributos;
     const attVazio = Object.keys(att).length === 0 || Object.values(att).every(v => v === false);
@@ -198,5 +205,18 @@ export class ModalExecucaoComponent implements OnInit {
     if (idx < indiceAtual) return 'visitada';
     if (idx === indiceAtual) return 'atual';
     return 'desabilitada';
+  }
+
+  drawerOpen = false;
+
+  toggleDrawer() {
+    this.drawerOpen = !this.drawerOpen;
+  }
+
+  get explicacaoAtual(): any[] {
+    const idx = this.etapas[this.etapaAtual].indice;
+    if (idx === 0) return this.tutor.resumos.xlsx;
+    if (idx === 1) return this.tutorModeloTarget;
+    return [];
   }
 }
