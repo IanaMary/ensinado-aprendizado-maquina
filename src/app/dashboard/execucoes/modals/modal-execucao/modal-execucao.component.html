@@ -1,6 +1,6 @@
-<div class="modal-layout" [class.expanded]="drawerOpen">
+<div class="modal-layout" [class.expanded]="drawerOpen" cdkDrag>
   <!-- Coluna principal -->
-  <div class="main-content">
+  <div class="main-content" [class.main-content-pad]="drawerOpen" cdkDragHandle>
 
     <nav class="modal-header">
       <nav class="box-linha breadcrumb">

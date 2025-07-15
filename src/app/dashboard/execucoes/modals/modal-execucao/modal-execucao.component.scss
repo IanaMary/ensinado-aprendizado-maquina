@@ -10,12 +10,18 @@
 
 // Estilo principal do modal
 ::ng-deep .modal-layout {
+
+  // transform: translate(-50%);
   display: flex;
   height: 900px;
   box-sizing: border-box;
   overflow: hidden;
   background: #fff;
   padding: 1rem;
+  border: 3px solid;
+  position: fixed;
+  top: 2%;
+  left: 25%;
 
   // Gaveta aberta → largura total: 900px
   &.expanded {
@@ -47,7 +53,7 @@
       display: flex;
       justify-content: flex-end;
       width: 100%;
-      padding: 4px 0 4px 0;
+      // padding: 4px 0 4px 0;
       gap: 1rem;
     }
 
@@ -106,10 +112,14 @@
 
   }
 
+  .main-content-pad {
+    padding-right: 1rem;
+  }
+
   .side-drawer {
     width: 250px;
     // background-color: #f5f5f5;
-    padding: 1rem;
+    // padding: 1rem;
     box-sizing: border-box;
     border-left: 1px solid #ccc;
     display: flex;

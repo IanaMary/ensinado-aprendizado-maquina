@@ -48,6 +48,8 @@ export class ExecucoesComponent implements OnInit {
     const dialogRef = this.dialog.open(ModalExecucaoComponent, {
       maxWidth: 'none',
       width: 'auto',
+      disableClose: true,
+      hasBackdrop: false,
       data: {
         etapa: item.tipoItem,
         resultadoColetaDado: this.resultadoColetaDado,
