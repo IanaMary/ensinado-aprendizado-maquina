@@ -2,7 +2,7 @@
   <!-- Coluna principal -->
   <div class="main-content" [class.main-content-pad]="drawerOpen" cdkDragHandle>
 
-    <nav class="modal-header">
+    <nav class="modal-cabecalho">
       <nav class="box-linha breadcrumb">
         <ng-container *ngFor="let key of etapaKeys; let idx = index">
           <div [matTooltip]="etapas[key].titulo" matTooltipPosition="above" class="bolinha"
@@ -26,13 +26,13 @@
         </button>
       </nav>
 
+      <mat-divider></mat-divider>
     </nav>
 
 
-    <mat-divider></mat-divider>
 
 
-    <section class="conteudo-modal">
+    <section class="modal-conteudo">
       <ng-container [ngSwitch]="etapas[etapaAtual].indice">
 
         <ng-container *ngSwitchCase="0">
