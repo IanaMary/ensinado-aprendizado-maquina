@@ -16,13 +16,42 @@
   display: flex;
   justify-content: flex-end;
   margin-bottom: 1.5rem;
+  align-items: center;
+  gap: 16px;
+
+  .texto-informativo {
+    color: $verde-medio;
+  }
 }
 
+
 .resultado-container {
-  background-color: #f7f9fc;
-  border-radius: 6px;
-  padding: 1.5rem 2rem;
-  box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+  background-color: $cinza-claro;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 16px;
+  border-radius: 8px;
+  gap: 16px;
+  width: 100%;
+
+  .resultado {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+
+    p {
+      width: 100%;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      color: #222;
+      border-bottom: 2px solid #1976d2;
+      padding-bottom: 0.3rem;
+    }
+  }
 }
 
 .resultado-container::-webkit-scrollbar {
@@ -38,27 +67,22 @@
   border-radius: 4px;
 }
 
-h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
-  color: #222;
-  border-bottom: 2px solid #1976d2;
-  padding-bottom: 0.3rem;
-}
+
 
 p {
   margin: 0.3rem 0;
   font-size: 1rem;
   line-height: 1.4;
+
   strong {
     color: #555;
   }
 }
 
-mat-divider {
-  margin: 1.5rem 0;
-  border-color: #ddd !important;
+
+.mat-progress-spinner circle {
+  stroke: red !important;
+  /* isso sobrescreve qualquer tema */
 }
 
 /* Responsividade */

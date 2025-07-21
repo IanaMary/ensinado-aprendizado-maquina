@@ -13,13 +13,15 @@ import { FormsModule } from '@angular/forms'; // Importe o FormsModule
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { HttpClientModule } from '@angular/common/http';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 
 import { DashboardComponent } from './dashboard.component';
 import { PipelineComponent } from './pipeline/pipeline.component';
 import { ExecucoesComponent } from './execucoes/execucoes.component';
 import { ColetaDeDadosComponent } from './pipeline/coleta-de-dados/coleta-de-dados.component';
 import { FiltroColunaComponent } from './execucoes/filtro-coluna/filtro-coluna.component';
-import { HttpClientModule } from '@angular/common/http';
 import { TreinoValidacaoTesteComponent } from './pipeline/treino-validacao-teste/treino-validacao-teste.component';
 import { ClasificadorComponent } from './execucoes/modals/classificador/classificador.component';
 import { ColetaDadoComponent } from './execucoes/modals/coleta-dado/coleta-dado.component';
@@ -63,7 +65,8 @@ import { TutorComponent } from './tutor/tutor.component';
     MatSelectModule,
     MatMenuModule,
     MatTooltipModule,
-    HttpClientModule
+    HttpClientModule,
+    MatProgressSpinnerModule
   ]
 })
 export class DashboardModule { }

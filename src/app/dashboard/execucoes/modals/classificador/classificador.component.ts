@@ -10,20 +10,30 @@ import { ItemPipeline, ResultadoColetaDado, nomeModelos } from '../../../../mode
 })
 export class ClasificadorComponent implements OnChanges {
 
-  @Input() resultadoTreinamento: any;
+  @Input() resultadoTreinamento: Record<string, any> = {};;
   @Input() modeloSelecionado: ItemPipeline | undefined;
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
   @Output() atualizarResultadoTreinamento = new EventEmitter<any>();
 
+  treinando = false;
 
   constructor(
     private dashboardService: DashboardService
   ) { }
 
 
-  ngOnChanges(changes: SimpleChanges): void { }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['resultadoColetaDado'] && changes['modeloSelecionado']) {
+      const valor = this.modeloSelecionado?.valor;
+      const jaTreinado = this.resultadoTreinamento && valor ? this.resultadoTreinamento.hasOwnProperty(valor) : false;
+      if (valor && !jaTreinado) {
+        this.enviarParaClassificador(valor);
+      }
+    }
+  }
 
   async enviarParaClassificador(classificador: string) {
+    this.treinando = true
     const tipoClassficador = classificador ?? '';
     const body = await this.criarBody()
 
@@ -34,9 +44,12 @@ export class ClasificadorComponent implements OnChanges {
           ...this.resultadoTreinamento,
           [modelo]: res
         };
+        this.treinando = false
         this.atualizarResultadoTreinamento.emit(this.resultadoTreinamento)
       },
-      error: (err) => { }
+      error: (err) => {
+        this.treinando = false
+      }
     });
   }
 

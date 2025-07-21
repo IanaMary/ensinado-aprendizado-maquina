@@ -1,19 +1,33 @@
 <nav class="modal">
 
+
   <!-- Botão para treinar o modelo atual -->
   <section class="acoes" *ngIf="modeloSelecionado">
-    <button
-      mat-raised-button
-      (click)="enviarParaClassificador(modeloSelecionado.valor)">
-      Treinar {{modeloSelecionado.label}}
-    </button>
+    <ng-container *ngIf="treinando">
+      <span class="texto-informativo ">
+        Aguarde, treinando {{modeloSelecionado.label}}
+      </span>
+      <mat-spinner color="primary" mode="indeterminate" diameter="50"></mat-spinner>
+    </ng-container>
+
+    <ng-container *ngIf="!treinando">
+      <button mat-raised-button (click)="enviarParaClassificador(modeloSelecionado.valor)">
+        Treinar {{modeloSelecionado.label}}
+      </button>
+    </ng-container>
+
+
   </section>
 
   <!-- Visualização dos detalhes para todos os modelos treinados -->
+
+
+
   <section class="resultado-container" *ngIf="resultadoTreinamento">
 
-    <ng-container *ngFor="let modeloValor of getModelosComResultado()">
-      
+
+    <nav class="resultado" *ngFor="let modeloValor of getModelosComResultado()">
+
       <h2>Status do Treinamento - {{ getLabel(modeloValor) }}</h2>
 
       <p><strong>Status:</strong> {{ resultadoTreinamento[modeloValor].status }}</p>
@@ -23,13 +37,10 @@
       <p><strong>Total Amostras Treino:</strong> {{ resultadoTreinamento[modeloValor].total_amostras_treino }}</p>
       <p><strong>Total Amostras Teste:</strong> {{ resultadoTreinamento[modeloValor].total_amostras_teste }}</p>
 
-       <button
-        mat-raised-button
-        (click)="enviarParaClassificador(modeloValor)">
+      <button *ngIf="!treinando" mat-raised-button (click)="enviarParaClassificador(modeloValor)">
         Treinar {{ getLabel(modeloValor) }}
       </button>
-       <mat-divider></mat-divider>
-    </ng-container>
+    </nav>
 
   </section>
 

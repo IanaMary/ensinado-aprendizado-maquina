@@ -36,6 +36,10 @@ body {
 
 }
 
+::ng-deep mat-spinner circle {
+  stroke: $verde-medio !important;
+}
+
 .mat-checkbox-label {
   white-space: normal !important;
   /* permite quebra de linha */

@@ -15,9 +15,9 @@ export class ModalExecucaoComponent implements OnInit {
 
   tutor = tutor;
 
-  etapas: Record<string, { indice: number; proximo: boolean; titulo: string; }> = {
+  etapas: Record<string, { indice: number; proximo: boolean; titulo: string; botaoProximo?: string }> = {
     'coleta-dado': { indice: 0, proximo: true, titulo: 'Importar Planilha' },
-    'selecao-do-modelo': { indice: 1, proximo: true, titulo: 'Seleção do Modelo' },
+    'selecao-do-modelo': { indice: 1, proximo: true, titulo: 'Seleção do Modelo', botaoProximo: 'Treinar' },
     'treino-validacao-teste': { indice: 2, proximo: true, titulo: 'Treinamento' },
     'selecao-das-metricas': { indice: 3, proximo: true, titulo: 'Seleção das Métricas' },
     'metrica': { indice: 4, proximo: true, titulo: 'Visualizar Avaliações' }
