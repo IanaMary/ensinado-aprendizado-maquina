@@ -59,6 +59,11 @@
       "Com target do tipo texto: Aprendizado supervisionado - classificação",
       "Com target do tipo numérico: Aprendizado supervisionado - Regressão"
     ],
+    "treinamento": [
+      "Treino: usado para o modelo aprender, ex: 70%",
+      "Teste: usado para avaliar se o modelo funciona bem com novos dados, ex: 30%",
+      "Importância: uma boa divisão evita que o modelo decore os dados e garante que ele generalize bem"
+    ],
     "modelo-classificacao": [
       "Aprendizado supervisionado: o modelo aprende com base em exemplos com entrada e saída conhecidas.",
       "Target do tipo texto (categorias, rótulos): como 'sim/não', 'alto/médio/baixo', 'cliente fiel', etc.",

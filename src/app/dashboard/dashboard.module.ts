@@ -15,6 +15,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HttpClientModule } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 
 
 import { DashboardComponent } from './dashboard.component';
@@ -66,7 +70,14 @@ import { TutorComponent } from './tutor/tutor.component';
     MatMenuModule,
     MatTooltipModule,
     HttpClientModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatSliderModule,
+    MatInputModule,
+    MatFormFieldModule,
+    NgxMaskDirective
+  ],
+  providers: [
+    provideNgxMask()
   ]
 })
 export class DashboardModule { }

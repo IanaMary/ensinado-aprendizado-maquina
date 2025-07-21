@@ -4,10 +4,10 @@
 :host ::ng-deep .modal-coleta {
   width: 100%;
   height: 100%;
-  // height: 700px;
-  // max-width: 100%;
-  // max-height: 90vh;
-  overflow: auto;
+  height: 700px;
+  max-width: 100%;
+  max-height: 90vh;
+  // overflow: auto;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -28,8 +28,9 @@
     }
   }
 
-  .modal-conteudo {
-    display: block;
+  .modal-conteudo-coleta {
+    display: flex;
+    flex-direction: column;
     gap: 4px;
 
   }
@@ -65,9 +66,10 @@ small {
 
 .tipos-container,
 .tabela-container {
-  flex: 1;
-  overflow: auto;
-  margin-top: 1rem;
+  // flex: 1;
+  display: flex;
+  // overflow: auto;
+  // margin-top: 1rem;
   border: 1px solid #ddd;
   border-radius: 6px;
   background-color: #fafafa;
@@ -82,10 +84,10 @@ small {
 
 .thead {
   position: sticky;
-  top: 0;
+  // top: 0;
   background-color: #f0f0f0;
-  z-index: 10;
-  font-weight: 600;
+  // z-index: 10;
+  // font-weight: 600;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -129,5 +131,30 @@ input[type="file"] {
 
 .configuracao-generica {
   width: 100%;
-  padding-top: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.configuracao-inicial {
+  width: 100%;
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.botao-mais-menos {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+
+  .botoes {
+    width: 100% !important;
+    background-color: $branco !important;
+    border: none !important;
+  }
+
 }

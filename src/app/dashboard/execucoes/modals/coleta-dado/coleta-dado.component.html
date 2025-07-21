@@ -24,27 +24,60 @@
 
   </nav>
 
-  <nav class="modal-conteudo">
+  <nav class="modal-conteudo-coleta">
     <!-- Tabela de configuração das colunas TREINO -->
-    <nav *ngIf="treino.dados.length > 0">
+    <ng-container *ngIf="treino.dados.length > 0">
       <mat-divider></mat-divider>
 
-      <div class="target">
+      <nav class="target">
         Configuração do dataset de treino
-        <app-tutor [resumo]="tutor.target"></app-tutor>
-      </div>
+
+      </nav>
 
       <mat-divider></mat-divider>
 
-      <mat-form-field appearance="outline" class="configuracao-generica">
-        <mat-label>Seleção do target</mat-label>
-        <mat-select (selectionChange)="selecaoTarget()" [(ngModel)]="treino.target">
-          <mat-option [value]="opTarget" *ngFor="let opTarget of opcoesTarget">{{opTarget}}</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <nav class="configuracao-inicial">
+        <div class="configuracao-generica">
+          <mat-form-field appearance="outline">
+            <mat-label>Seleção do target</mat-label>
+            <mat-select (selectionChange)="selecaoTarget()" [(ngModel)]="treino.target">
+              <mat-option [value]="opTarget" *ngFor="let opTarget of opcoesTarget">{{opTarget}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <app-tutor [resumo]="tutor.target"></app-tutor>
+        </div>
+        <div class="configuracao-generica">
+          <mat-form-field appearance="outline">
+            <mat-label>Total Treino</mat-label>
+            <input matInput type="text" mask="percent" suffix="%" min="50" max="90" [step]="5"
+              [(ngModel)]="porcentagemTreino" (ngModelChange)="atualizaTarget()" name="valorSelecionado" step="5" />
+            <nav matSuffix class="botao-mais-menos">
+              <button [disabled]="porcentagemTreino >= 90" mat-raised-button class="botoes" (click)="incrementar(true)"
+                aria-label="Aumentar">
+                <mat-icon>add</mat-icon>
+              </button>
+              <button [disabled]="porcentagemTreino <= 50" mat-raised-button class="botoes" (click)="incrementar(false)"
+                aria-label="Diminuir">
+                <mat-icon>remove</mat-icon>
+              </button>
+            </nav>
+
+          </mat-form-field>
+          <app-tutor [resumo]="tutor.treinamento"></app-tutor>
+        </div>
+        <div class="configuracao-generica">
+          <mat-hint>
+            Total disponível: {{ treino.dados.length }} |
+            Treino: {{ treinoCount }} ({{ porcentagemTreino }}%) |
+            Teste: {{ testeCount }} ({{ testePercent }}%)
+          </mat-hint>
+        </div>
+      </nav>
+
+
 
       <nav class="tabela-container">
-        <table mat-table [dataSource]="dataSourceColunas" class="mat-table">
+        <table mat-table [dataSource]="dataSourceColunas" class="mat-table mat-elevation-z1">
 
           <!-- Nome -->
           <ng-container matColumnDef="nome">
@@ -93,10 +126,10 @@
           <tr mat-row *matRowDef="let row; columns: colunasTabela;"></tr>
         </table>
       </nav>
-    </nav>
+    </ng-container>
 
     <!-- Tabela para mostrar dados da planilha TREINO -->
-    <nav *ngIf="treino.dados.length > 0">
+    <ng-container *ngIf="treino.dados.length > 0">
 
       <nav class="configuracao-generica">
         Dataset de treino
@@ -114,7 +147,7 @@
           <tr mat-row *matRowDef="let row; columns: treino.colunas;"></tr>
         </table>
       </nav>
-    </nav>
+    </ng-container>
   </nav>
 
 

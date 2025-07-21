@@ -10,7 +10,7 @@ import { ItemPipeline, ResultadoColetaDado, nomeModelos } from '../../../../mode
 })
 export class ClasificadorComponent implements OnChanges {
 
-  @Input() resultadoTreinamento: Record<string, any> = {};;
+  @Input() resultadoTreinamento: Record<string, any> = {};
   @Input() modeloSelecionado: ItemPipeline | undefined;
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
   @Output() atualizarResultadoTreinamento = new EventEmitter<any>();
@@ -23,7 +23,7 @@ export class ClasificadorComponent implements OnChanges {
 
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['resultadoColetaDado'] && changes['modeloSelecionado']) {
+    if (changes['resultadoColetaDado'] || changes['modeloSelecionado']) {
       const valor = this.modeloSelecionado?.valor;
       const jaTreinado = this.resultadoTreinamento && valor ? this.resultadoTreinamento.hasOwnProperty(valor) : false;
       if (valor && !jaTreinado) {
@@ -31,6 +31,8 @@ export class ClasificadorComponent implements OnChanges {
       }
     }
   }
+
+
 
   async enviarParaClassificador(classificador: string) {
     this.treinando = true
@@ -61,8 +63,9 @@ export class ClasificadorComponent implements OnChanges {
     }, {}) ?? {};
 
     const atributosMap = this.resultadoColetaDado?.treino.atributos ?? {};
-
+    const porcentagem = this.resultadoColetaDado?.treino?.porcentagemTreino ?? 70;
     return {
+      porcentagem_teste: (100 - porcentagem) / 100,
       dados_treino: this.resultadoColetaDado?.treino.dados,
       dados_teste: this.resultadoColetaDado?.teste?.dados,
       target: this.resultadoColetaDado?.treino.target,

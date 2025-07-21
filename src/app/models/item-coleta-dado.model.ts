@@ -68,6 +68,7 @@ export interface InformacoesDados {
   erro?: string;
   nomeArquivo?: string;
   tipoItem?: TipoItem;
+  porcentagemTreino?: number;
 }
 
 

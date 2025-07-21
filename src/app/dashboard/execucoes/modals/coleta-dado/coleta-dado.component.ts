@@ -19,14 +19,14 @@ import tutor from '../../../../constants/tutor.json';
   standalone: false
 })
 export class ColetaDadoComponent implements OnChanges, OnInit {
-  tutor = tutor.resumos;
-
 
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
   @Output() resultadoColetaDadoModificado = new EventEmitter<ResultadoColetaDado>();
 
+  tutor = tutor.resumos;
 
-  treino: InformacoesDados = { dados: [], colunas: [], tipos: {}, atributos: {}, target: '', tipoTarget: null };
+
+  treino: InformacoesDados = { dados: [], colunas: [], tipos: {}, atributos: {}, target: '', tipoTarget: null, porcentagemTreino: 70 };
   teste: InformacoesDados = { dados: [], colunas: [], tipos: {}, atributos: {}, target: '', tipoTarget: null };
 
   colunasTabela = ['nome', 'tipo', 'atributos'];
@@ -48,6 +48,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     if (changes['resultadoColetaDado'] && this.resultadoColetaDado) {
       this.treino = this.resultadoColetaDado.treino || this.treino;
       this.teste = this.resultadoColetaDado.teste || this.teste;
+
+      this.porcentagemTreino = this.treino.porcentagemTreino ?? 70
 
       if (!this.treino.tipos || Object.keys(this.treino.tipos).length === 0) {
         this.treino.tipos = this.detectarTipos(this.treino.dados);
@@ -242,4 +244,39 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     return tipos;
   }
+
+
+  porcentagemTreino = 70; // valor inicial
+  atualizaTarget() {
+    this.treino.porcentagemTreino = this.porcentagemTreino;
+  }
+
+  get maxTarget(): number {
+    return Math.floor(this.treino.dados.length * 0.9);
+  }
+
+  get testeCount(): number {
+    const testSize = 1 - (this.porcentagemTreino / 100);
+    return Math.ceil(this.treino.dados.length * testSize);
+  }
+
+  get treinoCount(): number {
+    return this.treino.dados.length - this.testeCount;
+  }
+
+  get testePercent(): number {
+    return 100 - this.porcentagemTreino;
+  }
+
+
+  incrementar(bool: boolean) {
+    if (bool) {
+      this.porcentagemTreino += 5;
+    } else {
+      this.porcentagemTreino -= 5;
+    }
+    this.atualizaTarget();
+  }
+
+
 }

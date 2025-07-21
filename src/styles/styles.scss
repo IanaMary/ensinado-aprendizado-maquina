@@ -40,6 +40,7 @@ body {
   stroke: $verde-medio !important;
 }
 
+
 .mat-checkbox-label {
   white-space: normal !important;
   /* permite quebra de linha */
@@ -52,20 +53,33 @@ body {
 }
 
 .mat-mdc-text-field-wrapper {
-  width: 50% !important;
+  // width: 50% !important;
 }
 
 .mat-mdc-select-trigger {
-  width: 95% !important;
+  // width: 95% !important;
 }
 
 .mat-mdc-select-value {
-  width: 95% !important;
-  padding-left: 8px;
+  // width: 95% !important;
+  // padding-left: 8px;
 }
+
+.mat-mdc-form-field {}
 
 .mat-mdc-form-field-subscript-wrapper {
   height: 0;
+}
+
+.mat-mdc-form-field-infix {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.mat-mdc-form-field-icon-prefix,
+.mat-mdc-form-field-icon-suffix {
+  z-index: 0 !important;
 }
 
 h2 {
@@ -101,6 +115,17 @@ button[mat-raised-button] {
   background-color: $verde-claro !important;
   transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
   cursor: pointer;
+  display: flex;
+}
+
+.mat-mdc-button>.mat-icon,
+.mat-mdc-unelevated-button>.mat-icon,
+.mat-mdc-raised-button>.mat-icon,
+.mat-mdc-outlined-button>.mat-icon {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 
