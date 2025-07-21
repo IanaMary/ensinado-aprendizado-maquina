@@ -46,32 +46,35 @@
           </mat-form-field>
           <app-tutor [resumo]="tutor.target"></app-tutor>
         </div>
-        <div class="configuracao-generica">
-          <mat-form-field appearance="outline">
-            <mat-label>Total Treino</mat-label>
-            <input matInput type="text" mask="percent" suffix="%" min="50" max="90" [step]="5"
-              [(ngModel)]="porcentagemTreino" (ngModelChange)="atualizaTarget()" name="valorSelecionado" step="5" />
-            <nav matSuffix class="botao-mais-menos">
-              <button [disabled]="porcentagemTreino >= 90" mat-raised-button class="botoes" (click)="incrementar(true)"
-                aria-label="Aumentar">
-                <mat-icon>add</mat-icon>
-              </button>
-              <button [disabled]="porcentagemTreino <= 50" mat-raised-button class="botoes" (click)="incrementar(false)"
-                aria-label="Diminuir">
-                <mat-icon>remove</mat-icon>
-              </button>
-            </nav>
+        <ng-container *ngIf="!teste.dados.length">
+          <div class="configuracao-generica">
+            <mat-form-field appearance="outline">
+              <mat-label>Total Treino</mat-label>
+              <input matInput type="text" mask="percent" suffix="%" min="50" max="90" [step]="5"
+                [(ngModel)]="porcentagemTreino" (ngModelChange)="atualizaTarget()" name="valorSelecionado" step="5" />
+              <nav matSuffix class="botao-mais-menos">
+                <button [disabled]="porcentagemTreino >= 90" mat-raised-button class="botoes"
+                  (click)="incrementar(true)" aria-label="Aumentar">
+                  <mat-icon>add</mat-icon>
+                </button>
+                <button [disabled]="porcentagemTreino <= 50" mat-raised-button class="botoes"
+                  (click)="incrementar(false)" aria-label="Diminuir">
+                  <mat-icon>remove</mat-icon>
+                </button>
+              </nav>
 
-          </mat-form-field>
-          <app-tutor [resumo]="tutor.treinamento"></app-tutor>
-        </div>
-        <div class="configuracao-generica">
-          <mat-hint>
-            Total disponível: {{ treino.dados.length }} |
-            Treino: {{ treinoCount }} ({{ porcentagemTreino }}%) |
-            Teste: {{ testeCount }} ({{ testePercent }}%)
-          </mat-hint>
-        </div>
+            </mat-form-field>
+            <app-tutor [resumo]="tutor.treinamento"></app-tutor>
+          </div>
+          <div class="configuracao-generica">
+            <mat-hint>
+              Total disponível: {{ treino.dados.length }} |
+              Treino: {{ treinoCount }} ({{ porcentagemTreino }}%) |
+              Teste: {{ testeCount }} ({{ testePercent }}%)
+            </mat-hint>
+          </div>
+        </ng-container>
+
       </nav>
 
 

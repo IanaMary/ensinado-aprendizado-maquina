@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ItemPipeline, ResultadoColetaDado, nomeModelos } from '../../../../models/item-coleta-dado.model';
+import { itensTreino } from '../../../../constants/itens-coletas-dados.json';
+
 
 @Component({
   selector: 'app-classificador',
@@ -37,7 +39,7 @@ export class ClasificadorComponent implements OnChanges {
   async enviarParaClassificador(classificador: string) {
     this.treinando = true
     const tipoClassficador = classificador ?? '';
-    const body = await this.criarBody()
+    const body = await this.criarBody(classificador)
 
     this.dashboardService.classificadorTreino(tipoClassficador, body).subscribe({
       next: (res: any) => {
@@ -55,7 +57,9 @@ export class ClasificadorComponent implements OnChanges {
     });
   }
 
-  async criarBody(): Promise<any> {
+  async criarBody(classificador: string): Promise<any> {
+
+    const modelo = itensTreino.find(item => item.valor === classificador);
 
     const hiperparametros = this.modeloSelecionado?.hiperparametros?.reduce((obj: Record<string, any>, hp: any) => {
       obj[hp.nomeHiperparametro] = hp.valorPadrao;
