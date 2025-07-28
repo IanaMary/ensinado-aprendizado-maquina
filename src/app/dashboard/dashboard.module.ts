@@ -35,6 +35,8 @@ import { SelecaoMetricasComponent } from './execucoes/modals/selecao-metricas/se
 import { MetricasComponent } from './pipeline/metricas/metricas.component';
 import { MetricaAvaliacaoComponent } from './execucoes/modals/metrica-avaliacao/metrica-avaliacao.component';
 import { TutorComponent } from './tutor/tutor.component';
+import { SessionService } from '../service/sessao-store.service';
+
 
 
 

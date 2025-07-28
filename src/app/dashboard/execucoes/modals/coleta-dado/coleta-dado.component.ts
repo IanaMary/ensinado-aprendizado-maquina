@@ -11,6 +11,8 @@ import { PlanilhaService } from '../../../../service/planilha.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { InformacoesDados, labelParaTipoTargetMap, ResultadoColetaDado, TipoDado } from '../../../../models/item-coleta-dado.model';
 import tutor from '../../../../constants/tutor.json';
+import { DashboardService } from '../../../services/dashboard.service';
+import { SessionService } from '../../../../service/sessao-store.service';
 
 @Component({
   selector: 'app-coleta-dado',
@@ -25,9 +27,22 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   tutor = tutor.resumos;
 
+  treino: InformacoesDados = { dados: [], totalDados: 0, nomeArquivo: '' };
+  teste: InformacoesDados = { dados: [], totalDados: 0, nomeArquivo: '' };
 
-  treino: InformacoesDados = { dados: [], colunas: [], tipos: {}, atributos: {}, target: '', tipoTarget: null, porcentagemTreino: 70 };
-  teste: InformacoesDados = { dados: [], colunas: [], tipos: {}, atributos: {}, target: '', tipoTarget: null };
+  att: { [key: string]: boolean } = {};
+
+
+  resultColetaDadoL: ResultadoColetaDado = {
+    target: '',
+    colunas: [],
+    porcentagemTreino: 70,
+    tipoTarget: null,
+    atributos: this.att,
+    tipos: {},
+    treino: this.treino,
+    teste: this.teste
+  }
 
   colunasTabela = ['nome', 'tipo', 'atributos'];
 
@@ -37,113 +52,148 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   opcoesTarget: string[] = [];
   target: string | null = '';
 
+  idColeta: string = '';
+  totalDados: number = 0;
+  treinoArquivo: any;
+  testeArquivo: any;
+  dataSourceTreino = new MatTableDataSource<{ nomeColuna: string; tipoColuna: string; atributo: boolean }>([]);
 
-  dataSourceColunas = new MatTableDataSource<{ nome: string; tipo: string }>([]);
-  dataSourceColunasTeste = new MatTableDataSource<{ nome: string; tipo: string }>([]);
 
+  constructor(private planilhaService: PlanilhaService,
+    private dashboardService: DashboardService,
+    private sessionService: SessionService
 
-  constructor(private planilhaService: PlanilhaService) { }
+  ) { }
 
   ngOnChanges(changes: SimpleChanges) {
+
+    this.idColeta = this.sessionService.getColetaId();
+    console.log(this.resultadoColetaDado, changes['resultadoColetaDado'])
     if (changes['resultadoColetaDado'] && this.resultadoColetaDado) {
-      this.treino = this.resultadoColetaDado.treino || this.treino;
-      this.teste = this.resultadoColetaDado.teste || this.teste;
-
-      this.porcentagemTreino = this.treino.porcentagemTreino ?? 70
-
-      if (!this.treino.tipos || Object.keys(this.treino.tipos).length === 0) {
-        this.treino.tipos = this.detectarTipos(this.treino.dados);
-      }
-      if (!this.teste.tipos || Object.keys(this.treino.tipos).length === 0) {
-        this.teste.tipos = this.detectarTipos(this.teste.dados);
-      }
-
-      if (!this.target && this.treino.target) {
-        this.target = this.treino.target;
-      }
-
-      this.atualizarDataSource('treino');
-      this.configurarFiltro();
-
-      if (this.teste.dados.length > 0) {
-        this.atualizarDataSource('teste');
-      }
-    }
-
-    if (changes['target']) {
-      this.configurarFiltro();
+      this.resultColetaDadoL = this.resultadoColetaDado;
+      this.treino = this.resultColetaDadoL.treino;
+      this.teste = this.resultColetaDadoL.teste;
+    } else if (this.idColeta) {
+      this.getColetaInfo();
     }
   }
 
   ngOnInit() {
-    this.atualizarDataSource('treino');
-    this.configurarFiltro();
-    if (this.teste.dados.length) {
-      this.atualizarDataSource('teste');
-    }
+    // this.atualizarDataSource('treino');
+    // this.configurarFiltro();
+    // if (this.teste.dados.length) {
+    //   this.atualizarDataSource('teste');
+    // }
   }
 
-  onArquivoSelecionado(event: Event, tipo: 'treino' | 'teste') {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) {
-      (tipo === 'treino' ? this.treino : this.teste).erro = 'Nenhum arquivo selecionado';
-      (tipo === 'treino' ? this.treino : this.teste).nomeArquivo = '';
-      return;
-    }
 
-    const arquivo = input.files[0];
-    if (tipo === 'treino') {
-      this.treino.nomeArquivo = arquivo.name;
-      this.treino.erro = '';
-    } else {
-      this.teste.nomeArquivo = arquivo.name;
-      this.teste.erro = '';
-    }
 
-    this.planilhaService.lerPlanilha(arquivo).then(dados => {
-      const cols = this.obterColunas(dados);
+  postArquivo(event: Event, tipo: 'treino' | 'teste') {
 
-      if (tipo === 'treino') {
-        this.treino.dados = dados;
-        this.treino.tipos = this.detectarTipos(dados);
-        this.treino.colunas = cols;
-        this.treino.atributos = {};
-        this.target = '';
-      } else {
-        const falt = this.treino.colunas.filter(c => !cols.includes(c));
-        const extr = cols.filter(c => !this.treino.colunas.includes(c));
-        if (falt.length || extr.length) {
-          this.teste.erro = `Colunas diferentes. Faltando: ${falt.join(', ')}. Extras: ${extr.join(', ')}.`;
-          return;
+    const formData = this.criarBody(event, tipo)
+
+    this.dashboardService.postColetaArquivo('xlxs', formData).subscribe({
+      next: (res: any) => {
+
+        this.sessionService.setColetaId(res.id_coleta)
+        this.idColeta = res.id_coleta;
+        this.preencherDados(res);
+
+      },
+      error: (err) => {
+        console.error(err);
+        if (tipo === 'treino') {
+          this.treino.erro = 'Erro ao enviar o arquivo de treino.';
+        } else {
+          this.teste.erro = 'Erro ao enviar o arquivo de teste.';
         }
-
-        const tiposTeste = this.detectarTipos(dados);
-        const diff = cols.filter(c =>
-          (this.treino.tipos[c] || '').toLowerCase() !== (tiposTeste[c] || '').toLowerCase()
-        );
-        if (diff.length) {
-          this.teste.erro = `Tipos divergentes em: ${diff.map(c =>
-            `${c} (Treino: ${this.treino.tipos[c]}, Teste: ${tiposTeste[c]})`
-          ).join('; ')}`;
-          return;
-        }
-
-        this.teste.dados = dados;
-        this.teste.colunas = cols;
-        this.teste.tipos = tiposTeste;
-      }
-
-      this.emitirResultadoColetaDado();
-
-      this.atualizarDataSource(tipo);
-    }).catch(() => {
-      if (tipo === 'treino') {
-        this.treino.erro = `Erro ao ler a planilha de treino.`;
-      } else {
-        this.teste.erro = `Erro ao ler a planilha de teste.`;
       }
     });
   }
+
+  criarBody(event: Event, tipo: 'treino' | 'teste') {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const formData = new FormData();
+    formData.append('tipo', tipo);
+
+    if (tipo === 'treino') {
+      const porcentagemTeste = (1 - this.resultColetaDadoL.porcentagemTreino / 100).toString()
+      this.treinoArquivo = input.files[0];
+      formData.append('file', this.treinoArquivo, this.treinoArquivo.name);
+      formData.append('test_size', porcentagemTeste);
+    } else if (tipo === 'teste') {
+      this.testeArquivo = input.files[0];
+
+      if (this.treinoArquivo) {
+        formData.append('file_treino', this.treinoArquivo, this.treinoArquivo.name);
+      }
+
+      formData.append('file_teste', this.testeArquivo, this.testeArquivo.name);
+      formData.append('id_coleta', this.idColeta);
+    }
+
+    return formData;
+  }
+
+  getColetaInfo() {
+    this.dashboardService.getColetaInfo('xlxs', this.idColeta).subscribe({
+      next: (res: any) => {
+        this.preencherDados(res);
+      },
+      error: (err) => { }
+    });
+  }
+
+
+  preencherDados(res: any) {
+
+
+    console.log('res ', res)
+    const nomeColunas = Object.keys(res.atributos);
+    this.totalDados = res.num_linhas_total;
+
+
+    this.dataSourceTreino = res.colunas_detalhes;
+
+
+    this.treino.dados = res.preview_treino;
+    this.treino.totalDados = res.num_linhas_treino;
+    this.treino.nomeArquivo = res.arquivo_nome_treino;
+
+    this.teste.dados = res.preview_teste;
+    this.teste.totalDados = res.num_linhas_teste;
+    this.teste.nomeArquivo = res.arquivo_nome_teste ?? '';
+
+    this.resultColetaDadoL.colunas = nomeColunas;
+    this.resultColetaDadoL.atributos = res.atributos;
+    this.resultColetaDadoL.target = res.target;
+
+    this.opcoesNome = nomeColunas;
+    this.opcoesTarget = ['-'].concat(nomeColunas);
+
+    this.resultadoColetaDado = this.resultColetaDadoL;
+    this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
+
+  }
+
+  putConfiguracaoTreino() {
+    const body = {
+      target: this.resultColetaDadoL.target,
+      atributos: this.resultColetaDadoL.atributos
+    }
+    this.dashboardService.putColetaConfig('xlxs', this.idColeta, body).subscribe({
+      next: (res: any) => {
+        this.resultadoColetaDado = this.resultColetaDadoL;
+        this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
+        console.log('resultadoColetaDado ', this.resultadoColetaDado)
+      },
+      error: (err) => { }
+    });
+  }
+
+
 
   onFiltroChange(coluna: string, valor: string) {
     this.filtros[coluna] = valor.toLowerCase();
@@ -151,16 +201,26 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       this.target = valor === '-' ? null : valor;
 
     } else {
-      this.dataSourceColunas.filter = JSON.stringify(this.filtros);
+      this.dataSourceTreino.filter = JSON.stringify(this.filtros);
     }
   }
 
-  selecaoTarget() {
-    const label = this.treino.target
-    const tipoLabel = this.treino.tipos[label]
-    this.treino.tipoTarget = labelParaTipoTargetMap[tipoLabel as TipoDado] ?? null
-    this.treino.atributos[label] = false;
-    this.emitirResultadoColetaDado();
+  selecaoTargetAtt(bool: boolean) {
+    if (bool) {
+      const target = this.resultColetaDadoL.target
+      this.resultColetaDadoL.atributos[target] = false;
+    }
+
+    this.putConfiguracaoTreino();
+    // this.emitirResultadoColetaDado();
+  }
+
+
+
+  emitirResultadoColetaDado() {
+    // console.log("w ", this.resultColetaDadoL)
+    // this.resultColetaDadoL.atributos = obj;
+    // restante do código
   }
 
   montarResultadoColetado(): any {
@@ -170,59 +230,30 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     };
   }
 
-  emitirResultadoColetaDado() {
-    this.resultadoColetaDadoModificado.emit({
-      treino: this.treino,
-      teste: this.teste
-    });
-  }
+
 
   getResultadoColeta() {
     return this.montarResultadoColetado();
   }
 
-  atualizarDataSource(tipo: 'treino' | 'teste') {
-    const dados = tipo === 'treino' ? this.treino.dados : this.teste.dados;
-    const tipos = tipo === 'treino' ? this.treino.tipos : this.teste.tipos;
-    const cols = this.obterColunas(dados);
-    if (tipo === 'treino') {
-      this.treino.colunas = cols;
-    } else {
-      this.teste.colunas = cols;
-    }
-
-    const rows = cols.map(n => ({ nome: n, tipo: tipos[n] || 'Desconhecido' }));
-
-    if (tipo === 'treino') {
-      this.dataSourceColunas.data = rows;
-      this.opcoesNome = [...new Set(rows.map(r => r.nome))].sort();
-      this.opcoesTipo = [...new Set(rows.map(r => r.tipo))].sort();
-
-      this.opcoesTarget = ['-'].concat(this.opcoesNome);
-    } else {
-      this.dataSourceColunasTeste.data = rows;
-    }
-
-
-  }
 
   configurarFiltro() {
-    this.dataSourceColunas.filterPredicate = (linha, raw) => {
-      const f = JSON.parse(raw as string);
+    // this.dataSourceColunas.filterPredicate = (linha, raw) => {
+    //   const f = JSON.parse(raw as string);
 
-      if (f.nome && !linha.nome.toLowerCase().includes(f.nome)) return false;
-      if (f.tipo && !linha.tipo.toLowerCase().includes(f.tipo)) return false;
+    //   if (f.nome && !linha.nome.toLowerCase().includes(f.nome)) return false;
+    //   if (f.tipo && !linha.tipo.toLowerCase().includes(f.tipo)) return false;
 
-      const isTarget = linha.nome === this.target;
-      if (f.target === 'sim' && !isTarget) return false;
-      if (f.target === 'não' && isTarget) return false;
+    //   const isTarget = linha.nome === this.target;
+    //   if (f.target === 'sim' && !isTarget) return false;
+    //   if (f.target === 'não' && isTarget) return false;
 
-      const marcado = !!this.treino.atributos[linha.nome];
-      if (f.atributos === 'marcados' && !marcado) return false;
-      if (f.atributos === 'desmarcados' && marcado) return false;
+    //   const marcado = !!this.treino.atributos[linha.nome];
+    //   if (f.atributos === 'marcados' && !marcado) return false;
+    //   if (f.atributos === 'desmarcados' && marcado) return false;
 
-      return true;
-    };
+    //   return true;
+    // };
   }
 
   obterColunas(dados: any[]): string[] {
@@ -247,35 +278,34 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
 
   porcentagemTreino = 70; // valor inicial
-  atualizaTarget() {
-    this.treino.porcentagemTreino = this.porcentagemTreino;
+  atualizarPocentagemTreino() {
+    this.resultColetaDadoL.porcentagemTreino = this.porcentagemTreino;
   }
 
   get maxTarget(): number {
-    return Math.floor(this.treino.dados.length * 0.9);
+    return Math.floor(this.resultColetaDadoL.treino.totalDados * 0.9);
   }
 
   get testeCount(): number {
-    const testSize = 1 - (this.porcentagemTreino / 100);
-    return Math.ceil(this.treino.dados.length * testSize);
+    const testSize = 1 - (this.resultColetaDadoL.porcentagemTreino / 100);
+    return Math.ceil(this.totalDados * testSize);
   }
 
   get treinoCount(): number {
-    return this.treino.dados.length - this.testeCount;
+    return this.resultColetaDadoL.treino.totalDados;
   }
 
   get testePercent(): number {
-    return 100 - this.porcentagemTreino;
+    return 100 - this.resultColetaDadoL.porcentagemTreino;
   }
 
 
   incrementar(bool: boolean) {
     if (bool) {
-      this.porcentagemTreino += 5;
+      this.resultColetaDadoL.porcentagemTreino += 5;
     } else {
-      this.porcentagemTreino -= 5;
+      this.resultColetaDadoL.porcentagemTreino -= 5;
     }
-    this.atualizaTarget();
   }
 
 

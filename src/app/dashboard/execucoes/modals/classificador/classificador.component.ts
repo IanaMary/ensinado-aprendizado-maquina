@@ -66,13 +66,13 @@ export class ClasificadorComponent implements OnChanges {
       return obj;
     }, {}) ?? {};
 
-    const atributosMap = this.resultadoColetaDado?.treino.atributos ?? {};
-    const porcentagem = this.resultadoColetaDado?.treino?.porcentagemTreino ?? 70;
+    const atributosMap = this.resultadoColetaDado?.atributos ?? {};
+    const porcentagem = this.resultadoColetaDado?.porcentagemTreino ?? 70;
     return {
       porcentagem_teste: (100 - porcentagem) / 100,
       dados_treino: this.resultadoColetaDado?.treino.dados,
       dados_teste: this.resultadoColetaDado?.teste?.dados,
-      target: this.resultadoColetaDado?.treino.target,
+      target: this.resultadoColetaDado?.target,
       atributos: Object.keys(atributosMap).filter(chave => atributosMap[chave]),
       hiperparametros
     };
@@ -81,12 +81,13 @@ export class ClasificadorComponent implements OnChanges {
 
 
   get atributosFormatados(): string {
-    const atributos = this.resultadoColetaDado?.treino?.atributos;
-    if (!atributos) {
-      return 'Nenhum atributo disponível';
-    }
-    const selecionados = Object.keys(atributos).filter(chave => atributos[chave]);
-    return selecionados.length ? selecionados.join(', ') : 'Nenhum atributo disponível';
+    // const atributos = this.resultadoColetaDado?.treino?.atributos;
+    // if (!atributos) {
+    //   return 'Nenhum atributo disponível';
+    // }
+    // const selecionados = Object.keys(atributos).filter(chave => atributos[chave]);
+    // return selecionados.length ? selecionados.join(', ') : 'Nenhum atributo disponível';
+    return 'Nenhum atributo disponível'
   }
 
   getLabel(valor: string): string {

@@ -54,21 +54,22 @@ export interface ItemPipeline {
 }
 
 export interface ResultadoColetaDado {
+  target: string;
+  colunas: string[];
+  porcentagemTreino: number;
+  tipoTarget: TipoTarget;
+  atributos: Record<string, boolean>;
+  tipos: Record<string, TipoDado>;
   treino: InformacoesDados;
-  teste?: InformacoesDados;
+  teste: InformacoesDados;
 }
 
 export interface InformacoesDados {
   dados: unknown[];
-  colunas: string[];
-  tipos: Record<string, TipoDado>;           // Corrigido aqui
-  atributos: Record<string, boolean>;
-  target: string;
-  tipoTarget: TipoTarget;
+  totalDados: number;
   erro?: string;
   nomeArquivo?: string;
   tipoItem?: TipoItem;
-  porcentagemTreino?: number;
 }
 
 
