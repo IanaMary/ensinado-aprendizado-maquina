@@ -20,7 +20,8 @@ export class DashboardService {
   private itemsEmExecucao = new BehaviorSubject<ItemPipeline[]>([]);
 
   url = environment.apiUrl;
-  private readonly endpointColeta: string = 'coleta-dados';
+  private readonly endpointColeta: string = 'coleta_dados';
+  private readonly endpointConfiguraca: string = 'configurar_treinamento';
   private readonly endpointClassificador: string = 'classificador';
 
   constructor(private http: HttpClient) { }
@@ -29,8 +30,8 @@ export class DashboardService {
     return this.http.post(`${this.url}${this.endpointColeta}/salvar_${tipo}`, body);
   }
 
-  getColetaInfo(tipo: string, idColeta: string) {
-    return this.http.get(`${this.url}${this.endpointColeta}/buscar_${tipo}/${idColeta}`);
+  getColetaInfo(tipo: string, idConfigurcacaoTreinamento: string) {
+    return this.http.get(`${this.url}${this.endpointConfiguraca}/${tipo}/${idConfigurcacaoTreinamento}`);
   }
 
   putColetaConfig(tipo: string, idColeta: string, body: any) {

@@ -20,4 +20,12 @@ export class SessionService {
   setColetaId(idColeta: string) {
     sessionStorage.setItem('idColeta', idColeta);
   }
+
+  getConfigurcaoTreinamento(): string {
+    return sessionStorage.getItem('configurcaoTreinamento') || '';
+  }
+
+  setConfigurcaoTreinamento(configurcaoTreinamento: string) {
+    sessionStorage.setItem('configurcaoTreinamento', configurcaoTreinamento);
+  }
 }

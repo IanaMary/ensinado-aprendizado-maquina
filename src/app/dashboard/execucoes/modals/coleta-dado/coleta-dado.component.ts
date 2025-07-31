@@ -53,6 +53,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   target: string | null = '';
 
   idColeta: string = '';
+  idConfigurcacaoTreinamento: string = '';
   totalDados: number = 0;
   treinoArquivo: any;
   testeArquivo: any;
@@ -68,12 +69,13 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   ngOnChanges(changes: SimpleChanges) {
 
     this.idColeta = this.sessionService.getColetaId();
+    this.idConfigurcacaoTreinamento = this.sessionService.getConfigurcaoTreinamento();
     console.log(this.resultadoColetaDado, changes['resultadoColetaDado'])
     if (changes['resultadoColetaDado'] && this.resultadoColetaDado) {
       this.resultColetaDadoL = this.resultadoColetaDado;
       this.treino = this.resultColetaDadoL.treino;
       this.teste = this.resultColetaDadoL.teste;
-    } else if (this.idColeta) {
+    } else if (this.idConfigurcacaoTreinamento) {
       this.getColetaInfo();
     }
   }
@@ -94,9 +96,10 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     this.dashboardService.postColetaArquivo('xlxs', formData).subscribe({
       next: (res: any) => {
-
-        this.sessionService.setColetaId(res.id_coleta)
         this.idColeta = res.id_coleta;
+        this.idConfigurcacaoTreinamento = res.id_configuracoes_treinamento;
+        this.sessionService.setColetaId(this.idColeta)
+        this.sessionService.setConfigurcaoTreinamento(this.idConfigurcacaoTreinamento)
         this.preencherDados(res);
 
       },
@@ -138,8 +141,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   }
 
   getColetaInfo() {
-    this.dashboardService.getColetaInfo('xlxs', this.idColeta).subscribe({
+    this.dashboardService.getColetaInfo('xlxs', this.idConfigurcacaoTreinamento).subscribe({
       next: (res: any) => {
+        console.log("getColetaInfo ", res)
         this.preencherDados(res);
       },
       error: (err) => { }
@@ -174,7 +178,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.opcoesTarget = ['-'].concat(nomeColunas);
 
     this.resultadoColetaDado = this.resultColetaDadoL;
-    this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
+    // this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
 
   }
 
