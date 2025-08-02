@@ -94,7 +94,7 @@
                 </app-filtro-coluna>
               </nav>
             </th>
-            <td mat-cell *matCellDef="let linha"> {{ linha.nomeColuna }} </td>
+            <td mat-cell *matCellDef="let linha"> {{ linha.nome_coluna }} </td>
           </ng-container>
 
           <!-- Tipo -->
@@ -107,7 +107,7 @@
                 </app-filtro-coluna>
               </nav>
             </th>
-            <td mat-cell *matCellDef="let linha"> {{ linha.tipoColuna }} </td>
+            <td mat-cell *matCellDef="let linha"> {{ linha.tipo_coluna }} </td>
           </ng-container>
 
           <!-- Atributos -->
@@ -122,8 +122,8 @@
             </th>
             <td mat-cell *matCellDef="let linha">
               <mat-checkbox (change)="selecaoTargetAtt(false)"
-                [disabled]="linha.nomeColuna === resultColetaDadoL.target"
-                [(ngModel)]="resultColetaDadoL.atributos[linha.nomeColuna]">
+                [disabled]="linha.nome_coluna === resultColetaDadoL.target"
+                [(ngModel)]="resultColetaDadoL.atributos[linha.nome_coluna]">
               </mat-checkbox>
             </td>
           </ng-container>

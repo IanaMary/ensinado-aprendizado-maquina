@@ -35,7 +35,7 @@ export class DashboardService {
   }
 
   putColetaConfig(tipo: string, idColeta: string, body: any) {
-    return this.http.put(`${this.url}${this.endpointColeta}/configurar_coleta_${tipo}/${idColeta}`, body);
+    return this.http.put(`${this.url}${this.endpointConfiguraca}/${tipo}/${idColeta}`, body);
   }
 
 

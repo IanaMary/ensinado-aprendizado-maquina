@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { ItemPipeline, ResultadoColetaDado, TipoTarget } from '../../../../models/item-coleta-dado.model';
+import { ItemPipeline, ResultadoColetaDado, TipoTarget, labelParaTipoTargetMap } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import itensPipeline from '../../../../constants/itens-coletas-dados.json';
@@ -97,28 +97,29 @@ export class ModalExecucaoComponent implements OnInit {
 
   atualizarResultadoColeta(event: ResultadoColetaDado) {
     this.resultadoColetaDado = event;
-    // this.tipoTargetSelecionado = event.treino.tipoTarget
-    // this.tutorModeloTarget = this.tipoTargetSelecionado === 'string' ? tutor.resumos['modelo-classificacao'] :
-    //   this.tipoTargetSelecionado === 'number' ? tutor.resumos['modelo-regressao'] :
-    //     tutor.resumos['modelo-exploratorio'];
+    const tipoTarget = this.resultadoColetaDado.tipoTarget;
+    this.tutorModeloTarget = tipoTarget === 'string' ? tutor.resumos['modelo-classificacao'] :
+      tipoTarget === 'number' ? tutor.resumos['modelo-regressao'] :
+        tutor.resumos['modelo-exploratorio'];
 
-    // // const att = event.treino.atributos;
-    // const attVazio = Object.keys(att).length === 0 || Object.values(att).every(v => v === false);
+    const att = event.atributos;
+    const attVazio = Object.keys(att).length === 0 || Object.values(att).every(v => v === false);
 
-    // const erroTreino = !!event.treino.erro;
-    // const erroTeste = !!event.teste?.erro;
-    // const tipoTargetNaoSelecionado = this.tipoTargetSelecionado === undefined;
+    const erroTreino = !!this.resultadoColetaDado.treino.erro;
+    const erroTeste = !!this.resultadoColetaDado.teste?.erro;
+    const tipoTargetNaoSelecionado = this.tipoTargetSelecionado === undefined;
 
-    // this.etapas[this.etapaAtual].proximo = !(erroTreino || erroTeste || tipoTargetNaoSelecionado || attVazio);
+    this.etapas[this.etapaAtual].proximo = !(erroTreino || erroTeste || tipoTargetNaoSelecionado || attVazio);
 
-    // this.dashboardService.habilitadarModelos(
-    //   this.tipoTargetSelecionado,
-    //   this.etapas[this.etapaAtual].proximo
-    // );
+    this.dashboardService.habilitadarModelos(
+      tipoTarget,
+      this.etapas[this.etapaAtual].proximo
+    );
 
-    // this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(this.tipoTargetSelecionado);
-    // this.modeloSelecionado = this.modelosDisponiveis[0];
+    this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(tipoTarget);
+    this.modeloSelecionado = this.modelosDisponiveis[0];
   }
+
 
   atualizarModelo(event: ItemPipeline) {
     this.modeloSelecionado = event;

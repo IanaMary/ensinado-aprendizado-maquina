@@ -161,6 +161,10 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     const nomeColunas = Object.keys(res.atributos);
     this.totalDados = res.num_linhas_total;
 
+    this.resultColetaDadoL.colunas = nomeColunas;
+    this.resultColetaDadoL.atributos = res.atributos;
+    this.resultColetaDadoL.target = res.tipo_target
+
     this.dataSourceTreino = res.colunas_detalhes;
 
     this.treino.dados = res.preview_treino;
@@ -171,14 +175,11 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.teste.totalDados = res.num_linhas_teste;
     this.teste.nomeArquivo = res.arquivo_nome_teste ?? '';
 
-    this.resultColetaDadoL.colunas = nomeColunas;
-    this.resultColetaDadoL.atributos = res.atributos;
-    this.resultColetaDadoL.target = res.target;
-
     this.opcoesNome = nomeColunas;
     this.opcoesTarget = ['-'].concat(nomeColunas);
 
     this.resultadoColetaDado = this.resultColetaDadoL;
+    this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
 
   }
 
@@ -187,8 +188,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       target: this.resultColetaDadoL.target,
       atributos: this.resultColetaDadoL.atributos
     }
-    this.dashboardService.putColetaConfig('xlxs', this.idColeta, body).subscribe({
+    this.dashboardService.putColetaConfig('xlxs', this.idConfigurcacaoTreinamento, body).subscribe({
       next: (res: any) => {
+        this.resultColetaDadoL.tipoTarget = res.tipo_target;
         this.resultadoColetaDado = this.resultColetaDadoL;
         this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
       },
