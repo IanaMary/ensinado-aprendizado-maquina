@@ -98,18 +98,16 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       next: (res: any) => {
         this.idColeta = res.id_coleta;
         this.idConfigurcacaoTreinamento = res.id_configuracoes_treinamento;
+        this.msgErro(tipo, '')
         this.sessionService.setColetaId(this.idColeta)
         this.sessionService.setConfigurcaoTreinamento(this.idConfigurcacaoTreinamento)
         this.preencherDados(res);
 
       },
       error: (err) => {
-        console.error(err);
-        if (tipo === 'treino') {
-          this.treino.erro = 'Erro ao enviar o arquivo de treino.';
-        } else {
-          this.teste.erro = 'Erro ao enviar o arquivo de teste.';
-        }
+        console.error(err.error.detail);
+        const msg = err?.error?.detail ? err.error.detail : `Erro ao enviar o arquivo de ${tipo}.`
+        this.msgErro(tipo, msg)
       }
     });
   }
@@ -140,10 +138,17 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     return formData;
   }
 
+  msgErro(tipo: 'treino' | 'teste', msg: string) {
+    if (tipo === 'treino') {
+      this.treino.erro = msg;
+    } else {
+      this.teste.erro = msg;
+    }
+  }
+
   getColetaInfo() {
     this.dashboardService.getColetaInfo('xlxs', this.idConfigurcacaoTreinamento).subscribe({
       next: (res: any) => {
-        console.log("getColetaInfo ", res)
         this.preencherDados(res);
       },
       error: (err) => { }
@@ -153,14 +158,10 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   preencherDados(res: any) {
 
-
-    console.log('res ', res)
     const nomeColunas = Object.keys(res.atributos);
     this.totalDados = res.num_linhas_total;
 
-
     this.dataSourceTreino = res.colunas_detalhes;
-
 
     this.treino.dados = res.preview_treino;
     this.treino.totalDados = res.num_linhas_treino;
@@ -178,7 +179,6 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.opcoesTarget = ['-'].concat(nomeColunas);
 
     this.resultadoColetaDado = this.resultColetaDadoL;
-    // this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
 
   }
 
@@ -191,7 +191,6 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       next: (res: any) => {
         this.resultadoColetaDado = this.resultColetaDadoL;
         this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
-        console.log('resultadoColetaDado ', this.resultadoColetaDado)
       },
       error: (err) => { }
     });
@@ -216,28 +215,6 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     }
 
     this.putConfiguracaoTreino();
-    // this.emitirResultadoColetaDado();
-  }
-
-
-
-  emitirResultadoColetaDado() {
-    // console.log("w ", this.resultColetaDadoL)
-    // this.resultColetaDadoL.atributos = obj;
-    // restante do código
-  }
-
-  montarResultadoColetado(): any {
-    return {
-      treino: this.treino.dados,
-      teste: this.teste
-    };
-  }
-
-
-
-  getResultadoColeta() {
-    return this.montarResultadoColetado();
   }
 
 
