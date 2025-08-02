@@ -70,7 +70,6 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     this.idColeta = this.sessionService.getColetaId();
     this.idConfigurcacaoTreinamento = this.sessionService.getConfigurcaoTreinamento();
-    console.log(this.resultadoColetaDado, changes['resultadoColetaDado'])
     if (changes['resultadoColetaDado'] && this.resultadoColetaDado) {
       this.resultColetaDadoL = this.resultadoColetaDado;
       this.treino = this.resultColetaDadoL.treino;
@@ -78,6 +77,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     } else if (this.idConfigurcacaoTreinamento) {
       this.getColetaInfo();
     }
+
   }
 
   ngOnInit() {
