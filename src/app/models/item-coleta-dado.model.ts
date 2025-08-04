@@ -20,6 +20,13 @@ export const nomeModelos: Record<string, string> = {
   regressao_linear: 'Regressão Linear',
 };
 
+export const roleMap: Record<string, string> = {
+  'aluno': '/view-aluno',
+  'professor': '/view-professor',
+  'admin': '/view-admin'
+};
+
+
 export const labelParaTipoTargetMap: Record<TipoDado, TipoTarget> = {
   'Número': 'number',
   'Texto': 'string',

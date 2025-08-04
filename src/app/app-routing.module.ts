@@ -1,11 +1,18 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { AuthGuard } from './service/router-guard/auth.guard.ts';
 
 const routes: Routes = [
-  { path: 'dashboard', component: DashboardComponent },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: 'dashboard' }
+  {
+    path: 'autenticacao',
+    loadChildren: () => import('./externo/externo.module').then(m => m.ExternoModule)
+  },
+  {
+    path: '',
+    loadChildren: () => import('./interno/interno.module').then(m => m.InternoModule),
+    canLoad: [AuthGuard]
+  },
+  { path: '**', redirectTo: 'autenticacao/login' }
 ];
 
 @NgModule({

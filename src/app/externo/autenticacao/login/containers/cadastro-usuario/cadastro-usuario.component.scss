@@ -1,0 +1,46 @@
+@import '../../../../../../styles/colores.scss';
+@import '../../../../../../styles/styles.scss';
+
+
+.box-principal {
+  // height: 100%;
+  display: flex;
+  width: 100%;
+  /* margin: auto; */
+  justify-content: space-between;
+  align-content: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  background-color: $cor-secundaria;
+}
+
+.box {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  width: 400px;
+  background-color: $cor-secundaria;
+  border: 4px solid $cor-principal;
+  border-radius: 5px;
+  margin: auto;
+}
+
+.box-linha {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 8px;
+  padding-top: 8px;
+  gap: 8px;
+
+  .campos {
+    width: 80%;
+  }
+}
