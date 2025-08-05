@@ -7,9 +7,9 @@ export class AuthService {
 
   constructor() { }
 
-  isAuthenticated(): Promise<boolean> {
+  autenticado(): Promise<boolean> {
     return new Promise((resolve) => {
-      const usuario = this.getAuthorizationToken();
+      const usuario = this.getToken();
       if (usuario) {
         resolve(true);
       }
@@ -17,30 +17,30 @@ export class AuthService {
     });
   }
 
-  saveLocalStorage(usuario: any): Promise<any> {
+  salvarUsuarioSessionStorage(usuario: any): Promise<any> {
     return new Promise((resolve) => {
-      localStorage.setItem('id', usuario?.usuario?._id);
-      localStorage.setItem('token', usuario.access_token);
-      localStorage.setItem('name', usuario?.usuario?.name);
-      localStorage.setItem('role', usuario?.usuario?.role);
+      sessionStorage.setItem('id', usuario?.usuario?._id);
+      sessionStorage.setItem('token', usuario.access_token);
+      sessionStorage.setItem('name', usuario?.usuario?.name);
+      sessionStorage.setItem('role', usuario?.usuario?.role);
       resolve(true);
     });
   }
 
-  removeLocalStorage(): Promise<any> {
+  limparSessionStorage(): Promise<any> {
     return new Promise<any>((resolve) => {
       sessionStorage.clear();
-      localStorage.clear();
+      sessionStorage.clear();
       resolve(true);
     });
   }
 
-  getAuthorizationToken() {
-    return localStorage.getItem('token');
+  getToken() {
+    return sessionStorage.getItem('token');
   }
 
   getUsuarioRole(): string {
-    return localStorage.getItem('role') || '';
+    return sessionStorage.getItem('role') || '';
   }
 
 }

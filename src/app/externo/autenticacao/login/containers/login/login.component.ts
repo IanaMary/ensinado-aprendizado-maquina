@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
@@ -12,7 +12,7 @@ import { roleMap } from '../../../../../models/item-coleta-dado.model';
   styleUrls: ['./login.component.scss'],
   standalone: false,
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
 
   loginForm: FormGroup;
@@ -24,7 +24,7 @@ export class LoginComponent {
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly auth: AuthService,) {
+    private readonly auth: AuthService) {
 
     this.loginForm = this.formBuilder.group({
       email: [null, [
@@ -49,13 +49,11 @@ export class LoginComponent {
 
     this.loginService.login(this.email, this.senha).subscribe({
       next: async (usuario: any) => {
-        const validation = await this.auth.saveLocalStorage(usuario);
-        if (validation) {
+        const validar = await this.auth.salvarUsuarioSessionStorage(usuario);
+        if (validar) {
 
           const role = usuario?.usuario?.role
-
           const rota = roleMap[role] || '/autenticacao/login';
-
           await this.router.navigate([rota]);
         }
       },

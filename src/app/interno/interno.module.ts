@@ -6,11 +6,12 @@ import { InternoComponent } from './interno.component';
 
 @NgModule({
   declarations: [
-    InternoComponent
+    InternoComponent,
   ],
   imports: [
-    InternoRoutingModule
+    InternoRoutingModule,
   ],
+  exports: [],
   providers: [],
   bootstrap: []
 })

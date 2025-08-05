@@ -10,9 +10,9 @@ export class AuthGuard implements CanLoad {
   constructor(private authService: AuthService, private router: Router) { }
 
   async canLoad(route: Route, segments: UrlSegment[]): Promise<boolean> {
-    const isAuthenticated: boolean = await this.authService.isAuthenticated();
+    const autenticado: boolean = await this.authService.autenticado();
 
-    if (!isAuthenticated) {
+    if (!autenticado) {
       this.router.navigate(['/autenticacao/login']);
       return false;
     }

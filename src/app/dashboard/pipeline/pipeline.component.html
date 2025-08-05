@@ -1,19 +1,27 @@
 <nav class="container">
-  <nav class="bloco">
-   <app-coleta-de-dados></app-coleta-de-dados>
-  </nav>
+  <div class="container-interno">
+    <nav class="bloco">
+      <app-coleta-de-dados></app-coleta-de-dados>
+    </nav>
 
 
-  <nav class="bloco">
-    <p>Bloco 2</p>
-  </nav>
+    <nav class="bloco">
+      <p>Bloco 2</p>
+    </nav>
 
 
-  <nav class="bloco">
-    <app-treino-validacao-teste></app-treino-validacao-teste>
-  </nav>
+    <nav class="bloco">
+      <app-treino-validacao-teste></app-treino-validacao-teste>
+    </nav>
 
-  <nav class="bloco">
-    <app-metricas></app-metricas>
-  </nav>
+    <nav class="bloco">
+      <app-metricas></app-metricas>
+    </nav>
+
+    <nav class="bloco">
+      <button (click)="navegar(true)" class="botao-principal" *ngIf="role !== 'aluno'">VOLTAR</button>
+      <button (click)="navegar(false)" class="botao-principal">SAIR</button>
+    </nav>
+  </div>
+
 </nav>

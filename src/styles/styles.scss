@@ -1,5 +1,7 @@
 @use '@angular/material' as mat;
+@use 'sass:map';
 @import '../styles/colores.scss';
+
 
 html,
 body {
@@ -399,4 +401,19 @@ mat-checkbox {
   display: flex !important;
   align-items: center;
   justify-content: space-between;
+}
+
+.mat-mdc-tab-group.mat-mdc-tab-group-stretch-tabs>.mat-mdc-tab-header .mat-mdc-tab {
+  background: $cor-secundaria;
+  color: $cor-principal;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }

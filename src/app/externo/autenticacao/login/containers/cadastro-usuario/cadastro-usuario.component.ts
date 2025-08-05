@@ -20,7 +20,7 @@ export class CadastroUsuarioComponent {
   constructor(private readonly loginService: LoginService,
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
-    private readonly auth: AuthService,) {
+    private readonly auth: AuthService) {
 
     this.cadastroUsuarioForm = this.formBuilder.group({
       nome_usuario: [null, [
@@ -65,8 +65,8 @@ export class CadastroUsuarioComponent {
   postCadastroUsuario() {
     this.loginService.cadastrarAluno(this.cadastroUsuarioForm.value).subscribe({
       next: async (user: any) => {
-        const validation = await this.auth.saveLocalStorage(user);
-        if (validation) {
+        const validar = await this.auth.salvarUsuarioSessionStorage(user);
+        if (validar) {
           this.router.navigate(['']);
         }
       },
@@ -81,7 +81,6 @@ export class CadastroUsuarioComponent {
             messageErr = 'Algo de errado aconteceu, tente novamente mais tarde.';
         }
 
-        // Exemplo: você pode mostrar via snackbar/toast/dialog
         console.error('Erro de login:', messageErr);
       }
     });

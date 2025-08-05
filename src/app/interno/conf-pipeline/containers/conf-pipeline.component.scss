@@ -1,0 +1,15 @@
+@import '../../../../styles/colores.scss';
+@import '../../../../styles/styles.scss';
+
+
+.container {
+  padding: 16px;
+  width: 100%;
+
+  .container-interno {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}

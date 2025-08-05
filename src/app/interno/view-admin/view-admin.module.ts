@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { ViewAdminComponent } from './containers/view-admin.component';
 import { ViewAdminRoutingModule } from './view-admin-routing.module';
+import { SharedModule } from '../../shared/shared.module';
 
 
 @NgModule({
@@ -9,6 +10,7 @@ import { ViewAdminRoutingModule } from './view-admin-routing.module';
   ],
   imports: [
     ViewAdminRoutingModule,
+    SharedModule,
   ],
   providers: []
 })
