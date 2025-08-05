@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ItemPipeline, TipoTarget } from '../../models/item-coleta-dado.model';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
@@ -14,20 +14,31 @@ export class DashboardService {
   todosItensTreino = itensPipeline.itensTreino as ItemPipeline[];
   todosItensMetricas = itensPipeline.itensMetricas as any[];
 
-  private itensColetasDados = new BehaviorSubject<ItemPipeline[]>(this.todosItensColetasDados);
+  // private itensColetasDados = new BehaviorSubject<ItemPipeline[]>(this.todosItensColetasDados);
+  private itensColetasDados = new BehaviorSubject<ItemPipeline[]>([]);
+
+
+
   private itensTreino = new BehaviorSubject<ItemPipeline[]>(this.todosItensTreino);
   private itensMetricas = new BehaviorSubject<ItemPipeline[]>(this.todosItensMetricas);
   private itemsEmExecucao = new BehaviorSubject<ItemPipeline[]>([]);
 
   url = environment.apiUrl;
-  private readonly endpointColeta: string = 'coleta_dados';
+  private readonly endpointConfPipeline: string = 'conf_pipeline/';
+  private readonly endpointColeta: string = 'coleta_dados/';
   private readonly endpointConfiguraca: string = 'configurar_treinamento';
   private readonly endpointClassificador: string = 'classificador';
 
-  constructor(private http: HttpClient) { }
+
+  constructor(private http: HttpClient) {
+    this.carregarItensColetasDados();
+  }
+
+
+  // SERVIÇOS COM LIGAÇÃO COM BANCO 
 
   postColetaArquivo(tipo: string, body: any) {
-    return this.http.post(`${this.url}${this.endpointColeta}/salvar_${tipo}`, body);
+    return this.http.post(`${this.url}${this.endpointColeta}salvar_${tipo}`, body);
   }
 
   getColetaInfo(tipo: string, idConfigurcacaoTreinamento: string) {
@@ -55,9 +66,28 @@ export class DashboardService {
     return this.http.post(`${this.url}${this.endpointClassificador}/prever`, body);
   }
 
-  getItensColetasDados() {
+
+  fetchItensColetasDados() {
+    return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointColeta}todos`);
+  }
+
+
+  // SERVIÇOS SEM LIGAÇÃO COM BANCO
+
+  carregarItensColetasDados() {
+    this.fetchItensColetasDados()
+      .subscribe({
+        next: dados => this.itensColetasDados.next(dados),
+        error: err => {
+          console.error('Erro ao carregar itens coleta dados:', err);
+        }
+      });
+  }
+
+  getItensColetasDados(): Observable<ItemPipeline[]> {
     return this.itensColetasDados.asObservable();
   }
+
 
   getItensTreino() {
     return this.itensTreino.asObservable();
