@@ -16,29 +16,15 @@ export class SelecaoMetricasComponent implements OnChanges {
 
   constructor(private dashboardService: DashboardService) { }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.sincronizarMetricas();
-  }
+  ngOnChanges(changes: SimpleChanges): void { }
 
-  sincronizarMetricas() {
-    this.metricasDisponiveis.forEach(metrica => {
-      metrica.habilitado = this.metricasSelecionadas.some(selecionada => selecionada.valor === metrica.valor);
-    });
-  }
 
   toggleMetrica(metrica: ItemPipeline) {
-    metrica.movido = !metrica.movido;
-
-    if (metrica.movido) {
-      this.metricasSelecionadas.push(metrica);
-    } else {
-      this.metricasSelecionadas = this.metricasSelecionadas.filter(m => m.valor !== metrica.valor);
-    }
-    this.dashboardService.selecionarMetricas(metrica);
+    this.metricasSelecionadas = this.dashboardService.selecionarMetricas(metrica);
     this.emitSelecaoMetricas();
   }
 
   emitSelecaoMetricas() {
-    this.selecaoMetricas.emit( this.metricasSelecionadas);
+    this.selecaoMetricas.emit(this.metricasSelecionadas);
   }
 }

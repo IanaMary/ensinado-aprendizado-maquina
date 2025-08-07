@@ -38,10 +38,9 @@ export class ModalExecucaoComponent implements OnInit {
 
   tutorModeloTarget: string[] = [];
 
-  todasMetricas = itensPipeline.itensMetricas as ItemPipeline[];
   metricasDisponiveis: ItemPipeline[] = [];
   metricasSelecionadas: ItemPipeline[] = [];
-  resultadosDasAvaliacoes: any;
+  resultadosDasAvaliacoes: any = {};
 
   constructor(
     private dashboardService: DashboardService,
@@ -123,10 +122,6 @@ export class ModalExecucaoComponent implements OnInit {
 
     this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(tipoTarget);
     this.modeloSelecionado = this.modelosDisponiveis[0];
-
-    console.log('')
-
-    console.log("ssssssss =>", this.modelosDisponiveis, this.modeloSelecionado)
   }
 
 
@@ -143,16 +138,16 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   inicializarMetricasDisponiveis() {
-    const metricasModelo = this.modeloSelecionado?.metricas ?? [];
 
-    this.metricasDisponiveis = this.todasMetricas.filter(metrica =>
-      metricasModelo.includes(metrica.valor)
-    );
+    if (this.resultadoTreinamento) {
+      const modelosTreinados = Object.keys(this.resultadoTreinamento);
+      this.metricasDisponiveis = this.dashboardService.habilitadarMetricas(modelosTreinados);
+    }
 
-    this.dashboardService.habilitadarMetricas(this.metricasDisponiveis);
   }
 
   atualizarMetricasSelecionadas(event: any) {
+    this.metricasSelecionadas = event;
     this.etapas[this.etapaAtual].proximo = this.metricasSelecionadas.length > 0;
   }
 
@@ -196,7 +191,7 @@ export class ModalExecucaoComponent implements OnInit {
     }
   }
 
-  atualizarResultadoAvaliacoes(event: any) {
+  funcResultadoAvaliacoes(event: any) {
     this.resultadosDasAvaliacoes = event;
   }
 

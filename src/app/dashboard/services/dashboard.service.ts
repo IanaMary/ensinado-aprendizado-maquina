@@ -67,7 +67,7 @@ export class DashboardService {
   }
 
   postMetricas(body: any) {
-    return this.http.post(`${this.url}${this.endpointClassificador}/avaliar-multiplos`, body);
+    return this.http.post(`${this.url}${this.endpointClassificador}/avaliar_modelos`, body);
   }
 
   classificadorPrever(body: any) {
@@ -145,27 +145,27 @@ export class DashboardService {
   }
 
 
-  getMetricasPorModelo(modelo: string, considerarMovido: boolean = false): string[] {
-    const itemTreino = this.itensModelos.value.find(item => item.valor === modelo);
+  // getMetricasPorModelo(modelo: string, considerarMovido: boolean = false): string[] {
+  //   // const itemTreino = this.itensModelos.value.find(item => item.valor === modelo);
 
-    // Se não encontrar ou não tiver métricas, retorna array vazio
-    const metricasDoModelo = itemTreino?.metricas ?? [];
+  //   // // Se não encontrar ou não tiver métricas, retorna array vazio
+  //   // const metricasDoModelo = itemTreino?.metricas ?? [];
 
-    if (considerarMovido) {
-      // Filtra métricas movidas que pertençam ao modelo
-      const metricasMovidas = this.itensMetricas.value
-        .filter(item => item.movido && metricasDoModelo.includes(item.valor))
-        .map(item => item.valor);
+  //   // if (considerarMovido) {
+  //   //   // Filtra métricas movidas que pertençam ao modelo
+  //   //   const metricasMovidas = this.itensMetricas.value
+  //   //     .filter(item => item.movido && metricasDoModelo.includes(item.valor))
+  //   //     .map(item => item.valor);
 
-      if (metricasMovidas.length) {
-        return metricasMovidas;
-      }
+  //   //   if (metricasMovidas.length) {
+  //   //     return metricasMovidas;
+  //   //   }
 
-      return [];
-    }
+  //   //   return [];
+  //   // }
 
-    return metricasDoModelo;
-  }
+  //   // return metricasDoModelo;
+  // }
 
   movendoItemExecucao(item: ItemPipeline) {
     this.itemsEmExecucao.next([
@@ -225,31 +225,45 @@ export class DashboardService {
     this.itensModelos.next(itensAtualizados);
   }
 
-  habilitadarMetricas(metricasDisponiveis: any[]) {
+  habilitadarMetricas(modelos: any[]) {
+
+
+    const modelosSelecionados = this.itensModelos.getValue().filter(
+      m => modelos.includes(m.valor)
+    );
+
+    let metricasComuns: string[] = [];
+
+    if (modelosSelecionados.length > 0) {
+      metricasComuns = modelosSelecionados
+        .map(m => m.metricas ?? [])
+        .reduce((acc, metricas) => acc.filter(m => metricas.includes(m)));
+    }
+
 
     const itensAtualizados = this.itensMetricas.value.map(item => ({
       ...item,
-      habilitado: metricasDisponiveis.some(
-        sel => sel.valor === item.valor && sel.tipoItem === item.tipoItem
-      )
+      habilitado: metricasComuns.includes(item.valor)
     }));
 
     this.itensMetricas.next(itensAtualizados);
+
+    return itensAtualizados
+
   }
 
   selecionarMetricas(metricaSelecionada: ItemPipeline) {
 
-    const itensAtualizados = this.itensMetricas.value.map(item => {
-      const isSelecionado = item.valor === metricaSelecionada.valor && item.tipoItem === metricaSelecionada.tipoItem;
-
-      return {
-        ...item,
-        movido: isSelecionado ? metricaSelecionada.movido : item.movido,
-        habilitado: item.habilitado
-      };
-    });
-
+    const itensAtualizados = this.itensMetricas.value.map(item => ({
+      ...item,
+      habilitado: item.habilitado,
+      movido: item.valor === metricaSelecionada.valor ? true : item.movido
+    }));
     this.itensMetricas.next(itensAtualizados);
+
+    const movidos = itensAtualizados.filter(item => item.movido === true);
+    return movidos;
+
   }
 
 }

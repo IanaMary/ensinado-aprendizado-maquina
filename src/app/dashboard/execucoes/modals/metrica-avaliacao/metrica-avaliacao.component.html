@@ -1,46 +1,26 @@
-<nav class="modal">
+<table>
+  <thead>
+    <tr>
+      <th>Métrica</th>
+      <th *ngFor="let modelo of modelosAvaliados">{{ modelo }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let metrica of metricsAvaliadas">
+      <td>{{ metrica }}</td>
+      <td *ngFor="let modelo of modelosAvaliados">
+        {{
+        isNumber(resultadosDasAvaliacoes[metrica]?.[modelo])
+        ? (resultadosDasAvaliacoes[metrica][modelo] | number: '1.2-4')
+        : resultadosDasAvaliacoes[metrica]?.[modelo] || '-'
+        }}
+      </td>
+    </tr>
+  </tbody>
+</table>
 
-  <div class="resultado-container" *ngIf="resultadosDasAvaliacoes && (modelosAvaliados.length > 0)">
-
-    <h2>Status das Avaliações</h2>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Métrica</th>
-          <th *ngFor="let modelo of modelosAvaliados">{{ modelo | uppercase }}</th>
-        </tr>
-        <tr>
-          <th>Status</th>
-          <th *ngFor="let modelo of modelosAvaliados">
-            {{ resultadosDasAvaliacoes[modelo]?.status || 'Sem status' }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let metrica of metricsAvaliadas">
-          <td>{{ metrica }}</td>
-          <td *ngFor="let modelo of modelosAvaliados">
-            {{
-              isNumber(resultadosDasAvaliacoes[modelo]?.resultados?.[metrica])
-                ? (resultadosDasAvaliacoes[modelo].resultados[metrica] | number:'1.2-4')
-                : '-'
-            }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-  </div>
-
-  <div *ngIf="!resultadosDasAvaliacoes || !modelosAvaliados || modelosAvaliados.length === 0">
-    <p>Nenhuma avaliação realizada ainda.</p>
-  </div>
-
-  <section class="acoes">
-    <button mat-raised-button color="primary" (click)="postAvaliacao()">
-      Gerar avaliações
-    </button>
-  </section>
-
-</nav>
+<section class="acoes">
+  <button mat-raised-button color="primary" (click)="postAvaliacao()">
+    Gerar avaliações
+  </button>
+</section>

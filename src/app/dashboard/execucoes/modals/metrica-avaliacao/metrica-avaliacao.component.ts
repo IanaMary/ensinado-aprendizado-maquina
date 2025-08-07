@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ItemPipeline, nomeMetricas } from '../../../../models/item-coleta-dado.model';
 
@@ -8,57 +8,49 @@ import { ItemPipeline, nomeMetricas } from '../../../../models/item-coleta-dado.
   styleUrls: ['./metrica-avaliacao.component.scss'],
   standalone: false
 })
-export class MetricaAvaliacaoComponent implements OnChanges {
+export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
 
   @Input() resultadoTreinamento: any;
-  @Input() resultadosDasAvaliacoes: any;
+  @Input() resultadosDasAvaliacoes: any = {};
   @Input() metricasSelecionadas: ItemPipeline[] = [];
   itensMetricas: ItemPipeline[] = [];
   modelosAvaliados: string[] = [];
   metricsAvaliadas: string[] = [];
+
+
+
 
   @Output() atualizarResultadoAvaliacoes = new EventEmitter<any>();
 
   private mapaLabel = new Map<string, string>();
 
   constructor(private dashboardService: DashboardService) { }
+  cont = 0;
 
   ngOnChanges(changes: SimpleChanges): void {
-
-    if (changes['resultadosDasAvaliacoes'] && changes['resultadosDasAvaliacoes'].previousValue !== changes['resultadosDasAvaliacoes'].currentValue) {
-      this.atualizarVariaveis();
+    const naoExisteAvaliacao = Object.keys(this.resultadosDasAvaliacoes).length === 0
+    if (naoExisteAvaliacao) {
+      this.postAvaliacao();
     }
   }
 
-  atualizarVariaveis() {
-    this.dashboardService.getItensMetricas().subscribe(itens => {
-      this.itensMetricas = itens;
-    });
-
-    if (this.resultadosDasAvaliacoes) {
-      this.modelosAvaliados = Object.keys(this.resultadosDasAvaliacoes);
-
-      if (this.modelosAvaliados.length > 0) {
-        const primeiroModelo = this.modelosAvaliados[0];
-        this.metricsAvaliadas = Object.keys(this.resultadosDasAvaliacoes[primeiroModelo]?.resultados || {});
-      } else {
-        this.metricsAvaliadas = [];
-      }
-
-    } else {
-      this.modelosAvaliados = [];
-      this.metricsAvaliadas = [];
-    }
+  ngOnInit(): void {
+    this.atualizarVariaveis();
   }
 
 
   async postAvaliacao() {
 
-    const body = await this.criarBody();
+    const body = {
+      modelos: Object.values(this.resultadoTreinamento).map((e: any) => ({ id: e.id, label: e.nome_modelo })),
+      metricas: this.metricasSelecionadas.map((e: any) => ({ valor: e.valor, label: e.label }))
+    };
+
     this.dashboardService.postMetricas(body).subscribe({
       next: (res) => {
         this.resultadosDasAvaliacoes = res;
-        this.atualizarResultadoAvaliacoes.emit(res);
+        this.atualizarVariaveis()
+        this.atualizarResultadoAvaliacoes.emit(this.resultadosDasAvaliacoes);
       },
       error: (err) => {
         console.error(err);
@@ -66,51 +58,13 @@ export class MetricaAvaliacaoComponent implements OnChanges {
     });
   }
 
-  async criarBody(): Promise<any> {
-
-    const modelosNomes = Object.keys(this.resultadoTreinamento);
-
-    // Filtra apenas as métricas habilitadas
-    const metricasHabilitadas = this.itensMetricas
-      .filter(m => m.habilitado)
-      .map(m => m.valor);
-
-    // Monta as avaliações respeitando o mapa
-    const avaliacoes = modelosNomes.map(modeloNome => {
-      const metricasEsperadas = this.dashboardService.getMetricasPorModelo(modeloNome, true);
-
-      const metricasModelo = metricasHabilitadas.filter(m => metricasEsperadas.includes(m));
-
-      return {
-        modelo_nome: modeloNome,
-        metricas: metricasModelo,
-        mlflow_run_id_modelo: this.resultadoTreinamento[modeloNome]?.mlflow_run_id_modelo || null
-      };
-    });
-
-    // Assume que os dados de teste são iguais para todos os modelos
-    const primeiroModelo = this.resultadoTreinamento[modelosNomes[0]];
-
-    return {
-      dados_teste: primeiroModelo.teste,
-      target: primeiroModelo.target,
-      atributos: primeiroModelo.atributos,
-      avaliacoes: avaliacoes
-    };
-
-
+  atualizarVariaveis() {
+    this.metricsAvaliadas = Object.keys(this.resultadosDasAvaliacoes);
+    this.modelosAvaliados = this.metricsAvaliadas.length > 0
+      ? Object.keys(this.resultadosDasAvaliacoes[this.metricsAvaliadas[0]])
+      : [];
   }
 
-
-
-
-  get modelos(): string[] {
-    return this.resultadosDasAvaliacoes ? Object.keys(this.resultadosDasAvaliacoes) : [];
-  }
-
-  getLabel(valor: string): string {
-    return nomeMetricas[valor] ?? valor;
-  }
 
   isNumber(value: any): boolean {
     return typeof value === 'number';
