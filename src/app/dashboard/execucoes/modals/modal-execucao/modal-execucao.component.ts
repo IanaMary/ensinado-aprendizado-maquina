@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
 import { ItemPipeline, ResultadoColetaDado, TipoTarget, labelParaTipoTargetMap } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
@@ -14,6 +14,8 @@ import tutor from '../../../../constants/tutor.json';
 export class ModalExecucaoComponent implements OnInit {
 
   tutor = tutor;
+  proximaEtapaPipe = new EventEmitter<any>();
+
 
   etapas: Record<string, { indice: number; proximo: boolean; titulo: string; botaoProximo?: string }> = {
     'coleta-dado': { indice: 0, proximo: true, titulo: 'Importar Planilha' },
@@ -91,6 +93,7 @@ export class ModalExecucaoComponent implements OnInit {
       default:
         this.etapas[this.etapaAtual].proximo = false;
     }
+    this.dashboardService.emitirProximaEtapaPipe({ pos: this.etapaAtual, etapa: this.etapas[this.etapaAtual] });
   }
 
   atualizarResultadoColeta(event: ResultadoColetaDado) {
@@ -120,6 +123,10 @@ export class ModalExecucaoComponent implements OnInit {
 
     this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(tipoTarget);
     this.modeloSelecionado = this.modelosDisponiveis[0];
+
+    console.log('')
+
+    console.log("ssssssss =>", this.modelosDisponiveis, this.modeloSelecionado)
   }
 
 

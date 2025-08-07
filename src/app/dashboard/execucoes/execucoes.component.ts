@@ -41,6 +41,12 @@ export class ExecucoesComponent implements OnInit {
       this.colunaMetrica = itens.filter(i => i.tipoItem === 'metrica');
       this.metricasSelecionadas = this.colunaMetrica.filter(i => i.movido);
     });
+
+    this.dashboardService.proximaEtapaPipe$.subscribe(dado => {
+      console.log('Evento recebido:', dado);
+    });
+
+
   }
 
 

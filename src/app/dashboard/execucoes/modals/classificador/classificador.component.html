@@ -28,7 +28,7 @@
 
     <nav class="resultado" *ngFor="let modeloValor of getModelosComResultado()">
 
-      <h2>Status do Treinamento - {{ getLabel(modeloValor) }}</h2>
+      <h2>Status do Treinamento - {{ resultadoTreinamento[modeloValor]?.nome_modelo }}</h2>
 
       <p><strong>Status:</strong> {{ resultadoTreinamento[modeloValor].status }}</p>
       <p><strong>Target:</strong> {{ resultadoTreinamento[modeloValor].target }}</p>
@@ -38,7 +38,7 @@
       <p><strong>Total Amostras Teste:</strong> {{ resultadoTreinamento[modeloValor].total_amostras_teste }}</p>
 
       <button *ngIf="!treinando" mat-raised-button (click)="enviarParaClassificador(modeloValor)">
-        Treinar {{ getLabel(modeloValor) }}
+        Treinar {{ resultadoTreinamento[modeloValor]?.nome_modelo }}
       </button>
     </nav>
 

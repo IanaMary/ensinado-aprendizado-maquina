@@ -27,10 +27,8 @@ export class TiposClassificadoresComponent implements OnChanges {
   constructor(private dashboardService: DashboardService) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.modeloSelecionado) {
+    if (changes['modeloSelecionado'] && this.modeloSelecionado?.valor) {
       this.modeloValor = this.modeloSelecionado.valor;
-    } else {
-      this.modeloValor = undefined;
     }
   }
 

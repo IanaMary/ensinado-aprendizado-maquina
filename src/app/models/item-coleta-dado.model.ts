@@ -54,6 +54,7 @@ export interface ItemPipeline {
   tipoItem: TipoItem;
   habilitado: boolean;
   valor: string;
+  id: number;
   resumo?: string;
   tipo?: TipoTarget;
   hiperparametros?: any[];
@@ -63,6 +64,7 @@ export interface ItemPipeline {
 export interface ResultadoColetaDado {
   target: string;
   colunas: string[];
+  colunasDetalhes: [];
   porcentagemTreino: number;
   tipoTarget: TipoTarget;
   atributos: Record<string, boolean>;

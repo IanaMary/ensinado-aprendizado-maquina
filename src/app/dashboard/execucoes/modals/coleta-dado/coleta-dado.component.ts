@@ -36,6 +36,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   resultColetaDadoL: ResultadoColetaDado = {
     target: '',
     colunas: [],
+    colunasDetalhes: [],
     porcentagemTreino: 70,
     tipoTarget: null,
     atributos: this.att,
@@ -57,7 +58,6 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   totalDados: number = 0;
   treinoArquivo: any;
   testeArquivo: any;
-  dataSourceTreino = new MatTableDataSource<{ nomeColuna: string; tipoColuna: string; atributo: boolean }>([]);
 
 
   constructor(private planilhaService: PlanilhaService,
@@ -162,7 +162,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.resultColetaDadoL.target = res.target
     this.resultColetaDadoL.tipoTarget = res.tipo_target
 
-    this.dataSourceTreino = res.colunas_detalhes;
+    this.resultColetaDadoL.colunasDetalhes = res.colunas_detalhes;
 
     this.treino.dados = res.preview_treino;
     this.treino.totalDados = res.num_linhas_treino;
@@ -189,7 +189,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       next: (res: any) => {
         this.resultColetaDadoL.tipoTarget = res.tipo_target;
         this.resultadoColetaDado = this.resultColetaDadoL;
-        this.resultadoColetaDadoModificado.emit(this.resultColetaDadoL);
+        this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
       },
       error: (err) => { }
     });
@@ -198,13 +198,13 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
 
   onFiltroChange(coluna: string, valor: string) {
-    this.filtros[coluna] = valor.toLowerCase();
-    if (coluna === 'target') {
-      this.target = valor === '-' ? null : valor;
+    //   this.filtros[coluna] = valor.toLowerCase();
+    //   if (coluna === 'target') {
+    //     this.target = valor === '-' ? null : valor;
 
-    } else {
-      this.dataSourceTreino.filter = JSON.stringify(this.filtros);
-    }
+    //   } else {
+    //     this.dataSourceTreino.filter = JSON.stringify(this.filtros);
+    //   }
   }
 
   selecaoTargetAtt(bool: boolean) {

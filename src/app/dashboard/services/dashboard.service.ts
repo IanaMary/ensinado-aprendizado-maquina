@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { ItemPipeline, TipoTarget } from '../../models/item-coleta-dado.model';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
@@ -10,17 +10,17 @@ import itensPipeline from '../../../app/constants/itens-coletas-dados.json'
 })
 export class DashboardService {
 
+  private proximaEtapaPipe = new Subject<any>();
+  proximaEtapaPipe$ = this.proximaEtapaPipe.asObservable();
+
   todosItensColetasDados = itensPipeline.itensColetasDados as ItemPipeline[];
   todosModelos = itensPipeline.itensTreino as ItemPipeline[];
   todosItensMetricas = itensPipeline.itensMetricas as any[];
 
+  private itemsEmExecucao = new BehaviorSubject<ItemPipeline[]>([]);
   private itensColetasDados = new BehaviorSubject<ItemPipeline[]>([]);
   private itensModelos = new BehaviorSubject<ItemPipeline[]>([]);
   private itensMetricas = new BehaviorSubject<ItemPipeline[]>([]);
-
-
-
-  private itemsEmExecucao = new BehaviorSubject<ItemPipeline[]>([]);
 
   url = environment.apiUrl;
   private readonly endpointConfPipeline: string = 'conf_pipeline/';
@@ -37,6 +37,11 @@ export class DashboardService {
     this.carregarItensMetricas();
   }
 
+
+  // EVENTO DE MUDANÇA NO PIPE
+  emitirProximaEtapaPipe(dado: any) {
+    this.proximaEtapaPipe.next(dado);
+  }
 
   // SERVIÇOS COM LIGAÇÃO COM BANCO 
 
@@ -103,7 +108,6 @@ export class DashboardService {
     this.fetchItensModelos()
       .subscribe({
         next: dados => {
-          console.log('Modelos recebidos da API:', dados);
           this.itensModelos.next(dados);
         },
         error: err => {
