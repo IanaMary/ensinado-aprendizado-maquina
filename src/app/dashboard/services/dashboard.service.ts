@@ -102,9 +102,12 @@ export class DashboardService {
   carregarItensModelos() {
     this.fetchItensModelos()
       .subscribe({
-        next: dados => this.itensModelos.next(dados),
+        next: dados => {
+          console.log('Modelos recebidos da API:', dados);
+          this.itensModelos.next(dados);
+        },
         error: err => {
-          console.error('Erro ao carregar itens coleta dados:', err);
+          console.error('Erro ao carregar itens modelos:', err);
         }
       });
   }
@@ -134,7 +137,7 @@ export class DashboardService {
 
 
   getModelosPorTipo(tipo: string | null): ItemPipeline[] {
-    return this.itensModelos.value.filter(item => item.tipo === tipo);
+    return this.itensModelos.getValue().filter(item => item.tipo === tipo);
   }
 
 

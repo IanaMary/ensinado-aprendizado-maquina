@@ -70,22 +70,18 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     this.idColeta = this.sessionService.getColetaId();
     this.idConfigurcacaoTreinamento = this.sessionService.getConfigurcaoTreinamento();
-    if (changes['resultadoColetaDado'] && this.resultadoColetaDado) {
-      this.resultColetaDadoL = this.resultadoColetaDado;
-      this.treino = this.resultColetaDadoL.treino;
-      this.teste = this.resultColetaDadoL.teste;
-    } else if (this.idConfigurcacaoTreinamento) {
+    if (this.idConfigurcacaoTreinamento && !this.resultadoColetaDado) {
       this.getColetaInfo();
     }
 
   }
 
   ngOnInit() {
-    // this.atualizarDataSource('treino');
-    // this.configurarFiltro();
-    // if (this.teste.dados.length) {
-    //   this.atualizarDataSource('teste');
-    // }
+    if (this.resultadoColetaDado) {
+      this.resultColetaDadoL = this.resultadoColetaDado;
+      this.treino = this.resultColetaDadoL.treino;
+      this.teste = this.resultColetaDadoL.teste;
+    }
   }
 
 
@@ -163,7 +159,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     this.resultColetaDadoL.colunas = nomeColunas;
     this.resultColetaDadoL.atributos = res.atributos;
-    this.resultColetaDadoL.target = res.tipo_target
+    this.resultColetaDadoL.target = res.target
+    this.resultColetaDadoL.tipoTarget = res.tipo_target
 
     this.dataSourceTreino = res.colunas_detalhes;
 
@@ -192,7 +189,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       next: (res: any) => {
         this.resultColetaDadoL.tipoTarget = res.tipo_target;
         this.resultadoColetaDado = this.resultColetaDadoL;
-        this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
+        this.resultadoColetaDadoModificado.emit(this.resultColetaDadoL);
       },
       error: (err) => { }
     });

@@ -27,7 +27,7 @@ export const roleMap: Record<string, string> = {
 };
 
 
-export const labelParaTipoTargetMap: Record<TipoDado, TipoTarget> = {
+export const labelParaTipoTargetMap: Record<string, TipoTarget> = {
   'Número': 'number',
   'Texto': 'string',
   'Booleano': 'boolean'

@@ -34,7 +34,6 @@ export class ModalExecucaoComponent implements OnInit {
   modeloSelecionado?: ItemPipeline;
   modelosDisponiveis: ItemPipeline[] = [];
 
-  tipoTargetSelecionado: TipoTarget = null;
   tutorModeloTarget: string[] = [];
 
   todasMetricas = itensPipeline.itensMetricas as ItemPipeline[];
@@ -78,7 +77,6 @@ export class ModalExecucaoComponent implements OnInit {
         this.etapas[this.etapaAtual].proximo = !!this.resultadoColetaDado;
         break;
       case 'selecao-do-modelo':
-        // this.tipoTargetSelecionado = this.resultadoColetaDado?.treino?.tipoTarget ?? null;
         this.etapas[this.etapaAtual].proximo = !!this.modeloSelecionado;
         break;
       case 'treino-validacao-teste':
@@ -97,7 +95,11 @@ export class ModalExecucaoComponent implements OnInit {
 
   atualizarResultadoColeta(event: ResultadoColetaDado) {
     this.resultadoColetaDado = event;
-    const tipoTarget = this.resultadoColetaDado.tipoTarget;
+
+    const aux = this.resultadoColetaDado?.tipoTarget;
+
+    const tipoTarget = aux ? labelParaTipoTargetMap[aux] : null;
+
     this.tutorModeloTarget = tipoTarget === 'string' ? tutor.resumos['modelo-classificacao'] :
       tipoTarget === 'number' ? tutor.resumos['modelo-regressao'] :
         tutor.resumos['modelo-exploratorio'];
@@ -107,7 +109,7 @@ export class ModalExecucaoComponent implements OnInit {
 
     const erroTreino = !!this.resultadoColetaDado.treino.erro;
     const erroTeste = !!this.resultadoColetaDado.teste?.erro;
-    const tipoTargetNaoSelecionado = this.tipoTargetSelecionado === undefined;
+    const tipoTargetNaoSelecionado = tipoTarget === undefined;
 
     this.etapas[this.etapaAtual].proximo = !(erroTreino || erroTeste || tipoTargetNaoSelecionado || attVazio);
 
@@ -160,8 +162,12 @@ export class ModalExecucaoComponent implements OnInit {
 
     if (this.etapas['coleta-dado'].proximo) {
       this.resultadoColetaDado = data.resultadoColetaDado;
-      this.tipoTargetSelecionado = data.resultadoColetaDado?.treino?.tipoTarget ?? undefined;
-      this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(this.tipoTargetSelecionado);
+
+      const aux = this.resultadoColetaDado?.tipoTarget;
+
+      const tipoTarget = aux ? labelParaTipoTargetMap[aux] : null;
+
+      this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(tipoTarget);
       this.modeloSelecionado = data.modeloSelecionado ? data.modeloSelecionado : this.modelosDisponiveis[0];
     }
 

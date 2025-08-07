@@ -41,6 +41,7 @@
           <mat-form-field appearance="outline">
             <mat-label>Seleção do target</mat-label>
             <mat-select (selectionChange)="selecaoTargetAtt(true)" [(ngModel)]="resultColetaDadoL.target">
+              <mat-option [value]="null">-</mat-option>
               <mat-option [value]="item.key"
                 *ngFor="let item of resultColetaDadoL.atributos| keyvalue">{{item.key}}</mat-option>
             </mat-select>
