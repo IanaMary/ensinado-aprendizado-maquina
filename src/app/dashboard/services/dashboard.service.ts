@@ -11,27 +11,30 @@ import itensPipeline from '../../../app/constants/itens-coletas-dados.json'
 export class DashboardService {
 
   todosItensColetasDados = itensPipeline.itensColetasDados as ItemPipeline[];
-  todosItensTreino = itensPipeline.itensTreino as ItemPipeline[];
+  todosModelos = itensPipeline.itensTreino as ItemPipeline[];
   todosItensMetricas = itensPipeline.itensMetricas as any[];
 
-  // private itensColetasDados = new BehaviorSubject<ItemPipeline[]>(this.todosItensColetasDados);
   private itensColetasDados = new BehaviorSubject<ItemPipeline[]>([]);
+  private itensModelos = new BehaviorSubject<ItemPipeline[]>([]);
+  private itensMetricas = new BehaviorSubject<ItemPipeline[]>([]);
 
 
 
-  private itensTreino = new BehaviorSubject<ItemPipeline[]>(this.todosItensTreino);
-  private itensMetricas = new BehaviorSubject<ItemPipeline[]>(this.todosItensMetricas);
   private itemsEmExecucao = new BehaviorSubject<ItemPipeline[]>([]);
 
   url = environment.apiUrl;
   private readonly endpointConfPipeline: string = 'conf_pipeline/';
   private readonly endpointColeta: string = 'coleta_dados/';
+  private readonly endpointModelo: string = 'modelos/';
+  private readonly endpointMetricas: string = 'metricas/';
   private readonly endpointConfiguraca: string = 'configurar_treinamento';
   private readonly endpointClassificador: string = 'classificador';
 
 
   constructor(private http: HttpClient) {
     this.carregarItensColetasDados();
+    this.carregarItensModelos();
+    this.carregarItensMetricas();
   }
 
 
@@ -71,6 +74,14 @@ export class DashboardService {
     return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointColeta}todos`);
   }
 
+  fetchItensModelos() {
+    return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointModelo}todos`);
+  }
+
+
+  fetchItensMetricas() {
+    return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointMetricas}todos`);
+  }
 
   // SERVIÇOS SEM LIGAÇÃO COM BANCO
 
@@ -88,14 +99,34 @@ export class DashboardService {
     return this.itensColetasDados.asObservable();
   }
 
+  carregarItensModelos() {
+    this.fetchItensModelos()
+      .subscribe({
+        next: dados => this.itensModelos.next(dados),
+        error: err => {
+          console.error('Erro ao carregar itens coleta dados:', err);
+        }
+      });
+  }
 
-  getItensTreino() {
-    return this.itensTreino.asObservable();
+  getModelos() {
+    return this.itensModelos.asObservable();
+  }
+
+  carregarItensMetricas() {
+    this.fetchItensMetricas()
+      .subscribe({
+        next: dados => this.itensMetricas.next(dados),
+        error: err => {
+          console.error('Erro ao carregar itens coleta dados:', err);
+        }
+      });
   }
 
   getItensMetricas() {
     return this.itensMetricas.asObservable();
   }
+
 
   getItemsEmExecucao() {
     return this.itemsEmExecucao.asObservable();
@@ -103,12 +134,12 @@ export class DashboardService {
 
 
   getModelosPorTipo(tipo: string | null): ItemPipeline[] {
-    return this.itensTreino.value.filter(item => item.tipo === tipo);
+    return this.itensModelos.value.filter(item => item.tipo === tipo);
   }
 
 
   getMetricasPorModelo(modelo: string, considerarMovido: boolean = false): string[] {
-    const itemTreino = this.itensTreino.value.find(item => item.valor === modelo);
+    const itemTreino = this.itensModelos.value.find(item => item.valor === modelo);
 
     // Se não encontrar ou não tiver métricas, retorna array vazio
     const metricasDoModelo = itemTreino?.metricas ?? [];
@@ -141,12 +172,12 @@ export class DashboardService {
     }));
     this.itensColetasDados.next(itensAtualizados);
 
-    const itensTreinoAtualizados = this.itensTreino.value.map(i => ({
+    const modelosAtualizados = this.itensModelos.value.map(i => ({
       ...i,
       // habilitado: false
     }));
 
-    this.itensTreino.next(itensTreinoAtualizados);
+    this.itensModelos.next(modelosAtualizados);
 
     const itenssMetricaAtualizados = this.itensMetricas.value.map(i => ({
       ...i,
@@ -159,7 +190,7 @@ export class DashboardService {
 
     const itensMovidos = [
       ...this.itensColetasDados.value.filter(item => item.movido),
-      ...this.itensTreino.value.filter(item => item.movido),
+      ...this.itensModelos.value.filter(item => item.movido),
       ...this.itensMetricas.value.filter(item => item.movido)
     ];
 
@@ -171,20 +202,20 @@ export class DashboardService {
   }
 
   habilitadarModelos(tipoTargetSelecionado: TipoTarget, habilitado: boolean) {
-    const itensAtualizados = this.itensTreino.value.map(item => ({
+    const itensAtualizados = this.itensModelos.value.map(item => ({
       ...item,
       habilitado: item.tipo === tipoTargetSelecionado
     }));
-    this.itensTreino.next(itensAtualizados);
+    this.itensModelos.next(itensAtualizados);
   }
 
   selecionarModelo(modeloSelecionado: any) {
-    const itensAtualizados = this.itensTreino.value.map(item => ({
+    const itensAtualizados = this.itensModelos.value.map(item => ({
       ...item,
       habilitado: item.habilitado,
       movido: item.valor === modeloSelecionado.valor ? true : item.movido
     }));
-    this.itensTreino.next(itensAtualizados);
+    this.itensModelos.next(itensAtualizados);
   }
 
   habilitadarMetricas(metricasDisponiveis: any[]) {

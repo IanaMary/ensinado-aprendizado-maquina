@@ -9,15 +9,17 @@ import { ItemPipeline } from '../../../models/item-coleta-dado.model';
   standalone: false
 })
 export class TreinoValidacaoTesteComponent {
-itens: ItemPipeline[] = [];
+  itens: ItemPipeline[] = [];
 
 
   constructor(private dashboardService: DashboardService) { }
 
   ngOnInit() {
-    this.dashboardService.getItensTreino().subscribe(itens => {
-      this.itens = itens;
-    });
+    this.dashboardService.getModelos()
+      .subscribe((itens: ItemPipeline[]) => {
+        this.itens = itens;
+      });
+
   }
 
   // Manipulando o evento de soltar
