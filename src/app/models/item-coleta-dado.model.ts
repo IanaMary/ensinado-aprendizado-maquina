@@ -1,6 +1,7 @@
 // Tipos e constantes
 export type TipoItem = 'coleta-dado' | 'pre-processamento' | 'treino-validacao-teste' | 'metrica';
-export type TipoTarget = 'number' | 'string' | 'boolean' | null;
+// export type TipoTarget = 'number' | 'string' | 'boolean' | null;
+export type TipoTarget = 'Texto' | 'Número' | 'Booleano' | null;
 export type TipoDado = 'Texto' | 'Número' | 'Booleano';
 
 
@@ -27,10 +28,16 @@ export const roleMap: Record<string, string> = {
 };
 
 
+// export const labelParaTipoTargetMap: Record<string, TipoTarget> = {
+//   'Número': 'number',
+//   'Texto': 'string',
+//   'Booleano': 'boolean'
+// };
+
 export const labelParaTipoTargetMap: Record<string, TipoTarget> = {
-  'Número': 'number',
-  'Texto': 'string',
-  'Booleano': 'boolean'
+  'number': 'Número',
+  'string': 'Texto',
+  'boolean': 'Booleano'
 };
 
 export const tipoLabels: Record<string, string> = {
@@ -82,9 +89,22 @@ export interface InformacoesDados {
 }
 
 
+export interface BodyTutor {
+  tamanho_arq: number;
+  prever_categoria?: boolean;
+  // prever_quantidade?: boolean;
+  // dados_rotulados?: boolean;
+  // outras propriedades...
+}
+
+
 export function formatarValor(valor: unknown): string {
   if (typeof valor === 'boolean') {
     return valor ? 'Sim' : 'Não';
   }
   return String(valor ?? '');
 }
+
+
+
+

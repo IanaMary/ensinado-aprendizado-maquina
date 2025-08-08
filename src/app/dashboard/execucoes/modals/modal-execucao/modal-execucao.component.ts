@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
-import { ItemPipeline, ResultadoColetaDado, TipoTarget, labelParaTipoTargetMap } from '../../../../models/item-coleta-dado.model';
+import { BodyTutor, ItemPipeline, ResultadoColetaDado, TipoTarget, labelParaTipoTargetMap } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import itensPipeline from '../../../../constants/itens-coletas-dados.json';
@@ -14,8 +14,10 @@ import tutor from '../../../../constants/tutor.json';
 export class ModalExecucaoComponent implements OnInit {
 
   tutor = tutor;
-  proximaEtapaPipe = new EventEmitter<any>();
 
+  bodyTutor: BodyTutor = {
+    tamanho_arq: 0,
+  }
 
   etapas: Record<string, { indice: number; proximo: boolean; titulo: string; botaoProximo?: string }> = {
     'coleta-dado': { indice: 0, proximo: true, titulo: 'Importar Planilha' },
@@ -76,6 +78,7 @@ export class ModalExecucaoComponent implements OnInit {
     switch (this.etapaAtual) {
       case 'coleta-dado':
         this.etapas[this.etapaAtual].proximo = !!this.resultadoColetaDado;
+        this.emitTutor();
         break;
       case 'selecao-do-modelo':
         this.etapas[this.etapaAtual].proximo = !!this.modeloSelecionado;
@@ -92,7 +95,6 @@ export class ModalExecucaoComponent implements OnInit {
       default:
         this.etapas[this.etapaAtual].proximo = false;
     }
-    this.dashboardService.emitirProximaEtapaPipe({ pos: this.etapaAtual, etapa: this.etapas[this.etapaAtual] });
   }
 
   atualizarResultadoColeta(event: ResultadoColetaDado) {
@@ -102,8 +104,8 @@ export class ModalExecucaoComponent implements OnInit {
 
     const tipoTarget = aux ? labelParaTipoTargetMap[aux] : null;
 
-    this.tutorModeloTarget = tipoTarget === 'string' ? tutor.resumos['modelo-classificacao'] :
-      tipoTarget === 'number' ? tutor.resumos['modelo-regressao'] :
+    this.tutorModeloTarget = tipoTarget === 'Texto' ? tutor.resumos['modelo-classificacao'] :
+      tipoTarget === 'Número' ? tutor.resumos['modelo-regressao'] :
         tutor.resumos['modelo-exploratorio'];
 
     const att = event.atributos;
@@ -122,6 +124,8 @@ export class ModalExecucaoComponent implements OnInit {
 
     this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(tipoTarget);
     this.modeloSelecionado = this.modelosDisponiveis[0];
+
+    this.emitTutor();
   }
 
 
@@ -164,6 +168,7 @@ export class ModalExecucaoComponent implements OnInit {
 
     if (this.etapas['coleta-dado'].proximo) {
       this.resultadoColetaDado = data.resultadoColetaDado;
+
 
       const aux = this.resultadoColetaDado?.tipoTarget;
 
@@ -227,5 +232,14 @@ export class ModalExecucaoComponent implements OnInit {
     if (idx === 0) return this.tutor.resumos.xlsx;
     if (idx === 1) return this.tutorModeloTarget;
     return [];
+  }
+
+  emitTutor() {
+    console.log('emitTutor => ', this.resultadoColetaDado)
+    this.bodyTutor.tamanho_arq = 100
+    this.bodyTutor['prever_categoria'] = this.resultadoColetaDado?.tipoTarget === 'Texto'
+    // this.bodyTutor.prever_quantidade = this.resultadoColetaDado?.tipoTarget === 'Número'
+    // this.bodyTutor.dados_rotulados = this.resultadoColetaDado?.target !== null
+    this.dashboardService.emitirProximaEtapaPipe({ etapaAtual: this.etapaAtual, bodyTutor: this.bodyTutor });
   }
 }

@@ -23,6 +23,7 @@ export class DashboardService {
   private itensMetricas = new BehaviorSubject<ItemPipeline[]>([]);
 
   url = environment.apiUrl;
+  private readonly endpointTutor: string = 'tutor';
   private readonly endpointConfPipeline: string = 'conf_pipeline/';
   private readonly endpointColeta: string = 'coleta_dados/';
   private readonly endpointModelo: string = 'modelos/';
@@ -44,6 +45,10 @@ export class DashboardService {
   }
 
   // SERVIÇOS COM LIGAÇÃO COM BANCO 
+
+  postTutor(body: any) {
+    return this.http.post(`${this.url}${this.endpointTutor}`, body);
+  }
 
   postColetaArquivo(tipo: string, body: any) {
     return this.http.post(`${this.url}${this.endpointColeta}salvar_${tipo}`, body);

@@ -2,9 +2,11 @@ import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
-import { ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
+import { BodyTutor, ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
 import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.component';
 import tutor from '../../constants/tutor.json';
+import { isEqual } from 'lodash';
+
 
 
 @Component({
@@ -15,7 +17,11 @@ import tutor from '../../constants/tutor.json';
 })
 export class ExecucoesComponent implements OnInit {
 
-  tutor = tutor;
+  tutor: any[] = [];
+  bodyTutor: BodyTutor = {
+    tamanho_arq: 0,
+  };
+
 
   itens: ItemPipeline[] = [];
   colunaColeta: ItemPipeline[] = [];
@@ -34,6 +40,7 @@ export class ExecucoesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.atualizarTutor(null);
     this.dashboardService.getItemsEmExecucao().subscribe(itens => {
       this.itens = [...itens];
       this.colunaColeta = itens.filter(i => i.tipoItem === 'coleta-dado');
@@ -41,16 +48,14 @@ export class ExecucoesComponent implements OnInit {
       this.colunaMetrica = itens.filter(i => i.tipoItem === 'metrica');
       this.metricasSelecionadas = this.colunaMetrica.filter(i => i.movido);
     });
-
-    this.dashboardService.proximaEtapaPipe$.subscribe(dado => {
-      console.log('Evento recebido:', dado);
+    this.dashboardService.proximaEtapaPipe$.subscribe((event: any) => {
+      this.atualizarTutor(event);
     });
-
-
   }
 
 
   abrirModalExecucao(item: ItemPipeline): void {
+    this.atualizarTutor(item.tipoItem);
     const dialogRef = this.dialog.open(ModalExecucaoComponent, {
       maxWidth: 'none',
       width: 'auto',
@@ -75,6 +80,39 @@ export class ExecucoesComponent implements OnInit {
         this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
         this.dashboardService.moverItensEmExecucao();
       }
+    });
+  }
+
+
+  atualizarTutor(event: any) {
+
+    if (event && event.bodyTutor) {
+      const diff = !isEqual(this.bodyTutor, event.bodyTutor)
+      if (diff) {
+
+        this.bodyTutor = event.bodyTutor;
+
+        this.postTutor();
+      }
+    } else {
+      if (this.resultadoColetaDado?.treino) {
+        this.bodyTutor.tamanho_arq = 100;
+        this.bodyTutor['prever_categoria'] = this.resultadoColetaDado?.target !== null;
+      }
+      this.postTutor();
+    }
+
+
+  }
+
+  postTutor() {
+    this.dashboardService.postTutor(this.bodyTutor).subscribe((res: any) => {
+      if (res.descricao) {
+        this.tutor = res.descricao
+      } else if (res.historico) {
+        this.tutor = res.historico
+      }
+      console.log('atualizarTutor res =>> ', res);
     });
   }
 
