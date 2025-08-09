@@ -6,11 +6,18 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTabsModule } from '@angular/material/tabs';
-
+import { ConfTutorComponent } from './containers/conf-tutor.component';
+import { ConfTutorRoutingModule } from './conf-tutor-routing.module';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { QuillModule } from 'ngx-quill';
+import { MatDivider } from "@angular/material/divider";
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    ConfTutorComponent
+  ],
   imports: [
+    ConfTutorRoutingModule,
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
@@ -18,18 +25,12 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatInputModule,
     MatIconModule,
     MatRadioModule,
-    MatTabsModule
+    MatTabsModule,
+    MatExpansionModule,
+    QuillModule.forRoot(),
+    MatDivider
   ],
-  exports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatRadioModule,
-    MatTabsModule
-  ],
+  exports: [],
   providers: []
 })
-export class SharedModule { }
+export class ConfTutorModule { }

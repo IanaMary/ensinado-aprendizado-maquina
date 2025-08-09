@@ -92,9 +92,10 @@ export interface InformacoesDados {
 export interface BodyTutor {
   tamanho_arq: number;
   prever_categoria?: boolean;
-  // prever_quantidade?: boolean;
-  // dados_rotulados?: boolean;
-  // outras propriedades...
+  prever_quantidade?: boolean;
+  dados_rotulados?: boolean;
+  num_categorias_conhecidas?: boolean;
+  apenas_olhando?: boolean;
 }
 
 

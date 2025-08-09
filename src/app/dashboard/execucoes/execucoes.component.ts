@@ -6,6 +6,7 @@ import { BodyTutor, ItemPipeline, ResultadoColetaDado } from '../../models/item-
 import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.component';
 import tutor from '../../constants/tutor.json';
 import { isEqual } from 'lodash';
+import { Subject, takeUntil } from 'rxjs';
 
 
 
@@ -17,7 +18,10 @@ import { isEqual } from 'lodash';
 })
 export class ExecucoesComponent implements OnInit {
 
-  tutor: any[] = [];
+  private destroy$ = new Subject<void>();
+
+
+  tutor: any;
   bodyTutor: BodyTutor = {
     tamanho_arq: 0,
   };
@@ -48,9 +52,11 @@ export class ExecucoesComponent implements OnInit {
       this.colunaMetrica = itens.filter(i => i.tipoItem === 'metrica');
       this.metricasSelecionadas = this.colunaMetrica.filter(i => i.movido);
     });
-    this.dashboardService.proximaEtapaPipe$.subscribe((event: any) => {
-      this.atualizarTutor(event);
-    });
+    this.dashboardService.proximaEtapaPipe$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((event: any) => {
+        this.atualizarTutor(event);
+      });
   }
 
 
@@ -92,29 +98,34 @@ export class ExecucoesComponent implements OnInit {
 
         this.bodyTutor = event.bodyTutor;
 
-        this.postTutor();
+        this.getTutor();
       }
     } else {
       if (this.resultadoColetaDado?.treino) {
         this.bodyTutor.tamanho_arq = 100;
         this.bodyTutor['prever_categoria'] = this.resultadoColetaDado?.target !== null;
       }
-      this.postTutor();
+      this.getTutor();
     }
 
 
   }
 
-  postTutor() {
-    this.dashboardService.postTutor(this.bodyTutor).subscribe((res: any) => {
-      if (res.descricao) {
-        this.tutor = res.descricao
-      } else if (res.historico) {
-        this.tutor = res.historico
-      }
-      console.log('atualizarTutor res =>> ', res);
+  getTutor() {
+    this.dashboardService.getTutor(this.bodyTutor).subscribe({
+      next: async (res: any) => {
+        if (res.descricao) {
+          const aux = res.descricao.replace(/&nbsp;/g, ' ');
+          this.tutor = aux;
+        }
+      },
+      error: (error: any) => { }
     });
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
 }

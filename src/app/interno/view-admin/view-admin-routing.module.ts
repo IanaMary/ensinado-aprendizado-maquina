@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ViewAdminComponent } from './containers/view-admin.component';
 import { DashboardComponent } from '../../dashboard/dashboard.component';
 import { ConfPipelineComponent } from '../conf-pipeline/containers/conf-pipeline.component';
+import { ConfTutorComponent } from '../conf-tutor/containers/conf-tutor.component';
 
 const routes: Routes = [
   {
@@ -22,6 +23,13 @@ const routes: Routes = [
   {
     path: 'conf-pipeline',
     component: ConfPipelineComponent,
+    data: {
+      breadcrumb: ''
+    }
+  },
+  {
+    path: 'conf-tutor',
+    component: ConfTutorComponent,
     data: {
       breadcrumb: ''
     }

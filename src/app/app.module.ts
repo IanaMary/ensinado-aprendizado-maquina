@@ -4,10 +4,15 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { MatIconRegistry } from '@angular/material/icon';
+import { ConfTutorModule } from './interno/conf-tutor/conf-tutor.module';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, AppRoutingModule, DashboardModule],
+  imports: [BrowserModule,
+    AppRoutingModule,
+    DashboardModule,
+    ConfTutorModule,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {

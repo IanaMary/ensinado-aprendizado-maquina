@@ -1,9 +1,13 @@
 <div class="box-principal">
-  <div class="box" (click)="navegar(false)">
+  <div class="box" (click)="navegar('dashboard')">
     DASHBOARD
   </div>
 
-  <div class="box" (click)="navegar(true)">
+  <div class="box" (click)="navegar('conf-pipeline')">
     CONFIGURAÇÃO DO PIPELINE
+  </div>
+
+  <div class="box" (click)="navegar('conf-tutor')">
+    CONFIGURAÇÃO DO TUTOR
   </div>
 </div>

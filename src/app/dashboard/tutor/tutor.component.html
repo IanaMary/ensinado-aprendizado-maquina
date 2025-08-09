@@ -10,15 +10,7 @@
     </div>
   </ng-container>
   <div class="tutor-painel">
-    <ng-container *ngFor="let tutor of normalizadoTutor">
-      <p *ngIf="tutor.texto">{{ tutor.texto }}</p>
-      <li *ngFor="let item of tutor.itens">{{ item }}</li>
-    </ng-container>
-    <ng-container *ngIf="explicacao.length">
-      <ng-container *ngFor="let tutor of explicacao">
-        <p>{{tutor}}</p>
-      </ng-container>
-    </ng-container>
+    <div *ngIf="tutorGeral" [innerHTML]="tutorGeral"></div>
   </div>
 
 </div>

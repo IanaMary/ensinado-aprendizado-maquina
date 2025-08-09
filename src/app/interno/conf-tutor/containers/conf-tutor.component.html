@@ -1,0 +1,89 @@
+<div class="box-principal">
+  <div class="box">
+    <div class="box-coluna titulo-principal-modal">
+      CONFIGURAR TUTOR
+    </div>
+
+    <form [formGroup]="formConfTutor" class="box-coluna">
+
+      <div>Sobre o tamanho do arquivo</div>
+
+      <mat-radio-group (change)="bodyTutor()" formControlName="tamanho_arq">
+        <mat-radio-button [value]="0">Sem arquivo</mat-radio-button>
+        <mat-radio-button [value]="50">Arquivo pequeno</mat-radio-button>
+        <mat-radio-button [value]="51">Arquivo ideal</mat-radio-button>
+      </mat-radio-group>
+
+      <ng-container *ngIf="formConfTutor.value.tamanho_arq === 51">
+        <mat-divider></mat-divider>
+        <div>Prever uma categoria</div>
+
+        <mat-radio-group (change)="bodyTutor()" formControlName="prever_categoria">
+          <mat-radio-button [value]="true">Sim</mat-radio-button>
+          <mat-radio-button [value]="false">Não</mat-radio-button>
+        </mat-radio-group>
+      </ng-container>
+
+      <ng-container *ngIf="formConfTutor.value.prever_categoria">
+        <mat-divider></mat-divider>
+        <div>Os dados possuem rótulos</div>
+
+        <mat-radio-group (change)="bodyTutor()" formControlName="dados_rotulados">
+          <mat-radio-button [value]="true">Sim</mat-radio-button>
+          <mat-radio-button [value]="false">Não</mat-radio-button>
+        </mat-radio-group>
+      </ng-container>
+
+      <ng-container *ngIf="formConfTutor.value.dados_rotulados === false">
+        <mat-divider></mat-divider>
+        <div>Os número de categorias é conhecido?</div>
+
+        <mat-radio-group (change)="bodyTutor()" formControlName="num_categorias_conhecidas">
+          <mat-radio-button [value]="true">Sim</mat-radio-button>
+          <mat-radio-button [value]="false">Não</mat-radio-button>
+        </mat-radio-group>
+      </ng-container>
+
+
+      <ng-container *ngIf="formConfTutor.value.prever_categoria === false">
+        <mat-divider></mat-divider>
+        <div>Prevem uma quantidade</div>
+
+        <mat-radio-group (change)="bodyTutor()" formControlName="prever_quantidade">
+          <mat-radio-button [value]="true">Sim</mat-radio-button>
+          <mat-radio-button [value]="false">Não</mat-radio-button>
+        </mat-radio-group>
+      </ng-container>
+
+      <ng-container *ngIf="formConfTutor.value.prever_quantidade === false">
+        <mat-divider></mat-divider>
+        <div>Não sei, apenas olhando?</div>
+
+        <mat-radio-group (change)="bodyTutor()" formControlName="apenas_olhando">
+          <mat-radio-button [value]="true">Sim</mat-radio-button>
+          <mat-radio-button [value]="false">Não</mat-radio-button>
+        </mat-radio-group>
+      </ng-container>
+
+
+    </form>
+    <mat-divider></mat-divider>
+    <quill-editor [readOnly]="erroTutor" [(ngModel)]="conteudo" [modules]="modules" class="editor"></quill-editor>
+    <mat-divider></mat-divider>
+    <ng-container *ngIf="erroTutor">
+      <h3>Campos vazios</h3>
+    </ng-container>
+    <ng-container *ngIf="!erroTutor">
+      <h3>Conteúdo HTML gerado:</h3>
+      <div [innerHTML]="conteudo" class="editor"></div>
+    </ng-container>
+
+
+    <nav class="bloco">
+      <button class="botao-principal" (click)="putTutor()">EDITAR</button>
+      <button (click)="navegar(true)" class="botao-principal" *ngIf="role !== 'aluno'">VOLTAR</button>
+      <button (click)="navegar(false)" class="botao-principal">SAIR</button>
+    </nav>
+
+  </div>
+</div>

@@ -16,11 +16,7 @@ export class ViewAdminComponent implements OnInit {
 
   ngOnInit() { }
 
-  navegar(bool: boolean) {
-    if (bool) {
-      this.router.navigate(['conf-pipeline'], { relativeTo: this.route });
-    } else {
-      this.router.navigate(['dashboard'], { relativeTo: this.route });
-    }
+  navegar(rota: string) {
+    this.router.navigate([rota], { relativeTo: this.route });
   }
 }

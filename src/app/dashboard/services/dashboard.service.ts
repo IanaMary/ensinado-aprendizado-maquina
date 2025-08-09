@@ -46,8 +46,13 @@ export class DashboardService {
 
   // SERVIÇOS COM LIGAÇÃO COM BANCO 
 
-  postTutor(body: any) {
-    return this.http.post(`${this.url}${this.endpointTutor}`, body);
+  getTutor(body: any) {
+    const params = new URLSearchParams(body as any).toString();
+    return this.http.get(`${this.url}${this.endpointTutor}?${params}`);
+  }
+
+  putTutor(body: any) {
+    return this.http.put(`${this.url}${this.endpointTutor}`, body);
   }
 
   postColetaArquivo(tipo: string, body: any) {
