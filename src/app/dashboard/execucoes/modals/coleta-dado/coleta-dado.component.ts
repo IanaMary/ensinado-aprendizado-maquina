@@ -92,10 +92,12 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.dashboardService.postColetaArquivo('xlxs', formData).subscribe({
       next: (res: any) => {
         this.idColeta = res.id_coleta;
-        this.idConfigurcacaoTreinamento = res.id_configuracoes_treinamento;
         this.msgErro(tipo, '')
         this.sessionService.setColetaId(this.idColeta)
-        this.sessionService.setConfigurcaoTreinamento(this.idConfigurcacaoTreinamento)
+        if (res.id_configuracoes_treinamento) {
+          this.idConfigurcacaoTreinamento = res.id_configuracoes_treinamento;
+          this.sessionService.setConfigurcaoTreinamento(this.idConfigurcacaoTreinamento)
+        }
         this.preencherDados(res);
 
       },

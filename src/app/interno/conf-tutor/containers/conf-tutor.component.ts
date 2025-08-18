@@ -73,19 +73,16 @@ export class ConfTutorComponent implements OnInit {
   bodyTutor() {
     const aux = this.formConfTutor.value;
     this.body = {
-      tamanho_arq: 0
+      tamanho_arq: aux.tamanho_arq,
+      prever_categoria: aux.prever_categoria,
     }
     if (aux.prever_categoria) {
-      this.body.tamanho_arq = aux.tamanho_arq;
-      this.body.prever_categoria = aux.prever_categoria;
       this.body.dados_rotulados = aux.dados_rotulados;
       if (!aux.dados_rotulados) {
         this.body.num_categorias_conhecidas = aux.num_categorias_conhecidas
       }
 
     } else {
-      this.body.tamanho_arq = aux.tamanho_arq;
-      this.body.prever_categoria = aux.prever_categoria;
       this.body.prever_quantidade = aux.prever_quantidade;
       if (!aux.prever_quantidade) {
         this.body.apenas_olhando = aux.apenas_olhando
@@ -112,9 +109,10 @@ export class ConfTutorComponent implements OnInit {
   }
 
   putTutor() {
+    const aux = this.conteudo.replace(/&nbsp;/g, ' ');
     const body = {
       "contexto": this.formConfTutor.value,
-      "nova_descricao": this.conteudo
+      "nova_descricao": aux
     }
 
     this.dashboardService.putTutor(body).subscribe({

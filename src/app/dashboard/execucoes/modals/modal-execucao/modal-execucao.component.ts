@@ -126,7 +126,7 @@ export class ModalExecucaoComponent implements OnInit {
 
     this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(tipoTarget);
     this.modeloSelecionado = this.modelosDisponiveis[0];
-    this.emitTutor();
+    this.funcBodyTutor();
   }
 
 
@@ -214,10 +214,38 @@ export class ModalExecucaoComponent implements OnInit {
     return [];
   }
 
+  funcBodyTutor() {
+    const prever_categoria = this.resultadoColetaDado?.tipoTarget === 'Texto'
+    const prever_quantidade = this.resultadoColetaDado?.tipoTarget === 'Número'
+
+
+    this.bodyTutor = {
+      tamanho_arq: this.resultadoColetaDado?.treino.totalDados ?? 0,
+      prever_categoria: prever_categoria
+    }
+
+    if (prever_categoria) {
+      const dados_rotulados = this.resultadoColetaDado?.target !== null
+      this.bodyTutor.dados_rotulados = dados_rotulados;
+
+      if (!dados_rotulados) {
+        this.bodyTutor.num_categorias_conhecidas = true
+      }
+
+    } else {
+      this.bodyTutor.prever_quantidade = prever_quantidade;
+      if (!prever_quantidade) {
+        this.bodyTutor.apenas_olhando = true;
+      }
+    }
+
+    this.emitTutor();
+  }
+
   emitTutor() {
-    console.log('emitTutor => ', this.resultadoColetaDado)
-    this.bodyTutor.tamanho_arq = 100
-    this.bodyTutor['prever_categoria'] = this.resultadoColetaDado?.tipoTarget === 'Texto'
+    // console.log('emitTutor => ', this.resultadoColetaDado)
+    // this.bodyTutor.tamanho_arq = 100
+    // this.bodyTutor['prever_categoria'] = this.resultadoColetaDado?.tipoTarget === 'Texto'
     // this.bodyTutor.prever_quantidade = this.resultadoColetaDado?.tipoTarget === 'Número'
     // this.bodyTutor.dados_rotulados = this.resultadoColetaDado?.target !== null
     this.dashboardService.emitirProximaEtapaPipe({ etapaAtual: this.etapaAtual, bodyTutor: this.bodyTutor });
