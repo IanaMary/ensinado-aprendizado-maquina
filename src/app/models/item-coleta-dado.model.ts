@@ -28,17 +28,17 @@ export const roleMap: Record<string, string> = {
 };
 
 
-// export const labelParaTipoTargetMap: Record<string, TipoTarget> = {
-//   'Número': 'number',
-//   'Texto': 'string',
-//   'Booleano': 'boolean'
-// };
-
-export const labelParaTipoTargetMap: Record<string, TipoTarget> = {
-  'number': 'Número',
-  'string': 'Texto',
-  'boolean': 'Booleano'
+export const labelParaTipoTargetMap: Record<string, string> = {
+  'Número': 'number',
+  'Texto': 'string',
+  'Booleano': 'boolean'
 };
+
+// export const labelParaTipoTargetMap: Record<string, TipoTarget> = {
+//   'number': 'Número',
+//   'string': 'Texto',
+//   'boolean': 'Booleano'
+// };
 
 export const tipoLabels: Record<string, string> = {
   number: 'Número',

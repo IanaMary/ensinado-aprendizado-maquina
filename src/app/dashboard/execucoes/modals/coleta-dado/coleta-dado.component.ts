@@ -8,8 +8,7 @@ import {
   OnInit
 } from '@angular/core';
 import { PlanilhaService } from '../../../../service/planilha.service';
-import { MatTableDataSource } from '@angular/material/table';
-import { InformacoesDados, labelParaTipoTargetMap, ResultadoColetaDado, TipoDado } from '../../../../models/item-coleta-dado.model';
+import { InformacoesDados, ResultadoColetaDado, TipoDado } from '../../../../models/item-coleta-dado.model';
 import tutor from '../../../../constants/tutor.json';
 import { DashboardService } from '../../../services/dashboard.service';
 import { SessionService } from '../../../../service/sessao-store.service';

@@ -1,8 +1,7 @@
-import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
-import { BodyTutor, ItemPipeline, ResultadoColetaDado, TipoTarget, labelParaTipoTargetMap } from '../../../../models/item-coleta-dado.model';
+import { Component, Inject, OnInit } from '@angular/core';
+import { BodyTutor, ItemPipeline, ResultadoColetaDado, labelParaTipoTargetMap } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
-import itensPipeline from '../../../../constants/itens-coletas-dados.json';
 import tutor from '../../../../constants/tutor.json';
 
 @Component({
@@ -98,6 +97,7 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   atualizarResultadoColeta(event: ResultadoColetaDado) {
+
     this.resultadoColetaDado = event;
 
     const aux = this.resultadoColetaDado?.tipoTarget;
@@ -109,13 +109,15 @@ export class ModalExecucaoComponent implements OnInit {
         tutor.resumos['modelo-exploratorio'];
 
     const att = event.atributos;
-    const attVazio = Object.keys(att).length === 0 || Object.values(att).every(v => v === false);
+
+    const attSelecionado = Object.values(att).includes(true);
+
 
     const erroTreino = !!this.resultadoColetaDado.treino.erro;
     const erroTeste = !!this.resultadoColetaDado.teste?.erro;
     const tipoTargetNaoSelecionado = tipoTarget === undefined;
 
-    this.etapas[this.etapaAtual].proximo = !(erroTreino || erroTeste || tipoTargetNaoSelecionado || attVazio);
+    this.etapas[this.etapaAtual].proximo = !(erroTreino || erroTeste || tipoTargetNaoSelecionado || !attSelecionado);
 
     this.dashboardService.habilitadarModelos(
       tipoTarget,
@@ -124,7 +126,6 @@ export class ModalExecucaoComponent implements OnInit {
 
     this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(tipoTarget);
     this.modeloSelecionado = this.modelosDisponiveis[0];
-
     this.emitTutor();
   }
 
@@ -134,11 +135,11 @@ export class ModalExecucaoComponent implements OnInit {
     this.etapas[this.etapaAtual].proximo = true;
   }
 
-  atualizarResultadoTreinamento(event: any) {
+  async atualizarResultadoTreinamento(event: any) {
+
     this.resultadoTreinamento = event;
     this.dashboardService.selecionarModelo(this.modeloSelecionado);
     this.inicializarMetricasDisponiveis();
-    this.etapas[this.etapaAtual].proximo = this.metricasDisponiveis.length > 0;
   }
 
   inicializarMetricasDisponiveis() {
@@ -146,61 +147,40 @@ export class ModalExecucaoComponent implements OnInit {
     if (this.resultadoTreinamento) {
       const modelosTreinados = Object.keys(this.resultadoTreinamento);
       this.metricasDisponiveis = this.dashboardService.habilitadarMetricas(modelosTreinados);
+      this.etapas[this.etapaAtual].proximo = this.metricasDisponiveis.length > 0
     }
 
   }
 
   atualizarMetricasSelecionadas(event: any) {
     this.metricasSelecionadas = event;
-    this.etapas[this.etapaAtual].proximo = this.metricasSelecionadas.length > 0;
-  }
-
-  atualizarVariaveis(data: any) {
-    if (data?.etapa) {
-      this.etapaAtual = data.etapa;
-    }
-
-    this.etapas['coleta-dado'].proximo = !!data?.resultadoColetaDado;
-    this.etapas['selecao-do-modelo'].proximo = !!data?.modeloSelecionado;
-    this.etapas['treino-validacao-teste'].proximo = !!data?.resultadoTreinamento;
-    this.etapas['selecao-das-metricas'].proximo = !!data?.metricasSelecionadas;
-    this.etapas['metrica'].proximo = !!data?.resultadosDasAvaliacoes;
-
-    if (this.etapas['coleta-dado'].proximo) {
-      this.resultadoColetaDado = data.resultadoColetaDado;
-
-
-      const aux = this.resultadoColetaDado?.tipoTarget;
-
-      const tipoTarget = aux ? labelParaTipoTargetMap[aux] : null;
-
-      this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(tipoTarget);
-      this.modeloSelecionado = data.modeloSelecionado ? data.modeloSelecionado : this.modelosDisponiveis[0];
-    }
-
-    if (this.etapas['selecao-do-modelo'].proximo) {
-      this.modeloSelecionado = data.modeloSelecionado;
-    }
-
-    if (this.etapas['treino-validacao-teste'].proximo) {
-      this.resultadoTreinamento = data.resultadoTreinamento;
-    }
-
-    if (this.etapas['selecao-das-metricas'].proximo) {
-      this.metricasSelecionadas = data.metricasSelecionadas;
-      this.inicializarMetricasDisponiveis();
-    }
-
-    if (this.etapas['metrica'].proximo) {
-      this.resultadosDasAvaliacoes = data.resultadosDasAvaliacoes;
-    }
+    this.etapas['selecao-das-metricas'].proximo = this.metricasSelecionadas.length > 0;
   }
 
   funcResultadoAvaliacoes(event: any) {
     this.resultadosDasAvaliacoes = event;
   }
 
-  selecaoTarget() { }
+  atualizarVariaveis(data: any) {
+    if (data?.etapa) {
+      this.etapaAtual = data.etapa;
+      if (!this.resultadoColetaDado && data.resultadoColetaDado) {
+        this.atualizarResultadoColeta(data.resultadoColetaDado);
+      }
+      if (data.modeloSelecionado) {
+        this.atualizarModelo(data.modeloSelecionado);
+      }
+      if (data.resultadoTreinamento) {
+        this.atualizarResultadoTreinamento(data.resultadoTreinamento);
+      }
+      if (data.metricasSelecionadas) {
+        this.atualizarMetricasSelecionadas(data.metricasSelecionadas);
+      }
+      if (data.resultadosDasAvaliacoes) {
+        this.funcResultadoAvaliacoes(data.resultadosDasAvaliacoes)
+      }
+    }
+  }
 
   fechar(): void {
     this.dialogRef.close({

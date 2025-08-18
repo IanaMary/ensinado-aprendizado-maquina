@@ -218,7 +218,7 @@ export class DashboardService {
     return this.itemsEmExecucao.value.some(i => i.label === item.label);
   }
 
-  habilitadarModelos(tipoTargetSelecionado: TipoTarget, habilitado: boolean) {
+  habilitadarModelos(tipoTargetSelecionado: any, habilitado: boolean) {
     const itensAtualizados = this.itensModelos.value.map(item => ({
       ...item,
       habilitado: item.tipo === tipoTargetSelecionado
@@ -236,7 +236,6 @@ export class DashboardService {
   }
 
   habilitadarMetricas(modelos: any[]) {
-
 
     const modelosSelecionados = this.itensModelos.getValue().filter(
       m => modelos.includes(m.valor)
