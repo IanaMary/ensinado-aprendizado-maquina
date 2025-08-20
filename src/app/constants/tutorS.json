@@ -1,0 +1,67 @@
+{
+  "tutorS": [
+    {
+      "pipe": "coleta-dado",
+      "texto-pipe": "texto sobre a importação",
+      "planilha_de_treino": "explicar os dados de treino",
+      "planilha_de_teste": "texto sobre os dados de teste",
+      "divisao_entre_teste": "divisão entre treino e teste",
+      "target": "explicas",
+      "atributos": "explicas"
+    },
+    {
+      "pipe": "selecao_do_modelo",
+      "texto-pipe": "texto sobre a selecao",
+      "tipos": [
+        {
+          "tipo": "texto",
+          "sobre_grupo": "explicação",
+          "modelos": [
+            {
+              "modelo": "knn",
+              "hiperparametros": [
+                {
+                  "nome": "nome",
+                  "explicação": "explicação"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tipo": "numero",
+          "sobre_grupo": "explicação",
+          "modelos": [
+            {
+              "modelo": "knn",
+              "hiperparametros": [
+                {
+                  "nome": "nome",
+                  "explicação": "explicação"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pipe": "treinamento",
+      "texto-pipe": "texto sobre o treinamento"
+    },
+    {
+      "pipe": "selecao_de_metricas",
+      "texto-pipe": "texto sobre as metricas",
+      "tipos": [
+        {
+          "nome": "nome",
+          "explicação": "explicação"
+        }
+      ]
+    },
+    {
+      "pipe": "avaliação",
+      "texto-pipe": "texto sobre o avaliação"
+    }
+  ]
+}

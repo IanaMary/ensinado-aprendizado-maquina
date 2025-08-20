@@ -1,7 +1,7 @@
 // Tipos e constantes
 export type TipoItem = 'coleta-dado' | 'pre-processamento' | 'treino-validacao-teste' | 'metrica';
 // export type TipoTarget = 'number' | 'string' | 'boolean' | null;
-export type TipoTarget = 'Texto' | 'Número' | 'Booleano' | null;
+export type TipoTarget = 'number' | 'string' | 'boolean' | null;
 export type TipoDado = 'Texto' | 'Número' | 'Booleano';
 
 

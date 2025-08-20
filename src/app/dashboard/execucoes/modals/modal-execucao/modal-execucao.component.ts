@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { BodyTutor, ItemPipeline, ResultadoColetaDado, labelParaTipoTargetMap } from '../../../../models/item-coleta-dado.model';
+import { BodyTutor, ItemPipeline, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import tutor from '../../../../constants/tutor.json';
@@ -100,12 +100,10 @@ export class ModalExecucaoComponent implements OnInit {
 
     this.resultadoColetaDado = event;
 
-    const aux = this.resultadoColetaDado?.tipoTarget;
+    const tipoTarget = this.resultadoColetaDado?.tipoTarget;
 
-    const tipoTarget = aux ? labelParaTipoTargetMap[aux] : null;
-
-    this.tutorModeloTarget = tipoTarget === 'Texto' ? tutor.resumos['modelo-classificacao'] :
-      tipoTarget === 'Número' ? tutor.resumos['modelo-regressao'] :
+    this.tutorModeloTarget = tipoTarget === 'string' ? tutor.resumos['modelo-classificacao'] :
+      tipoTarget === 'number' ? tutor.resumos['modelo-regressao'] :
         tutor.resumos['modelo-exploratorio'];
 
     const att = event.atributos;
@@ -215,8 +213,8 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   funcBodyTutor() {
-    const prever_categoria = this.resultadoColetaDado?.tipoTarget === 'Texto'
-    const prever_quantidade = this.resultadoColetaDado?.tipoTarget === 'Número'
+    const prever_categoria = this.resultadoColetaDado?.tipoTarget === 'string'
+    const prever_quantidade = this.resultadoColetaDado?.tipoTarget === 'number'
 
 
     this.bodyTutor = {
