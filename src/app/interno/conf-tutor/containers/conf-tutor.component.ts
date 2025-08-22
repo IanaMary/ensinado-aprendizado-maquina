@@ -31,9 +31,12 @@ export class ConfTutorComponent implements OnInit {
     tamanho_arq: 0
   };
 
+  tabs = [true, false, false]
+
   erroTutor = false;
 
   formConfTutor: FormGroup;
+  formConfTutor2: FormGroup;
 
 
   constructor(private readonly loginService: LoginService,
@@ -54,11 +57,51 @@ export class ConfTutorComponent implements OnInit {
       apenas_olhando: [null, []],
     });
 
+    this.formConfTutor2 = this.formBuilder.group({
+      formConfTutorInicio: this.formBuilder.group({
+        explicacao: [null, [Validators.required]]
+      }),
+      formConfTutorColetaDados: this.formBuilder.group({
+        planilha_treino: [null, [Validators.required]],
+        planilha_teste: [null, [Validators.required]],
+        divisao_treino_teste: [null, [Validators.required]],
+        target: [null, [Validators.required]],
+        atributos: [null, [Validators.required]]
+      }),
+      formConfTutorSelecaoModelo: this.formBuilder.group({
+        aprendizado_supervisionado: [null, [Validators.required]],
+        classficacao: [null, [Validators.required]],
+        modelos_classficacao: this.formBuilder.array([]),
+        regressao: [null, [Validators.required]],
+        modelos_regressao: this.formBuilder.array([]),
+        aprendizado_nao_supervisionado: [null, [Validators.required]],
+        reducao_dimensionalidade: [null, [Validators.required]],
+        agrupamento: [null, [Validators.required]]
+      })
+    });
+
   }
 
 
-  ngOnInit() {
-    this.getTutor();
+  ngOnInit() { }
+
+  tabAtual(e: any) {
+    const idx = e.index
+    if (!this.tabs[idx]) {
+      this.tabs[idx] = true;
+    }
+  }
+
+  get formConfTutorInicio(): FormGroup {
+    return this.formConfTutor2.get('formConfTutorInicio') as FormGroup;
+  }
+
+  get formConfTutorColetaDados(): FormGroup {
+    return this.formConfTutor2.get('formConfTutorColetaDados') as FormGroup;
+  }
+
+  get formConfTutorSelecaoModelo(): FormGroup {
+    return this.formConfTutor2.get('formConfTutorSelecaoModelo') as FormGroup;
   }
 
   navegar(bool: boolean) {
@@ -70,59 +113,6 @@ export class ConfTutorComponent implements OnInit {
     }
   }
 
-  bodyTutor() {
-    const aux = this.formConfTutor.value;
-    this.body = {
-      tamanho_arq: aux.tamanho_arq,
-      prever_categoria: aux.prever_categoria,
-    }
-    if (aux.prever_categoria) {
-      this.body.dados_rotulados = aux.dados_rotulados;
-      if (!aux.dados_rotulados) {
-        this.body.num_categorias_conhecidas = aux.num_categorias_conhecidas
-      }
 
-    } else {
-      this.body.prever_quantidade = aux.prever_quantidade;
-      if (!aux.prever_quantidade) {
-        this.body.apenas_olhando = aux.apenas_olhando
-      }
-    }
-
-    this.getTutor();
-  }
-
-  getTutor() {
-    this.dashboardService.getTutor(this.body).subscribe({
-      next: async (res: any) => {
-        this.erroTutor = res.descricao ? false : true;
-        if (res.descricao) {
-          this.conteudo = res.descricao;
-        }
-      },
-      error: (error: any) => {
-        this.conteudo = '';
-        this.erroTutor = true;
-      }
-    });
-
-  }
-
-  putTutor() {
-    const aux = this.conteudo.replace(/&nbsp;/g, ' ');
-    const body = {
-      "contexto": this.formConfTutor.value,
-      "nova_descricao": aux
-    }
-
-    this.dashboardService.putTutor(body).subscribe({
-      next: async (res: any) => {
-        if (res.descricao) {
-          this.conteudo = res.descricao;
-        }
-      },
-      error: (error: any) => { }
-    });
-  }
 
 }

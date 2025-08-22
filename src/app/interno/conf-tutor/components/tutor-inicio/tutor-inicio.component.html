@@ -1,0 +1,16 @@
+<nav class="box-formulario">
+
+  <nav class="box-titulo">
+    <nav class="titulo">
+      <h2>Texto Inicial</h2>
+    </nav>
+    <nav class="titulo bloco">
+      <button [disabled]="formConfTutorInicio.invalid" class="botao-principal" (click)="putTutor()">EDITAR</button>
+    </nav>
+  </nav>
+  <mat-divider class="linha"></mat-divider>
+  <form [formGroup]="formConfTutorInicio">
+    <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+    </quill-editor>
+  </form>
+</nav>

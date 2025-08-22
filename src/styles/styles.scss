@@ -175,6 +175,10 @@ mat-checkbox {
   display: block;
 }
 
+.mat-mdc-radio-button .mdc-radio__native-control:checked+.mdc-radio__background,
+.mat-mdc-radio-button .mdc-radio__native-control:disabled+.mdc-radio__background {
+  color: $cor-principal !important;
+}
 
 
 ::ng-deep .mat-tab-label {

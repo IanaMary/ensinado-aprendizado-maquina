@@ -1,7 +1,11 @@
 {
   "tutorS": [
     {
-      "pipe": "coleta-dado",
+      "pipe": "inicio",
+      "texto-pipe": "texto sobre a importação"
+    },
+    {
+      "pipe": "coleta_dado",
       "texto-pipe": "texto sobre a importação",
       "planilha_de_treino": "explicar os dados de treino",
       "planilha_de_teste": "texto sobre os dados de teste",
@@ -10,40 +14,80 @@
       "atributos": "explicas"
     },
     {
-      "pipe": "selecao_do_modelo",
+      "pipe": "selecao_modelo",
       "texto-pipe": "texto sobre a selecao",
-      "tipos": [
-        {
-          "tipo": "texto",
-          "sobre_grupo": "explicação",
-          "modelos": [
-            {
-              "modelo": "knn",
-              "hiperparametros": [
-                {
-                  "nome": "nome",
-                  "explicação": "explicação"
-                }
-              ]
-            }
-          ]
+      "tipos": {
+        "nao_supervisionado": {
+          "explicacao": "explicacao",
+          "reducao_dimensionalidade": {
+            "explicacao": "explicacao",
+            "modelos": [
+              {
+                "label": "k-NN",
+                "valor": "knn",
+                "explicacao": "explicacao",
+                "hiperparametros": [
+                  {
+                    "nome": "nome",
+                    "explicacao": "explicacao"
+                  }
+                ]
+              }
+            ]
+          },
+          "agrupamento": {
+            "explicacao": "explicacao",
+            "modelos": [
+              {
+                "label": "k-NN",
+                "valor": "knn",
+                "explicacao": "explicacao",
+                "hiperparametros": [
+                  {
+                    "nome": "nome",
+                    "explicacao": "explicacao"
+                  }
+                ]
+              }
+            ]
+          }
         },
-        {
-          "tipo": "numero",
-          "sobre_grupo": "explicação",
-          "modelos": [
-            {
-              "modelo": "knn",
-              "hiperparametros": [
-                {
-                  "nome": "nome",
-                  "explicação": "explicação"
-                }
-              ]
-            }
-          ]
+        "supervisionado": {
+          "explicacao": "explicacao",
+          "classficacao": {
+            "explicacao": "explicacao",
+            "modelos": [
+              {
+                "label": "k-NN",
+                "valor": "knn",
+                "explicacao": "explicacao",
+                "hiperparametros": [
+                  {
+                    "nome": "nome",
+                    "explicacao": "explicacao"
+                  }
+                ]
+              }
+            ]
+          },
+          "regressao": {
+            "explicacao": "explicacao",
+            "modelos": [
+              {
+                "label": "k-NN",
+                "valor": "knn",
+                "explicacao": "explicacao",
+                "hiperparametros": [
+                  {
+                    "nome": "nome",
+                    "explicacao": "explicacao"
+                  }
+                ]
+              }
+            ]
+          }
         }
-      ]
+      }
     },
     {
       "pipe": "treinamento",
@@ -54,8 +98,9 @@
       "texto-pipe": "texto sobre as metricas",
       "tipos": [
         {
-          "nome": "nome",
-          "explicação": "explicação"
+          "label": "Acurácia",
+          "explicacao": "explicacao",
+          "valor": "accuracy_score"
         }
       ]
     },

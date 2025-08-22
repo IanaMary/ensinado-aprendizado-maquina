@@ -22,10 +22,7 @@ export class ExecucoesComponent implements OnInit {
 
 
   tutor: any;
-  bodyTutor: BodyTutor = {
-    tamanho_arq: 0,
-  };
-
+  paramsTutor = '';
 
   itens: ItemPipeline[] = [];
   colunaColeta: ItemPipeline[] = [];
@@ -44,7 +41,7 @@ export class ExecucoesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.atualizarTutor(null);
+    this.getTutor('inicio');
     this.dashboardService.getItemsEmExecucao().subscribe(itens => {
       this.itens = [...itens];
       this.colunaColeta = itens.filter(i => i.tipoItem === 'coleta-dado');
@@ -55,13 +52,13 @@ export class ExecucoesComponent implements OnInit {
     this.dashboardService.proximaEtapaPipe$
       .pipe(takeUntil(this.destroy$))
       .subscribe((event: any) => {
-        this.atualizarTutor(event);
+        this.getTutor(event.etapaAtual, event.chaves);
       });
   }
 
 
   abrirModalExecucao(item: ItemPipeline): void {
-    this.atualizarTutor(item.tipoItem);
+    this.getTutor(item.tipoItem);
     const dialogRef = this.dialog.open(ModalExecucaoComponent, {
       maxWidth: 'none',
       width: 'auto',
@@ -90,37 +87,31 @@ export class ExecucoesComponent implements OnInit {
   }
 
 
-  atualizarTutor(event: any) {
 
-    if (event && event.bodyTutor) {
-      const diff = !isEqual(this.bodyTutor, event.bodyTutor)
-      if (diff) {
 
-        this.bodyTutor = event.bodyTutor;
-
-        this.getTutor();
-      }
-    } else {
-      if (this.resultadoColetaDado?.treino) {
-        this.bodyTutor.tamanho_arq = 100;
-        this.bodyTutor['prever_categoria'] = this.resultadoColetaDado?.target !== null;
-      }
-      this.getTutor();
+  getTutor(etapa: string, chaves: string[] = []) {
+    const params = this.criarBody(etapa, chaves)
+    if (params !== this.paramsTutor) {
+      this.paramsTutor = params;
+      this.dashboardService.getTutor(this.paramsTutor).subscribe({
+        next: async (res: any) => {
+          if (res.descricao) {
+            this.tutor = res.descricao;
+          }
+        },
+        error: (error: any) => { }
+      });
     }
-
-
   }
 
-  getTutor() {
-    this.dashboardService.getTutor(this.bodyTutor).subscribe({
-      next: async (res: any) => {
-        if (res.descricao) {
-          const aux = res.descricao.replace(/&nbsp;/g, ' ');
-          this.tutor = aux;
-        }
-      },
-      error: (error: any) => { }
-    });
+  criarBody(etapa: string, chaves: string[]) {
+
+    const params = new URLSearchParams();
+    params.append('pipe', etapa);
+
+    chaves?.forEach(chave => params.append('textos', chave));
+
+    return params.toString();
   }
 
   ngOnDestroy() {

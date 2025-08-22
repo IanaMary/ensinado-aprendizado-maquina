@@ -61,6 +61,7 @@ export class ModalExecucaoComponent implements OnInit {
     }
 
     this.validarProximaEtapa();
+
   }
 
   anterior(): void {
@@ -77,7 +78,6 @@ export class ModalExecucaoComponent implements OnInit {
     switch (this.etapaAtual) {
       case 'coleta-dado':
         this.etapas[this.etapaAtual].proximo = !!this.resultadoColetaDado;
-        this.emitTutor();
         break;
       case 'selecao-do-modelo':
         this.etapas[this.etapaAtual].proximo = !!this.modeloSelecionado;
@@ -177,6 +177,9 @@ export class ModalExecucaoComponent implements OnInit {
       if (data.resultadosDasAvaliacoes) {
         this.funcResultadoAvaliacoes(data.resultadosDasAvaliacoes)
       }
+
+
+
     }
   }
 
@@ -213,39 +216,23 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   funcBodyTutor() {
-    const prever_categoria = this.resultadoColetaDado?.tipoTarget === 'string'
-    const prever_quantidade = this.resultadoColetaDado?.tipoTarget === 'number'
-
-
-    this.bodyTutor = {
-      tamanho_arq: this.resultadoColetaDado?.treino.totalDados ?? 0,
-      prever_categoria: prever_categoria
-    }
-
-    if (prever_categoria) {
-      const dados_rotulados = this.resultadoColetaDado?.target !== null
-      this.bodyTutor.dados_rotulados = dados_rotulados;
-
-      if (!dados_rotulados) {
-        this.bodyTutor.num_categorias_conhecidas = true
-      }
-
-    } else {
-      this.bodyTutor.prever_quantidade = prever_quantidade;
-      if (!prever_quantidade) {
-        this.bodyTutor.apenas_olhando = true;
+    let chaves: string[] = [];
+    if (this.etapaAtual === 'coleta-dado') {
+      if (this.etapaAtual === 'coleta-dado') {
+        const totalDados = this.resultadoColetaDado?.treino?.totalDados ?? 0;
+        if (totalDados > 0) {
+          chaves = []
+        } else {
+          chaves = ['texto_pipe'];
+        }
       }
     }
 
-    this.emitTutor();
+    this.emitTutor(chaves);
   }
 
-  emitTutor() {
-    // console.log('emitTutor => ', this.resultadoColetaDado)
-    // this.bodyTutor.tamanho_arq = 100
-    // this.bodyTutor['prever_categoria'] = this.resultadoColetaDado?.tipoTarget === 'Texto'
-    // this.bodyTutor.prever_quantidade = this.resultadoColetaDado?.tipoTarget === 'Número'
-    // this.bodyTutor.dados_rotulados = this.resultadoColetaDado?.target !== null
-    this.dashboardService.emitirProximaEtapaPipe({ etapaAtual: this.etapaAtual, bodyTutor: this.bodyTutor });
+  emitTutor(chaves: string[]) {
+
+    this.dashboardService.emitirProximaEtapaPipe({ etapaAtual: this.etapaAtual, chaves: chaves });
   }
 }

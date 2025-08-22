@@ -37,6 +37,10 @@
       <mat-divider></mat-divider>
 
       <nav class="configuracao-inicial">
+        <mat-radio-group>
+          <mat-radio-button [value]="0">Rotulado</mat-radio-button>
+          <mat-radio-button [value]="1">Não Rotulador</mat-radio-button>
+        </mat-radio-group>
         <div class="configuracao-generica">
           <mat-form-field appearance="outline">
             <mat-label>Seleção do target</mat-label>

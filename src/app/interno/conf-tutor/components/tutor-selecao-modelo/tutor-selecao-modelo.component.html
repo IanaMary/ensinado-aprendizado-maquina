@@ -1,0 +1,67 @@
+<div class="box-formulario">
+  <h2 class="titulo">Texto sobre a seleção do modelo</h2>
+
+  <mat-radio-group [(ngModel)]="tipoAprendizado">
+    <mat-radio-button [value]="0">Explicação sobre aprendizado supervisionado</mat-radio-button>
+    <mat-radio-button [value]="1">Explicação sobre aprendizado não supervisionado</mat-radio-button>
+  </mat-radio-group>
+
+
+  <form [formGroup]="formGroup">
+
+    <ng-container *ngIf="tipoAprendizado === 0">
+
+      <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor"
+        formControlName="aprendizado_supervisionado">
+      </quill-editor>
+
+      <mat-radio-group [(ngModel)]="subTipoAprendizado" [ngModelOptions]="{standalone: true}">
+        <mat-radio-button [value]="0">Explicação sobre classificação</mat-radio-button>
+        <mat-radio-button [value]="1">Explicação sobre regressão</mat-radio-button>
+      </mat-radio-group>
+
+      <ng-container *ngIf="subTipoAprendizado === 0">
+        <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="classficacao">
+        </quill-editor>
+        <div formArrayName="modelos_classficacao">
+          <div *ngFor="let modelo of modelosClassificacao.controls; let i = index">
+            <input [formControlName]="i" placeholder="Modelo Classificação">
+            <button type="button" (click)="removeModeloClassificacao(i)">Remover</button>
+          </div>
+        </div>
+        <button type="button" (click)="addModeloClassificacao()">Adicionar Modelo Classificação</button>
+      </ng-container>
+      <ng-container *ngIf="subTipoAprendizado === 1">
+        <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="regressao">
+        </quill-editor>
+      </ng-container>
+
+
+    </ng-container>
+
+    <ng-container *ngIf="tipoAprendizado === 1">
+
+      <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor"
+        formControlName="aprendizado_nao_supervisionado">
+      </quill-editor>
+
+      <mat-radio-group [(ngModel)]="subTipoAprendizado" [ngModelOptions]="{standalone: true}">
+        <mat-radio-button [value]="0">Explicação sobre redução de dimensionalidade </mat-radio-button>
+        <mat-radio-button [value]="1">Explicação sobre Agrupamento</mat-radio-button>
+      </mat-radio-group>
+
+      <quill-editor *ngIf="subTipoAprendizado === 0" [readOnly]="erroTutor" [modules]="modules" class="editor"
+        formControlName="reducao_dimensionalidade">
+      </quill-editor>
+      <quill-editor *ngIf="subTipoAprendizado === 1" [readOnly]="erroTutor" [modules]="modules" class="editor"
+        formControlName="agrupamento">
+      </quill-editor>
+    </ng-container>
+
+
+  </form>
+
+
+
+
+</div>

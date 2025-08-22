@@ -6,15 +6,23 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTabsModule } from '@angular/material/tabs';
-import { ConfTutorComponent } from './containers/conf-tutor.component';
-import { ConfTutorRoutingModule } from './conf-tutor-routing.module';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDividerModule } from '@angular/material/divider';
 import { QuillModule } from 'ngx-quill';
-import { MatDivider } from "@angular/material/divider";
+
+import { ConfTutorRoutingModule } from './conf-tutor-routing.module';
+import { ConfTutorComponent } from './containers/conf-tutor.component';
+import { TutorColetaDadosComponent } from './components/tutor-coleta-dados/tutor-coleta-dados.component';
+import { TutorInicioComponent } from './components/tutor-inicio/tutor-inicio.component';
+import { TutorSelecaoModeloComponent } from './components/tutor-selecao-modelo/tutor-selecao-modelo.component';
+
 
 @NgModule({
   declarations: [
-    ConfTutorComponent
+    ConfTutorComponent,
+    TutorInicioComponent,
+    TutorColetaDadosComponent,
+    TutorSelecaoModeloComponent
   ],
   imports: [
     ConfTutorRoutingModule,
@@ -27,10 +35,9 @@ import { MatDivider } from "@angular/material/divider";
     MatRadioModule,
     MatTabsModule,
     MatExpansionModule,
+    MatDividerModule,
     QuillModule.forRoot(),
-    MatDivider
   ],
-  exports: [],
   providers: []
 })
 export class ConfTutorModule { }
