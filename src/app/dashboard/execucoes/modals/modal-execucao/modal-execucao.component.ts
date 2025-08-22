@@ -20,7 +20,7 @@ export class ModalExecucaoComponent implements OnInit {
 
   etapas: Record<string, { indice: number; proximo: boolean; titulo: string; botaoProximo?: string }> = {
     'coleta-dado': { indice: 0, proximo: true, titulo: 'Importar Planilha' },
-    'selecao-do-modelo': { indice: 1, proximo: true, titulo: 'Seleção do Modelo', botaoProximo: 'Treinar' },
+    'selecao-modelo': { indice: 1, proximo: true, titulo: 'Seleção do Modelo', botaoProximo: 'Treinar' },
     'treino-validacao-teste': { indice: 2, proximo: true, titulo: 'Treinamento' },
     'selecao-das-metricas': { indice: 3, proximo: true, titulo: 'Seleção das Métricas' },
     'metrica': { indice: 4, proximo: true, titulo: 'Visualizar Avaliações' }
@@ -79,7 +79,7 @@ export class ModalExecucaoComponent implements OnInit {
       case 'coleta-dado':
         this.etapas[this.etapaAtual].proximo = !!this.resultadoColetaDado;
         break;
-      case 'selecao-do-modelo':
+      case 'selecao-modelo':
         this.etapas[this.etapaAtual].proximo = !!this.modeloSelecionado;
         break;
       case 'treino-validacao-teste':
@@ -218,12 +218,18 @@ export class ModalExecucaoComponent implements OnInit {
   funcBodyTutor() {
     let chaves: string[] = [];
     if (this.etapaAtual === 'coleta-dado') {
+
       if (this.etapaAtual === 'coleta-dado') {
-        const totalDados = this.resultadoColetaDado?.treino?.totalDados ?? 0;
-        if (totalDados > 0) {
-          chaves = []
+        const totalDadosTreino = this.resultadoColetaDado?.treino?.totalDados ?? 0;
+        if (totalDadosTreino === 0) {
+          chaves = ['texto_pipe', 'planilha_treino'];
         } else {
-          chaves = ['texto_pipe'];
+          const arquivoTeste = this.resultadoColetaDado?.teste?.nomeArquivo ?? '';
+          if (arquivoTeste.length === 0) {
+            chaves = ['planilha_treino', 'divisao_entre_teste'];
+          } else {
+            chaves = ['planilha_treino', 'planilha_teste'];
+          }
         }
       }
     }
@@ -232,7 +238,6 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   emitTutor(chaves: string[]) {
-
     this.dashboardService.emitirProximaEtapaPipe({ etapaAtual: this.etapaAtual, chaves: chaves });
   }
 }

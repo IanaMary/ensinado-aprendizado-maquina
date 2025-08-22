@@ -37,17 +37,20 @@
       <mat-divider></mat-divider>
 
       <nav class="configuracao-inicial">
-        <mat-radio-group>
-          <mat-radio-button [value]="0">Rotulado</mat-radio-button>
-          <mat-radio-button [value]="1">Não Rotulador</mat-radio-button>
-        </mat-radio-group>
         <div class="configuracao-generica">
+          <section class="example-section">
+            <mat-checkbox [(ngModel)]="resultColetaDadoL.preverCategoria">Prever uma categoria</mat-checkbox>
+            <mat-checkbox [(ngModel)]="resultColetaDadoL.dadosRotulados">Dados rotulados</mat-checkbox>
+          </section>
+        </div>
+        <div class="configuracao-generica" *ngIf="resultColetaDadoL.dadosRotulados">
           <mat-form-field appearance="outline">
-            <mat-label>Seleção do target</mat-label>
-            <mat-select (selectionChange)="selecaoTargetAtt(true)" [(ngModel)]="resultColetaDadoL.target">
+            <mat-label>Seleção do rotulado</mat-label>
+            <mat-select (selectionChange)="selecaoTargetAtt($event, true)" [(ngModel)]="resultColetaDadoL.target">
               <mat-option [value]="null">-</mat-option>
-              <mat-option [value]="item.key"
-                *ngFor="let item of resultColetaDadoL.atributos| keyvalue">{{item.key}}</mat-option>
+              <mat-option [value]="item"
+                [disabled]="(!resultColetaDadoL.preverCategoria && item['tipo_coluna'] === 'string') || (resultColetaDadoL.preverCategoria && item['tipo_coluna'] === 'number')"
+                *ngFor="let item of resultColetaDadoL.colunasDetalhes ">{{item['nome_coluna']}}</mat-option>
             </mat-select>
           </mat-form-field>
           <app-tutor [resumo]="tutor.target"></app-tutor>
@@ -126,7 +129,7 @@
               </nav>
             </th>
             <td mat-cell *matCellDef="let linha">
-              <mat-checkbox (change)="selecaoTargetAtt(false)"
+              <mat-checkbox (change)="selecaoTargetAtt($event, false)"
                 [disabled]="linha.nome_coluna === resultColetaDadoL.target"
                 [(ngModel)]="resultColetaDadoL.atributos[linha.nome_coluna]">
               </mat-checkbox>

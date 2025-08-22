@@ -34,6 +34,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   resultColetaDadoL: ResultadoColetaDado = {
     target: '',
+    preverCategoria: false,
+    dadosRotulados: false,
     colunas: [],
     colunasDetalhes: [],
     porcentagemTreino: 70,
@@ -174,7 +176,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.teste.nomeArquivo = res.arquivo_nome_teste ?? '';
 
     this.opcoesNome = nomeColunas;
-    this.opcoesTarget = ['-'].concat(nomeColunas);
+    this.opcoesTarget = nomeColunas;
 
     this.resultadoColetaDado = this.resultColetaDadoL;
     this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
@@ -208,9 +210,10 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     //   }
   }
 
-  selecaoTargetAtt(bool: boolean) {
+  selecaoTargetAtt(e: any, bool: boolean) {
     if (bool) {
-      const target = this.resultColetaDadoL.target
+      const target = e.value['nome_coluna']
+      this.resultColetaDadoL.target = target
       this.resultColetaDadoL.atributos[target] = false;
     }
 

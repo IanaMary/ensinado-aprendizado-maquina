@@ -60,6 +60,8 @@ export interface ItemPipeline {
   movido: boolean;
   tipoItem: TipoItem;
   habilitado: boolean;
+  preverCategoria: boolean,
+  dadosRotulados: boolean
   valor: string;
   id: number;
   resumo?: string;
@@ -70,6 +72,8 @@ export interface ItemPipeline {
 
 export interface ResultadoColetaDado {
   target: string;
+  preverCategoria: boolean,
+  dadosRotulados: boolean,
   colunas: string[];
   colunasDetalhes: [];
   porcentagemTreino: number;
