@@ -4,12 +4,20 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import tutor from '../../../../constants/tutor.json';
 
+const COLETA_DADO = 'coleta-dado';
+const SELECAO_MODELO = 'selecao-modelo';
+const TREINO_VALIDACAO_TESTE = 'treino-validacao-teste';
+const SELECAO_METRICAS = 'selecao-das-metricas';
+const METRICA = 'metrica'
+
+
 @Component({
   selector: 'modal-execucao',
   templateUrl: './modal-execucao.component.html',
   styleUrls: ['./modal-execucao.component.scss'],
   standalone: false
 })
+
 export class ModalExecucaoComponent implements OnInit {
 
   tutor = tutor;
@@ -19,18 +27,18 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   etapas: Record<string, { indice: number; proximo: boolean; titulo: string; botaoProximo?: string }> = {
-    'coleta-dado': { indice: 0, proximo: true, titulo: 'Importar Planilha' },
-    'selecao-modelo': { indice: 1, proximo: true, titulo: 'Seleção do Modelo', botaoProximo: 'Treinar' },
-    'treino-validacao-teste': { indice: 2, proximo: true, titulo: 'Treinamento' },
-    'selecao-das-metricas': { indice: 3, proximo: true, titulo: 'Seleção das Métricas' },
-    'metrica': { indice: 4, proximo: true, titulo: 'Visualizar Avaliações' }
+    [COLETA_DADO]: { indice: 0, proximo: true, titulo: 'Importar Planilha' },
+    [SELECAO_MODELO]: { indice: 1, proximo: false, titulo: 'Seleção do Modelo', botaoProximo: 'Treinar' },
+    [TREINO_VALIDACAO_TESTE]: { indice: 2, proximo: true, titulo: 'Treinamento' },
+    [SELECAO_METRICAS]: { indice: 3, proximo: true, titulo: 'Seleção das Métricas' },
+    [METRICA]: { indice: 4, proximo: true, titulo: 'Visualizar Avaliações' }
   };
 
   etapaKeys = Object.keys(this.etapas);
   nEtapas = this.etapaKeys.length;
 
   ordemEtapas = Object.keys(this.etapas);
-  etapaAtual: string = 'coleta-dado';
+  etapaAtual: string = COLETA_DADO;
 
   resultadoColetaDado?: ResultadoColetaDado | undefined;
   resultadoTreinamento?: any;
@@ -76,17 +84,21 @@ export class ModalExecucaoComponent implements OnInit {
 
   validarProximaEtapa(): void {
     switch (this.etapaAtual) {
-      case 'coleta-dado':
-        this.etapas[this.etapaAtual].proximo = !!this.resultadoColetaDado;
-        break;
-      case 'selecao-modelo':
-        this.etapas[this.etapaAtual].proximo = !!this.modeloSelecionado;
+      case COLETA_DADO:
+        const att = this.resultadoColetaDado?.atributos ?? {};
+        const attSelecionado = Object.values(att).includes(true);
+        const erroTreino = this.resultadoColetaDado?.treino.erro;
+        const erroTeste = !!this.resultadoColetaDado?.teste?.erro;
+        const existeTarget = this.resultadoColetaDado?.dadosRotulados === true
+          && !this.resultadoColetaDado?.target;
+        this.etapas[this.etapaAtual].proximo = !erroTreino && !erroTeste && !attSelecionado || existeTarget;
+        this.etapas[this.etapaAtual].proximo = false;
         break;
       case 'treino-validacao-teste':
-        this.etapas[this.etapaAtual].proximo = !!this.resultadoTreinamento && this.metricasDisponiveis.length > 0;
+        this.etapas[this.etapaAtual].proximo = !this.resultadoTreinamento && this.metricasDisponiveis.length === 0;
         break;
       case 'selecao-das-metricas':
-        this.etapas[this.etapaAtual].proximo = this.metricasSelecionadas.length > 0;
+        this.etapas[this.etapaAtual].proximo = this.metricasSelecionadas.length === 0;
         break;
       case 'metrica':
         this.etapas[this.etapaAtual].proximo = true;
@@ -106,18 +118,11 @@ export class ModalExecucaoComponent implements OnInit {
       tipoTarget === 'number' ? tutor.resumos['modelo-regressao'] :
         tutor.resumos['modelo-exploratorio'];
 
-    const att = event.atributos;
-    const attSelecionado = Object.values(att).includes(true);
-    const erroTreino = !!this.resultadoColetaDado.treino.erro;
-    const erroTeste = !!this.resultadoColetaDado.teste?.erro;
-    const existeTarget = this.resultadoColetaDado?.dadosRotulados === true
-      && !this.resultadoColetaDado?.target;
-
-    this.etapas[this.etapaAtual].proximo = !erroTreino && !erroTeste && !attSelecionado || existeTarget;
+    this.validarProximaEtapa();
 
     this.dashboardService.habilitadarModelos(
       tipoTarget,
-      this.etapas[this.etapaAtual].proximo
+      this.etapas[COLETA_DADO].proximo
     );
 
     this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(tipoTarget);
@@ -128,7 +133,6 @@ export class ModalExecucaoComponent implements OnInit {
 
   atualizarModelo(event: ItemPipeline) {
     this.modeloSelecionado = event;
-    this.etapas[this.etapaAtual].proximo = true;
   }
 
   async atualizarResultadoTreinamento(event: any) {
@@ -143,14 +147,14 @@ export class ModalExecucaoComponent implements OnInit {
     if (this.resultadoTreinamento) {
       const modelosTreinados = Object.keys(this.resultadoTreinamento);
       this.metricasDisponiveis = this.dashboardService.habilitadarMetricas(modelosTreinados);
-      this.etapas[this.etapaAtual].proximo = this.metricasDisponiveis.length > 0
+      this.validarProximaEtapa();
     }
 
   }
 
   atualizarMetricasSelecionadas(event: any) {
     this.metricasSelecionadas = event;
-    this.etapas['selecao-das-metricas'].proximo = this.metricasSelecionadas.length > 0;
+    this.validarProximaEtapa();
   }
 
   funcResultadoAvaliacoes(event: any) {
@@ -175,8 +179,6 @@ export class ModalExecucaoComponent implements OnInit {
       if (data.resultadosDasAvaliacoes) {
         this.funcResultadoAvaliacoes(data.resultadosDasAvaliacoes)
       }
-
-
 
     }
   }
@@ -215,8 +217,8 @@ export class ModalExecucaoComponent implements OnInit {
 
   funcBodyTutor() {
     let chaves: string[] = [];
-    if (this.etapaAtual === 'coleta-dado') {
-      if (this.etapaAtual === 'coleta-dado') {
+    if (this.etapaAtual === COLETA_DADO) {
+      if (this.etapaAtual === COLETA_DADO) {
         const totalDadosTreino = this.resultadoColetaDado?.treino?.totalDados ?? 0;
         if (totalDadosTreino === 0) {
           chaves = ['texto_pipe', 'planilha_treino'];
