@@ -76,7 +76,7 @@
       <button *ngIf="etapas[etapaAtual].indice" mat-raised-button (click)="anterior()"
         [disabled]="etapas[etapaAtual].indice === 0">Anterior</button>
       <button *ngIf="etapas[etapaAtual].indice < nEtapas - 1" mat-raised-button color="primary" (click)="proximo()"
-        [disabled]="!etapas[etapaAtual].proximo">
+        [disabled]="etapas[etapaAtual].proximo">
         {{ etapas[etapaAtual].botaoProximo ? etapas[etapaAtual].botaoProximo : 'Próximo'}}
       </button>
     </div>

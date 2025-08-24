@@ -30,7 +30,7 @@ export class TutorColetaDadosComponent implements OnChanges {
       texto_pipe: [null, [Validators.required]],
       planilha_treino: [null, [Validators.required]],
       planilha_teste: [null, [Validators.required]],
-      divisao_treino_teste: [null, [Validators.required]],
+      divisao_entre_treino_teste: [null, [Validators.required]],
       target: [null, [Validators.required]],
       atributos: [null, [Validators.required]]
     });
@@ -54,7 +54,7 @@ export class TutorColetaDadosComponent implements OnChanges {
           planilha_teste: res?.planilha_teste || '',
           target: res?.target || '',
           atributos: res?.atributos || '',
-          divisao_treino_teste: res?.divisao_treino_teste || ''
+          divisao_entre_treino_teste: res?.divisao_entre_treino_teste || ''
         });
 
       },

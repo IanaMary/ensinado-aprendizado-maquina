@@ -64,7 +64,7 @@ export class ConfTutorComponent implements OnInit {
       formConfTutorColetaDados: this.formBuilder.group({
         planilha_treino: [null, [Validators.required]],
         planilha_teste: [null, [Validators.required]],
-        divisao_treino_teste: [null, [Validators.required]],
+        divisao_entre_treino_teste: [null, [Validators.required]],
         target: [null, [Validators.required]],
         atributos: [null, [Validators.required]]
       }),

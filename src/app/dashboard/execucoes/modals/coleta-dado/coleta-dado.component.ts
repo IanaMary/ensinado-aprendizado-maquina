@@ -162,8 +162,11 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     this.resultColetaDadoL.colunas = nomeColunas;
     this.resultColetaDadoL.atributos = res.atributos;
-    this.resultColetaDadoL.target = res.target
-    this.resultColetaDadoL.tipoTarget = res.tipo_target
+    this.resultColetaDadoL.target = res.target;
+    this.resultColetaDadoL.tipoTarget = res.tipo_target;
+    this.resultColetaDadoL.preverCategoria = res.prever_categoria;
+    this.resultColetaDadoL.dadosRotulados = res.daods_rotulados;
+
 
     this.resultColetaDadoL.colunasDetalhes = res.colunas_detalhes;
 
@@ -184,10 +187,17 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   }
 
   putConfiguracaoTreino() {
+
+    const daods_rotulados = this.resultColetaDadoL.dadosRotulados ?? false;
+    const prever_categoria = this.resultColetaDadoL.preverCategoria ?? false;
+    this.resultColetaDadoL.target = daods_rotulados ? this.resultColetaDadoL.target : '';
     const body = {
       target: this.resultColetaDadoL.target,
-      atributos: this.resultColetaDadoL.atributos
+      atributos: this.resultColetaDadoL.atributos,
+      prever_categoria: prever_categoria,
+      daods_rotulados: daods_rotulados,
     }
+
     this.dashboardService.putColetaConfig('xlxs', this.idConfigurcacaoTreinamento, body).subscribe({
       next: (res: any) => {
         this.resultColetaDadoL.tipoTarget = res.tipo_target;
@@ -212,7 +222,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   selecaoTargetAtt(e: any, bool: boolean) {
     if (bool) {
-      const target = e.value['nome_coluna']
+      const target = e.value
       this.resultColetaDadoL.target = target
       this.resultColetaDadoL.atributos[target] = false;
     }

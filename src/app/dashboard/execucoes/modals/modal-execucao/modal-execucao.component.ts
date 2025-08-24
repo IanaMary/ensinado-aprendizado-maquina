@@ -102,20 +102,39 @@ export class ModalExecucaoComponent implements OnInit {
 
     const tipoTarget = this.resultadoColetaDado?.tipoTarget;
 
+
+
     this.tutorModeloTarget = tipoTarget === 'string' ? tutor.resumos['modelo-classificacao'] :
       tipoTarget === 'number' ? tutor.resumos['modelo-regressao'] :
         tutor.resumos['modelo-exploratorio'];
 
     const att = event.atributos;
 
+
+
     const attSelecionado = Object.values(att).includes(true);
+
+    console.log("att 1) ", att);
+    console.log("attSelecionado 1) ", attSelecionado);
 
 
     const erroTreino = !!this.resultadoColetaDado.treino.erro;
     const erroTeste = !!this.resultadoColetaDado.teste?.erro;
     const tipoTargetNaoSelecionado = tipoTarget === undefined;
 
-    this.etapas[this.etapaAtual].proximo = !(erroTreino || erroTeste || tipoTargetNaoSelecionado || !attSelecionado);
+    const existeTarget = this.resultadoColetaDado?.dadosRotulados === true
+      && !this.resultadoColetaDado?.target;
+
+
+    this.etapas[this.etapaAtual].proximo = !erroTreino && !erroTeste && !attSelecionado || existeTarget;
+
+    console.log("erroTreino 1) ", erroTreino);
+    console.log("erroTeste 1) ", erroTeste);
+    console.log("tipoTargetNaoSelecionado 1) ", tipoTargetNaoSelecionado);
+    console.log("existeTarget 1) ", existeTarget);
+
+    console.log("proximo 1) ", this.etapaAtual, this.etapas[this.etapaAtual].proximo)
+
 
     this.dashboardService.habilitadarModelos(
       tipoTarget,
@@ -218,7 +237,6 @@ export class ModalExecucaoComponent implements OnInit {
   funcBodyTutor() {
     let chaves: string[] = [];
     if (this.etapaAtual === 'coleta-dado') {
-
       if (this.etapaAtual === 'coleta-dado') {
         const totalDadosTreino = this.resultadoColetaDado?.treino?.totalDados ?? 0;
         if (totalDadosTreino === 0) {
@@ -226,7 +244,7 @@ export class ModalExecucaoComponent implements OnInit {
         } else {
           const arquivoTeste = this.resultadoColetaDado?.teste?.nomeArquivo ?? '';
           if (arquivoTeste.length === 0) {
-            chaves = ['planilha_treino', 'divisao_entre_teste'];
+            chaves = ['planilha_treino', 'divisao_entre_treino_teste', 'target', 'atributos'];
           } else {
             chaves = ['planilha_treino', 'planilha_teste'];
           }
