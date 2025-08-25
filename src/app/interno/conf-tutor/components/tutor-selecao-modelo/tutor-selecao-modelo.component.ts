@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import modulesJson from '../../modules.json';
 import { DashboardService } from '../../../../dashboard/services/dashboard.service';
 import { NotificacaoService } from '../../../../service/notificacao.service';
@@ -17,34 +17,34 @@ export class TutorSelecaoModeloComponent implements OnChanges {
   role: string = sessionStorage.getItem('role') || '';
   modules = modulesJson.modules;
 
-
   idTutor = '';
   erroTutor = false;
 
-  tipoAprendizado = 0
-  subTipoAprendizado = 0
+  tipoAprendizado = 0;
+  subTipoAprendizado = 0;
 
   formConfTutorSelecaoModelo: FormGroup;
 
-
-  constructor(private readonly formBuilder: FormBuilder,
+  constructor(
+    private readonly formBuilder: FormBuilder,
     private dashboardService: DashboardService,
-    private readonly notificacao: NotificacaoService) {
-
+    private readonly notificacao: NotificacaoService
+  ) {
     this.formConfTutorSelecaoModelo = this.formBuilder.group({
-      texto_pipe: [null, [Validators.required]],
-      aprendizado_supervisionado: [null, [Validators.required]],
-      classficacao: [null, [Validators.required]],
-      modelos_classficacao: this.formBuilder.array([]),
-      regressao: [null, [Validators.required]],
-      modelos_regressao: this.formBuilder.array([]),
-      aprendizado_nao_supervisionado: [null, [Validators.required]],
-      reducao_dimensionalidade: [null, [Validators.required]],
-      modelos_reducao_dimensionalidade: this.formBuilder.array([]),
-      agrupamento: [null, [Validators.required]],
-      modelos_agrupamento: this.formBuilder.array([]),
+      texto_pipe: [''],
+      tipos: this.formBuilder.group({
+        supervisionado: this.formBuilder.group({
+          explicacao: [''],
+          classficacao: this.formBuilder.group({ explicacao: [''] }),
+          regressao: this.formBuilder.group({ explicacao: [''] })
+        }),
+        nao_supervisionado: this.formBuilder.group({
+          explicacao: [''],
+          reducao_dimensionalidade: this.formBuilder.group({ explicacao: [''] }),
+          agrupamento: this.formBuilder.group({ explicacao: [''] })
+        })
+      })
     });
-
   }
 
   ngOnChanges() {
@@ -53,20 +53,40 @@ export class TutorSelecaoModeloComponent implements OnChanges {
     }
   }
 
-
   getTutor() {
     this.dashboardService.getTutorEditar({ pipe: 'selecao-modelo' }).subscribe({
-      next: async (res: any) => {
+      next: (res: any) => {
         this.idTutor = res.id;
+
+        // Atualiza o texto principal
         this.formConfTutorSelecaoModelo.patchValue({
-          texto_pipe: res?.texto_pipe || '',
-          aprendizado_supervisionado: res?.aprendizado_supervisionado || '',
-          classficacao: res?.classficacao || '',
-          regressao: res?.regressao || '',
-          aprendizado_nao_supervisionado: res?.aprendizado_nao_supervisionado || '',
-          reducao_dimensionalidade: res?.reducao_dimensionalidade || '',
-          agrupamento: res?.agrupamento || ''
+          texto_pipe: res?.texto_pipe || ''
         });
+
+        // Atualiza supervisionado e nao_supervisionado
+        ['supervisionado', 'nao_supervisionado'].forEach(grupo => {
+          const grupoData = res?.tipos?.[grupo];
+          if (!grupoData) return;
+
+          const grupoForm = this.formConfTutorSelecaoModelo.get(`tipos.${grupo}`) as FormGroup;
+          if (grupoData.explicacao !== undefined) {
+            grupoForm.patchValue({ explicacao: grupoData.explicacao });
+          }
+
+          // Atualiza subgrupos
+          Object.keys(grupoData).forEach(sub => {
+            if (sub === 'explicacao') return;
+
+            const subData = grupoData[sub];
+            const subForm = grupoForm.get(sub) as FormGroup;
+            if (!subForm) return;
+
+            if (subData.explicacao !== undefined) {
+              subForm.patchValue({ explicacao: subData.explicacao });
+            }
+          });
+        });
+
         this.erroTutor = false;
       },
       error: (error: any) => {
@@ -74,16 +94,15 @@ export class TutorSelecaoModeloComponent implements OnChanges {
         this.notificacao.erro('Erro ao buscar dados da seleção do modelo!');
       }
     });
-
   }
 
   putTutor() {
-    const body = this.bodyTutor();
+    const body = {
+      contexto: this.formConfTutorSelecaoModelo.value
+    }
+    console.log("body => ", body)
     this.dashboardService.putTutor(body, this.idTutor).subscribe({
-      next: async (res: any) => {
-        this.formConfTutorSelecaoModelo.patchValue({
-          explicacao: res?.explicacao || ''
-        });
+      next: (res: any) => {
         this.notificacao.sucesso('Edição feita com sucesso!');
       },
       error: (error: any) => {
@@ -92,44 +111,18 @@ export class TutorSelecaoModeloComponent implements OnChanges {
     });
   }
 
-  bodyTutor() {
-    const contextoOriginal = this.formConfTutorSelecaoModelo.value;
-    const contextoTratado = Object.fromEntries(
-      Object.entries(contextoOriginal).map(([key, value]) => {
-        return [key, typeof value === 'string' ? value.replace(/&nbsp;/g, ' ') : value];
-      })
-    );
-    return {
-      contexto: contextoTratado
-    };
+
+  removerNbspEditor(event: any, caminho: string) {
+    const control = this.formConfTutorSelecaoModelo.get(caminho);
+    if (!control) return;
+
+    // substitui &nbsp; por espaço normal
+    const valorLimpo = (event.html || '').replace(/&nbsp;/g, ' ').trim();
+
+    // só atualiza se o valor realmente mudou
+    if (valorLimpo !== control.value) {
+      control.setValue(valorLimpo, { emitEvent: false }); // evita disparar outro onContentChanged
+    }
   }
-
-
-  get modelosClassificacao(): FormArray {
-    return this.formConfTutorSelecaoModelo.get('modelos_classficacao') as FormArray;
-  }
-
-  get modelosRegressao(): FormArray {
-    return this.formConfTutorSelecaoModelo.get('modelos_regressao') as FormArray;
-  }
-
-  // Métodos para adicionar/remover
-  addModeloClassificacao() {
-    this.modelosClassificacao.push(this.formBuilder.control('', Validators.required));
-  }
-
-  removeModeloClassificacao(index: number) {
-    this.modelosClassificacao.removeAt(index);
-  }
-
-  addModeloRegressao() {
-    this.modelosRegressao.push(this.formBuilder.control('', Validators.required));
-  }
-
-  removeModeloRegressao(index: number) {
-    this.modelosRegressao.removeAt(index);
-  }
-
-
 
 }
