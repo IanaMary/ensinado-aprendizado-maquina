@@ -413,6 +413,23 @@ mat-checkbox {
   color: $cor-principal;
 }
 
+.mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  // color: $cor-principal;
+  font-weight: 600;
+}
+
+// .mat-mdc-tab .mdc-tab__text-label {
+//   color: $cor-principal;
+// }
+
+.mat-mdc-tab-list {
+  color: $cor-principal;
+}
+
+.mat-mdc-tab-label-container {
+  color: $cor-principal;
+}
+
 html,
 body {
   height: 100%;
@@ -421,4 +438,22 @@ body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.toast-sucesso {
+  background: #4caf50; // verde
+  color: #fff;
+  font-weight: 600;
+}
+
+.toast-erro {
+  background: #f44336; // vermelho
+  color: #fff;
+  font-weight: 600;
+}
+
+.toast-aviso {
+  background: #ff9800; // laranja
+  color: #000;
+  font-weight: 600;
 }

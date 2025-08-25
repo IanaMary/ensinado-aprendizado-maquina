@@ -92,7 +92,6 @@ export class ModalExecucaoComponent implements OnInit {
         const existeTarget = this.resultadoColetaDado?.dadosRotulados === true
           && !this.resultadoColetaDado?.target;
         this.etapas[this.etapaAtual].proximo = !erroTreino && !erroTeste && !attSelecionado || existeTarget;
-        this.etapas[this.etapaAtual].proximo = false;
         break;
       case 'treino-validacao-teste':
         this.etapas[this.etapaAtual].proximo = !this.resultadoTreinamento && this.metricasDisponiveis.length === 0;

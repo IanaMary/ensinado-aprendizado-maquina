@@ -2,8 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService } from '../../../../dashboard/services/dashboard.service';
 import modulesJson from '../../modules.json';
-
-
+import { NotificacaoService } from '../../../../service/notificacao.service';
 
 @Component({
   selector: 'app-tutor-inicio',
@@ -24,7 +23,8 @@ export class TutorInicioComponent implements OnChanges {
   formConfTutorInicio: FormGroup;
 
   constructor(private readonly formBuilder: FormBuilder,
-    private dashboardService: DashboardService) {
+    private dashboardService: DashboardService,
+    private readonly notificacao: NotificacaoService) {
 
     this.formConfTutorInicio = this.formBuilder.group({
       explicacao: [null, [Validators.required]]
@@ -51,6 +51,7 @@ export class TutorInicioComponent implements OnChanges {
       },
       error: (error: any) => {
         this.erroTutor = true;
+        this.notificacao.erro('Erro ao buscar dados do início!');
       }
     });
 
@@ -64,9 +65,11 @@ export class TutorInicioComponent implements OnChanges {
         this.formConfTutorInicio.patchValue({
           explicacao: res?.explicacao || ''
         });
+        this.notificacao.sucesso('Edição feita com sucesso!');
       },
       error: (error: any) => {
         this.erroTutor = true;
+        this.notificacao.erro('Erro ao editar!');
       }
     });
   }

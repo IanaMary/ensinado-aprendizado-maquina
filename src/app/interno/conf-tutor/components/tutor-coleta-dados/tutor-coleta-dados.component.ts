@@ -2,6 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService } from '../../../../dashboard/services/dashboard.service';
 import modulesJson from '../../modules.json';
+import { NotificacaoService } from '../../../../service/notificacao.service';
 
 @Component({
   selector: 'app-tutor-coleta-dados',
@@ -24,7 +25,8 @@ export class TutorColetaDadosComponent implements OnChanges {
   formConfTutorColetaDados: FormGroup;
 
   constructor(private readonly formBuilder: FormBuilder,
-    private dashboardService: DashboardService) {
+    private readonly dashboardService: DashboardService,
+    private readonly notificacao: NotificacaoService) {
 
     this.formConfTutorColetaDados = this.formBuilder.group({
       texto_pipe: [null, [Validators.required]],
@@ -50,16 +52,18 @@ export class TutorColetaDadosComponent implements OnChanges {
       next: async (res: any) => {
         this.idTutor = res.id;
         this.formConfTutorColetaDados.patchValue({
+          texto_pipe: res?.texto_pipe || '',
           planilha_treino: res?.planilha_treino || '',
           planilha_teste: res?.planilha_teste || '',
+          divisao_entre_treino_teste: res?.divisao_entre_treino_teste || '',
           target: res?.target || '',
-          atributos: res?.atributos || '',
-          divisao_entre_treino_teste: res?.divisao_entre_treino_teste || ''
+          atributos: res?.atributos || ''
         });
-
+        this.erroTutor = false;
       },
       error: (error: any) => {
         this.erroTutor = true;
+        this.notificacao.erro('Erro ao buscar dados da coleta de dados!');
       }
     });
 
@@ -69,13 +73,13 @@ export class TutorColetaDadosComponent implements OnChanges {
     const body = this.bodyTutor();
     this.dashboardService.putTutor(body, this.idTutor).subscribe({
       next: async (res: any) => {
-        this.idTutor = res.id;
         this.formConfTutorColetaDados.patchValue({
           explicacao: res?.explicacao || ''
         });
+        this.notificacao.sucesso('Edição feita com sucesso!');
       },
       error: (error: any) => {
-        this.erroTutor = true;
+        this.notificacao.erro('Erro ao editar!');
       }
     });
   }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../service/auth/auth.service';
 import { LoginService } from '../../../externo/autenticacao/login/services/login.service';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 import { BodyTutor } from '../../../models/item-coleta-dado.model';
 
@@ -17,15 +17,6 @@ export class ConfTutorComponent implements OnInit {
   role: string = sessionStorage.getItem('role') || '';
 
   conteudo = '';
-
-  modules = {
-    preserveWhiteSpace: true,
-    toolbar: [
-      ['bold', 'italic', 'underline'],
-      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-      ['clean']
-    ]
-  };
 
   body: BodyTutor = {
     tamanho_arq: 0

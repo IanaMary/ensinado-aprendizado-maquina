@@ -11,14 +11,15 @@
   <mat-divider class="linha"></mat-divider>
   <mat-radio-group (change)="bodyTutor()" [(ngModel)]="opcaoSelecionada">
     <mat-radio-button [value]="0">Explicação sobre a etapa de coleta</mat-radio-button>
-    <mat-radio-button [value]="1">Explicação sobre a planilha de teste</mat-radio-button>
-    <mat-radio-button [value]="2">Explicação sobre a divisão entre treino e teste</mat-radio-button>
-    <mat-radio-button [value]="3">Explicação sobre a target</mat-radio-button>
-    <mat-radio-button [value]="4">Explicação sobre a atributos</mat-radio-button>
+    <mat-radio-button [value]="1">Explicação sobre a planilha de treino</mat-radio-button>
+    <mat-radio-button [value]="2">Explicação sobre a planilha de teste</mat-radio-button>
+    <mat-radio-button [value]="3">Explicação sobre a divisão entre treino e teste</mat-radio-button>
+    <mat-radio-button [value]="4">Explicação sobre a target</mat-radio-button>
+    <mat-radio-button [value]="5">Explicação sobre a atributos</mat-radio-button>
   </mat-radio-group>
   <form [formGroup]="formConfTutorColetaDados">
     <quill-editor *ngIf="opcaoSelecionada === 0" [readOnly]="erroTutor" [modules]="modules" class="editor"
-      formControlName="planilha_treino">
+      formControlName="texto_pipe">
     </quill-editor>
 
     <quill-editor *ngIf="opcaoSelecionada === 1" [readOnly]="erroTutor" [modules]="modules" class="editor"
@@ -30,7 +31,7 @@
     </quill-editor>
 
     <quill-editor *ngIf="opcaoSelecionada === 3" [readOnly]="erroTutor" [modules]="modules" class="editor"
-      formControlName="'divisao_entre_treino_teste">
+      formControlName="divisao_entre_treino_teste">
     </quill-editor>
 
     <quill-editor *ngIf="opcaoSelecionada === 4" [readOnly]="erroTutor" [modules]="modules" class="editor"

@@ -13,7 +13,7 @@
       (selectedTabChange)="tabAtual($event)">
       <mat-tab label="Inicio">
         <div class="box-coluna">
-          <app-tutor-inicio [atualizar]="tabs[0]" [formGroup]="formConfTutorInicio"></app-tutor-inicio>
+          <app-tutor-inicio [atualizar]="tabs[0]"></app-tutor-inicio>
         </div>
       </mat-tab>
       <mat-tab label="Coleta de dados">
@@ -23,7 +23,7 @@
       </mat-tab>
       <mat-tab label="Seleção de modelos">
         <div class="box-coluna">
-          <!-- <app-tutor-selecao-modelo [formGroup]="formConfTutorSelecaoModelo"></app-tutor-selecao-modelo> -->
+          <app-tutor-selecao-modelo [atualizar]="tabs[2]"></app-tutor-selecao-modelo>
         </div>
       </mat-tab>
     </mat-tab-group>
