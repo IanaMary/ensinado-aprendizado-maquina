@@ -40,7 +40,9 @@ export class TutorSelecaoModeloComponent implements OnChanges {
       modelos_regressao: this.formBuilder.array([]),
       aprendizado_nao_supervisionado: [null, [Validators.required]],
       reducao_dimensionalidade: [null, [Validators.required]],
-      agrupamento: [null, [Validators.required]]
+      modelos_reducao_dimensionalidade: this.formBuilder.array([]),
+      agrupamento: [null, [Validators.required]],
+      modelos_agrupamento: this.formBuilder.array([]),
     });
 
   }
