@@ -15,6 +15,7 @@ import { ConfTutorComponent } from './containers/conf-tutor.component';
 import { TutorColetaDadosComponent } from './components/tutor-coleta-dados/tutor-coleta-dados.component';
 import { TutorInicioComponent } from './components/tutor-inicio/tutor-inicio.component';
 import { TutorSelecaoModeloComponent } from './components/tutor-selecao-modelo/tutor-selecao-modelo.component';
+import { TutorTreinamentoComponent } from './components/tutor-treinamento/tutor-treinamento.component';
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import { TutorSelecaoModeloComponent } from './components/tutor-selecao-modelo/t
     ConfTutorComponent,
     TutorInicioComponent,
     TutorColetaDadosComponent,
-    TutorSelecaoModeloComponent
+    TutorSelecaoModeloComponent,
+    TutorTreinamentoComponent
   ],
   imports: [
     ConfTutorRoutingModule,

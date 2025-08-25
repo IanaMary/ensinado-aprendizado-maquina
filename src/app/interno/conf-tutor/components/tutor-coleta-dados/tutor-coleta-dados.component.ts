@@ -73,9 +73,6 @@ export class TutorColetaDadosComponent implements OnChanges {
     const body = this.bodyTutor();
     this.dashboardService.putTutor(body, this.idTutor).subscribe({
       next: async (res: any) => {
-        this.formConfTutorColetaDados.patchValue({
-          explicacao: res?.explicacao || ''
-        });
         this.notificacao.sucesso('Edição feita com sucesso!');
       },
       error: (error: any) => {

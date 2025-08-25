@@ -2,14 +2,14 @@
 
   <nav class="box-titulo">
     <nav class="titulo">
-      <h2>Texto Inicial</h2>
+      <h2>Texto Treinamento</h2>
     </nav>
     <nav class="titulo bloco">
-      <button [disabled]="formConfTutorInicio.invalid" class="botao-principal" (click)="putTutor()">EDITAR</button>
+      <button [disabled]="formConfTutorTreinamento.invalid" class="botao-principal" (click)="putTutor()">EDITAR</button>
     </nav>
   </nav>
   <mat-divider class="linha"></mat-divider>
-  <form [formGroup]="formConfTutorInicio">
+  <form [formGroup]="formConfTutorTreinamento">
     <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="texto_pipe">
     </quill-editor>
   </form>

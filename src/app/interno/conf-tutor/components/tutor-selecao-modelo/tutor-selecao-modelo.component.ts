@@ -70,7 +70,7 @@ export class TutorSelecaoModeloComponent implements OnChanges {
       },
       error: (error: any) => {
         this.erroTutor = true;
-        this.notificacao.erro('Erro ao buscar dados da coleta de dados!');
+        this.notificacao.erro('Erro ao buscar dados da seleção do modelo!');
       }
     });
 

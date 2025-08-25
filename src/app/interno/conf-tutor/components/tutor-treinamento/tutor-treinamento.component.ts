@@ -5,12 +5,12 @@ import modulesJson from '../../modules.json';
 import { NotificacaoService } from '../../../../service/notificacao.service';
 
 @Component({
-  selector: 'app-tutor-inicio',
-  templateUrl: './tutor-inicio.component.html',
-  styleUrls: ['./tutor-inicio.component.scss'],
+  selector: 'app-tutor-treinamento',
+  templateUrl: './tutor-treinamento.component.html',
+  styleUrls: ['./tutor-treinamento.component.scss'],
   standalone: false,
 })
-export class TutorInicioComponent implements OnChanges {
+export class TutorTreinamentoComponent implements OnChanges {
 
   @Input() atualizar = false;
 
@@ -20,13 +20,13 @@ export class TutorInicioComponent implements OnChanges {
   erroTutor = false;
   idTutor = '';
 
-  formConfTutorInicio: FormGroup;
+  formConfTutorTreinamento: FormGroup;
 
   constructor(private readonly formBuilder: FormBuilder,
     private dashboardService: DashboardService,
     private readonly notificacao: NotificacaoService) {
 
-    this.formConfTutorInicio = this.formBuilder.group({
+    this.formConfTutorTreinamento = this.formBuilder.group({
       texto_pipe: [null, [Validators.required]],
       explicacao: [null, [Validators.required]]
     });
@@ -42,10 +42,10 @@ export class TutorInicioComponent implements OnChanges {
 
 
   getTutor() {
-    this.dashboardService.getTutorEditar({ pipe: 'inicio' }).subscribe({
+    this.dashboardService.getTutorEditar({ pipe: 'treinamento' }).subscribe({
       next: async (res: any) => {
         this.idTutor = res.id;
-        this.formConfTutorInicio.patchValue({
+        this.formConfTutorTreinamento.patchValue({
           texto_pipe: res?.texto_pipe || '',
           explicacao: res?.explicacao || ''
         });
@@ -53,7 +53,7 @@ export class TutorInicioComponent implements OnChanges {
       },
       error: (error: any) => {
         this.erroTutor = true;
-        this.notificacao.erro('Erro ao buscar dados do início!');
+        this.notificacao.erro('Erro ao buscar dados do treinamento!');
       }
     });
 
@@ -74,7 +74,7 @@ export class TutorInicioComponent implements OnChanges {
 
 
   bodyTutor() {
-    const contextoOriginal = this.formConfTutorInicio.value;
+    const contextoOriginal = this.formConfTutorTreinamento.value;
     const contextoTratado = Object.fromEntries(
       Object.entries(contextoOriginal).map(([key, value]) => {
         return [key, typeof value === 'string' ? value.replace(/&nbsp;/g, ' ') : value];
