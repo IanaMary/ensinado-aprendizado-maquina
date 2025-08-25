@@ -28,7 +28,7 @@ export class TutorInicioComponent implements OnChanges {
 
     this.formConfTutorInicio = this.formBuilder.group({
       texto_pipe: [null, [Validators.required]],
-      explicacao: [null, [Validators.required]]
+      explicacao: [null, []]
     });
 
   }
