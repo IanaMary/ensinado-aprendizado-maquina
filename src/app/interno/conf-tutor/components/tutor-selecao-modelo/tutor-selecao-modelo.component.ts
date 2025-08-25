@@ -57,7 +57,6 @@ export class TutorSelecaoModeloComponent implements OnChanges {
   getTutor() {
     this.dashboardService.getTutorEditar({ pipe: 'selecao-modelo' }).subscribe({
       next: async (res: any) => {
-        console.log("TutorSelecaoModeloComponent =>> ", res)
         this.idTutor = res.id;
         this.formConfTutorSelecaoModelo.patchValue({
           texto_pipe: res?.texto_pipe || '',

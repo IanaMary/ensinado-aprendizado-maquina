@@ -1,0 +1,46 @@
+<div class="box-formulario">
+
+  <!-- Cabeçalho -->
+  <div class="box-titulo">
+    <div class="titulo">
+      <h2>Texto seleção de métricas</h2>
+    </div>
+    <div class="titulo bloco">
+      <button [disabled]="formConfTutorSelecaoMetricas.invalid" class="botao-principal" (click)="putTutor()">
+        EDITAR
+      </button>
+    </div>
+  </div>
+
+  <mat-divider class="linha"></mat-divider>
+
+  <!-- Seleção de opção -->
+  <mat-radio-group (change)="bodyTutor()" [(ngModel)]="opcaoSelecionada">
+    <mat-radio-button [value]="0">Explicação sobre a seleção de métricas</mat-radio-button>
+    <mat-radio-button [value]="1">Explicação sobre as métricas</mat-radio-button>
+  </mat-radio-group>
+
+  <!-- Formulário -->
+  <form [formGroup]="formConfTutorSelecaoMetricas">
+
+    <!-- Texto inicial -->
+    <ng-container *ngIf="opcaoSelecionada === 0">
+      <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="texto_pipe">
+      </quill-editor>
+    </ng-container>
+
+    <!-- Métricas -->
+    <ng-container *ngIf="opcaoSelecionada === 1" formArrayName="tipos">
+      <div *ngFor="let metrica of tipos.controls; let i = index" [formGroupName]="i" class="metrica-item">
+
+        <nav class="texto-label">Explicação sobre: {{ metrica.get('label')?.value }}</nav>
+
+        <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+        </quill-editor>
+
+      </div>
+    </ng-container>
+
+  </form>
+
+</div>
