@@ -22,7 +22,7 @@ export class ConfTutorComponent implements OnInit {
     tamanho_arq: 0
   };
 
-  tabs = [true, false, false, false, false, false]
+  tabs = [true, false, false, false, false, false, false]
 
   erroTutor = false;
 

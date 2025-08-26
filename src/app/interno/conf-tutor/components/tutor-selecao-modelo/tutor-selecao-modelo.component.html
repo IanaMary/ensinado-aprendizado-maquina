@@ -1,7 +1,7 @@
 <div class="box-formulario">
   <div class="box-titulo">
     <div class="titulo">
-      <h2>Texto sobre a aprendizado de máquina</h2>
+      <h2>Texto sobre os modelos</h2>
     </div>
     <div class="titulo bloco">
       <button [disabled]="formConfTutorSelecaoModelo.invalid" class="botao-principal" (click)="putTutor()">
@@ -13,96 +13,53 @@
   <mat-divider class="linha"></mat-divider>
 
   <!-- Seleção do tipo de aprendizado -->
-  <mat-radio-group [(ngModel)]="tipoAprendizado" [ngModelOptions]="{standalone: true}">
-    <mat-radio-button [value]="0">Explicação sobre seleção de modelos</mat-radio-button>
-    <mat-radio-button [value]="1">Explicação sobre aprendizado supervisionado</mat-radio-button>
-    <mat-radio-button [value]="2">Explicação sobre aprendizado não supervisionado</mat-radio-button>
+  <mat-radio-group (change)="onTipoModelo()" [(ngModel)]="tipoModeloSelecionado" [ngModelOptions]="{standalone: true}">
+    <mat-radio-button [value]="0">Classificação</mat-radio-button>
+    <mat-radio-button [value]="1">Regressão</mat-radio-button>
+    <mat-radio-button [value]="2">Agrupamento</mat-radio-button>
+    <mat-radio-button [value]="3">Redução de dimensionalidade</mat-radio-button>
   </mat-radio-group>
 
-  <form [formGroup]="formConfTutorSelecaoModelo">
+  <mat-divider class="linha"></mat-divider>
+  <mat-accordion multi class="mat-accordion">
+    <mat-expansion-panel class="mat-expansion-panel"
+      *ngFor="let modelo of modelos[tipoModeloSelecionado]; let i = index ">
+      <mat-expansion-panel-header>
+        <mat-panel-title> {{ modelo?.label }} </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-divider class="linha"></mat-divider>
 
-    <!-- Tipo 0: Seleção de modelos -->
-    <ng-container *ngIf="tipoAprendizado === 0">
-      <nav class="texto-label">Explicação sobre seleção de modelos</nav>
-      <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="texto_pipe"
-        (onContentChanged)="removerNbspEditor($event, 'texto_pipe')">
-      </quill-editor>
-    </ng-container>
-
-    <!-- Tipo 1: Aprendizado Supervisionado -->
-    <ng-container *ngIf="tipoAprendizado === 1">
-      <div [formGroupName]="'tipos'">
-        <div [formGroupName]="'supervisionado'">
-
-          <!-- Explicação geral -->
-          <nav class="texto-label">Explicação sobre aprendizado supervisionado</nav>
-          <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao"
-            (onContentChanged)="removerNbspEditor($event, 'tipos.supervisionado.explicacao')">
-          </quill-editor>
-
-          <!-- Subtipo: classificação ou regressão -->
-          <mat-radio-group [(ngModel)]="subTipoAprendizado" [ngModelOptions]="{standalone: true}">
-            <mat-radio-button [value]="0">Explicação sobre classificação</mat-radio-button>
-            <mat-radio-button [value]="1">Explicação sobre regressão</mat-radio-button>
-          </mat-radio-group>
-
-          <!-- Classificação -->
-          <ng-container *ngIf="subTipoAprendizado === 0" [formGroupName]="'classficacao'">
-            <nav class="texto-label">Explicação sobre classificação</nav>
-            <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao"
-              (onContentChanged)="removerNbspEditor($event, 'tipos.supervisionado.classficacao.explicacao')">
-            </quill-editor>
+      <form [formGroup]="formConfTutorSelecaoModelo">
+        <ng-container *ngIf="tipoModeloSelecionado === 0">
+          <ng-container formArrayName="classficacao">
+            <div [formGroupName]="i">
+              <nav class="texto-label">
+                Explicação sobre o modelo
+              </nav>
+              <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+              </quill-editor>
+            </div>
           </ng-container>
-
-          <!-- Regressão -->
-          <ng-container *ngIf="subTipoAprendizado === 1" [formGroupName]="'regressao'">
-            <nav class="texto-label">Explicação sobre regressão</nav>
-            <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao"
-              (onContentChanged)="removerNbspEditor($event, 'tipos.supervisionado.regressao.explicacao')">
-            </quill-editor>
+        </ng-container>
+        <ng-container *ngIf="tipoModeloSelecionado === 1">
+          <ng-container formArrayName="regressao">
+            <div [formGroupName]="i">
+              <nav class="texto-label">
+                Explicação sobre o modelo
+              </nav>
+              <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+              </quill-editor>
+            </div>
           </ng-container>
+        </ng-container>
+      </form>
 
-        </div>
-      </div>
-    </ng-container>
 
-    <!-- Tipo 2: Aprendizado Não Supervisionado -->
-    <ng-container *ngIf="tipoAprendizado === 2">
-      <div [formGroupName]="'tipos'">
-        <div [formGroupName]="'nao_supervisionado'">
 
-          <!-- Explicação geral -->
-          <nav class="texto-label">Explicação sobre aprendizado não supervisionado</nav>
-          <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao"
-            (onContentChanged)="removerNbspEditor($event, 'tipos.nao_supervisionado.explicacao')">
-          </quill-editor>
+    </mat-expansion-panel>
+  </mat-accordion>
 
-          <!-- Subtipo: redução dimensionalidade ou agrupamento -->
-          <mat-radio-group [(ngModel)]="subTipoAprendizado" [ngModelOptions]="{standalone: true}">
-            <mat-radio-button [value]="0">Explicação sobre redução de dimensionalidade</mat-radio-button>
-            <mat-radio-button [value]="1">Explicação sobre agrupamento</mat-radio-button>
-          </mat-radio-group>
 
-          <!-- Redução dimensionalidade -->
-          <ng-container *ngIf="subTipoAprendizado === 0" [formGroupName]="'reducao_dimensionalidade'">
-            <nav class="texto-label">Explicação sobre redução dimensionalidade</nav>
-            <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao"
-              (onContentChanged)="removerNbspEditor($event, 'tipos.nao_supervisionado.reducao_dimensionalidade.explicacao')">
-            </quill-editor>
-          </ng-container>
 
-          <!-- Agrupamento -->
-          <ng-container *ngIf="subTipoAprendizado === 1" [formGroupName]="'agrupamento'">
-            <nav class="texto-label">Explicação sobre agrupamento</nav>
-            <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao"
-              (onContentChanged)="removerNbspEditor($event, 'tipos.nao_supervisionado.agrupamento.explicacao')">
-            </quill-editor>
-          </ng-container>
-
-        </div>
-      </div>
-    </ng-container>
-
-  </form>
 
 </div>

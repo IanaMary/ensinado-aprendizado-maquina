@@ -18,6 +18,7 @@ import { TutorSelecaoModeloComponent } from './components/tutor-selecao-modelo/t
 import { TutorTreinamentoComponent } from './components/tutor-treinamento/tutor-treinamento.component';
 import { TutorAvaliacaoComponent } from './components/tutor-avaliacao/tutor-avaliacao.component';
 import { TutorSelecaoMetricasComponent } from './components/tutor-selecao-metricas/tutor-selecao-metricas.component';
+import { TtutorTiposAprendizadoComponent } from './components/tutor-tipos-aprendizado/tutor-tipos-aprendizado.component';
 
 
 @NgModule({
@@ -25,6 +26,7 @@ import { TutorSelecaoMetricasComponent } from './components/tutor-selecao-metric
     ConfTutorComponent,
     TutorInicioComponent,
     TutorColetaDadosComponent,
+    TtutorTiposAprendizadoComponent,
     TutorSelecaoModeloComponent,
     TutorTreinamentoComponent,
     TutorSelecaoMetricasComponent,

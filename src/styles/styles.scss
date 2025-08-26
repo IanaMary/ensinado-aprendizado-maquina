@@ -457,3 +457,13 @@ body {
   color: #000;
   font-weight: 600;
 }
+
+.mat-expansion-panel-header-title,
+.mat-expansion-panel-header-description {
+  color: $cor-principal;
+}
+
+.mat-expansion-indicator {
+  color: $cor-principal !important;
+  fill: $cor-principal !important;
+}

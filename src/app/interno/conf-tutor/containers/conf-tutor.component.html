@@ -23,22 +23,27 @@
       </mat-tab>
       <mat-tab label="Explicação sobre aprendizado">
         <div class="box-coluna">
-          <app-tutor-selecao-modelo [atualizar]="tabs[2]"></app-tutor-selecao-modelo>
+          <app-tutor-tipos-aprendizado [atualizar]="tabs[2]"></app-tutor-tipos-aprendizado>
+        </div>
+      </mat-tab>
+      <mat-tab label="Explicação sobre os modelos">
+        <div class="box-coluna">
+          <app-tutor-selecao-modelo [atualizar]="tabs[3]"></app-tutor-selecao-modelo>
         </div>
       </mat-tab>
       <mat-tab label="Treinamento">
         <div class="box-coluna">
-          <app-tutor-treinamento [atualizar]="tabs[3]"></app-tutor-treinamento>
+          <app-tutor-treinamento [atualizar]="tabs[4]"></app-tutor-treinamento>
         </div>
       </mat-tab>
       <mat-tab label="Seleção de Métricas">
         <div class="box-coluna">
-          <app-tutor-selecao-metricas [atualizar]="tabs[4]"></app-tutor-selecao-metricas>
+          <app-tutor-selecao-metricas [atualizar]="tabs[5]"></app-tutor-selecao-metricas>
         </div>
       </mat-tab>
       <mat-tab label="Avaliação">
         <div class="box-coluna">
-          <app-tutor-avaliacao [atualizar]="tabs[5]"></app-tutor-avaliacao>
+          <app-tutor-avaliacao [atualizar]="tabs[6]"></app-tutor-avaliacao>
         </div>
       </mat-tab>
     </mat-tab-group>

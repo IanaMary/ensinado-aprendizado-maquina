@@ -71,10 +71,14 @@ export class DashboardService {
     return this.http.put(`${this.url}${this.endpointConfiguraca}/${tipo}/${idColeta}`, body);
   }
 
-
   getColetaDadosTreino(idColeta: string, limite: number) {
     return this.http.get(`${this.url}${this.endpointColeta}/unique?id_coleta=${idColeta}&limit=${limite}`);
   }
+
+  getModelosParams(params: any) {
+    return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointModelo}todos?${params}`);
+  }
+
 
   classificadorTreino(tipoClassficador: string, body: any) {
     return this.http.post(`${this.url}${this.endpointClassificador}/treinamento/${tipoClassficador}`, body);
@@ -96,7 +100,6 @@ export class DashboardService {
   fetchItensModelos() {
     return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointModelo}todos`);
   }
-
 
   fetchItensMetricas() {
     return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointMetricas}todos`);

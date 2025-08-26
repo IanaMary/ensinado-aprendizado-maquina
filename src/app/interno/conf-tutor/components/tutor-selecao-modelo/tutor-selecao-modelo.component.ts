@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import modulesJson from '../../modules.json';
 import { DashboardService } from '../../../../dashboard/services/dashboard.service';
 import { NotificacaoService } from '../../../../service/notificacao.service';
@@ -20,8 +20,12 @@ export class TutorSelecaoModeloComponent implements OnChanges {
   idTutor = '';
   erroTutor = false;
 
-  tipoAprendizado = 0;
-  subTipoAprendizado = 0;
+  tipoModeloSelecionado = 0;
+  tipoAprendizado = 'supervisionado';
+  subTipoAprendizado = 'classficacao';
+
+  modelos: any[] = [[], [], [], []];
+  modelosMap: any[] = ['classficacao', 'regressao', 'reducao_dimensionalidade', 'agrupamento'];
 
   formConfTutorSelecaoModelo: FormGroup;
 
@@ -31,61 +35,90 @@ export class TutorSelecaoModeloComponent implements OnChanges {
     private readonly notificacao: NotificacaoService
   ) {
     this.formConfTutorSelecaoModelo = this.formBuilder.group({
-      texto_pipe: [''],
-      tipos: this.formBuilder.group({
-        supervisionado: this.formBuilder.group({
-          explicacao: [''],
-          classficacao: this.formBuilder.group({ explicacao: [''] }),
-          regressao: this.formBuilder.group({ explicacao: [''] })
-        }),
-        nao_supervisionado: this.formBuilder.group({
-          explicacao: [''],
-          reducao_dimensionalidade: this.formBuilder.group({ explicacao: [''] }),
-          agrupamento: this.formBuilder.group({ explicacao: [''] })
-        })
-      })
+      classficacao: this.formBuilder.array([]),
+      regressao: this.formBuilder.array([]),
+      reducao_dimensionalidade: this.formBuilder.array([]),
+      agrupamento: this.formBuilder.array([])
     });
   }
 
   ngOnChanges() {
     if (this.atualizar) {
-      this.getTutor();
+      this.onTipoModelo();
     }
   }
 
+
+  onTipoModelo() {
+    if (!this.modelos[this.tipoModeloSelecionado].length) {
+      let prever_categoria = false;
+      let dados_rotulados = false;
+
+      switch (this.tipoModeloSelecionado) {
+        case 0: // Classificação
+          prever_categoria = true;
+          dados_rotulados = true;
+          this.tipoAprendizado = 'supervisionado';
+          this.subTipoAprendizado = 'classficacao';
+          break;
+        case 1: // Regressão
+          prever_categoria = false;
+          dados_rotulados = true;
+          this.tipoAprendizado = 'supervisionado';
+          this.subTipoAprendizado = 'regressao';
+          break;
+        case 2: // Agrupamento
+          prever_categoria = true;
+          dados_rotulados = false;
+          this.tipoAprendizado = 'nao_supervisionado';
+          this.subTipoAprendizado = 'agrupamento';
+          break;
+        case 3: // Redução de dimensionalidade
+          prever_categoria = false;
+          dados_rotulados = false;
+          this.tipoAprendizado = 'nao_supervisionado';
+          this.subTipoAprendizado = 'reducao_dimensionalidade';
+          break;
+      }
+      const aux = {
+        prever_categoria: prever_categoria,
+        dados_rotulados: dados_rotulados
+      }
+      const params = new URLSearchParams(aux as any).toString();
+      this.getModelos(params);
+    }
+  }
+
+
+
+  getModelos(params: any) {
+    this.dashboardService.getModelosParams(params).subscribe({
+      next: (res: any) => {
+        this.modelos[this.tipoModeloSelecionado] = res;
+        this.getArrayModelos();
+        this.getTutor();
+      },
+      error: (error: any) => {
+        this.erroTutor = true;
+        this.notificacao.erro('Erro ao buscar dados da seleção do modelo!');
+      }
+    });
+  }
+
+
   getTutor() {
-    this.dashboardService.getTutorEditar({ pipe: 'selecao-modelo' }).subscribe({
+    const params = {
+      pipe: 'selecao-modelo',
+      tipos: {
+        tipoAprendizado: this.tipoAprendizado,
+        subTipoAprendizado: this.subTipoAprendizado,
+      }
+    }
+    this.dashboardService.getTutorEditar(params).subscribe({
       next: (res: any) => {
         this.idTutor = res.id;
 
-        // Atualiza o texto principal
-        this.formConfTutorSelecaoModelo.patchValue({
-          texto_pipe: res?.texto_pipe || ''
-        });
-
-        // Atualiza supervisionado e nao_supervisionado
-        ['supervisionado', 'nao_supervisionado'].forEach(grupo => {
-          const grupoData = res?.tipos?.[grupo];
-          if (!grupoData) return;
-
-          const grupoForm = this.formConfTutorSelecaoModelo.get(`tipos.${grupo}`) as FormGroup;
-          if (grupoData.explicacao !== undefined) {
-            grupoForm.patchValue({ explicacao: grupoData.explicacao });
-          }
-
-          // Atualiza subgrupos
-          Object.keys(grupoData).forEach(sub => {
-            if (sub === 'explicacao') return;
-
-            const subData = grupoData[sub];
-            const subForm = grupoForm.get(sub) as FormGroup;
-            if (!subForm) return;
-
-            if (subData.explicacao !== undefined) {
-              subForm.patchValue({ explicacao: subData.explicacao });
-            }
-          });
-        });
+        console.log("getTutor =>> ", res)
 
         this.erroTutor = false;
       },
@@ -95,6 +128,21 @@ export class TutorSelecaoModeloComponent implements OnChanges {
       }
     });
   }
+
+  getArrayModelos() {
+    console.log('getArrayModelos ', this.modelos[this.tipoModeloSelecionado])
+    const mod = this.modelos[this.tipoModeloSelecionado];
+    const chave = this.modelosMap[this.tipoModeloSelecionado];
+    const metricasArray = this.formConfTutorSelecaoModelo.get(chave) as FormArray;
+    metricasArray.clear(); // agora funciona
+    (mod || []).forEach((m: any) => {
+      metricasArray.push(this.formBuilder.group({
+        explicacao: [m.explicacao, Validators.required],
+      }));
+    });
+  }
+
+
 
   putTutor() {
     const body = {
@@ -110,6 +158,21 @@ export class TutorSelecaoModeloComponent implements OnChanges {
       }
     });
   }
+
+  get classficacaoArray(): FormArray {
+    return this.formConfTutorSelecaoModelo.get('classficacao') as FormArray;
+  }
+
+  get painelArray() {
+    if (this.tipoModeloSelecionado === 0) {
+      return this.modelos[0].map((painel: any, index: number) => ({
+        label: painel.label,
+        formGroup: (this.formConfTutorSelecaoModelo.get('classficacao') as FormArray).at(index)
+      }));
+    }
+    return this.modelos[this.tipoModeloSelecionado];
+  }
+
 
 
   removerNbspEditor(event: any, caminho: string) {
