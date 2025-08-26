@@ -93,6 +93,9 @@ export class ModalExecucaoComponent implements OnInit {
           && !this.resultadoColetaDado?.target;
         this.etapas[this.etapaAtual].proximo = !erroTreino && !erroTeste && !attSelecionado || existeTarget;
         break;
+      case SELECAO_MODELO:
+        this.funcBodyTutor();
+        break;
       case 'treino-validacao-teste':
         this.etapas[this.etapaAtual].proximo = !this.resultadoTreinamento && this.metricasDisponiveis.length === 0;
         break;
@@ -132,6 +135,7 @@ export class ModalExecucaoComponent implements OnInit {
 
   atualizarModelo(event: ItemPipeline) {
     this.modeloSelecionado = event;
+    this.funcBodyTutor();
   }
 
   async atualizarResultadoTreinamento(event: any) {
@@ -161,24 +165,32 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   atualizarVariaveis(data: any) {
+    let todosExistem = false
     if (data?.etapa) {
       this.etapaAtual = data.etapa;
       if (!this.resultadoColetaDado && data.resultadoColetaDado) {
+        todosExistem = true;
         this.atualizarResultadoColeta(data.resultadoColetaDado);
       }
       if (data.modeloSelecionado) {
+        todosExistem = true;
         this.atualizarModelo(data.modeloSelecionado);
       }
       if (data.resultadoTreinamento) {
+        todosExistem = true;
         this.atualizarResultadoTreinamento(data.resultadoTreinamento);
       }
-      if (data.metricasSelecionadas) {
+      if (data.metricasSelecionadas.length) {
+        todosExistem = true;
         this.atualizarMetricasSelecionadas(data.metricasSelecionadas);
       }
-      if (data.resultadosDasAvaliacoes) {
+      if (data.resultadosDasAvaliacoes.length) {
+        todosExistem = true;
         this.funcResultadoAvaliacoes(data.resultadosDasAvaliacoes)
       }
-
+      if (!todosExistem) {
+        this.funcBodyTutor();
+      }
     }
   }
 
@@ -217,18 +229,28 @@ export class ModalExecucaoComponent implements OnInit {
   funcBodyTutor() {
     let chaves: string[] = [];
     if (this.etapaAtual === COLETA_DADO) {
-      if (this.etapaAtual === COLETA_DADO) {
-        const totalDadosTreino = this.resultadoColetaDado?.treino?.totalDados ?? 0;
-        if (totalDadosTreino === 0) {
-          chaves = ['texto_pipe', 'planilha_treino'];
+      const totalDadosTreino = this.resultadoColetaDado?.treino?.totalDados ?? 0;
+      if (totalDadosTreino === 0) {
+        chaves = ['texto_pipe', 'planilha_treino'];
+      } else {
+        const arquivoTeste = this.resultadoColetaDado?.teste?.nomeArquivo ?? '';
+        if (arquivoTeste.length === 0) {
+          chaves = ['planilha_treino', 'divisao_entre_treino_teste', 'target', 'atributos'];
         } else {
-          const arquivoTeste = this.resultadoColetaDado?.teste?.nomeArquivo ?? '';
-          if (arquivoTeste.length === 0) {
-            chaves = ['planilha_treino', 'divisao_entre_treino_teste', 'target', 'atributos'];
-          } else {
-            chaves = ['planilha_treino', 'planilha_teste'];
-          }
+          chaves = ['planilha_treino', 'planilha_teste', 'target', 'atributos'];
         }
+      }
+    } else if (this.etapaAtual === SELECAO_MODELO) {
+      const dadosRotulados = this.resultadoColetaDado?.dadosRotulados;
+      const preverCategoria = this.resultadoColetaDado?.preverCategoria;
+      if (preverCategoria && dadosRotulados) {
+        chaves = ['texto_pipe', 'tipos.supervisionado.explicacao', 'tipos.supervisionado.classficacao.explicacao'];
+      } else if (!preverCategoria && dadosRotulados) {
+        chaves = ['texto_pipe', 'tipos.supervisionado.explicacao', 'tipos.supervisionado.regressao.explicacao'];
+      } else if (preverCategoria && !dadosRotulados) {
+        chaves = ['texto_pipe', 'tipos.nao_supervisionado.explicacao', 'tipos.nao_supervisionado.agrupamento.explicacao'];
+      } else if (!preverCategoria && !dadosRotulados) {
+        chaves = ['texto_pipe', 'tipos.nao_supervisionado.explicacao', 'tipos.nao_supervisionado.reducao_dimensionalidade.explicacao'];
       }
     }
 
