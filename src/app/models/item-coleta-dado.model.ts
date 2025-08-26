@@ -63,7 +63,7 @@ export interface ItemPipeline {
   preverCategoria: boolean,
   dadosRotulados: boolean
   valor: string;
-  id: number;
+  id: string;
   resumo?: string;
   tipo?: TipoTarget;
   hiperparametros?: any[];

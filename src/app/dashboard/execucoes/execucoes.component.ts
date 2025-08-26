@@ -1,13 +1,9 @@
-import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
-import { BodyTutor, ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
+import { ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
 import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.component';
-import tutor from '../../constants/tutor.json';
-import { isEqual } from 'lodash';
 import { Subject, takeUntil } from 'rxjs';
-
 
 
 @Component({

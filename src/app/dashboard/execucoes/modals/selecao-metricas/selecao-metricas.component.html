@@ -1,5 +1,8 @@
-<div *ngFor="let metrica of metricasDisponiveis">
-  <mat-checkbox [checked]="metrica.movido" (change)="toggleMetrica(metrica)">
-    {{ metrica.label }}
-  </mat-checkbox>
-</div>
+<ng-container *ngIf="metricasDisponiveis.length">
+  <div *ngFor="let metrica of metricasDisponiveis">
+    <mat-checkbox (change)="toggleMetrica(metrica)" [(ngModel)]="metrica.movido">
+      {{ metrica?.label }}
+    </mat-checkbox>
+  </div>
+
+</ng-container>

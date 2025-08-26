@@ -28,7 +28,8 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   cont = 0;
 
   ngOnChanges(changes: SimpleChanges): void {
-    const naoExisteAvaliacao = Object.keys(this.resultadosDasAvaliacoes).length === 0
+
+    const naoExisteAvaliacao = Object.keys(this.resultadosDasAvaliacoes).length === 0;
     if (naoExisteAvaliacao) {
       this.postAvaliacao();
     }
