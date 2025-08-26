@@ -23,6 +23,7 @@ export class ExecucoesComponent implements OnInit {
 
   tutor: any;
   paramsTutor = '';
+  etapaAtual = '';
 
   itens: ItemPipeline[] = [];
   colunaColeta: ItemPipeline[] = [];
@@ -58,14 +59,14 @@ export class ExecucoesComponent implements OnInit {
 
 
   abrirModalExecucao(item: ItemPipeline): void {
-    this.getTutor(item.tipoItem);
+    // this.getTutor(item.tipoItem);
     const dialogRef = this.dialog.open(ModalExecucaoComponent, {
       maxWidth: 'none',
       width: 'auto',
       disableClose: true,
       hasBackdrop: false,
       data: {
-        etapa: item.tipoItem,
+        etapa: item.tipoItem === 'metrica' ? 'avaliacao' : item.tipoItem === 'treino-validacao-teste' ? 'treinamento' : item.tipoItem,
         resultadoColetaDado: this.resultadoColetaDado,
         modeloSelecionado: item.tipoItem === 'treino-validacao-teste' ? item : this.modeloSelecionado,
         resultadoTreinamento: this.resultadoTreinamento,
@@ -93,6 +94,7 @@ export class ExecucoesComponent implements OnInit {
     const params = this.criarBody(etapa, chaves)
     if (params !== this.paramsTutor) {
       this.paramsTutor = params;
+      this.etapaAtual = this.etapaAtual;
       this.dashboardService.getTutor(this.paramsTutor).subscribe({
         next: async (res: any) => {
           if (res.descricao) {

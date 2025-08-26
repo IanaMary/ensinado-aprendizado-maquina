@@ -6,9 +6,9 @@ import tutor from '../../../../constants/tutor.json';
 
 const COLETA_DADO = 'coleta-dado';
 const SELECAO_MODELO = 'selecao-modelo';
-const TREINO_VALIDACAO_TESTE = 'treino-validacao-teste';
-const SELECAO_METRICAS = 'selecao-das-metricas';
-const METRICA = 'metrica'
+const TREINAMENTO = 'treinamento';
+const SELECAO_METRICAS = 'selecao-metricas';
+const AVALIACAO = 'avaliacao'
 
 
 @Component({
@@ -29,9 +29,9 @@ export class ModalExecucaoComponent implements OnInit {
   etapas: Record<string, { indice: number; proximo: boolean; titulo: string; botaoProximo?: string }> = {
     [COLETA_DADO]: { indice: 0, proximo: true, titulo: 'Importar Planilha' },
     [SELECAO_MODELO]: { indice: 1, proximo: false, titulo: 'Seleção do Modelo', botaoProximo: 'Treinar' },
-    [TREINO_VALIDACAO_TESTE]: { indice: 2, proximo: true, titulo: 'Treinamento' },
+    [TREINAMENTO]: { indice: 2, proximo: true, titulo: 'Treinamento' },
     [SELECAO_METRICAS]: { indice: 3, proximo: true, titulo: 'Seleção das Métricas' },
-    [METRICA]: { indice: 4, proximo: true, titulo: 'Visualizar Avaliações' }
+    [AVALIACAO]: { indice: 4, proximo: true, titulo: 'Visualizar Avaliações' }
   };
 
   etapaKeys = Object.keys(this.etapas);
@@ -96,14 +96,16 @@ export class ModalExecucaoComponent implements OnInit {
       case SELECAO_MODELO:
         this.funcBodyTutor();
         break;
-      case 'treino-validacao-teste':
+      case TREINAMENTO:
         this.etapas[this.etapaAtual].proximo = !this.resultadoTreinamento && this.metricasDisponiveis.length === 0;
+        this.funcBodyTutor();
         break;
-      case 'selecao-das-metricas':
+      case SELECAO_METRICAS:
         this.etapas[this.etapaAtual].proximo = this.metricasSelecionadas.length === 0;
+        this.funcBodyTutor();
         break;
-      case 'metrica':
-        this.etapas[this.etapaAtual].proximo = true;
+      case AVALIACAO:
+        this.funcBodyTutor();
         break;
       default:
         this.etapas[this.etapaAtual].proximo = false;
@@ -252,6 +254,10 @@ export class ModalExecucaoComponent implements OnInit {
       } else if (!preverCategoria && !dadosRotulados) {
         chaves = ['texto_pipe', 'tipos.nao_supervisionado.explicacao', 'tipos.nao_supervisionado.reducao_dimensionalidade.explicacao'];
       }
+    } else if (this.etapaAtual === TREINAMENTO || this.etapaAtual === AVALIACAO) {
+      chaves = ['texto_pipe', 'explicacao'];
+    } else if (this.etapaAtual === SELECAO_METRICAS) {
+      chaves = ['texto_pipe', 'explicacao'];
     }
 
     this.emitTutor(chaves);
