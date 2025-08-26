@@ -1,26 +1,30 @@
-<table>
-  <thead>
-    <tr>
-      <th>Métrica</th>
-      <th *ngFor="let modelo of modelosAvaliados">{{ modelo }}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let metrica of metricsAvaliadas">
-      <td>{{ metrica }}</td>
-      <td *ngFor="let modelo of modelosAvaliados">
-        {{
-        isNumber(resultadosDasAvaliacoes[metrica]?.[modelo])
-        ? (resultadosDasAvaliacoes[metrica][modelo] | number: '1.2-4')
-        : resultadosDasAvaliacoes[metrica]?.[modelo] || '-'
-        }}
-      </td>
-    </tr>
-  </tbody>
-</table>
+<nav class="modal-coleta">
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Métrica</th>
+          <th *ngFor="let modelo of modelosAvaliados">{{ modelo }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let metrica of metricsAvaliadas">
+          <td>{{ metrica }}</td>
+          <td *ngFor="let modelo of modelosAvaliados">
+            {{
+            isNumber(resultadosDasAvaliacoes[metrica]?.[modelo])
+            ? (resultadosDasAvaliacoes[metrica][modelo] | number: '1.2-4')
+            : resultadosDasAvaliacoes[metrica]?.[modelo] || '-'
+            }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-<section class="acoes">
-  <button mat-raised-button color="primary" (click)="postAvaliacao()">
-    Gerar avaliações
-  </button>
-</section>
+  <section class="acoes">
+    <button mat-raised-button color="primary" (click)="postAvaliacao()">
+      Gerar avaliações
+    </button>
+  </section>
+</nav>

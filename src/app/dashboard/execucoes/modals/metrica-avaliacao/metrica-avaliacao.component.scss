@@ -1,52 +1,59 @@
-@use "../../../../../styles/colores.scss" as *;
+@import '../../../../../styles/styles.scss';
 
-.modal {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 1rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow-x: auto;
-  font-family: Arial, sans-serif;
-}
 
-.resultado-container {
-  margin-top: 1rem;
-  overflow-x: auto;
-}
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-th,
-td {
-  border: 1px solid #ccc;
-  padding: 0.75rem;
-  text-align: center;
-  word-wrap: break-word;
-  white-space: normal;
-  max-width: 200px;
-}
-
-th {
-  background-color: #f0f0f0;
-  font-weight: bold;
-}
-
-td {
-  background-color: #fafafa;
-}
-
-.acoes {
+.modal-coleta {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-}
+  flex-direction: column;
+  width: 100%;
 
-button {
-  min-width: 150px;
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+
+    table {
+      width: max-content;
+      /* permite que a tabela cresça horizontalmente */
+      border-collapse: collapse;
+      table-layout: fixed;
+      /* fixa largura das colunas */
+
+
+      th,
+      td {
+        width: 80px;
+        border: 1px solid #ccc;
+        padding: 0.5rem;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        /* corta texto que ultrapassa */
+      }
+
+      th {
+        background-color: #f0f0f0;
+        font-weight: bold;
+      }
+
+      td {
+        background-color: #fafafa;
+      }
+    }
+
+
+  }
+
+
+
+  .acoes {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  button {
+    min-width: 150px;
+  }
 }

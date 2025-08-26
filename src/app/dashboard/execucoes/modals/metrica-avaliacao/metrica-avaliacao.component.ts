@@ -13,14 +13,13 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   @Input() resultadoTreinamento: any;
   @Input() resultadosDasAvaliacoes: any = {};
   @Input() metricasSelecionadas: ItemPipeline[] = [];
+
+  @Output() atualizarResultadoAvaliacoes = new EventEmitter<any>();
+
   itensMetricas: ItemPipeline[] = [];
   modelosAvaliados: string[] = [];
   metricsAvaliadas: string[] = [];
 
-
-
-
-  @Output() atualizarResultadoAvaliacoes = new EventEmitter<any>();
 
   private mapaLabel = new Map<string, string>();
 
@@ -28,11 +27,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   cont = 0;
 
   ngOnChanges(changes: SimpleChanges): void {
-
-    const naoExisteAvaliacao = Object.keys(this.resultadosDasAvaliacoes).length === 0;
-    if (naoExisteAvaliacao) {
-      this.postAvaliacao();
-    }
+    this.postAvaliacao();
   }
 
   ngOnInit(): void {

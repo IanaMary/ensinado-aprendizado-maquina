@@ -30,7 +30,7 @@
 
   // Gaveta fechada → só a main-content: 650px
   &:not(.expanded) {
-    width: 650px !important;
+    // width: 650px !important;
   }
 
   .main-content {
