@@ -41,10 +41,11 @@ export class TutorSelecaoModeloComponent implements OnChanges {
     private readonly notificacao: NotificacaoService
   ) {
     this.formConfTutorSelecaoModelo = this.formBuilder.group({
-      classficacao: this.formBuilder.array([], Validators.required),
-      regressao: this.formBuilder.array([], Validators.required),
-      reducao_dimensionalidade: this.formBuilder.array([], Validators.required),
-      agrupamento: this.formBuilder.array([], Validators.required)
+      classficacao: this.formBuilder.array([]),
+      regressao: this.formBuilder.array([]),
+      agrupamento: this.formBuilder.array([]),
+      reducao_dimensionalidade: this.formBuilder.array([])
+
     });
   }
 
@@ -149,7 +150,24 @@ export class TutorSelecaoModeloComponent implements OnChanges {
 
   putTutor() {
     const body = {
-      contexto: this.formConfTutorSelecaoModelo.value
+      contexto: {
+        supervisionado: {
+          classficacao: {
+            modelos: this.formConfTutorSelecaoModelo.value.classficacao
+          },
+          regressao: {
+            modelos: this.formConfTutorSelecaoModelo.value.regressao
+          },
+        },
+        nao_supervisionado: {
+          agrupamento: {
+            modelos: this.formConfTutorSelecaoModelo.value.agrupamento
+          },
+          reducao_dimensionalidade: {
+            modelos: this.formConfTutorSelecaoModelo.value.reducao_dimensionalidade
+          }
+        }
+      }
     }
     this.dashboardService.putTutor(body, this.idTutor).subscribe({
       next: (res: any) => {
