@@ -186,16 +186,20 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   }
 
-  putConfiguracaoTreino() {
+  preverCategoriaDadosRotulados(bool: boolean) {
+    const dadoss_rotulados = this.resultColetaDadoL.dadosRotulados ?? false;
+    this.resultColetaDadoL.target = dadoss_rotulados && bool ? this.resultColetaDadoL.target : '';
+    this.putConfiguracaoTreino();
+  }
 
-    const daods_rotulados = this.resultColetaDadoL.dadosRotulados ?? false;
+  putConfiguracaoTreino() {
+    const dadoss_rotulados = this.resultColetaDadoL.dadosRotulados ?? false;
     const prever_categoria = this.resultColetaDadoL.preverCategoria ?? false;
-    this.resultColetaDadoL.target = daods_rotulados ? this.resultColetaDadoL.target : '';
     const body = {
       target: this.resultColetaDadoL.target,
       atributos: this.resultColetaDadoL.atributos,
       prever_categoria: prever_categoria,
-      daods_rotulados: daods_rotulados,
+      daods_rotulados: dadoss_rotulados,
     }
 
     this.dashboardService.putColetaConfig('xlxs', this.idConfigurcacaoTreinamento, body).subscribe({

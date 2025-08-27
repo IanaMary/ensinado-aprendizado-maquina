@@ -39,9 +39,11 @@
       <nav class="configuracao-inicial">
         <div class="configuracao-generica">
           <section class="example-section">
-            <mat-checkbox (change)="putConfiguracaoTreino()" [(ngModel)]="resultColetaDadoL.preverCategoria"> Prever uma
+            <mat-checkbox (change)="preverCategoriaDadosRotulados(false)"
+              [(ngModel)]="resultColetaDadoL.preverCategoria"> Prever uma
               categoria </mat-checkbox>
-            <mat-checkbox (change)="putConfiguracaoTreino()" [(ngModel)]="resultColetaDadoL.dadosRotulados"> Dados
+            <mat-checkbox (change)="preverCategoriaDadosRotulados(true)" [(ngModel)]="resultColetaDadoL.dadosRotulados">
+              Dados
               rotulados </mat-checkbox>
           </section>
         </div>
