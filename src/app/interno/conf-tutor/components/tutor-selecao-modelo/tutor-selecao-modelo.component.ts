@@ -51,20 +51,19 @@ export class TutorSelecaoModeloComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.atualizar) {
-      this.getTutor();
+      this.onTipoModelo();
     }
   }
 
 
-  getTutor() {
-    this.dashboardService.getTutorEditar({ pipe: 'selecao-modelo' }).subscribe({
+  getTutor(params: any) {
+    console.log('params', params)
+    this.dashboardService.getTutorEditar(params).subscribe({
       next: (res: any) => {
+        console.log(res)
         this.idTutor = res.id;
-        this.modelos[0] = res.supervisionado.classficacao.modelos;
-        this.modelos[1] = res.supervisionado.regressao.modelos;
-        this.modelos[2] = res.nao_supervisionado.agrupamento.modelos;
-        this.modelos[3] = res.nao_supervisionado.reducao_dimensionalidade.modelos;
-        this.onTipoModelo();
+        this.modelos[this.tipoModeloSelecionado] = res.modelos;
+        this.getArrayModelos();
         this.erroTutor = false;
       },
       error: (error: any) => {
@@ -76,8 +75,7 @@ export class TutorSelecaoModeloComponent implements OnChanges {
 
 
   onTipoModelo() {
-    // if (!this.modelos[this.tipoModeloSelecionado].length) {
-    if (!this.tabs[this.tipoModeloSelecionado]) {
+    if (!this.modelos[this.tipoModeloSelecionado].length) {
       let prever_categoria = false;
       let dados_rotulados = false;
 
@@ -107,18 +105,19 @@ export class TutorSelecaoModeloComponent implements OnChanges {
           this.subTipoAprendizado = 'reducao_dimensionalidade';
           break;
       }
-      // const aux = {
-      //   prever_categoria: prever_categoria,
-      //   dados_rotulados: dados_rotulados
-      // }
-      // const params = new URLSearchParams(aux as any).toString();
-      // this.getModelos(params);
-      this.getArrayModelos();
+
+      const aux = new URLSearchParams();
+      aux.append('pipe', 'selecao-modelo');
+      aux.append('modelos', this.tipoAprendizado);
+      aux.append('modelos', this.subTipoAprendizado);
+
+      const params = aux.toString();
+
+      this.getTutor(params);
     }
   }
 
   getArrayModelos() {
-    this.tabs[this.tipoModeloSelecionado] = true;
     const mod = this.modelos[this.tipoModeloSelecionado];
     const chave = this.modelosMap[this.tipoModeloSelecionado];
     const metricasArray = this.formConfTutorSelecaoModelo.get(chave) as FormArray;
@@ -133,43 +132,30 @@ export class TutorSelecaoModeloComponent implements OnChanges {
 
   }
 
-  getModelos(params: any) {
-    this.dashboardService.getModelosParams(params).subscribe({
-      next: (res: any) => {
-        this.modelos[this.tipoModeloSelecionado] = res;
-        this.getArrayModelos();
-        // this.getTutor();
-      },
-      error: (error: any) => {
-        this.erroTutor = true;
-        this.notificacao.erro('Erro ao buscar dados da seleção do modelo!');
-      }
-    });
-  }
-
-
   putTutor() {
-    const body = {
-      contexto: {
-        supervisionado: {
-          classficacao: {
-            modelos: this.formConfTutorSelecaoModelo.value.classficacao
-          },
-          regressao: {
-            modelos: this.formConfTutorSelecaoModelo.value.regressao
-          },
-        },
-        nao_supervisionado: {
-          agrupamento: {
-            modelos: this.formConfTutorSelecaoModelo.value.agrupamento
-          },
-          reducao_dimensionalidade: {
-            modelos: this.formConfTutorSelecaoModelo.value.reducao_dimensionalidade
-          }
-        }
-      }
+    const cam = this.modelosMap[this.tipoModeloSelecionado];
+
+    // Cria o body dinamicamente
+    const body: any = { contexto: {} };
+
+    // Garante que o tipoAprendizado exista
+    if (!body.contexto[this.tipoAprendizado]) {
+      body.contexto[this.tipoAprendizado] = {};
     }
-    this.dashboardService.putTutor(body, this.idTutor).subscribe({
+
+    // Adiciona o subTipoAprendizado com os modelos
+    body.contexto[this.tipoAprendizado][this.subTipoAprendizado] = {
+      modelos: this.formConfTutorSelecaoModelo.value[cam]
+    };
+
+    // Monta os parâmetros da query
+    const aux = new URLSearchParams();
+    aux.append('modelos', this.tipoAprendizado);
+    aux.append('modelos', this.subTipoAprendizado);
+    const params = aux.toString();
+
+    // Chama o serviço
+    this.dashboardService.putTutorParams(body, this.idTutor, params).subscribe({
       next: (res: any) => {
         this.notificacao.sucesso('Edição feita com sucesso!');
       },
@@ -178,6 +164,7 @@ export class TutorSelecaoModeloComponent implements OnChanges {
       }
     });
   }
+
 
 
   removerNbspEditor(event: any, caminho: string) {

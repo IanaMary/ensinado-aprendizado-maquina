@@ -13,8 +13,7 @@
   <mat-divider class="linha"></mat-divider>
 
   <!-- Seleção do tipo de aprendizado -->
-  <mat-radio-group (change)="getArrayModelos()" [(ngModel)]="tipoModeloSelecionado"
-    [ngModelOptions]="{standalone: true}">
+  <mat-radio-group (change)="onTipoModelo()" [(ngModel)]="tipoModeloSelecionado" [ngModelOptions]="{standalone: true}">
     <mat-radio-button [value]="0">Classificação</mat-radio-button>
     <mat-radio-button [value]="1">Regressão</mat-radio-button>
     <mat-radio-button [value]="2">Agrupamento</mat-radio-button>

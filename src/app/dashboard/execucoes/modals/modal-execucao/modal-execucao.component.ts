@@ -245,14 +245,15 @@ export class ModalExecucaoComponent implements OnInit {
     } else if (this.etapaAtual === SELECAO_MODELO) {
       const dadosRotulados = this.resultadoColetaDado?.dadosRotulados;
       const preverCategoria = this.resultadoColetaDado?.preverCategoria;
+      console.log("selecao ", this.modeloSelecionado)
       if (preverCategoria && dadosRotulados) {
-        chaves = ['texto_pipe', 'tipos.supervisionado.explicacao', 'tipos.supervisionado.classficacao.explicacao'];
+        chaves = ['texto_pipe', 'supervisionado.explicacao', 'supervisionado.classficacao.explicacao'];
       } else if (!preverCategoria && dadosRotulados) {
-        chaves = ['texto_pipe', 'tipos.supervisionado.explicacao', 'tipos.supervisionado.regressao.explicacao'];
+        chaves = ['texto_pipe', 'supervisionado.explicacao', 'supervisionado.regressao.explicacao'];
       } else if (preverCategoria && !dadosRotulados) {
-        chaves = ['texto_pipe', 'tipos.nao_supervisionado.explicacao', 'tipos.nao_supervisionado.agrupamento.explicacao'];
+        chaves = ['texto_pipe', 'nao_supervisionado.explicacao', 'nao_supervisionado.agrupamento.explicacao'];
       } else if (!preverCategoria && !dadosRotulados) {
-        chaves = ['texto_pipe', 'tipos.nao_supervisionado.explicacao', 'tipos.nao_supervisionado.reducao_dimensionalidade.explicacao'];
+        chaves = ['texto_pipe', 'nao_supervisionado.explicacao', 'nao_supervisionado.reducao_dimensionalidade.explicacao'];
       }
     } else if (this.etapaAtual === TREINAMENTO || this.etapaAtual === AVALIACAO) {
       chaves = ['texto_pipe', 'explicacao'];

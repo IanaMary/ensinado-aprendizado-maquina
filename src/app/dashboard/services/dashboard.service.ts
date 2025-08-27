@@ -59,6 +59,10 @@ export class DashboardService {
     return this.http.put(`${this.url}${this.endpointTutor}/${id}`, body);
   }
 
+  putTutorParams(body: any, id: string, params: any) {
+    return this.http.put(`${this.url}${this.endpointTutor}/${id}?${params}`, body);
+  }
+
   postColetaArquivo(tipo: string, body: any) {
     return this.http.post(`${this.url}${this.endpointColeta}salvar_${tipo}`, body);
   }
