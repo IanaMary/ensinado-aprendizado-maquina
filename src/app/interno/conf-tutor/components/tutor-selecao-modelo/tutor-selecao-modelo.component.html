@@ -13,7 +13,8 @@
   <mat-divider class="linha"></mat-divider>
 
   <!-- Seleção do tipo de aprendizado -->
-  <mat-radio-group (change)="onTipoModelo()" [(ngModel)]="tipoModeloSelecionado" [ngModelOptions]="{standalone: true}">
+  <mat-radio-group (change)="getArrayModelos()" [(ngModel)]="tipoModeloSelecionado"
+    [ngModelOptions]="{standalone: true}">
     <mat-radio-button [value]="0">Classificação</mat-radio-button>
     <mat-radio-button [value]="1">Regressão</mat-radio-button>
     <mat-radio-button [value]="2">Agrupamento</mat-radio-button>
@@ -36,7 +37,8 @@
               <nav class="texto-label">
                 Explicação sobre o modelo
               </nav>
-              <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+              <quill-editor (onContentChanged)="removerNbspEditor($event, 'classficacao.' + i + '.explicacao')"
+                [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
               </quill-editor>
             </div>
           </ng-container>
@@ -47,19 +49,38 @@
               <nav class="texto-label">
                 Explicação sobre o modelo
               </nav>
-              <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+              <quill-editor (onContentChanged)="removerNbspEditor($event, 'regressao.' + i + '.explicacao')"
+                [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+              </quill-editor>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="tipoModeloSelecionado === 2">
+          <ng-container formArrayName="agrupamento">
+            <div [formGroupName]="i">
+              <nav class="texto-label">
+                Explicação sobre o modelo
+              </nav>
+              <quill-editor (onContentChanged)="removerNbspEditor($event, 'agrupamento.' + i + '.explicacao')"
+                [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+              </quill-editor>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="tipoModeloSelecionado === 3">
+          <ng-container formArrayName="reducao_dimensionalidade">
+            <div [formGroupName]="i">
+              <nav class="texto-label">
+                Explicação sobre o modelo
+              </nav>
+              <quill-editor
+                (onContentChanged)="removerNbspEditor($event, 'reducao_dimensionalidade.' + i + '.explicacao')"
+                [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
               </quill-editor>
             </div>
           </ng-container>
         </ng-container>
       </form>
-
-
-
     </mat-expansion-panel>
   </mat-accordion>
-
-
-
-
 </div>

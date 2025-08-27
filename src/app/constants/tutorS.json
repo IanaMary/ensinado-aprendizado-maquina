@@ -1,112 +1,118 @@
-{
-  "tutorS": [
-    {
-      "pipe": "inicio",
-      "texto-pipe": "texto sobre a importação"
-    },
-    {
-      "pipe": "coleta_dado",
-      "texto-pipe": "texto sobre a importação",
-      "planilha_de_treino": "explicar os dados de treino",
-      "planilha_de_teste": "texto sobre os dados de teste",
-      "divisao_entre_teste": "divisão entre treino e teste",
-      "target": "explicas",
-      "atributos": "explicas"
-    },
-    {
-      "pipe": "selecao_modelo",
-      "texto-pipe": "texto sobre a selecao",
-      "tipos": {
-        "nao_supervisionado": {
-          "explicacao": "explicacao",
-          "reducao_dimensionalidade": {
+[
+  {
+    "pipe": "inicio",
+    "texto-pipe": "texto sobre a importação",
+    "explicacao": "<p>Vamos começar escolhendo um formato para coletar os dados. Existem algumas opções disponíveis, como arquivos .xlsx, .csv e .json. Cada um desses formatos possui características específicas, então é importante entender as diferenças para decidir qual se adapta melhor ao seu objetivo.</p><p></p><ul><li>O .xlsx é o formato padrão de planilhas do Excel, ideal quando os dados estão organizados em tabelas e podem conter múltiplas abas.</li><li>O .csv é uma versão mais simples, onde os dados são separados por vírgulas — excelente para quando você precisa de um arquivo leve e fácil de processar.</li><li>O .json é um formato muito usado em aplicações web e APIs, ideal para dados mais estruturados ou hierárquicos.</li></ul>",
+    "texto_pipe": ""
+  },
+  {
+    "pipe": "coleta-dado",
+    "explicacao": "",
+    "target": "<p><span style=\"color: var(--mat-radio-label-text-color, var(--mat-sys-on-surface));\">Explicação sobre a target</span></p><p></p><p></p>",
+    "atributos": "<p><span style=\"color: rgb(0, 0, 0);\">Explicação sobre a atributos</span></p>",
+    "texto_pipe": "<p><span style=\"color: rgb(0, 0, 0);\">Explicação sobre a etapa de coleta</span></p>",
+    "planilha_treino": "<p><span style=\"color: var(--mat-radio-label-text-color, var(--mat-sys-on-surface));\">Explicação sobre a planilha de treino</span></p><p></p><p></p>",
+    "planilha_teste": "<p><span style=\"color: rgb(0, 0, 0);\">Explicação sobre a planilha de teste</span></p>",
+    "divisao_entre_treino_teste": "<p><span style=\"color: var(--mat-radio-label-text-color, var(--mat-sys-on-surface));\">Explicação sobre a divisão entre treino e teste</span></p>"
+  },
+  {
+    "pipe": "selecao-modelo",
+    "nao_supervisionado": {
+      "explicacao": "nao_supervisionado",
+      "reducao_dimensionalidade": {
+        "explicacao": "reducao_dimensionalidade",
+        "modelos": [
+          {
+            "label": "PCA",
+            "valor": "pca",
             "explicacao": "explicacao",
-            "modelos": [
-              {
-                "label": "k-NN",
-                "valor": "knn",
-                "explicacao": "explicacao",
-                "hiperparametros": [
-                  {
-                    "nome": "nome",
-                    "explicacao": "explicacao"
-                  }
-                ]
-              }
-            ]
-          },
-          "agrupamento": {
-            "explicacao": "explicacao",
-            "modelos": [
-              {
-                "label": "k-NN",
-                "valor": "knn",
-                "explicacao": "explicacao",
-                "hiperparametros": [
-                  {
-                    "nome": "nome",
-                    "explicacao": "explicacao"
-                  }
-                ]
-              }
-            ]
+            "hiperparametros": []
           }
-        },
-        "supervisionado": {
-          "explicacao": "explicacao",
-          "classficacao": {
+        ]
+      },
+      "agrupamento": {
+        "explicacao": "explicacao",
+        "modelos": [
+          {
+            "label": "K-means",
+            "valor": "k_means",
             "explicacao": "explicacao",
-            "modelos": [
-              {
-                "label": "k-NN",
-                "valor": "knn",
-                "explicacao": "explicacao",
-                "hiperparametros": [
-                  {
-                    "nome": "nome",
-                    "explicacao": "explicacao"
-                  }
-                ]
-              }
-            ]
-          },
-          "regressao": {
-            "explicacao": "explicacao",
-            "modelos": [
-              {
-                "label": "k-NN",
-                "valor": "knn",
-                "explicacao": "explicacao",
-                "hiperparametros": [
-                  {
-                    "nome": "nome",
-                    "explicacao": "explicacao"
-                  }
-                ]
-              }
-            ]
+            "hiperparametros": []
           }
-        }
+        ]
       }
     },
-    {
-      "pipe": "treinamento",
-      "texto-pipe": "texto sobre o treinamento"
+    "supervisionado": {
+      "explicacao": "explicacao",
+      "classficacao": {
+        "explicacao": "explicacao",
+        "modelos": [
+          {
+            "label": "k-NN",
+            "valor": "knn",
+            "explicacao": "explicacao",
+            "hiperparametros": [
+              {
+                "nome": "nome",
+                "explicacao": "explicacao"
+              }
+            ]
+          },
+          {
+            "label": "Árvore de Decisão",
+            "valor": "arvore_decisao",
+            "explicacao": "explicacao",
+            "hiperparametros": []
+          },
+          {
+            "label": "SVM",
+            "valor": "svm",
+            "explicacao": "explicacao",
+            "hiperparametros": []
+          },
+          {
+            "label": "Regressão Logística",
+            "valor": "regressao_logistica",
+            "explicacao": "explicacao",
+            "hiperparametros": []
+          }
+        ]
+      },
+      "regressao": {
+        "explicacao": "explicacao",
+        "modelos": [
+          {
+            "label": "Regressão Linear",
+            "valor": "regressao_linear",
+            "explicacao": "explicacao",
+            "hiperparametros": []
+          }
+        ]
+      }
     },
-    {
-      "pipe": "selecao_de_metricas",
-      "texto-pipe": "texto sobre as metricas",
-      "tipos": [
-        {
-          "label": "Acurácia",
-          "explicacao": "explicacao",
-          "valor": "accuracy_score"
-        }
-      ]
-    },
-    {
-      "pipe": "avaliação",
-      "texto-pipe": "texto sobre o avaliação"
-    }
-  ]
-}
+    "texto_pipe": "texto sobre a selecao",
+    "explicacao": ""
+  },
+  {
+    "pipe": "treinamento",
+    "texto_pipe": "texto sobre o treinamento",
+    "explicacao": ""
+  },
+  {
+    "pipe": "selecao_metricas",
+    "tipos": [
+      {
+        "label": "Acurácia",
+        "explicacao": "explicacao",
+        "valor": "accuracy_score"
+      }
+    ],
+    "texto_pipe": "texto sobre as metricas",
+    "explicacao": ""
+  },
+  {
+    "pipe": "avaliacao",
+    "texto_pipe": "texto sobre o avaliação",
+    "explicacao": ""
+  }
+]

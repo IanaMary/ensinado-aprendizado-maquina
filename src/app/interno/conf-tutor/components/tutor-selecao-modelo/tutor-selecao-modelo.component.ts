@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import modulesJson from '../../modules.json';
 import { DashboardService } from '../../../../dashboard/services/dashboard.service';
 import { NotificacaoService } from '../../../../service/notificacao.service';
@@ -25,9 +25,15 @@ export class TutorSelecaoModeloComponent implements OnChanges {
   subTipoAprendizado = 'classficacao';
 
   modelos: any[] = [[], [], [], []];
-  modelosMap: any[] = ['classficacao', 'regressao', 'reducao_dimensionalidade', 'agrupamento'];
+  modelosMap: any[] = ['classficacao', 'regressao', 'agrupamento', 'reducao_dimensionalidade'];
+  tabs = [false, false, false, false];
 
   formConfTutorSelecaoModelo: FormGroup;
+
+  classficacao = [];
+  regressao = [];
+  reducao_dimensionalidade = [];
+  agrupamento = [];
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -35,22 +41,42 @@ export class TutorSelecaoModeloComponent implements OnChanges {
     private readonly notificacao: NotificacaoService
   ) {
     this.formConfTutorSelecaoModelo = this.formBuilder.group({
-      classficacao: this.formBuilder.array([]),
-      regressao: this.formBuilder.array([]),
-      reducao_dimensionalidade: this.formBuilder.array([]),
-      agrupamento: this.formBuilder.array([])
+      classficacao: this.formBuilder.array([], Validators.required),
+      regressao: this.formBuilder.array([], Validators.required),
+      reducao_dimensionalidade: this.formBuilder.array([], Validators.required),
+      agrupamento: this.formBuilder.array([], Validators.required)
     });
   }
 
   ngOnChanges() {
     if (this.atualizar) {
-      this.onTipoModelo();
+      this.getTutor();
     }
   }
 
 
+  getTutor() {
+    this.dashboardService.getTutorEditar({ pipe: 'selecao-modelo' }).subscribe({
+      next: (res: any) => {
+        this.idTutor = res.id;
+        this.modelos[0] = res.supervisionado.classficacao.modelos;
+        this.modelos[1] = res.supervisionado.regressao.modelos;
+        this.modelos[2] = res.nao_supervisionado.agrupamento.modelos;
+        this.modelos[3] = res.nao_supervisionado.reducao_dimensionalidade.modelos;
+        this.onTipoModelo();
+        this.erroTutor = false;
+      },
+      error: (error: any) => {
+        this.erroTutor = true;
+        this.notificacao.erro('Erro ao buscar dados dos modelos!');
+      }
+    });
+  }
+
+
   onTipoModelo() {
-    if (!this.modelos[this.tipoModeloSelecionado].length) {
+    // if (!this.modelos[this.tipoModeloSelecionado].length) {
+    if (!this.tabs[this.tipoModeloSelecionado]) {
       let prever_categoria = false;
       let dados_rotulados = false;
 
@@ -80,57 +106,18 @@ export class TutorSelecaoModeloComponent implements OnChanges {
           this.subTipoAprendizado = 'reducao_dimensionalidade';
           break;
       }
-      const aux = {
-        prever_categoria: prever_categoria,
-        dados_rotulados: dados_rotulados
-      }
-      const params = new URLSearchParams(aux as any).toString();
-      this.getModelos(params);
+      // const aux = {
+      //   prever_categoria: prever_categoria,
+      //   dados_rotulados: dados_rotulados
+      // }
+      // const params = new URLSearchParams(aux as any).toString();
+      // this.getModelos(params);
+      this.getArrayModelos();
     }
-  }
-
-
-
-  getModelos(params: any) {
-    this.dashboardService.getModelosParams(params).subscribe({
-      next: (res: any) => {
-        this.modelos[this.tipoModeloSelecionado] = res;
-        this.getArrayModelos();
-        this.getTutor();
-      },
-      error: (error: any) => {
-        this.erroTutor = true;
-        this.notificacao.erro('Erro ao buscar dados da seleção do modelo!');
-      }
-    });
-  }
-
-
-  getTutor() {
-    const params = {
-      pipe: 'selecao-modelo',
-      tipos: {
-        tipoAprendizado: this.tipoAprendizado,
-        subTipoAprendizado: this.subTipoAprendizado,
-      }
-    }
-    this.dashboardService.getTutorEditar(params).subscribe({
-      next: (res: any) => {
-        this.idTutor = res.id;
-
-        console.log("getTutor =>> ", res)
-
-        this.erroTutor = false;
-      },
-      error: (error: any) => {
-        this.erroTutor = true;
-        this.notificacao.erro('Erro ao buscar dados da seleção do modelo!');
-      }
-    });
   }
 
   getArrayModelos() {
-    console.log('getArrayModelos ', this.modelos[this.tipoModeloSelecionado])
+    this.tabs[this.tipoModeloSelecionado] = true;
     const mod = this.modelos[this.tipoModeloSelecionado];
     const chave = this.modelosMap[this.tipoModeloSelecionado];
     const metricasArray = this.formConfTutorSelecaoModelo.get(chave) as FormArray;
@@ -138,17 +125,32 @@ export class TutorSelecaoModeloComponent implements OnChanges {
     (mod || []).forEach((m: any) => {
       metricasArray.push(this.formBuilder.group({
         explicacao: [m.explicacao, Validators.required],
+        label: [m.label, Validators.required],
+        valor: [m.valor, Validators.required],
       }));
     });
+
   }
 
+  getModelos(params: any) {
+    this.dashboardService.getModelosParams(params).subscribe({
+      next: (res: any) => {
+        this.modelos[this.tipoModeloSelecionado] = res;
+        this.getArrayModelos();
+        // this.getTutor();
+      },
+      error: (error: any) => {
+        this.erroTutor = true;
+        this.notificacao.erro('Erro ao buscar dados da seleção do modelo!');
+      }
+    });
+  }
 
 
   putTutor() {
     const body = {
       contexto: this.formConfTutorSelecaoModelo.value
     }
-    console.log("body => ", body)
     this.dashboardService.putTutor(body, this.idTutor).subscribe({
       next: (res: any) => {
         this.notificacao.sucesso('Edição feita com sucesso!');
@@ -159,33 +161,19 @@ export class TutorSelecaoModeloComponent implements OnChanges {
     });
   }
 
-  get classficacaoArray(): FormArray {
-    return this.formConfTutorSelecaoModelo.get('classficacao') as FormArray;
-  }
-
-  get painelArray() {
-    if (this.tipoModeloSelecionado === 0) {
-      return this.modelos[0].map((painel: any, index: number) => ({
-        label: painel.label,
-        formGroup: (this.formConfTutorSelecaoModelo.get('classficacao') as FormArray).at(index)
-      }));
-    }
-    return this.modelos[this.tipoModeloSelecionado];
-  }
-
-
 
   removerNbspEditor(event: any, caminho: string) {
     const control = this.formConfTutorSelecaoModelo.get(caminho);
     if (!control) return;
 
-    // substitui &nbsp; por espaço normal
     const valorLimpo = (event.html || '').replace(/&nbsp;/g, ' ').trim();
 
-    // só atualiza se o valor realmente mudou
-    if (valorLimpo !== control.value) {
-      control.setValue(valorLimpo, { emitEvent: false }); // evita disparar outro onContentChanged
+    if (control instanceof FormControl) {
+      if (valorLimpo !== control.value) {
+        control.setValue(valorLimpo, { emitEvent: false });
+      }
     }
   }
+
 
 }
