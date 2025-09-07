@@ -71,7 +71,7 @@ export class TutorSelecaoMetricasComponent implements OnChanges {
   }
 
   putTutor() {
-    const body = this.bodyTutor();
+    const body = this.formConfTutorSelecaoMetricas.value;
     this.dashboardService.putTutor(body, this.idTutor).subscribe({
       next: () => this.notificacao.sucesso('Edição feita com sucesso!'),
       error: () => {
@@ -79,17 +79,6 @@ export class TutorSelecaoMetricasComponent implements OnChanges {
         this.notificacao.erro('Erro ao editar!');
       }
     });
-  }
-
-  bodyTutor() {
-    const contextoOriginal = this.formConfTutorSelecaoMetricas.value;
-    const contextoTratado = Object.fromEntries(
-      Object.entries(contextoOriginal).map(([key, value]) => [
-        key,
-        typeof value === 'string' ? value.replace(/&nbsp;/g, ' ') : value
-      ])
-    );
-    return { contexto: contextoTratado };
   }
 
   get tipos(): FormArray {

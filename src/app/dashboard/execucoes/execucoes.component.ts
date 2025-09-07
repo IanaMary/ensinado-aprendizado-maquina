@@ -94,7 +94,7 @@ export class ExecucoesComponent implements OnInit {
       this.dashboardService.getTutor(this.paramsTutor).subscribe({
         next: async (res: any) => {
           if (res.descricao) {
-            this.tutor = res.descricao;
+            this.tutor = res.descricao.replace(/&nbsp;/g, ' ');
           }
         },
         error: (error: any) => { }

@@ -32,17 +32,15 @@ export class TtutorTiposAprendizadoComponent implements OnChanges {
   ) {
     this.formConfTutorSelecaoModelo = this.formBuilder.group({
       texto_pipe: [''],
-      tipos: this.formBuilder.group({
-        supervisionado: this.formBuilder.group({
-          explicacao: [''],
-          classficacao: this.formBuilder.group({ explicacao: [''] }),
-          regressao: this.formBuilder.group({ explicacao: [''] })
-        }),
-        nao_supervisionado: this.formBuilder.group({
-          explicacao: [''],
-          reducao_dimensionalidade: this.formBuilder.group({ explicacao: [''] }),
-          agrupamento: this.formBuilder.group({ explicacao: [''] })
-        })
+      supervisionado: this.formBuilder.group({
+        explicacao: [''],
+        classficacao: this.formBuilder.group({ explicacao: [''] }),
+        regressao: this.formBuilder.group({ explicacao: [''] })
+      }),
+      nao_supervisionado: this.formBuilder.group({
+        explicacao: [''],
+        reducao_dimensionalidade: this.formBuilder.group({ explicacao: [''] }),
+        agrupamento: this.formBuilder.group({ explicacao: [''] })
       })
     });
   }
@@ -63,29 +61,51 @@ export class TtutorTiposAprendizadoComponent implements OnChanges {
           texto_pipe: res?.texto_pipe || ''
         });
 
-        // Atualiza supervisionado e nao_supervisionado
-        ['supervisionado', 'nao_supervisionado'].forEach(grupo => {
-          const grupoData = res?.tipos?.[grupo];
-          if (!grupoData) return;
+        // Atualiza supervisionado
+        const supervisionadoData = res?.supervisionado;
+        if (supervisionadoData) {
+          const supervisionadoForm = this.formConfTutorSelecaoModelo.get('supervisionado') as FormGroup;
 
-          const grupoForm = this.formConfTutorSelecaoModelo.get(`tipos.${grupo}`) as FormGroup;
-          if (grupoData.explicacao !== undefined) {
-            grupoForm.patchValue({ explicacao: grupoData.explicacao });
+          if (supervisionadoData.explicacao !== undefined) {
+            supervisionadoForm.patchValue({ explicacao: supervisionadoData.explicacao });
           }
 
-          // Atualiza subgrupos
-          Object.keys(grupoData).forEach(sub => {
-            if (sub === 'explicacao') return;
+          // Atualiza subgrupos de supervisionado
+          ['classficacao', 'regressao'].forEach(sub => {
+            const subData = supervisionadoData[sub];
+            if (!subData) return;
 
-            const subData = grupoData[sub];
-            const subForm = grupoForm.get(sub) as FormGroup;
+            const subForm = supervisionadoForm.get(sub) as FormGroup;
             if (!subForm) return;
 
             if (subData.explicacao !== undefined) {
               subForm.patchValue({ explicacao: subData.explicacao });
             }
           });
-        });
+        }
+
+        // Atualiza nao_supervisionado
+        const naoSupervisionadoData = res?.nao_supervisionado;
+        if (naoSupervisionadoData) {
+          const naoSupervisionadoForm = this.formConfTutorSelecaoModelo.get('nao_supervisionado') as FormGroup;
+
+          if (naoSupervisionadoData.explicacao !== undefined) {
+            naoSupervisionadoForm.patchValue({ explicacao: naoSupervisionadoData.explicacao });
+          }
+
+          // Atualiza subgrupos de nao_supervisionado
+          ['reducao_dimensionalidade', 'agrupamento'].forEach(sub => {
+            const subData = naoSupervisionadoData[sub];
+            if (!subData) return;
+
+            const subForm = naoSupervisionadoForm.get(sub) as FormGroup;
+            if (!subForm) return;
+
+            if (subData.explicacao !== undefined) {
+              subForm.patchValue({ explicacao: subData.explicacao });
+            }
+          });
+        }
 
         this.erroTutor = false;
       },
@@ -100,7 +120,7 @@ export class TtutorTiposAprendizadoComponent implements OnChanges {
     const body = {
       contexto: this.formConfTutorSelecaoModelo.value
     }
-    this.dashboardService.putTutor(body, this.idTutor).subscribe({
+    this.dashboardService.putTutorTipoAprendizado(body, this.idTutor).subscribe({
       next: (res: any) => {
         this.notificacao.sucesso('Edição feita com sucesso!');
       },
@@ -108,20 +128,6 @@ export class TtutorTiposAprendizadoComponent implements OnChanges {
         this.notificacao.erro('Erro ao editar!');
       }
     });
-  }
-
-
-  removerNbspEditor(event: any, caminho: string) {
-    const control = this.formConfTutorSelecaoModelo.get(caminho);
-    if (!control) return;
-
-    // substitui &nbsp; por espaço normal
-    const valorLimpo = (event.html || '').replace(/&nbsp;/g, ' ').trim();
-
-    // só atualiza se o valor realmente mudou
-    if (valorLimpo !== control.value) {
-      control.setValue(valorLimpo, { emitEvent: false }); // evita disparar outro onContentChanged
-    }
   }
 
 }

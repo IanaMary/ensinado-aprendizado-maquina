@@ -36,8 +36,7 @@
               <nav class="texto-label">
                 Explicação sobre o modelo
               </nav>
-              <quill-editor (onContentChanged)="removerNbspEditor($event, 'classficacao.' + i + '.explicacao')"
-                [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+              <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
               </quill-editor>
             </div>
           </ng-container>
@@ -48,8 +47,7 @@
               <nav class="texto-label">
                 Explicação sobre o modelo
               </nav>
-              <quill-editor (onContentChanged)="removerNbspEditor($event, 'regressao.' + i + '.explicacao')"
-                [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+              <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
               </quill-editor>
             </div>
           </ng-container>
@@ -60,8 +58,7 @@
               <nav class="texto-label">
                 Explicação sobre o modelo
               </nav>
-              <quill-editor (onContentChanged)="removerNbspEditor($event, 'agrupamento.' + i + '.explicacao')"
-                [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+              <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
               </quill-editor>
             </div>
           </ng-container>
@@ -72,9 +69,7 @@
               <nav class="texto-label">
                 Explicação sobre o modelo
               </nav>
-              <quill-editor
-                (onContentChanged)="removerNbspEditor($event, 'reducao_dimensionalidade.' + i + '.explicacao')"
-                [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+              <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
               </quill-editor>
             </div>
           </ng-container>

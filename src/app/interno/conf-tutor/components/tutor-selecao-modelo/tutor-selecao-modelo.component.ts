@@ -57,10 +57,8 @@ export class TutorSelecaoModeloComponent implements OnChanges {
 
 
   getTutor(params: any) {
-    console.log('params', params)
     this.dashboardService.getTutorEditar(params).subscribe({
       next: (res: any) => {
-        console.log(res)
         this.idTutor = res.id;
         this.modelos[this.tipoModeloSelecionado] = res.modelos;
         this.getArrayModelos();
@@ -164,21 +162,5 @@ export class TutorSelecaoModeloComponent implements OnChanges {
       }
     });
   }
-
-
-
-  removerNbspEditor(event: any, caminho: string) {
-    const control = this.formConfTutorSelecaoModelo.get(caminho);
-    if (!control) return;
-
-    const valorLimpo = (event.html || '').replace(/&nbsp;/g, ' ').trim();
-
-    if (control instanceof FormControl) {
-      if (valorLimpo !== control.value) {
-        control.setValue(valorLimpo, { emitEvent: false });
-      }
-    }
-  }
-
 
 }

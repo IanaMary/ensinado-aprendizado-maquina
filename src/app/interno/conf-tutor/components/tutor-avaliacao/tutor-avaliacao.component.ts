@@ -60,7 +60,7 @@ export class TutorAvaliacaoComponent implements OnChanges {
   }
 
   putTutor() {
-    const body = this.bodyTutor();
+    const body = this.formConfTutorAvaliacao.value;
     this.dashboardService.putTutor(body, this.idTutor).subscribe({
       next: async (res: any) => {
         this.notificacao.sucesso('Edição feita com sucesso!');
@@ -72,17 +72,5 @@ export class TutorAvaliacaoComponent implements OnChanges {
     });
   }
 
-
-  bodyTutor() {
-    const contextoOriginal = this.formConfTutorAvaliacao.value;
-    const contextoTratado = Object.fromEntries(
-      Object.entries(contextoOriginal).map(([key, value]) => {
-        return [key, typeof value === 'string' ? value.replace(/&nbsp;/g, ' ') : value];
-      })
-    );
-    return {
-      contexto: contextoTratado
-    };
-  }
 
 }

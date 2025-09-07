@@ -60,7 +60,9 @@ export class TutorTreinamentoComponent implements OnChanges {
   }
 
   putTutor() {
-    const body = this.bodyTutor();
+    const body = {
+      contexto: this.formConfTutorTreinamento.value
+    }
     this.dashboardService.putTutor(body, this.idTutor).subscribe({
       next: async (res: any) => {
         this.notificacao.sucesso('Edição feita com sucesso!');
@@ -70,19 +72,6 @@ export class TutorTreinamentoComponent implements OnChanges {
         this.notificacao.erro('Erro ao editar!');
       }
     });
-  }
-
-
-  bodyTutor() {
-    const contextoOriginal = this.formConfTutorTreinamento.value;
-    const contextoTratado = Object.fromEntries(
-      Object.entries(contextoOriginal).map(([key, value]) => {
-        return [key, typeof value === 'string' ? value.replace(/&nbsp;/g, ' ') : value];
-      })
-    );
-    return {
-      contexto: contextoTratado
-    };
   }
 
 }

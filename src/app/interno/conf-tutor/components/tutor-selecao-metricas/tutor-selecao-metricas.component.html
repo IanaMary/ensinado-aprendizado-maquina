@@ -15,7 +15,7 @@
   <mat-divider class="linha"></mat-divider>
 
   <!-- Seleção de opção -->
-  <mat-radio-group (change)="bodyTutor()" [(ngModel)]="opcaoSelecionada">
+  <mat-radio-group [(ngModel)]="opcaoSelecionada">
     <mat-radio-button [value]="0">Explicação sobre a seleção de métricas</mat-radio-button>
     <mat-radio-button [value]="1">Explicação sobre as métricas</mat-radio-button>
   </mat-radio-group>

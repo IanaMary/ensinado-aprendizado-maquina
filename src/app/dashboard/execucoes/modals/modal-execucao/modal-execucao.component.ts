@@ -245,7 +245,6 @@ export class ModalExecucaoComponent implements OnInit {
     } else if (this.etapaAtual === SELECAO_MODELO) {
       const dadosRotulados = this.resultadoColetaDado?.dadosRotulados;
       const preverCategoria = this.resultadoColetaDado?.preverCategoria;
-      console.log("selecao ", this.modeloSelecionado)
       if (preverCategoria && dadosRotulados) {
         chaves = ['texto_pipe', 'supervisionado.explicacao', 'supervisionado.classficacao.explicacao'];
       } else if (!preverCategoria && dadosRotulados) {
