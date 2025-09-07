@@ -27,7 +27,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   cont = 0;
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.postAvaliacao();
+    // this.postAvaliacao();
   }
 
   ngOnInit(): void {

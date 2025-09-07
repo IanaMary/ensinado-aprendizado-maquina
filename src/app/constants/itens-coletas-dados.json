@@ -33,7 +33,22 @@
           "label": "Número de vizinhos",
           "nomeHiperparametro": "n_neighbors",
           "valorPadrao": 5,
-          "tipo": "int"
+          "tipo": "int",
+          "resumo": [
+            "Define o número de vizinhos a serem considerados. Um valor comum é 5, mas isso pode ser ajustado conforme necessário."
+          ]
+        },
+        {
+          "label": "Pesos",
+          "nomeHiperparametro": "weights",
+          "valorPadrao": 5,
+          "tipo": "int",
+          "resumo": [
+            "Determina como os vizinhos influenciam a classificação. Pode ser: uniform e distance",
+            "'uniform': todos os vizinhos têm o mesmo peso.",
+            "'distance': vizinhos mais próximos têm maior peso.",
+            "Função personalizada: você pode definir sua própria função para calcular os pesos."
+          ]
         }
       ],
       "metricas": [

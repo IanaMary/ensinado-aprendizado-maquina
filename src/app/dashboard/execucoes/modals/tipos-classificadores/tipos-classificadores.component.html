@@ -13,7 +13,6 @@
     <ng-container *ngFor="let hiperparametro of modeloSelecionado.hiperparametros; let idx = index">
       <nav>
         <p>{{hiperparametro.label}}</p>
-
         <input matInput type="number" maxlength="5" [(ngModel)]="hiperparametro.valorPadrao">
       </nav>
     </ng-container>

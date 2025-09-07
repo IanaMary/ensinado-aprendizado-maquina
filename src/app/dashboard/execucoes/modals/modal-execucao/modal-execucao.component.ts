@@ -245,14 +245,19 @@ export class ModalExecucaoComponent implements OnInit {
     } else if (this.etapaAtual === SELECAO_MODELO) {
       const dadosRotulados = this.resultadoColetaDado?.dadosRotulados;
       const preverCategoria = this.resultadoColetaDado?.preverCategoria;
+      const modelo = this.modeloSelecionado?.valor
       if (preverCategoria && dadosRotulados) {
-        chaves = ['texto_pipe', 'supervisionado.explicacao', 'supervisionado.classficacao.explicacao'];
+        const caminho = `supervisionado.classficacao.modelos[valor=${modelo}].explicacao`
+        chaves = ['texto_pipe', 'supervisionado.explicacao', 'supervisionado.classficacao.explicacao', caminho];
       } else if (!preverCategoria && dadosRotulados) {
-        chaves = ['texto_pipe', 'supervisionado.explicacao', 'supervisionado.regressao.explicacao'];
+        const caminho = `supervisionado.regressao.modelos[valor=${modelo}].explicacao`
+        chaves = ['texto_pipe', 'supervisionado.explicacao', 'supervisionado.regressao.explicacao', caminho];
       } else if (preverCategoria && !dadosRotulados) {
-        chaves = ['texto_pipe', 'nao_supervisionado.explicacao', 'nao_supervisionado.agrupamento.explicacao'];
+        const caminho = `nao_supervisionado.agrupamento.modelos[valor=${modelo}].explicacao`
+        chaves = ['texto_pipe', 'nao_supervisionado.explicacao', 'nao_supervisionado.agrupamento.explicacao', caminho];
       } else if (!preverCategoria && !dadosRotulados) {
-        chaves = ['texto_pipe', 'nao_supervisionado.explicacao', 'nao_supervisionado.reducao_dimensionalidade.explicacao'];
+        const caminho = `nao_supervisionado.reducao_dimensionalidade.modelos[valor=${modelo}].explicacao`
+        chaves = ['texto_pipe', 'nao_supervisionado.explicacao', 'nao_supervisionado.reducao_dimensionalidade.explicacao', caminho];
       }
     } else if (this.etapaAtual === TREINAMENTO || this.etapaAtual === AVALIACAO) {
       chaves = ['texto_pipe', 'explicacao'];
