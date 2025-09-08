@@ -18,8 +18,6 @@ export class TiposClassificadoresComponent implements OnChanges {
   @Output() selecaoModelo = new EventEmitter<ItemPipeline>();
 
 
-  todosModelos = itensPipeline.itensTreino as ItemPipeline[];
-
   modelo!: ItemPipeline | undefined;
   modeloValor: string | undefined;
 

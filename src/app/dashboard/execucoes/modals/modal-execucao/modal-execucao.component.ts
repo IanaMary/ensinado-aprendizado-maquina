@@ -128,8 +128,10 @@ export class ModalExecucaoComponent implements OnInit {
       tipoTarget,
       this.etapas[COLETA_DADO].proximo
     );
-
-    this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(tipoTarget);
+    console.log("ee =>", this.resultadoColetaDado)
+    const preverCategoria = this.resultadoColetaDado.preverCategoria;
+    const dadosRotulados = this.resultadoColetaDado.dadosRotulados;
+    this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(preverCategoria, dadosRotulados);
     this.modeloSelecionado = this.modelosDisponiveis[0];
     this.funcBodyTutor();
   }

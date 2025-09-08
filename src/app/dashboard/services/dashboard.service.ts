@@ -13,9 +13,9 @@ export class DashboardService {
   private proximaEtapaPipe = new Subject<any>();
   proximaEtapaPipe$ = this.proximaEtapaPipe.asObservable();
 
-  todosItensColetasDados = itensPipeline.itensColetasDados as ItemPipeline[];
-  todosModelos = itensPipeline.itensTreino as ItemPipeline[];
-  todosItensMetricas = itensPipeline.itensMetricas as any[];
+  // todosItensColetasDados = itensPipeline.itensColetasDados as ItemPipeline[];
+  // todosModelos = itensPipeline.itensTreino as ItemPipeline[];
+  // todosItensMetricas = itensPipeline.itensMetricas as any[];
 
   private itemsEmExecucao = new BehaviorSubject<ItemPipeline[]>([]);
   private itensColetasDados = new BehaviorSubject<ItemPipeline[]>([]);
@@ -169,8 +169,8 @@ export class DashboardService {
   }
 
 
-  getModelosPorTipo(tipo: string | null): ItemPipeline[] {
-    return this.itensModelos.getValue().filter(item => item.tipo === tipo);
+  getModelosPorTipo(preverCategoria: boolean, dadosRotulados: boolean): ItemPipeline[] {
+    return this.itensModelos.getValue().filter(item => (item?.preverCategoria === preverCategoria && item.dadosRotulados === dadosRotulados));
   }
 
 
