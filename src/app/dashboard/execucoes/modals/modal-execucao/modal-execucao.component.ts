@@ -247,8 +247,8 @@ export class ModalExecucaoComponent implements OnInit {
       const preverCategoria = this.resultadoColetaDado?.preverCategoria;
       const modelo = this.modeloSelecionado?.valor
       if (preverCategoria && dadosRotulados) {
-        const caminho = `supervisionado.classficacao.modelos[valor=${modelo}].explicacao`
-        chaves = ['texto_pipe', 'supervisionado.explicacao', 'supervisionado.classficacao.explicacao', caminho];
+        const caminho = `supervisionado.classificacao.modelos[valor=${modelo}].explicacao`
+        chaves = ['texto_pipe', 'supervisionado.explicacao', 'supervisionado.classificacao.explicacao', caminho];
       } else if (!preverCategoria && dadosRotulados) {
         const caminho = `supervisionado.regressao.modelos[valor=${modelo}].explicacao`
         chaves = ['texto_pipe', 'supervisionado.explicacao', 'supervisionado.regressao.explicacao', caminho];

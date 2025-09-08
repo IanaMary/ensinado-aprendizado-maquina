@@ -24,7 +24,7 @@
     <!-- Tipo 0: Seleção de modelos -->
     <ng-container *ngIf="tipoAprendizado === 0">
       <nav class="texto-label">Explicação sobre seleção de modelos</nav>
-      <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="texto_pipe">
+      <quill-editor [readOnly]="erroTutor" class="editor" formControlName="texto_pipe">
       </quill-editor>
     </ng-container>
 
@@ -34,7 +34,7 @@
 
         <!-- Explicação geral -->
         <nav class="texto-label">Explicação sobre aprendizado supervisionado</nav>
-        <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+        <quill-editor [readOnly]="erroTutor" class="editor" formControlName="explicacao">
         </quill-editor>
 
         <!-- Subtipo: classificação ou regressão -->
@@ -44,16 +44,16 @@
         </mat-radio-group>
 
         <!-- Classificação -->
-        <ng-container *ngIf="subTipoAprendizado === 0" [formGroupName]="'classficacao'">
+        <ng-container *ngIf="subTipoAprendizado === 0" [formGroupName]="'classificacao'">
           <nav class="texto-label">Explicação sobre classificação</nav>
-          <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+          <quill-editor [readOnly]="erroTutor" class="editor" formControlName="explicacao">
           </quill-editor>
         </ng-container>
 
         <!-- Regressão -->
         <ng-container *ngIf="subTipoAprendizado === 1" [formGroupName]="'regressao'">
           <nav class="texto-label">Explicação sobre regressão</nav>
-          <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+          <quill-editor [readOnly]="erroTutor" class="editor" formControlName="explicacao">
           </quill-editor>
         </ng-container>
 
@@ -66,7 +66,7 @@
 
         <!-- Explicação geral -->
         <nav class="texto-label">Explicação sobre aprendizado não supervisionado</nav>
-        <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+        <quill-editor [readOnly]="erroTutor" class="editor" formControlName="explicacao">
         </quill-editor>
 
         <!-- Subtipo: redução dimensionalidade ou agrupamento -->
@@ -78,14 +78,14 @@
         <!-- Redução dimensionalidade -->
         <ng-container *ngIf="subTipoAprendizado === 0" [formGroupName]="'reducao_dimensionalidade'">
           <nav class="texto-label">Explicação sobre redução dimensionalidade</nav>
-          <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+          <quill-editor [readOnly]="erroTutor" class="editor" formControlName="explicacao">
           </quill-editor>
         </ng-container>
 
         <!-- Agrupamento -->
         <ng-container *ngIf="subTipoAprendizado === 1" [formGroupName]="'agrupamento'">
           <nav class="texto-label">Explicação sobre agrupamento</nav>
-          <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+          <quill-editor [readOnly]="erroTutor" class="editor" formControlName="explicacao">
           </quill-editor>
         </ng-container>
 

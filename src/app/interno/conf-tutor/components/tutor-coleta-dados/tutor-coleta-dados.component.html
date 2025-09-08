@@ -18,28 +18,24 @@
     <mat-radio-button [value]="5">Explicação sobre a atributos</mat-radio-button>
   </mat-radio-group>
   <form [formGroup]="formConfTutorColetaDados">
-    <quill-editor *ngIf="opcaoSelecionada === 0" [readOnly]="erroTutor" [modules]="modules" class="editor"
-      formControlName="texto_pipe">
+    <quill-editor *ngIf="opcaoSelecionada === 0" [readOnly]="erroTutor" class="editor" formControlName="texto_pipe">
     </quill-editor>
 
-    <quill-editor *ngIf="opcaoSelecionada === 1" [readOnly]="erroTutor" [modules]="modules" class="editor"
+    <quill-editor *ngIf="opcaoSelecionada === 1" [readOnly]="erroTutor" class="editor"
       formControlName="planilha_treino">
     </quill-editor>
 
-    <quill-editor *ngIf="opcaoSelecionada === 2" [readOnly]="erroTutor" [modules]="modules" class="editor"
-      formControlName="planilha_teste">
+    <quill-editor *ngIf="opcaoSelecionada === 2" [readOnly]="erroTutor" class="editor" formControlName="planilha_teste">
     </quill-editor>
 
-    <quill-editor *ngIf="opcaoSelecionada === 3" [readOnly]="erroTutor" [modules]="modules" class="editor"
+    <quill-editor *ngIf="opcaoSelecionada === 3" [readOnly]="erroTutor" class="editor"
       formControlName="divisao_entre_treino_teste">
     </quill-editor>
 
-    <quill-editor *ngIf="opcaoSelecionada === 4" [readOnly]="erroTutor" [modules]="modules" class="editor"
-      formControlName="target">
+    <quill-editor *ngIf="opcaoSelecionada === 4" [readOnly]="erroTutor" class="editor" formControlName="target">
     </quill-editor>
 
-    <quill-editor *ngIf="opcaoSelecionada === 5" [readOnly]="erroTutor" [modules]="modules" class="editor"
-      formControlName="atributos">
+    <quill-editor *ngIf="opcaoSelecionada === 5" [readOnly]="erroTutor" class="editor" formControlName="atributos">
     </quill-editor>
   </form>
 </nav>

@@ -340,6 +340,7 @@ mat-checkbox {
   border: none;
   height: 32px;
   margin: 0.25rem;
+  text-transform: uppercase;
 
   &:disabled {
     background: $cor-secundaria-escuro;

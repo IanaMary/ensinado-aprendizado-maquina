@@ -61,8 +61,8 @@ export class ConfTutorComponent implements OnInit {
       }),
       formConfTutorSelecaoModelo: this.formBuilder.group({
         aprendizado_supervisionado: [null, [Validators.required]],
-        classficacao: [null, [Validators.required]],
-        modelos_classficacao: this.formBuilder.array([]),
+        classificacao: [null, [Validators.required]],
+        modelos_classificacao: this.formBuilder.array([]),
         regressao: [null, [Validators.required]],
         modelos_regressao: this.formBuilder.array([]),
         aprendizado_nao_supervisionado: [null, [Validators.required]],

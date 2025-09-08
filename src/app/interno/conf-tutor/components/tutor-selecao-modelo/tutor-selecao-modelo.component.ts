@@ -22,15 +22,16 @@ export class TutorSelecaoModeloComponent implements OnChanges {
 
   tipoModeloSelecionado = 0;
   tipoAprendizado = 'supervisionado';
-  subTipoAprendizado = 'classficacao';
+  subTipoAprendizado = 'classificacao';
 
   modelos: any[] = [[], [], [], []];
-  modelosMap: any[] = ['classficacao', 'regressao', 'agrupamento', 'reducao_dimensionalidade'];
+  modelosMap: any[] = ['classificacao', 'regressao', 'agrupamento', 'reducao_dimensionalidade'];
+
   tabs = [false, false, false, false];
 
   formConfTutorSelecaoModelo: FormGroup;
 
-  classficacao = [];
+  classificacao = [];
   regressao = [];
   reducao_dimensionalidade = [];
   agrupamento = [];
@@ -41,7 +42,7 @@ export class TutorSelecaoModeloComponent implements OnChanges {
     private readonly notificacao: NotificacaoService
   ) {
     this.formConfTutorSelecaoModelo = this.formBuilder.group({
-      classficacao: this.formBuilder.array([]),
+      classificacao: this.formBuilder.array([]),
       regressao: this.formBuilder.array([]),
       agrupamento: this.formBuilder.array([]),
       reducao_dimensionalidade: this.formBuilder.array([])
@@ -72,37 +73,33 @@ export class TutorSelecaoModeloComponent implements OnChanges {
   }
 
 
-  onTipoModelo() {
-    if (!this.modelos[this.tipoModeloSelecionado].length) {
-      let prever_categoria = false;
-      let dados_rotulados = false;
 
-      switch (this.tipoModeloSelecionado) {
-        case 0: // Classificação
-          prever_categoria = true;
-          dados_rotulados = true;
-          this.tipoAprendizado = 'supervisionado';
-          this.subTipoAprendizado = 'classficacao';
-          break;
-        case 1: // Regressão
-          prever_categoria = false;
-          dados_rotulados = true;
-          this.tipoAprendizado = 'supervisionado';
-          this.subTipoAprendizado = 'regressao';
-          break;
-        case 2: // Agrupamento
-          prever_categoria = true;
-          dados_rotulados = false;
-          this.tipoAprendizado = 'nao_supervisionado';
-          this.subTipoAprendizado = 'agrupamento';
-          break;
-        case 3: // Redução de dimensionalidade
-          prever_categoria = false;
-          dados_rotulados = false;
-          this.tipoAprendizado = 'nao_supervisionado';
-          this.subTipoAprendizado = 'reducao_dimensionalidade';
-          break;
-      }
+
+  onTipoModelo() {
+    switch (this.tipoModeloSelecionado) {
+      case 0: // Classificação
+        this.tipoAprendizado = 'supervisionado';
+        this.subTipoAprendizado = 'classificacao';
+        break;
+      case 1: // Regressão
+        this.tipoAprendizado = 'supervisionado';
+        this.subTipoAprendizado = 'regressao';
+        break;
+      case 2: // Agrupamento
+        this.tipoAprendizado = 'nao_supervisionado';
+        this.subTipoAprendizado = 'agrupamento';
+        break;
+      case 3: // Redução de dimensionalidade
+        this.tipoAprendizado = 'nao_supervisionado';
+        this.subTipoAprendizado = 'reducao_dimensionalidade';
+        break;
+    }
+    this.atualizarForms();
+  }
+
+  atualizarForms() {
+    if (!this.modelos[this.tipoModeloSelecionado].length) {
+
 
       const aux = new URLSearchParams();
       aux.append('pipe', 'selecao-modelo');
@@ -131,34 +128,34 @@ export class TutorSelecaoModeloComponent implements OnChanges {
   }
 
   putTutor() {
-    const cam = this.modelosMap[this.tipoModeloSelecionado];
-
-    // Cria o body dinamicamente
-    const body: any = { contexto: {} };
-
-    // Garante que o tipoAprendizado exista
-    if (!body.contexto[this.tipoAprendizado]) {
-      body.contexto[this.tipoAprendizado] = {};
+    const body = {
+      contexto: {
+        supervisionado: {
+          classificacao: {
+            modelos: this.formConfTutorSelecaoModelo.value.classificacao
+          },
+          regressao: {
+            modelos: this.formConfTutorSelecaoModelo.value.regressao
+          }
+        },
+        nao_supervisionado: {
+          reducao_dimensionalidade: {
+            modelos: this.formConfTutorSelecaoModelo.value.reducao_dimensionalidade
+          },
+          agrupamento: {
+            modelos: this.formConfTutorSelecaoModelo.value.agrupamento
+          }
+        }
+      }
     }
 
-    // Adiciona o subTipoAprendizado com os modelos
-    body.contexto[this.tipoAprendizado][this.subTipoAprendizado] = {
-      modelos: this.formConfTutorSelecaoModelo.value[cam]
-    };
-
-    // Monta os parâmetros da query
-    const aux = new URLSearchParams();
-    aux.append('modelos', this.tipoAprendizado);
-    aux.append('modelos', this.subTipoAprendizado);
-    const params = aux.toString();
-
     // Chama o serviço
-    this.dashboardService.putTutorParams(body, this.idTutor, params).subscribe({
+    this.dashboardService.putTutorModelo(body, this.idTutor).subscribe({
       next: (res: any) => {
-        this.notificacao.sucesso('Edição feita com sucesso!');
+        this.notificacao.sucesso(`Modelos de editados com sucesso!`);
       },
       error: (error: any) => {
-        this.notificacao.erro('Erro ao editar!');
+        this.notificacao.erro(`Erro ao editar modelos!`);
       }
     });
   }

@@ -34,7 +34,7 @@ export class TtutorTiposAprendizadoComponent implements OnChanges {
       texto_pipe: [''],
       supervisionado: this.formBuilder.group({
         explicacao: [''],
-        classficacao: this.formBuilder.group({ explicacao: [''] }),
+        classificacao: this.formBuilder.group({ explicacao: [''] }),
         regressao: this.formBuilder.group({ explicacao: [''] })
       }),
       nao_supervisionado: this.formBuilder.group({
@@ -71,7 +71,7 @@ export class TtutorTiposAprendizadoComponent implements OnChanges {
           }
 
           // Atualiza subgrupos de supervisionado
-          ['classficacao', 'regressao'].forEach(sub => {
+          ['classificacao', 'regressao'].forEach(sub => {
             const subData = supervisionadoData[sub];
             if (!subData) return;
 

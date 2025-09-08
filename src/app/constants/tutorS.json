@@ -1,105 +1,108 @@
 [
   {
+    "_id": {
+      "$oid": "68af35f9c1255ac11615c54d"
+    },
     "pipe": "inicio",
     "texto-pipe": "texto sobre a importação",
-    "explicacao": "<p>Vamos começar escolhendo um formato para coletar os dados. Existem algumas opções disponíveis, como arquivos .xlsx, .csv e .json. Cada um desses formatos possui características específicas, então é importante entender as diferenças para decidir qual se adapta melhor ao seu objetivo.</p><p></p><ul><li>O .xlsx é o formato padrão de planilhas do Excel, ideal quando os dados estão organizados em tabelas e podem conter múltiplas abas.</li><li>O .csv é uma versão mais simples, onde os dados são separados por vírgulas — excelente para quando você precisa de um arquivo leve e fácil de processar.</li><li>O .json é um formato muito usado em aplicações web e APIs, ideal para dados mais estruturados ou hierárquicos.</li></ul>",
-    "texto_pipe": ""
+    "explicacao": "",
+    "texto_pipe": "<p><span class=\"ql-font-monospace\">Vamos&nbsp;começar&nbsp;escolhendo&nbsp;um&nbsp;formato&nbsp;para&nbsp;coletar&nbsp;os&nbsp;dados.&nbsp;Existem&nbsp;algumas&nbsp;opções&nbsp;disponíveis,&nbsp;como&nbsp;arquivos&nbsp;.xlsx,&nbsp;.csv&nbsp;e&nbsp;.json.&nbsp;Cada&nbsp;um&nbsp;desses&nbsp;formatos&nbsp;possui&nbsp;características&nbsp;específicas,&nbsp;então&nbsp;é&nbsp;importante&nbsp;entender&nbsp;as&nbsp;diferenças&nbsp;para&nbsp;decidir&nbsp;qual&nbsp;se&nbsp;adapta&nbsp;melhor&nbsp;ao&nbsp;seu&nbsp;objetivo.</span></p><ul><li><span class=\"ql-font-monospace\">O&nbsp;</span><strong class=\"ql-font-monospace\">.xlsx</strong><span class=\"ql-font-monospace\">&nbsp;é&nbsp;o&nbsp;formato&nbsp;padrão&nbsp;de&nbsp;planilhas&nbsp;do&nbsp;Excel,&nbsp;ideal&nbsp;quando&nbsp;os&nbsp;dados&nbsp;estão&nbsp;organizados&nbsp;em&nbsp;tabelas&nbsp;e&nbsp;podem&nbsp;conter&nbsp;múltiplas&nbsp;abas.</span></li><li><span class=\"ql-font-monospace\">O</span><strong class=\"ql-font-monospace\">&nbsp;.csv</strong><span class=\"ql-font-monospace\">&nbsp;é&nbsp;uma&nbsp;versão&nbsp;mais&nbsp;simples,&nbsp;onde&nbsp;os&nbsp;dados&nbsp;são&nbsp;separados&nbsp;por&nbsp;vírgulas&nbsp;—&nbsp;excelente&nbsp;para&nbsp;quando&nbsp;você&nbsp;precisa&nbsp;de&nbsp;um&nbsp;arquivo&nbsp;leve&nbsp;e&nbsp;fácil&nbsp;de&nbsp;processar.</span></li><li><span class=\"ql-font-monospace\">O&nbsp;.</span><strong class=\"ql-font-monospace\">json</strong><span class=\"ql-font-monospace\">&nbsp;é&nbsp;um&nbsp;formato&nbsp;muito&nbsp;usado&nbsp;em&nbsp;aplicações&nbsp;web&nbsp;e&nbsp;APIs,&nbsp;ideal&nbsp;para&nbsp;dados&nbsp;mais&nbsp;estruturados&nbsp;ou&nbsp;hierárquicos.&quot;</span></li></ul>"
   },
   {
+    "_id": {
+      "$oid": "68af35f9c1255ac11615c54e"
+    },
     "pipe": "coleta-dado",
     "explicacao": "",
-    "target": "<p><span style=\"color: var(--mat-radio-label-text-color, var(--mat-sys-on-surface));\">Explicação sobre a target</span></p><p></p><p></p>",
-    "atributos": "<p><span style=\"color: rgb(0, 0, 0);\">Explicação sobre a atributos</span></p>",
-    "texto_pipe": "<p><span style=\"color: rgb(0, 0, 0);\">Explicação sobre a etapa de coleta</span></p>",
-    "planilha_treino": "<p><span style=\"color: var(--mat-radio-label-text-color, var(--mat-sys-on-surface));\">Explicação sobre a planilha de treino</span></p><p></p><p></p>",
-    "planilha_teste": "<p><span style=\"color: rgb(0, 0, 0);\">Explicação sobre a planilha de teste</span></p>",
-    "divisao_entre_treino_teste": "<p><span style=\"color: var(--mat-radio-label-text-color, var(--mat-sys-on-surface));\">Explicação sobre a divisão entre treino e teste</span></p>"
+    "target": "<h2><strong class=\"ql-font-monospace\">TARGET</strong></h2><ul><li><span class=\"ql-font-monospace\">No&nbsp;aprendizado&nbsp;de&nbsp;máquina,&nbsp;o&nbsp;target&nbsp;é&nbsp;a&nbsp;resposta&nbsp;que&nbsp;queremos&nbsp;prever.</span></li><li><span class=\"ql-font-monospace\">É&nbsp;como&nbsp;a&nbsp;coluna&nbsp;principal&nbsp;da&nbsp;nossa&nbsp;planilha,&nbsp;o&nbsp;resultado&nbsp;final.</span></li><li><span class=\"ql-font-monospace\">O&nbsp;modelo&nbsp;usa&nbsp;as&nbsp;outras&nbsp;colunas&nbsp;(as&nbsp;informações&nbsp;ou&nbsp;características,&nbsp;chamadas&nbsp;de&nbsp;features)&nbsp;para&nbsp;tentar&nbsp;adivinhar&nbsp;o&nbsp;valor&nbsp;do&nbsp;target.</span></li><li><span class=\"ql-font-monospace\">Por&nbsp;exemplo:&nbsp;Planilha&nbsp;com&nbsp;tamanho,&nbsp;largura&nbsp;e&nbsp;cor&nbsp;da&nbsp;fruta.</span><ul><li><span class=\"ql-font-monospace\">O&nbsp;target&nbsp;é&nbsp;tipo&nbsp;da&nbsp;fruta.</span></li><li><span class=\"ql-font-monospace\">As&nbsp;outras&nbsp;colunas&nbsp;(tamanho,&nbsp;largura&nbsp;e&nbsp;cor)&nbsp;são&nbsp;as&nbsp;informações&nbsp;que&nbsp;ajudam&nbsp;a&nbsp;prever&nbsp;o&nbsp;target.</span></li></ul></li></ul>",
+    "atributos": "<h2><strong style=\"color: rgb(0, 0, 0);\" class=\"ql-font-monospace\">ATRIBUTOS</strong></h2><ul><li><span style=\"color: rgb(0, 0, 0);\" class=\"ql-font-monospace\">No&nbsp;aprendizado&nbsp;de&nbsp;máquina,&nbsp;um&nbsp;atributo&nbsp;é&nbsp;cada&nbsp;uma&nbsp;das&nbsp;informações&nbsp;que&nbsp;descreve&nbsp;um&nbsp;objeto.</span></li><li><span style=\"color: rgb(0, 0, 0);\" class=\"ql-font-monospace\">Em&nbsp;outras&nbsp;palavras,&nbsp;é&nbsp;uma&nbsp;coluna&nbsp;da&nbsp;planilha&nbsp;que&nbsp;ajuda&nbsp;o&nbsp;modelo&nbsp;a&nbsp;entender&nbsp;o&nbsp;que&nbsp;está&nbsp;acontecendo.</span></li><li><span style=\"color: rgb(0, 0, 0);\" class=\"ql-font-monospace\">Por&nbsp;exemplo,&nbsp;no&nbsp;nosso&nbsp;exemplo&nbsp;das&nbsp;frutas:&nbsp;Tamanho,&nbsp;largura&nbsp;e&nbsp;cor&nbsp;são&nbsp;atributos.</span><ul><li><span style=\"color: rgb(0, 0, 0);\" class=\"ql-font-monospace\">Eles&nbsp;descrevem&nbsp;cada&nbsp;fruta&nbsp;e&nbsp;ajudam&nbsp;o&nbsp;modelo&nbsp;a&nbsp;prever&nbsp;o&nbsp;target,&nbsp;que&nbsp;é&nbsp;o&nbsp;tipo&nbsp;da&nbsp;fruta.</span></li></ul></li></ul>",
+    "texto_pipe": "<h2><strong class=\"ql-font-monospace\">COLETA&nbsp;DE&nbsp;DADOS</strong></h2><ul><li><span class=\"ql-font-monospace\">Antes&nbsp;de&nbsp;treinar&nbsp;um&nbsp;modelo,&nbsp;é&nbsp;preciso&nbsp;coletar&nbsp;dados&nbsp;reais&nbsp;que&nbsp;serão&nbsp;usados&nbsp;no&nbsp;aprendizado.</span></li><li><span class=\"ql-font-monospace\">Coletar&nbsp;dados&nbsp;significa&nbsp;reunir&nbsp;informações&nbsp;reais&nbsp;que&nbsp;vamos&nbsp;usar&nbsp;para&nbsp;ensinar&nbsp;o&nbsp;modelo.</span></li><li><span class=\"ql-font-monospace\">No&nbsp;caso&nbsp;de&nbsp;uma&nbsp;planilha&nbsp;sobre&nbsp;frutas,&nbsp;isso&nbsp;inclui&nbsp;medir&nbsp;tamanho&nbsp;e&nbsp;largura,&nbsp;anotar&nbsp;a&nbsp;cor&nbsp;e&nbsp;registrar&nbsp;o&nbsp;tipo&nbsp;da&nbsp;fruta.</span></li><li><span class=\"ql-font-monospace\">Quanto&nbsp;mais&nbsp;completos&nbsp;e&nbsp;variados&nbsp;forem&nbsp;os&nbsp;dados,&nbsp;melhor&nbsp;o&nbsp;modelo&nbsp;consegue&nbsp;aprender&nbsp;a&nbsp;prever&nbsp;novas&nbsp;frutas.</span></li></ul>",
+    "planilha_treino": "<h2><strong class=\"ql-font-monospace\">DADOS&nbsp;DE&nbsp;TREINO</strong></h2><ul><li><span class=\"ql-font-monospace\">Os&nbsp;dados&nbsp;de&nbsp;treino&nbsp;são&nbsp;os&nbsp;exemplos&nbsp;usados&nbsp;para&nbsp;ensinar&nbsp;o&nbsp;modelo.</span></li><li><span class=\"ql-font-monospace\">É&nbsp;como&nbsp;quando&nbsp;você&nbsp;está&nbsp;aprendendo&nbsp;algo&nbsp;novo:&nbsp;precisa&nbsp;ver&nbsp;vários&nbsp;exemplos&nbsp;para&nbsp;entender&nbsp;o&nbsp;padrão.</span></li><li><span class=\"ql-font-monospace\">O&nbsp;modelo&nbsp;analisa&nbsp;esses&nbsp;dados&nbsp;e&nbsp;aprende&nbsp;a&nbsp;relação&nbsp;entre&nbsp;as&nbsp;informações&nbsp;e&nbsp;a&nbsp;resposta&nbsp;correta.</span></li><li><span class=\"ql-font-monospace\">Por&nbsp;exemplo,&nbsp;se&nbsp;temos&nbsp;uma&nbsp;planilha&nbsp;com&nbsp;informações&nbsp;sobre&nbsp;frutas,&nbsp;o&nbsp;modelo&nbsp;utiliza&nbsp;tamanho,&nbsp;largura&nbsp;e&nbsp;cor&nbsp;para&nbsp;aprender&nbsp;a&nbsp;identificar&nbsp;o&nbsp;tipo&nbsp;da&nbsp;fruta.</span></li><li><span class=\"ql-font-monospace\">Quanto&nbsp;mais&nbsp;bons&nbsp;exemplos&nbsp;tivermos&nbsp;no&nbsp;treino,&nbsp;melhor&nbsp;o&nbsp;modelo&nbsp;aprende.</span></li></ul>",
+    "planilha_teste": "<h2><strong class=\"ql-font-monospace\">DADOS&nbsp;DE&nbsp;TESTE</strong></h2><ul><li><span class=\"ql-font-monospace\">Os&nbsp;dados&nbsp;de&nbsp;teste&nbsp;servem&nbsp;para&nbsp;avaliar&nbsp;o&nbsp;modelo&nbsp;depois&nbsp;que&nbsp;ele&nbsp;aprendeu&nbsp;com&nbsp;os&nbsp;dados&nbsp;de&nbsp;treino.</span></li><li><span class=\"ql-font-monospace\">Eles&nbsp;são&nbsp;exemplos&nbsp;que&nbsp;o&nbsp;modelo&nbsp;nunca&nbsp;viu&nbsp;antes.</span></li><li><span class=\"ql-font-monospace\">A&nbsp;ideia&nbsp;é&nbsp;simples:&nbsp;se&nbsp;o&nbsp;modelo&nbsp;acertar&nbsp;nos&nbsp;dados&nbsp;de&nbsp;teste,&nbsp;significa&nbsp;que&nbsp;ele&nbsp;realmente&nbsp;aprendeu&nbsp;a&nbsp;reconhecer&nbsp;padrões,&nbsp;e&nbsp;não&nbsp;apenas&nbsp;decorou&nbsp;os&nbsp;exemplos&nbsp;do&nbsp;treino.</span></li><li><span class=\"ql-font-monospace\">Por&nbsp;exemplo,&nbsp;depois&nbsp;de&nbsp;aprender&nbsp;com&nbsp;várias&nbsp;frutas&nbsp;da&nbsp;planilha,&nbsp;o&nbsp;modelo&nbsp;recebe&nbsp;novas&nbsp;frutas&nbsp;que&nbsp;não&nbsp;estavam&nbsp;no&nbsp;treino.&nbsp;Assim&nbsp;podemos&nbsp;verificar&nbsp;se&nbsp;ele&nbsp;consegue&nbsp;prever&nbsp;corretamente&nbsp;o&nbsp;tipo&nbsp;da&nbsp;fruta.</span></li></ul>",
+    "divisao_entre_treino_teste": "<h2><strong class=\"ql-font-monospace\">DIVISÃO&nbsp;ENTRE&nbsp;TREINO&nbsp;E&nbsp;TESTE</strong></h2><ul><li><span class=\"ql-font-monospace\">Quando&nbsp;trabalhamos&nbsp;com&nbsp;aprendizado&nbsp;de&nbsp;máquina,&nbsp;não&nbsp;usamos&nbsp;todos&nbsp;os&nbsp;dados&nbsp;só&nbsp;para&nbsp;treinar.</span></li><li><span class=\"ql-font-monospace\">Nós&nbsp;dividimos&nbsp;os&nbsp;dados&nbsp;em&nbsp;duas&nbsp;partes:</span><ul><li><span class=\"ql-font-monospace\">Treino:&nbsp;a&nbsp;maior&nbsp;parte,&nbsp;usada&nbsp;para&nbsp;ensinar&nbsp;o&nbsp;modelo.</span></li><li><span class=\"ql-font-monospace\">Teste:&nbsp;a&nbsp;menor&nbsp;parte,&nbsp;usada&nbsp;para&nbsp;verificar&nbsp;se&nbsp;o&nbsp;modelo&nbsp;aprendeu&nbsp;de&nbsp;verdade.</span></li></ul></li><li><span class=\"ql-font-monospace\">Uma&nbsp;forma&nbsp;comum&nbsp;de&nbsp;fazer&nbsp;isso&nbsp;é&nbsp;separar&nbsp;cerca&nbsp;de&nbsp;70%&nbsp;para&nbsp;treino&nbsp;e&nbsp;30%&nbsp;para&nbsp;teste.</span></li><li><span class=\"ql-font-monospace\">Assim,&nbsp;garantimos&nbsp;que&nbsp;o&nbsp;modelo&nbsp;aprenda&nbsp;bem,&nbsp;mas&nbsp;também&nbsp;que&nbsp;seja&nbsp;avaliado&nbsp;com&nbsp;exemplos&nbsp;novos,&nbsp;que&nbsp;ele&nbsp;nunca&nbsp;viu&nbsp;antes.</span></li></ul>"
   },
   {
+    "_id": {
+      "$oid": "68af35f9c1255ac11615c54f"
+    },
     "pipe": "selecao-modelo",
     "nao_supervisionado": {
-      "explicacao": "nao_supervisionado",
+      "explicacao": "<h2><strong class=\"ql-font-monospace\">APRENDIZADO&nbsp;NÃO&nbsp;SUPERVISIONADO</strong></h2><ul><li><span class=\"ql-font-monospace\">Modelo&nbsp;recebe&nbsp;apenas&nbsp;os&nbsp;atributos,&nbsp;sem&nbsp;o&nbsp;target.&nbsp;</span></li><li><span class=\"ql-font-monospace\">Ele&nbsp;precisa&nbsp;descobrir&nbsp;padrões&nbsp;sozinho&nbsp;a&nbsp;partir&nbsp;dos&nbsp;dados.</span></li></ul>",
       "reducao_dimensionalidade": {
-        "explicacao": "reducao_dimensionalidade",
+        "explicacao": "<h2><strong class=\"ql-font-monospace\">REDUÇÃO&nbsp;DE&nbsp;DIMENSIONALIDADE</strong></h2><ul><li><span class=\"ql-font-monospace\">Às&nbsp;vezes&nbsp;temos&nbsp;muitos&nbsp;atributos&nbsp;em&nbsp;uma&nbsp;planilha,&nbsp;e&nbsp;nem&nbsp;todos&nbsp;são&nbsp;essenciais.</span></li><li><span class=\"ql-font-monospace\">A&nbsp;redução&nbsp;de&nbsp;dimensionalidade&nbsp;diminui&nbsp;o&nbsp;número&nbsp;de&nbsp;atributos,&nbsp;mantendo&nbsp;apenas&nbsp;os&nbsp;mais&nbsp;importantes,&nbsp;tornando&nbsp;o&nbsp;modelo&nbsp;mais&nbsp;simples&nbsp;e&nbsp;rápido.</span></li><li><span class=\"ql-font-monospace\">Exemplo&nbsp;com&nbsp;frutas:&nbsp;se&nbsp;temos&nbsp;tamanho,&nbsp;largura,&nbsp;cor,&nbsp;peso,&nbsp;textura&nbsp;da&nbsp;casca&nbsp;e&nbsp;doçura,&nbsp;talvez&nbsp;apenas&nbsp;cor&nbsp;e&nbsp;tamanho&nbsp;já&nbsp;sejam&nbsp;suficientes&nbsp;para&nbsp;identificar&nbsp;a&nbsp;fruta.&nbsp;Assim,&nbsp;simplificamos&nbsp;sem&nbsp;perder&nbsp;a&nbsp;essência&nbsp;do&nbsp;problema.</span></li></ul>",
         "modelos": [
           {
             "label": "PCA",
             "valor": "pca",
-            "explicacao": "explicacao",
-            "hiperparametros": []
+            "explicacao": "explicação pca"
           }
         ]
       },
       "agrupamento": {
-        "explicacao": "explicacao",
+        "explicacao": "<h2><strong class=\"ql-font-monospace\">AGRUPAMENTO</strong><span class=\"ql-font-monospace\">&nbsp;</span></h2><ul><li><span class=\"ql-font-monospace\">O&nbsp;agrupamento,&nbsp;ou&nbsp;clusterização,&nbsp;é&nbsp;uma&nbsp;técnica&nbsp;do&nbsp;aprendizado&nbsp;não&nbsp;supervisionado&nbsp;que&nbsp;organiza&nbsp;os&nbsp;dados&nbsp;em&nbsp;grupos&nbsp;com&nbsp;características&nbsp;semelhantes.</span></li><li><span class=\"ql-font-monospace\">No&nbsp;exemplo&nbsp;das&nbsp;frutas,&nbsp;o&nbsp;modelo&nbsp;separa&nbsp;as&nbsp;frutas&nbsp;em&nbsp;clusters&nbsp;de&nbsp;acordo&nbsp;com&nbsp;tamanho,&nbsp;largura&nbsp;e&nbsp;cor,&nbsp;mesmo&nbsp;sem&nbsp;saber&nbsp;o&nbsp;tipo&nbsp;correto&nbsp;de&nbsp;cada&nbsp;fruta.</span></li></ul>",
         "modelos": [
           {
             "label": "K-means",
             "valor": "k_means",
-            "explicacao": "explicacao",
-            "hiperparametros": []
+            "explicacao": "explicação K-means"
           }
         ]
       }
     },
     "supervisionado": {
-      "explicacao": "explicacao",
-      "classficacao": {
-        "explicacao": "explicacao",
-        "modelos": [
-          {
-            "label": "k-NN",
-            "valor": "knn",
-            "explicacao": "explicacao",
-            "hiperparametros": [
-              {
-                "nome": "nome",
-                "explicacao": "explicacao"
-              }
-            ]
-          },
-          {
-            "label": "Árvore de Decisão",
-            "valor": "arvore_decisao",
-            "explicacao": "explicacao",
-            "hiperparametros": []
-          },
-          {
-            "label": "SVM",
-            "valor": "svm",
-            "explicacao": "explicacao",
-            "hiperparametros": []
-          },
-          {
-            "label": "Regressão Logística",
-            "valor": "regressao_logistica",
-            "explicacao": "explicacao",
-            "hiperparametros": []
-          }
-        ]
-      },
+      "explicacao": "<h2><strong class=\"ql-font-monospace\">APRENDIZADO&nbsp;SUPERVISIONADO</strong></h2><ul><li><span class=\"ql-font-monospace\">No&nbsp;aprendizado&nbsp;supervisionado,&nbsp;o&nbsp;modelo&nbsp;aprende&nbsp;a&nbsp;partir&nbsp;de&nbsp;dados&nbsp;que&nbsp;já&nbsp;têm&nbsp;a&nbsp;resposta&nbsp;correta,&nbsp;o&nbsp;target.</span></li><li><span class=\"ql-font-monospace\">Por&nbsp;exemplo,&nbsp;se&nbsp;sabemos&nbsp;o&nbsp;tipo&nbsp;da&nbsp;fruta&nbsp;para&nbsp;cada&nbsp;registro&nbsp;na&nbsp;planilha,&nbsp;o&nbsp;modelo&nbsp;pode&nbsp;aprender&nbsp;a&nbsp;prever&nbsp;o&nbsp;target&nbsp;com&nbsp;base&nbsp;nos&nbsp;atributos&nbsp;como&nbsp;tamanho,&nbsp;largura&nbsp;e&nbsp;cor.</span></li></ul>",
       "regressao": {
-        "explicacao": "explicacao",
+        "explicacao": "<h2><strong class=\"ql-font-monospace\">REGRESSÃO</strong></h2><ul><li><span class=\"ql-font-monospace\">A&nbsp;regressão&nbsp;também&nbsp;é&nbsp;aprendizado&nbsp;supervisionado,&nbsp;mas&nbsp;em&nbsp;vez&nbsp;de&nbsp;prever&nbsp;categorias,&nbsp;o&nbsp;modelo&nbsp;prevê&nbsp;valores&nbsp;numéricos.</span></li><li><span class=\"ql-font-monospace\">Por&nbsp;exemplo,&nbsp;podemos&nbsp;usar&nbsp;atributos&nbsp;como&nbsp;tamanho&nbsp;e&nbsp;largura&nbsp;da&nbsp;fruta&nbsp;para&nbsp;prever&nbsp;o&nbsp;peso&nbsp;dela</span></li></ul>",
         "modelos": [
           {
             "label": "Regressão Linear",
             "valor": "regressao_linear",
-            "explicacao": "explicacao",
-            "hiperparametros": []
+            "explicacao": "<h2><strong class=\"ql-font-monospace\">REGRESSÃO&nbsp;LOGÍSTICA</strong></h2><ul><li>Regressão&nbsp;Linear&nbsp;é&nbsp;um&nbsp;modelo&nbsp;de&nbsp;aprendizado&nbsp;supervisionado&nbsp;utilizado&nbsp;para&nbsp;previsão&nbsp;numérica.&nbsp;Ela&nbsp;estima&nbsp;uma&nbsp;relação&nbsp;linear&nbsp;entre&nbsp;os&nbsp;atributos&nbsp;(entradas)&nbsp;e&nbsp;o&nbsp;valor&nbsp;contínuo&nbsp;do&nbsp;target&nbsp;(saída).</li><li>Funcionamento</li><li>Modelo&nbsp;Linear:&nbsp;A&nbsp;regressão&nbsp;linear&nbsp;busca&nbsp;encontrar&nbsp;uma&nbsp;equação&nbsp;da&nbsp;forma:&nbsp;y&nbsp;=&nbsp;w1&nbsp;*&nbsp;x2&nbsp;+&nbsp;&nbsp;w1&nbsp;*&nbsp;x2&nbsp;+&nbsp;...&nbsp;+&nbsp;wn&nbsp;*&nbsp;xn&nbsp;+&nbsp;b,&nbsp;onde&nbsp;w1,&nbsp;w2,&nbsp;...,&nbsp;wn&nbsp;e&nbsp;b&nbsp;é&nbsp;o&nbsp;intercepto.</li><li>Ajuste&nbsp;dos&nbsp;Coeficientes:&nbsp;O&nbsp;modelo&nbsp;ajusta&nbsp;os&nbsp;coeficientes&nbsp;w1,&nbsp;w2,&nbsp;...,&nbsp;wn​&nbsp;para&nbsp;minimizar&nbsp;a&nbsp;soma&nbsp;dos&nbsp;quadrados&nbsp;das&nbsp;diferenças&nbsp;entre&nbsp;os&nbsp;valores&nbsp;reais&nbsp;e&nbsp;os&nbsp;previstos,&nbsp;utilizando&nbsp;o&nbsp;método&nbsp;dos&nbsp;mínimos&nbsp;quadrados&nbsp;ordinários&nbsp;(OLS).</li><li>sssssssssssssssPredição:&nbsp;Com&nbsp;os&nbsp;coeficientes&nbsp;adasdasdsajustados,&nbsp;o&nbsp;modelo&nbsp;pode&nbsp;prever&nbsp;o&nbsp;valor&nbsp;do&nbsp;target&nbsp;para&nbsp;novos&nbsp;dados,&nbsp;aplicando&nbsp;a&nbsp;equação&nbsp;linear.</li><li>Vantagens</li><li>Simplicidade:&nbsp;Fácil&nbsp;de&nbsp;entender&nbsp;e&nbsp;implementar.</li><li>Interpretação:&nbsp;Os&nbsp;coeficientes&nbsp;indicam&nbsp;a&nbsp;influência&nbsp;de&nbsp;cada&nbsp;atributo&nbsp;no&nbsp;target.</li><li>Eficiência:&nbsp;Adequado&nbsp;para&nbsp;problemas&nbsp;com&nbsp;relação&nbsp;linear&nbsp;entre&nbsp;atributos&nbsp;e&nbsp;target.</li><li>Desvantagens</li><li>Linearidade:&nbsp;Supõe&nbsp;que&nbsp;a&nbsp;relação&nbsp;entre&nbsp;atributos&nbsp;e&nbsp;target&nbsp;seja&nbsp;linear.</li><li>Sensibilidade&nbsp;a&nbsp;Outliers:&nbsp;Valores&nbsp;extremos&nbsp;podem&nbsp;distorcer&nbsp;o&nbsp;modelo.</li><li>Multicolinearidade:&nbsp;A&nbsp;correlação&nbsp;entre&nbsp;atributos&nbsp;pode&nbsp;afetar&nbsp;a&nbsp;estabilidade&nbsp;dos&nbsp;coeficientes.</li></ul>"
+          }
+        ]
+      },
+      "classificacao": {
+        "explicacao": "<h2><strong class=\"ql-font-monospace\">CLASSIFICAÇÃO</strong></h2><ul><li><span class=\"ql-font-monospace\">A&nbsp;classificação&nbsp;é&nbsp;um&nbsp;tipo&nbsp;de&nbsp;aprendizado&nbsp;supervisionado&nbsp;usado&nbsp;para&nbsp;atribuir&nbsp;categorias&nbsp;aos&nbsp;dados.</span></li><li><span class=\"ql-font-monospace\">No&nbsp;exemplo&nbsp;das&nbsp;frutas,&nbsp;o&nbsp;modelo&nbsp;classifica&nbsp;cada&nbsp;fruta&nbsp;como&nbsp;maçã,&nbsp;banana&nbsp;ou&nbsp;laranja&nbsp;com&nbsp;base&nbsp;nos&nbsp;atributos.</span></li></ul>",
+        "modelos": [
+          {
+            "label": "Knn",
+            "valor": "KNN",
+            "explicacao": "explicação knn"
+          },
+          {
+            "label": "SVM",
+            "valor": "svm",
+            "explicacao": "explicação svm"
+          },
+          {
+            "label": "Árvore de Decisão",
+            "valor": "arvore_decisao",
+            "explicacao": "explicação Árvore de Decisão"
+          },
+          {
+            "label": "Regressão Logística",
+            "valor": "regressao_logistica",
+            "explicacao": "explicação Regressão Logística"
           }
         ]
       }
     },
-    "texto_pipe": "texto sobre a selecao",
+    "texto_pipe": "<h2><strong class=\"ql-font-monospace\">SELEÇÃO&nbsp;DE&nbsp;MODELOS</strong></h2><ul><li><span class=\"ql-font-monospace\">A&nbsp;seleção&nbsp;de&nbsp;modelos&nbsp;é&nbsp;a&nbsp;etapa&nbsp;em&nbsp;que&nbsp;escolhemos&nbsp;qual&nbsp;modelo&nbsp;de&nbsp;aprendizado&nbsp;de&nbsp;máquina&nbsp;é&nbsp;mais&nbsp;adequado&nbsp;para&nbsp;resolver&nbsp;um&nbsp;problema.</span></li><li><span class=\"ql-font-monospace\">Nessa&nbsp;fase,&nbsp;comparamos&nbsp;o&nbsp;desempenho&nbsp;de&nbsp;diferentes&nbsp;modelos&nbsp;usando&nbsp;os&nbsp;dados&nbsp;disponíveis&nbsp;e&nbsp;escolhemos&nbsp;o&nbsp;que&nbsp;oferece&nbsp;os&nbsp;melhores&nbsp;resultados&nbsp;para&nbsp;o&nbsp;objetivo&nbsp;desejado.</span></li></ul>",
     "explicacao": ""
   },
   {
+    "_id": {
+      "$oid": "68af35f9c1255ac11615c550"
+    },
     "pipe": "treinamento",
-    "texto_pipe": "texto sobre o treinamento",
+    "texto_pipe": "<p><strong>TREINAMENTO</strong></p><ul><li>A&nbsp;etapa&nbsp;de&nbsp;treinamento&nbsp;é&nbsp;quando&nbsp;o&nbsp;modelo&nbsp;realmente&nbsp;aprende&nbsp;a&nbsp;partir&nbsp;dos&nbsp;dados&nbsp;de&nbsp;treino.</li><li>Nessa&nbsp;fase,&nbsp;o&nbsp;modelo&nbsp;analisa&nbsp;os&nbsp;atributos&nbsp;(como&nbsp;tamanho,&nbsp;largura&nbsp;e&nbsp;cor&nbsp;das&nbsp;frutas)&nbsp;e&nbsp;tenta&nbsp;descobrir&nbsp;padrões&nbsp;que&nbsp;o&nbsp;ajudem&nbsp;a&nbsp;prever&nbsp;o&nbsp;target&nbsp;(tipo&nbsp;da&nbsp;fruta).</li><li>Durante&nbsp;o&nbsp;treinamento,&nbsp;o&nbsp;modelo&nbsp;ajusta&nbsp;seus&nbsp;cálculos&nbsp;internos&nbsp;para&nbsp;minimizar&nbsp;erros&nbsp;e&nbsp;melhorar&nbsp;suas&nbsp;previsões.&nbsp;Quanto&nbsp;mais&nbsp;exemplos&nbsp;e&nbsp;mais&nbsp;variados&nbsp;forem&nbsp;os&nbsp;dados&nbsp;de&nbsp;treino,&nbsp;melhor&nbsp;o&nbsp;modelo&nbsp;consegue&nbsp;aprender&nbsp;os&nbsp;padrões&nbsp;corretos.&quot;</li></ul>",
     "explicacao": ""
   },
   {
-    "pipe": "selecao_metricas",
+    "_id": {
+      "$oid": "68af35f9c1255ac11615c551"
+    },
+    "pipe": "selecao-metricas",
     "tipos": [
       {
         "label": "Acurácia",
@@ -111,6 +114,9 @@
     "explicacao": ""
   },
   {
+    "_id": {
+      "$oid": "68af35f9c1255ac11615c552"
+    },
     "pipe": "avaliacao",
     "texto_pipe": "texto sobre o avaliação",
     "explicacao": ""

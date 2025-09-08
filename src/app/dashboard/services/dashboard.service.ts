@@ -63,6 +63,10 @@ export class DashboardService {
     return this.http.put(`${this.url}${this.endpointTutor}/editar-tipo-aprendizado/${id}`, body);
   }
 
+  putTutorModelo(body: any, id: string) {
+    return this.http.put(`${this.url}${this.endpointTutor}/editar-modelos/${id}`, body);
+  }
+
   putTutorParams(body: any, id: string, params: any) {
     return this.http.put(`${this.url}${this.endpointTutor}/${id}?${params}`, body);
   }
