@@ -25,7 +25,7 @@
 
     <!-- Texto inicial -->
     <ng-container *ngIf="opcaoSelecionada === 0">
-      <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="texto_pipe">
+      <quill-editor [readOnly]="erroTutor" class="editor" formControlName="texto_pipe">
       </quill-editor>
     </ng-container>
 
@@ -35,7 +35,7 @@
 
         <nav class="texto-label">Explicação sobre: {{ metrica.get('label')?.value }}</nav>
 
-        <quill-editor [readOnly]="erroTutor" [modules]="modules" class="editor" formControlName="explicacao">
+        <quill-editor [readOnly]="erroTutor" class="editor" formControlName="explicacao">
         </quill-editor>
 
       </div>

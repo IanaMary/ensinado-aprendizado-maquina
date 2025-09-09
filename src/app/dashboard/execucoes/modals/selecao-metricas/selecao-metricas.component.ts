@@ -11,10 +11,9 @@ import { DashboardService } from '../../../services/dashboard.service';
 export class SelecaoMetricasComponent implements OnChanges {
 
   @Input() metricasDisponiveis: ItemPipeline[] = [];
-  @Input() metricasSelecionadas: ItemPipeline[] = [];
   @Output() selecaoMetricas = new EventEmitter<ItemPipeline[]>();
-  metricasMap: { item: ItemPipeline; movido: boolean }[] = [];
 
+  metricasSelecionadas: ItemPipeline[] = [];
 
   constructor(private dashboardService: DashboardService) { }
 
@@ -22,12 +21,12 @@ export class SelecaoMetricasComponent implements OnChanges {
 
 
   toggleMetrica(metrica: ItemPipeline) {
-    this.metricasSelecionadas = this.dashboardService.selecionarMetricas(metrica);
     this.emitSelecaoMetricas();
 
   }
 
   emitSelecaoMetricas() {
+    this.metricasSelecionadas = this.metricasDisponiveis.filter(e => e.movido);
     this.selecaoMetricas.emit(this.metricasSelecionadas);
   }
 }

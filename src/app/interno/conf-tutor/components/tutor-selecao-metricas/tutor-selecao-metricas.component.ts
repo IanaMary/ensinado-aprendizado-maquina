@@ -71,7 +71,10 @@ export class TutorSelecaoMetricasComponent implements OnChanges {
   }
 
   putTutor() {
-    const body = this.formConfTutorSelecaoMetricas.value;
+
+    const body = {
+      contexto: this.formConfTutorSelecaoMetricas.value
+    }
     this.dashboardService.putTutor(body, this.idTutor).subscribe({
       next: () => this.notificacao.sucesso('Edição feita com sucesso!'),
       error: () => {

@@ -128,9 +128,9 @@ export class ModalExecucaoComponent implements OnInit {
       tipoTarget,
       this.etapas[COLETA_DADO].proximo
     );
-    console.log("ee =>", this.resultadoColetaDado)
-    const preverCategoria = this.resultadoColetaDado.preverCategoria;
-    const dadosRotulados = this.resultadoColetaDado.dadosRotulados;
+
+    const preverCategoria = this.resultadoColetaDado.preverCategoria ?? false;
+    const dadosRotulados = this.resultadoColetaDado.dadosRotulados ?? false;
     this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(preverCategoria, dadosRotulados);
     this.modeloSelecionado = this.modelosDisponiveis[0];
     this.funcBodyTutor();
@@ -143,7 +143,6 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   async atualizarResultadoTreinamento(event: any) {
-
     this.resultadoTreinamento = event;
     this.dashboardService.selecionarModelo(this.modeloSelecionado);
     this.inicializarMetricasDisponiveis();
@@ -264,7 +263,8 @@ export class ModalExecucaoComponent implements OnInit {
     } else if (this.etapaAtual === TREINAMENTO || this.etapaAtual === AVALIACAO) {
       chaves = ['texto_pipe', 'explicacao'];
     } else if (this.etapaAtual === SELECAO_METRICAS) {
-      chaves = ['texto_pipe', 'explicacao'];
+      const caminhos = this.metricasSelecionadas.map(item => `tipos[valor=${item.valor}].explicacao`);
+      chaves = ['texto_pipe', 'explicacao'].concat(caminhos);
     }
 
     this.emitTutor(chaves);

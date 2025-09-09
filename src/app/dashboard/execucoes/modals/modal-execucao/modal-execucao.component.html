@@ -56,7 +56,7 @@
 
         <ng-container *ngSwitchCase="3">
           <app-selecao-metricas [metricasDisponiveis]="metricasDisponiveis"
-            [metricasSelecionadas]="metricasSelecionadas" (selecaoMetricas)="atualizarMetricasSelecionadas($event)">
+            (selecaoMetricas)="atualizarMetricasSelecionadas($event)">
           </app-selecao-metricas>
         </ng-container>
 
