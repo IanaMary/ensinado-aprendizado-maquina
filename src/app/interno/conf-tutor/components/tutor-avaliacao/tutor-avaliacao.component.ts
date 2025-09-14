@@ -60,7 +60,10 @@ export class TutorAvaliacaoComponent implements OnChanges {
   }
 
   putTutor() {
-    const body = this.formConfTutorAvaliacao.value;
+    const body = {
+      contexto: this.formConfTutorAvaliacao.value
+    }
+
     this.dashboardService.putTutor(body, this.idTutor).subscribe({
       next: async (res: any) => {
         this.notificacao.sucesso('Edição feita com sucesso!');
