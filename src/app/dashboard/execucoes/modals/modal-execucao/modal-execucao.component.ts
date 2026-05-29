@@ -44,6 +44,7 @@ export class ModalExecucaoComponent implements OnInit {
   resultadoTreinamento?: any;
   modeloSelecionado?: ItemPipeline;
   modelosDisponiveis: ItemPipeline[] = [];
+  tutorModeloTarget: string = '';
 
   tipoArquivoSelecionado: 'xlxs' | 'csv' | 'json' = 'xlxs';
 
