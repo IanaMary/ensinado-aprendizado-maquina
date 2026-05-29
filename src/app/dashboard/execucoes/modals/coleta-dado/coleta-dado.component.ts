@@ -22,6 +22,8 @@ import { SessionService } from '../../../../service/sessao-store.service';
 export class ColetaDadoComponent implements OnChanges, OnInit {
 
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
+  @Input() tipoArquivoSelecionado: 'xlxs' | 'csv' | 'json' = 'xlxs';
+  
   @Output() resultadoColetaDadoModificado = new EventEmitter<ResultadoColetaDado>();
 
   tutor = tutor.resumos;
@@ -67,6 +69,16 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   ) { }
 
+  get aceitarArquivos(): string {
+    switch (this.tipoArquivoSelecionado) {
+      case 'csv': return '.csv';
+      case 'json': return '.json';
+      case 'xlxs':
+      default:
+        return '.xlsx,.xls';
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges) {
 
     this.idColeta = this.sessionService.getColetaId();
@@ -91,7 +103,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     const formData = this.criarBody(event, tipo)
 
-    this.dashboardService.postColetaArquivo('xlxs', formData).subscribe({
+    this.dashboardService.postColetaArquivo(this.tipoArquivoSelecionado, formData).subscribe({
       next: (res: any) => {
         this.idColeta = res.id_coleta;
         this.msgErro(tipo, '')

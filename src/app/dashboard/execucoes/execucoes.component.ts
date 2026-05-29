@@ -63,6 +63,7 @@ export class ExecucoesComponent implements OnInit {
       hasBackdrop: false,
       data: {
         etapa: item.tipoItem === 'metrica' ? 'avaliacao' : item.tipoItem === 'treino-validacao-teste' ? 'treinamento' : item.tipoItem,
+        tipoArquivoSelecionado: item.tipoItem === 'coleta-dado' ? item.valor : undefined,
         resultadoColetaDado: this.resultadoColetaDado,
         modeloSelecionado: item.tipoItem === 'treino-validacao-teste' ? item : this.modeloSelecionado,
         resultadoTreinamento: this.resultadoTreinamento,

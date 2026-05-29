@@ -45,7 +45,7 @@ export class ModalExecucaoComponent implements OnInit {
   modeloSelecionado?: ItemPipeline;
   modelosDisponiveis: ItemPipeline[] = [];
 
-  tutorModeloTarget: string[] = [];
+  tipoArquivoSelecionado: 'xlxs' | 'csv' | 'json' = 'xlxs';
 
   metricasDisponiveis: ItemPipeline[] = [];
   metricasSelecionadas: ItemPipeline[] = [];
@@ -169,6 +169,9 @@ export class ModalExecucaoComponent implements OnInit {
 
   atualizarVariaveis(data: any) {
     let todosExistem = false
+    if (data?.tipoArquivoSelecionado) {
+      this.tipoArquivoSelecionado = data.tipoArquivoSelecionado;
+    }
     if (data?.etapa) {
       this.etapaAtual = data.etapa;
       if (!this.resultadoColetaDado && data.resultadoColetaDado) {

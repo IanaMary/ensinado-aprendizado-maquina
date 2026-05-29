@@ -1,13 +1,23 @@
 <nav class="modal-coleta">
 
-  <!-- Input para seleção do arquivo treino -->
-  <nav class="modal-cabecalho">
+    <!-- Input para seleção do arquivo treino -->
     <nav class="conteudo">
       <label for="arquivo-treino">Planilha de Treino (obrigatória)</label>
-      <input id="arquivo-treino" type="file" (change)="postArquivo($event, 'treino')" accept=".xlsx" />
+      <input id="arquivo-treino" type="file" (change)="postArquivo($event, 'treino')" [accept]="aceitarArquivos" />
       <nav *ngIf="treino.erro" class="erro">{{ treino.erro }}</nav>
       <div *ngIf="treino.nomeArquivo">
         <small>Arquivo selecionado: {{ treino.nomeArquivo }}</small>
+      </div>
+    </nav>
+
+
+    <!-- Input para seleção do arquivo teste -->
+    <nav class="conteudo">
+      <label for="arquivo-teste">Planilha de Teste (opcional)</label>
+      <input id="arquivo-teste" type="file" (change)="postArquivo($event, 'teste')" [accept]="aceitarArquivos" />
+      <nav *ngIf="teste.erro" class="erro">{{ teste.erro }}</nav>
+      <div *ngIf="teste.nomeArquivo">
+        <small>Arquivo selecionado: {{ teste.nomeArquivo }}</small>
       </div>
     </nav>
 

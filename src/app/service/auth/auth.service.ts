@@ -1,19 +1,39 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor() { }
+  constructor(private router: Router) { }
 
+  /**
+   * Verifica se o token existe e não expirou.
+   */
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    if (!token) {
+      return false;
+    }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp && payload.exp < Date.now() / 1000) {
+        this.logout();
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Alias para isAuthenticated() para manter compatibilidade.
+   */
   autenticado(): Promise<boolean> {
     return new Promise((resolve) => {
-      const usuario = this.getToken();
-      if (usuario) {
-        resolve(true);
-      }
-      resolve(false);
+      resolve(this.isAuthenticated());
     });
   }
 
@@ -35,7 +55,7 @@ export class AuthService {
     });
   }
 
-  getToken() {
+  getToken(): string | null {
     return sessionStorage.getItem('token');
   }
 
@@ -43,4 +63,18 @@ export class AuthService {
     return sessionStorage.getItem('role') || '';
   }
 
+  getUser(): any {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch {
+      return null;
+    }
+  }
+
+  logout(): void {
+    sessionStorage.clear();
+    this.router.navigate(['/autenticacao/login', { queryParams: { expirado: 1 } }]);
+  }
 }
