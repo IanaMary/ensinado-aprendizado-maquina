@@ -32,7 +32,13 @@ export class DashboardService {
   private readonly endpointClassificador: string = 'classificador';
 
 
-  constructor(private http: HttpClient) {
+  private loaded = false;
+
+  constructor(private http: HttpClient) { }
+
+  carregarDados() {
+    if (this.loaded) return;
+    this.loaded = true;
     this.carregarItensColetasDados();
     this.carregarItensModelos();
     this.carregarItensMetricas();

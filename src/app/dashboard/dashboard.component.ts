@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { DashboardService } from './services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -6,6 +7,12 @@ import { Component } from '@angular/core';
   styleUrls: ['./dashboard.component.scss'],
   standalone: false
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
+
+  constructor(private dashboardService: DashboardService) { }
+
+  ngOnInit() {
+    this.dashboardService.carregarDados();
+  }
 
 }

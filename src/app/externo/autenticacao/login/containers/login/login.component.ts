@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
 import { AuthService } from '../../../../../service/auth/auth.service';
+import { NotificacaoService } from '../../../../../service/notificacao.service';
 import { roleMap } from '../../../../../models/item-coleta-dado.model';
 
 
@@ -24,7 +25,8 @@ export class LoginComponent implements OnInit {
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly auth: AuthService) {
+    private readonly auth: AuthService,
+    private readonly notificacao: NotificacaoService) {
 
     this.loginForm = this.formBuilder.group({
       email: [null, [
@@ -68,7 +70,7 @@ export class LoginComponent implements OnInit {
             messageErr = 'Algo de errado aconteceu, tente novamente mais tarde.';
         }
 
-        console.error('Erro de login:', messageErr);
+        this.notificacao.erro(messageErr);
       }
     });
   }

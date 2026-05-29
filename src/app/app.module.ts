@@ -3,9 +3,7 @@ import { BrowserModule, DomSanitizer } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { DashboardModule } from './dashboard/dashboard.module';
 import { MatIconRegistry } from '@angular/material/icon';
-import { ConfTutorModule } from './interno/conf-tutor/conf-tutor.module';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
@@ -14,8 +12,6 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-    DashboardModule,
-    ConfTutorModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
