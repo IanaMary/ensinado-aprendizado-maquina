@@ -5,7 +5,8 @@ import {
   EventEmitter,
   OnChanges,
   SimpleChanges,
-  OnInit
+  OnInit,
+  ChangeDetectorRef
 } from '@angular/core';
 import { PlanilhaService } from '../../../../service/planilha.service';
 import { InformacoesDados, ResultadoColetaDado, TipoDado } from '../../../../models/item-coleta-dado.model';
@@ -65,7 +66,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   constructor(private planilhaService: PlanilhaService,
     private dashboardService: DashboardService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private cdr: ChangeDetectorRef
 
   ) { }
 
@@ -195,6 +197,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.resultadoColetaDado = this.resultColetaDadoL;
     this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
 
+    this.cdr.detectChanges();
   }
 
   preverCategoriaDadosRotulados(bool: boolean) {
