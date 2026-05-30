@@ -53,7 +53,7 @@ export class DashboardService {
   // SERVIÇOS COM LIGAÇÃO COM BANCO 
 
   getTutor(params: any) {
-    return this.http.get(`${this.url}${this.endpointTutor}?${params}`);
+    return this.http.get(`${this.url}${this.endpointTutor}/?${params}`);
   }
 
   getTutorEditar(body: any) {
