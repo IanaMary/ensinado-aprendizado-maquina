@@ -113,6 +113,17 @@ export class ExecucoesComponent implements OnInit {
     return params.toString();
   }
 
+  limparSessao() {
+    sessionStorage.removeItem('idColeta');
+    sessionStorage.removeItem('configurcaoTreinamento');
+    this.resultadoColetaDado = undefined;
+    this.modeloSelecionado = undefined;
+    this.resultadoTreinamento = undefined;
+    this.metricasSelecionadas = [];
+    this.resultadosDasAvaliacoes = {};
+    this.dashboardService.limparItensExecucao();
+  }
+
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();

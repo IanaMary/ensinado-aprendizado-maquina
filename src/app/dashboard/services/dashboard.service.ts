@@ -180,6 +180,10 @@ export class DashboardService {
     return this.itemsEmExecucao.asObservable();
   }
 
+  limparItensExecucao() {
+    this.itemsEmExecucao.next([]);
+  }
+
 
   getModelosPorTipo(preverCategoria: boolean, dadosRotulados: boolean): ItemPipeline[] {
     return this.itensModelos.getValue().filter(item => (item?.preverCategoria === preverCategoria && item.dadosRotulados === dadosRotulados));

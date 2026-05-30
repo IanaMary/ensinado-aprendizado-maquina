@@ -61,6 +61,10 @@
   <div cdkDrag class="coluna coluna-40">
     <nav class="titulo">
       <h3>Tutor</h3>
+      <button mat-stroked-button class="btn-limpar" (click)="limparSessao()">
+        <mat-icon>delete_outline</mat-icon>
+        Limpar Sessão
+      </button>
     </nav>
     <div class="conteudo">
       <app-tutor [tutorGeral]="tutor"></app-tutor>
