@@ -22,16 +22,6 @@
     </nav>
 
 
-    <!-- Input para seleção do arquivo teste -->
-    <nav class="conteudo">
-      <label for="arquivo-teste">Planilha de Teste (opcional)</label>
-      <input id="arquivo-teste" type="file" (change)="postArquivo($event, 'teste')" accept=".xlsx" />
-      <nav *ngIf="teste.erro" class="erro">{{ teste.erro }}</nav>
-      <div *ngIf="teste.nomeArquivo">
-        <small>Arquivo selecionado: {{ teste.nomeArquivo }}</small>
-      </div>
-    </nav>
-
   </nav>
 
   <nav class="modal-conteudo-coleta">

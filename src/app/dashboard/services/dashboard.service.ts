@@ -22,7 +22,7 @@ export class DashboardService {
   private itensModelos = new BehaviorSubject<ItemPipeline[]>([]);
   private itensMetricas = new BehaviorSubject<ItemPipeline[]>([]);
 
-  url = environment.apiUrl;
+  get url(): string { return environment.apiUrl; }
   private readonly endpointTutor: string = 'tutor';
   private readonly endpointConfPipeline: string = 'conf_pipeline/';
   private readonly endpointColeta: string = 'coleta_dados/';

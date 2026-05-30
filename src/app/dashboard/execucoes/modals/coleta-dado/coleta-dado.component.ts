@@ -137,13 +137,10 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       formData.append('test_size', porcentagemTeste);
     } else if (tipo === 'teste') {
       this.testeArquivo = input.files[0];
-
-      if (this.treinoArquivo) {
-        formData.append('file_treino', this.treinoArquivo, this.treinoArquivo.name);
+      formData.append('file', this.testeArquivo, this.testeArquivo.name);
+      if (this.idColeta) {
+        formData.append('id_coleta', this.idColeta);
       }
-
-      formData.append('file_teste', this.testeArquivo, this.testeArquivo.name);
-      formData.append('id_coleta', this.idColeta);
     }
 
     return formData;
@@ -168,6 +165,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
 
   preencherDados(res: any) {
+
+    if (!res?.atributos) return;
 
     const nomeColunas = Object.keys(res.atributos);
     this.totalDados = res.num_linhas_total;
