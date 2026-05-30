@@ -78,7 +78,13 @@ export class DashboardService {
   }
 
   postColetaArquivo(tipo: string, body: any) {
-    return this.http.post(`${this.url}${this.endpointColeta}salvar_${tipo}`, body);
+    const endpoints: Record<string, string> = {
+      csv: 'csv',
+      xlxs: 'salvar_xlxs',
+      json: 'salvar_json'
+    };
+    const endpoint = endpoints[tipo] || `salvar_${tipo}`;
+    return this.http.post(`${this.url}${this.endpointColeta}${endpoint}`, body);
   }
 
   getColetaInfo(tipo: string, idConfigurcacaoTreinamento: string) {
