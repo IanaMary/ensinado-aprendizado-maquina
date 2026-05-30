@@ -187,6 +187,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     this.teste = { dados: res.preview_teste || [], totalDados: res.num_linhas_teste || 0, nomeArquivo: res.arquivo_nome_teste ?? '', erro: '' };
 
+    console.log('DEBUG teste.dados:', JSON.stringify(this.teste.dados));
+    console.log('DEBUG colunas:', this.resultColetaDadoL.colunas);
+
     this.opcoesNome = nomeColunas;
     this.opcoesTarget = nomeColunas;
 
