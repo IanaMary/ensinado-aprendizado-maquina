@@ -151,7 +151,7 @@
     <ng-container *ngIf="treino.dados.length && resultColetaDadoL.colunas.length">
 
       <nav class="configuracao-generica">
-        Dataset de treino {{treino.totalDados}}
+        Dataset de treino: {{treino.totalDados}} exemplos
       </nav>
       <nav class="tabela-container">
         <table mat-table [dataSource]="treino.dados" class="mat-table mat-elevation-z1">
@@ -172,7 +172,7 @@
     <ng-container *ngIf="teste.dados.length && resultColetaDadoL.colunas.length">
 
       <nav class="configuracao-generica">
-        Dataset de teste {{teste.totalDados}}
+        Dataset de teste: {{teste.totalDados}} exemplos
       </nav>
       <nav class="tabela-container">
         <table mat-table [dataSource]="teste.dados" class="mat-table mat-elevation-z1">
