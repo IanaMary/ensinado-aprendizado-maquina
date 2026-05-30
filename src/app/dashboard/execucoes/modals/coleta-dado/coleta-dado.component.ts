@@ -183,13 +183,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     this.resultColetaDadoL.colunasDetalhes = res.colunas_detalhes;
 
-    this.treino.dados = res.preview_treino;
-    this.treino.totalDados = res.num_linhas_treino;
-    this.treino.nomeArquivo = res.arquivo_nome_treino;
+    this.treino = { dados: res.preview_treino, totalDados: res.num_linhas_treino, nomeArquivo: res.arquivo_nome_treino, erro: '' };
 
-    this.teste.dados = res.preview_teste;
-    this.teste.totalDados = res.num_linhas_teste;
-    this.teste.nomeArquivo = res.arquivo_nome_teste ?? '';
+    this.teste = { dados: res.preview_teste || [], totalDados: res.num_linhas_teste || 0, nomeArquivo: res.arquivo_nome_teste ?? '', erro: '' };
 
     this.opcoesNome = nomeColunas;
     this.opcoesTarget = nomeColunas;
