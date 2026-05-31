@@ -178,7 +178,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.resultColetaDadoL.target = res.target;
     this.resultColetaDadoL.tipoTarget = res.tipo_target;
     this.resultColetaDadoL.preverCategoria = res.prever_categoria;
-    this.resultColetaDadoL.dadosRotulados = res.daods_rotulados;
+    this.resultColetaDadoL.dadosRotulados = res.dados_rotulados || res.daods_rotulados;
 
 
     this.resultColetaDadoL.colunasDetalhes = res.colunas_detalhes;
@@ -212,7 +212,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       target: this.resultColetaDadoL.target,
       atributos: this.resultColetaDadoL.atributos,
       prever_categoria: prever_categoria,
-      daods_rotulados: dadoss_rotulados,
+      dados_rotulados: dadoss_rotulados,
     }
 
     this.dashboardService.putColetaConfig('xlxs', this.idConfigurcacaoTreinamento, body).subscribe({

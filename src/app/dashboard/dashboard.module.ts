@@ -9,11 +9,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { FormsModule } from '@angular/forms'; // Importe o FormsModule
+import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { HttpClientModule } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatInputModule } from '@angular/material/input';
@@ -71,7 +70,6 @@ import { SessionService } from '../service/sessao-store.service';
     MatSelectModule,
     MatMenuModule,
     MatTooltipModule,
-    HttpClientModule,
     MatProgressSpinnerModule,
     MatSliderModule,
     MatInputModule,

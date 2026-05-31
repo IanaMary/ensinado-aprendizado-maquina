@@ -50,7 +50,6 @@ export class AuthService {
   limparSessionStorage(): Promise<any> {
     return new Promise<any>((resolve) => {
       sessionStorage.clear();
-      sessionStorage.clear();
       resolve(true);
     });
   }
