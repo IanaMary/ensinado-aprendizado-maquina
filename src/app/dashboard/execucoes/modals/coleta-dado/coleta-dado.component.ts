@@ -119,7 +119,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   abrirConfigCSV(file: File, tipo: 'treino' | 'teste') {
     const dialogRef = this.dialog.open(CsvConfigComponent, {
-      width: '750px',
+      width: '90vw',
+      maxWidth: '950px',
+      panelClass: 'csv-config-dialog',
       disableClose: true,
       data: { file, tipo }
     });

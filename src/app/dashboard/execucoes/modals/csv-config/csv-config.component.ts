@@ -91,4 +91,9 @@ export class CsvConfigComponent implements OnInit {
   cancelar() {
     this.dialogRef.close({ confirmado: false });
   }
+
+  getTipoColuna(col: string): string {
+    const detalhe = this.colunasDetalhes.find((d: any) => d.nome_coluna === col);
+    return detalhe?.tipo_coluna || '';
+  }
 }
