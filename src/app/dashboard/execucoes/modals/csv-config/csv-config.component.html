@@ -1,5 +1,10 @@
 <div class="csv-config">
-  <h2 mat-dialog-title>Configurar Leitura CSV</h2>
+  <div class="cabecalho-topo">
+    <h2>Configurar Leitura CSV</h2>
+    <button mat-icon-button class="close-button" (click)="cancelar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
   <mat-dialog-content class="dialog-content">
     <div class="config-row">
@@ -23,7 +28,7 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Linhas preview</mat-label>
-        <input matInput type="number" [(ngModel)]="linhasPreview" min="1" max="50"
+        <input matInput type="number" [(ngModel)]="linhasPreview" min="1" max="100"
           (change)="fazerPreview()" />
       </mat-form-field>
     </div>
@@ -38,11 +43,11 @@
     <div *ngIf="!carregando && !erro && preview.length > 0" class="preview-section">
       <div class="preview-info">
         <span>{{ colunas.length }} colunas detectadas</span>
-        <span>{{ preview.length }} linhas no preview</span>
+        <span>{{ preview.length }} linhas carregadas</span>
       </div>
 
       <div class="tabela-container">
-        <table mat-table [dataSource]="preview" class="mat-table mat-elevation-z1">
+        <table mat-table [dataSource]="paginaAtual" class="mat-table mat-elevation-z1">
           <ng-container *ngFor="let col of colunas" [matColumnDef]="col">
             <th mat-header-cell *matHeaderCellDef>
               <div class="col-header">
@@ -55,6 +60,16 @@
           <tr mat-header-row *matHeaderRowDef="colunas"></tr>
           <tr mat-row *matRowDef="let row; columns: colunas;"></tr>
         </table>
+      </div>
+
+      <div class="paginacao">
+        <button mat-icon-button [disabled]="pagina === 0" (click)="paginaAnterior()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="paginacao-info">Página {{ pagina + 1 }} de {{ totalPaginas }}</span>
+        <button mat-icon-button [disabled]="pagina >= totalPaginas - 1" (click)="proximaPagina()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
       </div>
     </div>
   </mat-dialog-content>

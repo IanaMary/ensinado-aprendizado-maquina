@@ -45,8 +45,16 @@
 
       .cabecalho-topo {
         display: flex;
-        justify-content: flex-end;
-        padding-bottom: 4px;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 8px;
+
+        h2 {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: $cor-principal;
+        }
 
         .close-button {
           width: 28px;
@@ -85,10 +93,6 @@
       align-content: center;
       flex-wrap: nowrap;
       align-items: center;
-    }
-
-    .titulo {
-      justify-content: space-between;
     }
 
     .breadcrumb {

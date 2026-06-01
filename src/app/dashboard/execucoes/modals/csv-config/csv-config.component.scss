@@ -9,11 +9,29 @@
   width: 100%;
 }
 
-h2[mat-dialog-title] {
-  flex-shrink: 0;
-  margin: 0;
-  padding: 16px 24px;
+.cabecalho-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
   border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .close-button {
+    width: 32px;
+    height: 32px;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+  }
 }
 
 .dialog-content {
@@ -103,5 +121,25 @@ mat-dialog-actions {
     font-weight: normal;
     color: #999;
     font-size: 11px;
+  }
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 0 4px;
+
+  .paginacao-info {
+    font-size: 13px;
+    color: #666;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  button {
+    width: 32px;
+    height: 32px;
   }
 }

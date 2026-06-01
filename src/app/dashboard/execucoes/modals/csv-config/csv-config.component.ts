@@ -25,7 +25,7 @@ export class CsvConfigComponent implements OnInit {
 
   separador: string = 'virgula';
   encoding: string = 'utf-8';
-  linhasPreview: number = 10;
+  linhasPreview: number = 50;
 
   carregando: boolean = false;
   erro: string = '';
@@ -33,6 +33,9 @@ export class CsvConfigComponent implements OnInit {
   preview: any[] = [];
   colunas: string[] = [];
   colunasDetalhes: any[] = [];
+
+  pagina: number = 0;
+  linhasPorPagina: number = 10;
 
   constructor(
     public dialogRef: MatDialogRef<CsvConfigComponent>,
@@ -44,11 +47,29 @@ export class CsvConfigComponent implements OnInit {
     this.fazerPreview();
   }
 
+  get totalPaginas(): number {
+    return Math.max(1, Math.ceil(this.preview.length / this.linhasPorPagina));
+  }
+
+  get paginaAtual(): any[] {
+    const inicio = this.pagina * this.linhasPorPagina;
+    return this.preview.slice(inicio, inicio + this.linhasPorPagina);
+  }
+
+  paginaAnterior() {
+    if (this.pagina > 0) this.pagina--;
+  }
+
+  proximaPagina() {
+    if (this.pagina < this.totalPaginas - 1) this.pagina++;
+  }
+
   fazerPreview() {
     if (!this.data?.file) return;
 
     this.carregando = true;
     this.erro = '';
+    this.pagina = 0;
 
     const formData = new FormData();
     formData.append('file', this.data.file, this.data.file.name);

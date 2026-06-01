@@ -4,6 +4,7 @@
 
     <nav class="modal-cabecalho">
       <div class="cabecalho-topo">
+        <h2>{{ etapas[etapaAtual].titulo }}</h2>
         <button mat-icon-button class="close-button" (click)="fechar()">
           <mat-icon>close</mat-icon>
         </button>
@@ -17,12 +18,6 @@
           </div>
           <div *ngIf="idx < etapaKeys.length - 1" class="linha" [ngClass]="getClasseLinhaPipe(idx)"></div>
         </ng-container>
-      </nav>
-
-      <mat-divider></mat-divider>
-
-      <nav class="box-linha titulo">
-        <h2>{{ etapas[etapaAtual].titulo }}</h2>
       </nav>
 
       <mat-divider></mat-divider>
