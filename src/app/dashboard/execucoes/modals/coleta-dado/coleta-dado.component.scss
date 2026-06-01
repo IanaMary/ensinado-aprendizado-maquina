@@ -158,3 +158,53 @@ input[type="file"] {
   }
 
 }
+
+.label-secao {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.tipo-predicao-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  mat-radio-button {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    &.mat-radio-checked {
+      border-color: #4caf50;
+      background-color: #e8f5e9;
+    }
+
+    ::ng-deep .mat-radio-container {
+      padding-top: 2px;
+    }
+
+    .radio-label {
+      font-weight: 600;
+      font-size: 13px;
+      display: block;
+    }
+
+    .radio-desc {
+      font-size: 11px;
+      color: #666;
+      display: block;
+      margin-top: 2px;
+    }
+  }
+}
+
+.configuracao-generica {
+  mat-form-field {
+    min-width: 250px;
+  }
+}

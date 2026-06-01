@@ -36,6 +36,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   att: { [key: string]: boolean } = {};
 
+  tipoPredicao: 'regressao' | 'classificacao' | 'exploratorio' = 'exploratorio';
 
   resultColetaDadoL: ResultadoColetaDado = {
     target: '',
@@ -254,6 +255,50 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     const dadoss_rotulados = this.resultColetaDadoL.dadosRotulados ?? false;
     this.resultColetaDadoL.target = dadoss_rotulados && bool ? this.resultColetaDadoL.target : '';
     this.putConfiguracaoTreino();
+  }
+
+  onTipoPredicaoChange(tipo: 'regressao' | 'classificacao' | 'exploratorio') {
+    this.tipoPredicao = tipo;
+
+    if (tipo === 'exploratorio') {
+      this.resultColetaDadoL.dadosRotulados = false;
+      this.resultColetaDadoL.preverCategoria = false;
+      this.resultColetaDadoL.target = '';
+    } else if (tipo === 'classificacao') {
+      this.resultColetaDadoL.preverCategoria = true;
+    } else {
+      this.resultColetaDadoL.preverCategoria = false;
+    }
+
+    this.resultColetaDadoL.target = '';
+    this.putConfiguracaoTreino();
+  }
+
+  onDadosRotuladosChange() {
+    if (!this.resultColetaDadoL.dadosRotulados) {
+      this.resultColetaDadoL.target = '';
+    }
+    this.putConfiguracaoTreino();
+  }
+
+  isColunaHabilitada(item: any): boolean {
+    if (this.tipoPredicao === 'exploratorio') return false;
+    if (!this.resultColetaDadoL.dadosRotulados) return false;
+
+    const tipo = item.tipo_coluna;
+    if (this.tipoPredicao === 'classificacao') return tipo === 'string';
+    if (this.tipoPredicao === 'regressao') return tipo === 'number';
+    return false;
+  }
+
+  getMotivoDesabilitado(item: any): string {
+    if (this.tipoPredicao === 'exploratorio') return 'Selecione um tipo de predição';
+    if (!this.resultColetaDadoL.dadosRotulados) return 'Marque "Dados possuem rótulo"';
+
+    const tipo = item.tipo_coluna;
+    if (this.tipoPredicao === 'classificacao' && tipo === 'number') return 'Classificação requer coluna texto';
+    if (this.tipoPredicao === 'regressao' && tipo === 'string') return 'Regressão requer coluna numérica';
+    return '';
   }
 
   putConfiguracaoTreino() {
