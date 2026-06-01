@@ -63,6 +63,24 @@ small {
   color: #333;
 }
 
+.btn-selecionar-todos,
+.btn-limpar-todos {
+  width: 28px;
+  height: 28px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
 
 .tipos-container,
 .tabela-container {

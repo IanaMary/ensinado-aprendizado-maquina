@@ -345,6 +345,23 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.putConfiguracaoTreino();
   }
 
+  selecionarTodosAtributos() {
+    const target = this.resultColetaDadoL.target;
+    for (const col of this.resultColetaDadoL.colunas) {
+      if (col !== target) {
+        this.resultColetaDadoL.atributos[col] = true;
+      }
+    }
+    this.putConfiguracaoTreino();
+  }
+
+  limparTodosAtributos() {
+    for (const col of this.resultColetaDadoL.colunas) {
+      this.resultColetaDadoL.atributos[col] = false;
+    }
+    this.putConfiguracaoTreino();
+  }
+
 
   configurarFiltro() {
     // this.dataSourceColunas.filterPredicate = (linha, raw) => {
