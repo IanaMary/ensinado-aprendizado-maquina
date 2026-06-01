@@ -42,6 +42,24 @@
 
     .modal-cabecalho {
       // background-color: antiquewhite;
+
+      .cabecalho-topo {
+        display: flex;
+        justify-content: flex-end;
+        padding-bottom: 4px;
+
+        .close-button {
+          width: 28px;
+          height: 28px;
+          line-height: 28px;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
     }
 
     .modal-conteudo {

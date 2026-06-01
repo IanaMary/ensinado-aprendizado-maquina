@@ -238,6 +238,18 @@ mat-checkbox {
   padding: 8px !important;
 }
 
+.csv-config-dialog .mat-mdc-dialog-container {
+  max-height: 90vh !important;
+  max-width: 95vw !important;
+
+  .mat-mdc-dialog-surface {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    padding: 0 !important;
+  }
+}
+
 .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick,
 .mat-form-field-appearance-outline .mat-form-field-outline,
 .mat-form-field-appearance-outline .mat-form-field-outline-thick,

@@ -3,6 +3,12 @@
   <div class="main-content" [class.main-content-pad]="drawerOpen" cdkDragHandle>
 
     <nav class="modal-cabecalho">
+      <div class="cabecalho-topo">
+        <button mat-icon-button class="close-button" (click)="fechar()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
       <nav class="box-linha breadcrumb">
         <ng-container *ngFor="let key of etapaKeys; let idx = index">
           <div [matTooltip]="etapas[key].titulo" matTooltipPosition="above" class="bolinha"
@@ -11,19 +17,12 @@
           </div>
           <div *ngIf="idx < etapaKeys.length - 1" class="linha" [ngClass]="getClasseLinhaPipe(idx)"></div>
         </ng-container>
-        <!-- 
-        <button class="tutor drawer-toggle" (click)="toggleDrawer()">
-          <mat-icon [svgIcon]="'tutor'"></mat-icon>
-        </button> -->
       </nav>
 
       <mat-divider></mat-divider>
 
       <nav class="box-linha titulo">
         <h2>{{ etapas[etapaAtual].titulo }}</h2>
-        <button mat-icon-button class="close-button" (click)="fechar()">
-          <mat-icon>close</mat-icon>
-        </button>
       </nav>
 
       <mat-divider></mat-divider>
