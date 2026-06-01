@@ -1,0 +1,76 @@
+.csv-config {
+  min-width: 600px;
+  max-width: 90vw;
+}
+
+.config-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  color: #666;
+}
+
+.erro {
+  color: #f44336;
+  padding: 12px;
+  background: #ffebee;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.preview-section {
+  margin-top: 8px;
+}
+
+.preview-info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+.tabela-container {
+  max-height: 350px;
+  overflow: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+
+  table {
+    width: 100%;
+  }
+
+  th {
+    background: #f5f5f5;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  td {
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}
+
+.col-header {
+  display: flex;
+  flex-direction: column;
+
+  .col-type {
+    font-weight: normal;
+    color: #999;
+    font-size: 11px;
+  }
+}

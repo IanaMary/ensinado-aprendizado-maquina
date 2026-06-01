@@ -8,11 +8,13 @@ import {
   OnInit,
   ChangeDetectorRef
 } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { PlanilhaService } from '../../../../service/planilha.service';
 import { InformacoesDados, ResultadoColetaDado, TipoDado } from '../../../../models/item-coleta-dado.model';
 import tutor from '../../../../constants/tutor.json';
 import { DashboardService } from '../../../services/dashboard.service';
 import { SessionService } from '../../../../service/sessao-store.service';
+import { CsvConfigComponent } from '../csv-config/csv-config.component';
 
 @Component({
   selector: 'app-coleta-dado',
@@ -67,8 +69,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   constructor(private planilhaService: PlanilhaService,
     private dashboardService: DashboardService,
     private sessionService: SessionService,
-    private cdr: ChangeDetectorRef
-
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog
   ) { }
 
   get aceitarArquivos(): string {
@@ -102,9 +104,51 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
 
   postArquivo(event: Event, tipo: 'treino' | 'teste') {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
 
-    const formData = this.criarBody(event, tipo)
+    const file = input.files[0];
 
+    if (this.tipoArquivoSelecionado === 'csv') {
+      this.abrirConfigCSV(file, tipo);
+    } else {
+      const formData = this.criarBodyFromEvent(event, tipo);
+      this.enviarArquivo(formData, tipo);
+    }
+  }
+
+  abrirConfigCSV(file: File, tipo: 'treino' | 'teste') {
+    const dialogRef = this.dialog.open(CsvConfigComponent, {
+      width: '750px',
+      disableClose: true,
+      data: { file, tipo }
+    });
+
+    dialogRef.afterClosed().subscribe((resultado: any) => {
+      if (resultado?.confirmado) {
+        const formData = new FormData();
+        formData.append('tipo', tipo);
+        formData.append('file', file, file.name);
+        formData.append('separador', resultado.separador);
+        formData.append('encoding', resultado.encoding);
+
+        if (tipo === 'treino') {
+          const porcentagemTeste = (1 - this.resultColetaDadoL.porcentagemTreino / 100).toString();
+          formData.append('test_size', porcentagemTeste);
+          this.treinoArquivo = file;
+        } else {
+          this.testeArquivo = file;
+          if (this.idColeta) {
+            formData.append('id_coleta', this.idColeta);
+          }
+        }
+
+        this.enviarArquivo(formData, tipo);
+      }
+    });
+  }
+
+  enviarArquivo(formData: FormData, tipo: 'treino' | 'teste') {
     this.dashboardService.postColetaArquivo(this.tipoArquivoSelecionado, formData).subscribe({
       next: (res: any) => {
         this.idColeta = res.id_coleta;
@@ -115,7 +159,6 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
           this.sessionService.setConfigurcaoTreinamento(this.idConfigurcacaoTreinamento)
         }
         this.preencherDados(res);
-
       },
       error: (err) => {
         console.error(err.error.detail);
@@ -125,7 +168,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     });
   }
 
-  criarBody(event: Event, tipo: 'treino' | 'teste') {
+  criarBodyFromEvent(event: Event, tipo: 'treino' | 'teste') {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
 

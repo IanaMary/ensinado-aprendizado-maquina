@@ -34,6 +34,7 @@ import { SelecaoMetricasComponent } from './execucoes/modals/selecao-metricas/se
 import { MetricasComponent } from './pipeline/metricas/metricas.component';
 import { MetricaAvaliacaoComponent } from './execucoes/modals/metrica-avaliacao/metrica-avaliacao.component';
 import { TutorComponent } from './tutor/tutor.component';
+import { CsvConfigComponent } from './execucoes/modals/csv-config/csv-config.component';
 import { SessionService } from '../service/sessao-store.service';
 
 
@@ -54,7 +55,8 @@ import { SessionService } from '../service/sessao-store.service';
     SelecaoMetricasComponent,
     MetricasComponent,
     MetricaAvaliacaoComponent,
-    TutorComponent
+    TutorComponent,
+    CsvConfigComponent
   ],
   imports: [CommonModule,
     DragDropModule,

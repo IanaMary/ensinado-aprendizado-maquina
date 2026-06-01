@@ -1,0 +1,68 @@
+<div class="csv-config">
+  <h2 mat-dialog-title>Configurar Leitura CSV</h2>
+
+  <mat-dialog-content>
+    <div class="config-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Separador</mat-label>
+        <mat-select [(ngModel)]="separador" (selectionChange)="onSeparadorChange()">
+          <mat-option *ngFor="let s of separadores" [value]="s.valor">
+            {{ s.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Encoding</mat-label>
+        <mat-select [(ngModel)]="encoding" (selectionChange)="onEncodingChange()">
+          <mat-option *ngFor="let e of encodings" [value]="e.valor">
+            {{ e.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Linhas preview</mat-label>
+        <input matInput type="number" [(ngModel)]="linhasPreview" min="1" max="50"
+          (change)="fazerPreview()" />
+      </mat-form-field>
+    </div>
+
+    <div *ngIf="carregando" class="loading">
+      <mat-spinner diameter="30"></mat-spinner>
+      <span>Lendo arquivo...</span>
+    </div>
+
+    <div *ngIf="erro" class="erro">{{ erro }}</div>
+
+    <div *ngIf="!carregando && !erro && preview.length > 0" class="preview-section">
+      <div class="preview-info">
+        <span>{{ colunas.length }} colunas detectadas</span>
+        <span>{{ preview.length }} linhas no preview</span>
+      </div>
+
+      <div class="tabela-container">
+        <table mat-table [dataSource]="preview" class="mat-table mat-elevation-z1">
+          <ng-container *ngFor="let col of colunas" [matColumnDef]="col">
+            <th mat-header-cell *matHeaderCellDef>
+              <div class="col-header">
+                <span>{{ col }}</span>
+                <small class="col-type">{{ colunasDetalhes | json }}</small>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let row">{{ row[col] }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+          <tr mat-row *matRowDef="let row; columns: colunas;"></tr>
+        </table>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="confirmar()" [disabled]="carregando || erro || preview.length === 0">
+      Confirmar Importação
+    </button>
+  </mat-dialog-actions>
+</div>
