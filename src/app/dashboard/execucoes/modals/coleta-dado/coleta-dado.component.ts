@@ -266,8 +266,10 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       this.resultColetaDadoL.target = '';
     } else if (tipo === 'classificacao') {
       this.resultColetaDadoL.preverCategoria = true;
+      this.resultColetaDadoL.dadosRotulados = true;
     } else {
       this.resultColetaDadoL.preverCategoria = false;
+      this.resultColetaDadoL.dadosRotulados = true;
     }
 
     this.resultColetaDadoL.target = '';

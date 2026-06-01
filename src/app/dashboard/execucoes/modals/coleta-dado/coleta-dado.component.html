@@ -56,12 +56,6 @@
         </div>
 
         <div class="configuracao-generica" *ngIf="tipoPredicao !== 'exploratorio'">
-          <mat-checkbox [(ngModel)]="resultColetaDadoL.dadosRotulados" (change)="onDadosRotuladosChange()">
-            Dados possuem rótulo (target)
-          </mat-checkbox>
-        </div>
-
-        <div class="configuracao-generica" *ngIf="tipoPredicao !== 'exploratorio' && resultColetaDadoL.dadosRotulados">
           <mat-form-field appearance="outline">
             <mat-label>Coluna alvo (target)</mat-label>
             <mat-select (selectionChange)="selecaoTargetAtt($event, true)" [(ngModel)]="resultColetaDadoL.target">
