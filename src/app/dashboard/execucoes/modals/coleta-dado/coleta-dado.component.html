@@ -139,15 +139,10 @@
             <th mat-header-cell *matHeaderCellDef>
               <nav class="titulo">
                 Atributos
-                <button mat-icon-button class="btn-selecionar-todos"
-                  matTooltip="Selecionar todos (exceto target)"
-                  (click)="selecionarTodosAtributos()">
-                  <mat-icon>select_all</mat-icon>
-                </button>
-                <button mat-icon-button class="btn-limpar-todos"
-                  matTooltip="Desmarcar todos"
-                  (click)="limparTodosAtributos()">
-                  <mat-icon>deselect</mat-icon>
+                <button mat-icon-button class="btn-toggle-atributos"
+                  [matTooltip]="todosMarcados ? 'Desmarcar todos' : 'Selecionar todos (exceto target)'"
+                  (click)="toggleTodosAtributos()">
+                  <mat-icon>{{ todosMarcados ? 'deselect' : 'select_all' }}</mat-icon>
                 </button>
                 <app-filtro-coluna id="filtro-atributos" [opcoes]="['Marcados', 'Desmarcados']"
                   [value]="filtros['atributos'] || ''" (valueChange)="onFiltroChange('atributos', $event)">

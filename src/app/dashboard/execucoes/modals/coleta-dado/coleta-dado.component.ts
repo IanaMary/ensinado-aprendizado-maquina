@@ -65,6 +65,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   totalDados: number = 0;
   treinoArquivo: any;
   testeArquivo: any;
+  todosMarcados: boolean = false;
 
 
   constructor(private planilhaService: PlanilhaService,
@@ -352,6 +353,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
         this.resultColetaDadoL.atributos[col] = true;
       }
     }
+    this.todosMarcados = true;
     this.putConfiguracaoTreino();
   }
 
@@ -359,7 +361,16 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     for (const col of this.resultColetaDadoL.colunas) {
       this.resultColetaDadoL.atributos[col] = false;
     }
+    this.todosMarcados = false;
     this.putConfiguracaoTreino();
+  }
+
+  toggleTodosAtributos() {
+    if (this.todosMarcados) {
+      this.limparTodosAtributos();
+    } else {
+      this.selecionarTodosAtributos();
+    }
   }
 
 
