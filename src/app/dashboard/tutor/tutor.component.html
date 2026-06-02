@@ -1,16 +1,91 @@
 <div class="tutor">
+  <!-- Resumo em balao (tooltip) -->
   <ng-container *ngIf="resumo.length">
     <div class="wrapper">
       <mat-icon [svgIcon]="'tutor'"></mat-icon>
       <div class="balao">
-        <li *ngFor="let item of resumo ">
+        <li *ngFor="let item of resumo">
           {{item}}
         </li>
       </div>
     </div>
   </ng-container>
-  <div class="tutor-painel">
-    <div *ngIf="tutorGeral" [innerHTML]="tutorGeral"></div>
-  </div>
 
+  <!-- Painel principal -->
+  <div class="tutor-painel">
+    <!-- Tutor geral (HTML do backend) -->
+    <div *ngIf="tutorGeral" [innerHTML]="tutorGeral"></div>
+
+    <!-- Contexto dinâmico (modelo ou métrica selecionada) -->
+    <div *ngIf="contexto" class="contexto-info">
+      <div class="contexto-header">
+        <mat-icon class="contexto-icon">info</mat-icon>
+        <h4>{{ contexto.titulo }}</h4>
+      </div>
+
+      <p class="contexto-descricao">{{ contexto.descricao }}</p>
+
+      <!-- Lista de itens (como funciona / quando usar) -->
+      <ul *ngIf="contexto.itens?.length" class="contexto-lista">
+        <li *ngFor="let item of contexto.itens">{{ item }}</li>
+      </ul>
+
+      <!-- Detalhes do modelo -->
+      <ng-container *ngIf="contexto.modelo">
+        <!-- Hiperparâmetros -->
+        <div *ngIf="contexto.modelo.hiperparametros && objectKeys(contexto.modelo.hiperparametros).length" class="contexto-params">
+          <h5>Hiperparâmetros</h5>
+          <div *ngFor="let param of objectKeys(contexto.modelo.hiperparametros)" class="param-item">
+            <span class="param-nome">{{ contexto.modelo.hiperparametros[param].nome }}</span>
+            <span class="param-valor">Padrão: {{ contexto.modelo.hiperparametros[param].padrao }}</span>
+            <p class="param-desc">{{ contexto.modelo.hiperparametros[param].implicacoes }}</p>
+          </div>
+        </div>
+
+        <!-- Vantagens e Desvantagens -->
+        <div class="contexto-pros-cons">
+          <div *ngIf="contexto.modelo.vantagens?.length" class="pros">
+            <h5>Vantagens</h5>
+            <ul>
+              <li *ngFor="let v of contexto.modelo.vantagens">{{ v }}</li>
+            </ul>
+          </div>
+          <div *ngIf="contexto.modelo.desvantagens?.length" class="cons">
+            <h5>Desvantagens</h5>
+            <ul>
+              <li *ngFor="let d of contexto.modelo.desvantagens">{{ d }}</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Cuidados -->
+        <div *ngIf="contexto.modelo.cuidados?.length" class="contexto-cuidados">
+          <h5>Cuidados</h5>
+          <ul>
+            <li *ngFor="let c of contexto.modelo.cuidados">{{ c }}</li>
+          </ul>
+        </div>
+      </ng-container>
+
+      <!-- Detalhes da métrica -->
+      <ng-container *ngIf="contexto.metrica">
+        <div class="metrica-info">
+          <div *ngIf="contexto.metrica.formula" class="metrica-formula">
+            <strong>Fórmula:</strong> {{ contexto.metrica.formula }}
+          </div>
+          <div *ngIf="contexto.metrica.intervalo" class="metrica-intervalo">
+            <strong>Intervalo:</strong> {{ contexto.metrica.intervalo }}
+          </div>
+          <div *ngIf="contexto.metrica.exemplo" class="metrica-exemplo">
+            <strong>Exemplo:</strong> {{ contexto.metrica.exemplo }}
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Explicação (array de strings) -->
+    <div *ngIf="explicacao.length && !contexto" class="explicacao-lista">
+      <p *ngFor="let item of explicacao">{{ item }}</p>
+    </div>
+  </div>
 </div>

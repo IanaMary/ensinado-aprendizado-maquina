@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { BodyTutor, ItemPipeline, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
+import { TutorContexto } from '../../../tutor/tutor.component';
 import tutor from '../../../../constants/tutor.json';
 
 const COLETA_DADO = 'coleta-dado';
@@ -52,6 +53,10 @@ export class ModalExecucaoComponent implements OnInit {
   metricasSelecionadas: ItemPipeline[] = [];
   resultadosDasAvaliacoes: any = {};
 
+  // Contexto do tutor por etapa
+  tutorContexto: TutorContexto | null = null;
+  tutorPipelineInfo: any = null;
+
   constructor(
     private dashboardService: DashboardService,
     public dialogRef: MatDialogRef<ModalExecucaoComponent>,
@@ -70,6 +75,7 @@ export class ModalExecucaoComponent implements OnInit {
     }
 
     this.validarProximaEtapa();
+    this.atualizarTutorContexto();
 
   }
 
@@ -81,6 +87,23 @@ export class ModalExecucaoComponent implements OnInit {
     }
 
     this.validarProximaEtapa();
+    this.atualizarTutorContexto();
+  }
+
+  atualizarTutorContexto(): void {
+    const idx = this.etapas[this.etapaAtual].indice;
+    const pipeline = this.tutor.pipeline as any;
+    this.tutorPipelineInfo = pipeline?.[this.getPipelineKey(idx)] || null;
+
+    // Reset contexto quando muda de etapa
+    if (idx !== 1 && idx !== 3) {
+      this.tutorContexto = null;
+    }
+  }
+
+  private getPipelineKey(idx: number): string {
+    const keys = ['coleta', 'selecao_modelo', 'treinamento', 'selecao_metricas', 'avaliacao'];
+    return keys[idx] || '';
   }
 
   validarProximaEtapa(): void {
@@ -135,11 +158,25 @@ export class ModalExecucaoComponent implements OnInit {
     this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(preverCategoria, dadosRotulados);
     this.modeloSelecionado = this.modelosDisponiveis[0];
     this.funcBodyTutor();
+    this.atualizarTutorContexto();
   }
 
 
   atualizarModelo(event: ItemPipeline) {
     this.modeloSelecionado = event;
+
+    // Atualizar contexto do tutor com o modelo selecionado
+    const modelos = this.tutor.modelos as any;
+    const modeloInfo = modelos?.[event.valor];
+    if (modeloInfo) {
+      this.tutorContexto = {
+        titulo: modeloInfo.nome,
+        descricao: modeloInfo.descricao,
+        itens: modeloInfo.comoFunciona,
+        modelo: modeloInfo
+      };
+    }
+
     this.funcBodyTutor();
   }
 
@@ -198,6 +235,7 @@ export class ModalExecucaoComponent implements OnInit {
       if (!todosExistem) {
         this.funcBodyTutor();
       }
+      this.atualizarTutorContexto();
     }
   }
 
@@ -276,5 +314,18 @@ export class ModalExecucaoComponent implements OnInit {
 
   emitTutor(chaves: string[]) {
     this.dashboardService.emitirProximaEtapaPipe({ etapaAtual: this.etapaAtual, chaves: chaves });
+  }
+
+  getMetricaContexto(metrica: ItemPipeline): void {
+    const metricas = this.tutor.metricas as any;
+    const metricaInfo = metricas?.[metrica.valor];
+    if (metricaInfo) {
+      this.tutorContexto = {
+        titulo: metricaInfo.nome,
+        descricao: metricaInfo.descricao,
+        itens: metricaInfo.quandoUsar || metricaInfo.comoLer,
+        metrica: metricaInfo
+      };
+    }
   }
 }

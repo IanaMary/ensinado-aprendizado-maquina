@@ -74,7 +74,21 @@
 
   <!-- Gaveta lateral -->
   <div class="side-drawer" *ngIf="drawerOpen">
-    <app-tutor [explicacao]="explicacaoAtual">
+    <!-- Info da etapa atual -->
+    <div *ngIf="tutorPipelineInfo" class="pipeline-info">
+      <h4>{{ tutorPipelineInfo.titulo }}</h4>
+      <p>{{ tutorPipelineInfo.descricao }}</p>
+      <ul *ngIf="tutorPipelineInfo.dicas?.length">
+        <li *ngFor="let dica of tutorPipelineInfo.dicas">{{ dica }}</li>
+      </ul>
+    </div>
+
+    <!-- Tutor com contexto -->
+    <app-tutor
+      [explicacao]="explicacaoAtual"
+      [contexto]="tutorContexto"
+      [modeloSelecionado]="modeloSelecionado"
+      [metricaSelecionada]="metricasSelecionadas[0]">
     </app-tutor>
   </div>
 </div>

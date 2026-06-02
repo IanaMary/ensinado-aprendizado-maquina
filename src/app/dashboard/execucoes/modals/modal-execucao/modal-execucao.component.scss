@@ -147,13 +147,62 @@
   }
 
   .side-drawer {
-    width: 260px;
+    width: 300px;
     flex-shrink: 0;
     overflow-y: auto;
     border-left: 1px solid $roxo-claro;
     display: flex;
     flex-direction: column;
     background: $roxo-fundo;
+    padding: 16px;
+    gap: 12px;
+
+    .pipeline-info {
+      background: $branco;
+      border: 1px solid $roxo-claro;
+      border-radius: 12px;
+      padding: 14px;
+
+      h4 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: $roxo-escuro;
+      }
+
+      p {
+        margin: 0 0 10px 0;
+        font-size: 12px;
+        line-height: 1.6;
+        color: $cinza-escuro;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 14px;
+        list-style: none;
+
+        li {
+          font-size: 11px;
+          line-height: 1.5;
+          color: $cinza-escuro;
+          margin-bottom: 6px;
+          padding-left: 10px;
+          position: relative;
+
+          &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: $roxo-medio;
+          }
+        }
+      }
+    }
   }
 }
 
