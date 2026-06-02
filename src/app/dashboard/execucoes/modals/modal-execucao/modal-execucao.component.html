@@ -1,6 +1,6 @@
-<div class="modal-layout" [class.expanded]="drawerOpen" cdkDrag>
+<div class="modal-layout" [class.expanded]="drawerOpen">
   <!-- Coluna principal -->
-  <div class="main-content" [class.main-content-pad]="drawerOpen" cdkDragHandle>
+  <div class="main-content" [class.main-content-pad]="drawerOpen">
 
     <nav class="modal-cabecalho">
       <div class="cabecalho-topo">
@@ -22,9 +22,6 @@
 
       <mat-divider></mat-divider>
     </nav>
-
-
-
 
     <section class="modal-conteudo">
       <ng-container [ngSwitch]="etapas[etapaAtual].indice">
@@ -65,8 +62,6 @@
       </ng-container>
     </section>
 
-    <mat-divider></mat-divider>
-
     <div class="modal-footer">
       <button *ngIf="etapas[etapaAtual].indice" mat-raised-button (click)="anterior()"
         [disabled]="etapas[etapaAtual].indice === 0">Anterior</button>
@@ -83,5 +78,3 @@
     </app-tutor>
   </div>
 </div>
-
-<!-- Botão puxador (dentro da main-content ou fixo no canto direito) -->

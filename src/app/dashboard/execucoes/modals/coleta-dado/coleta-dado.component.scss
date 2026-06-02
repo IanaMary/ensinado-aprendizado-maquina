@@ -1,47 +1,68 @@
 @import '../../../../../styles/styles.scss';
 
-
 :host ::ng-deep .modal-coleta {
   width: 100%;
-  height: 100%;
-  height: 700px;
-  max-width: 100%;
-  max-height: 90vh;
-  // overflow: auto;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-  gap: 4px;
+  gap: 12px;
+  padding: 0 4px;
+}
 
+// Seção de arquivos
+.secao-arquivos {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
 
-  .modal-cabecalho {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
-    gap: 4px;
-    padding: 2px 0 2px 0;
-
-    .conteudo {
-      width: 100%;
-      gap: 4px;
-    }
-  }
-
-  .modal-conteudo-coleta {
+  .arquivo-item {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 4px;
 
+    label {
+      font-weight: 600;
+      font-size: 13px;
+      color: #333;
+    }
+  }
+
+  .arquivo-selecionado {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: #e8f5e9;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #2e7d32;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
   }
 }
 
+// Seção de configuração
+.secao-configuracao {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// Seção de dados
+.secao-dados {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
 .close-button mat-icon {
   font-size: 30px;
 }
-
-
 
 label {
   font-weight: 600;
@@ -80,38 +101,28 @@ small {
   }
 }
 
-
 .tipos-container,
 .tabela-container {
-  // flex: 1;
   display: flex;
-  // overflow: auto;
-  // margin-top: 1rem;
   border: 1px solid #ddd;
   border-radius: 6px;
   background-color: #fafafa;
-  // padding: 0.5rem;
 }
 
 .mat-table {
   width: 100%;
-  // table-layout: fixed;
   border-collapse: collapse;
 }
 
 .thead {
   position: sticky;
-  // top: 0;
   background-color: #f0f0f0;
-  // z-index: 10;
-  // font-weight: 600;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .erro {
   color: #d32f2f;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 input[type="file"] {
@@ -123,9 +134,10 @@ input[type="file"] {
     color: #000;
     background-color: #e0e0e0;
     border: 1px solid #ccc;
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.8rem;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 12px;
     transition: background-color 0.3s ease;
   }
 
@@ -134,16 +146,15 @@ input[type="file"] {
   }
 }
 
-
-
 .target {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  align-content: center;
-  flex-direction: row;
   gap: 4px;
-  padding: 2px 0 2px 0;
+  padding: 2px 0;
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
 }
 
 .configuracao-generica {
@@ -156,11 +167,9 @@ input[type="file"] {
 
 .configuracao-inicial {
   width: 100%;
-  padding-top: 8px;
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .botao-mais-menos {
@@ -173,25 +182,23 @@ input[type="file"] {
     background-color: $branco !important;
     border: none !important;
   }
-
 }
 
 .label-secao {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   color: #333;
-  margin-bottom: 4px;
 }
 
 .tipo-predicao-group {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
 
   mat-radio-button {
     display: flex;
     align-items: flex-start;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     transition: all 0.2s ease;
@@ -207,7 +214,7 @@ input[type="file"] {
 
     .radio-label {
       font-weight: 600;
-      font-size: 13px;
+      font-size: 12px;
       display: block;
     }
 
@@ -223,7 +230,7 @@ input[type="file"] {
 .tipo-predicao-row {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
 
   mat-radio-group {
@@ -232,12 +239,11 @@ input[type="file"] {
 
   app-tutor {
     flex-shrink: 0;
-    max-width: 300px;
   }
 }
 
 .configuracao-generica {
   mat-form-field {
-    min-width: 250px;
+    min-width: 200px;
   }
 }

@@ -1,12 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanLoad, Route, UrlSegment, Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
-
-const pathToRole: Record<string, string> = {
-  'view-aluno': 'aluno',
-  'view-professor': 'professor',
-  'view-admin': 'admin'
-};
+import { roleMap } from '../../../app/models/item-coleta-dado.model';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +20,7 @@ export class AuthGuard implements CanLoad {
     const role = this.authService.getUsuarioRole();
     const firstSegment = segments[0]?.path;
 
-    const requiredRole = pathToRole[firstSegment];
+    const requiredRole = roleMap[firstSegment];
 
     if (requiredRole && role !== requiredRole) {
       this.router.navigate(['/autenticacao/login']);

@@ -1,212 +1,194 @@
 <nav class="modal-coleta">
 
-    <!-- Input para seleção do arquivo treino -->
-    <nav class="conteudo">
-      <label for="arquivo-treino">Planilha de Treino (obrigatória)</label>
-      <input id="arquivo-treino" type="file" (change)="postArquivo($event, 'treino')" [accept]="aceitarArquivos" />
-      <nav *ngIf="treino.erro" class="erro">{{ treino.erro }}</nav>
-      <div *ngIf="treino.nomeArquivo">
-        <small>Arquivo selecionado: {{ treino.nomeArquivo }}</small>
+    <!-- Seção de seleção de arquivos -->
+    <nav class="secao-arquivos">
+      <div class="arquivo-item">
+        <label for="arquivo-treino">Planilha de Treino (obrigatória)</label>
+        <input id="arquivo-treino" type="file" (change)="postArquivo($event, 'treino')" [accept]="aceitarArquivos" />
+        <nav *ngIf="treino.erro" class="erro">{{ treino.erro }}</nav>
+        <div *ngIf="treino.nomeArquivo" class="arquivo-selecionado">
+          <mat-icon>description</mat-icon>
+          <span>{{ treino.nomeArquivo }}</span>
+        </div>
+      </div>
+
+      <div class="arquivo-item">
+        <label for="arquivo-teste">Planilha de Teste (opcional)</label>
+        <input id="arquivo-teste" type="file" (change)="postArquivo($event, 'teste')" [accept]="aceitarArquivos" />
+        <nav *ngIf="teste.erro" class="erro">{{ teste.erro }}</nav>
+        <div *ngIf="teste.nomeArquivo" class="arquivo-selecionado">
+          <mat-icon>description</mat-icon>
+          <span>{{ teste.nomeArquivo }}</span>
+        </div>
       </div>
     </nav>
 
-
-    <!-- Input para seleção do arquivo teste -->
-    <nav class="conteudo">
-      <label for="arquivo-teste">Planilha de Teste (opcional)</label>
-      <input id="arquivo-teste" type="file" (change)="postArquivo($event, 'teste')" [accept]="aceitarArquivos" />
-      <nav *ngIf="teste.erro" class="erro">{{ teste.erro }}</nav>
-      <div *ngIf="teste.nomeArquivo">
-        <small>Arquivo selecionado: {{ teste.nomeArquivo }}</small>
-      </div>
-    </nav>
-
-
-  </nav>
-
-  <nav class="modal-conteudo-coleta">
-    <!-- Tabela de configuração das colunas TREINO -->
+    <!-- Seção de configuração do dataset -->
     <ng-container *ngIf="treino.dados.length > 0">
-      <mat-divider></mat-divider>
+      <nav class="secao-configuracao">
+        <nav class="target">
+          Configuração do dataset de treino
+        </nav>
 
-      <nav class="target">
-        Configuração do dataset de treino
-
-      </nav>
-
-      <mat-divider></mat-divider>
-
-      <nav class="configuracao-inicial">
-        <div class="configuracao-generica">
-          <label class="label-secao">Tipo de Predição</label>
-          <div class="tipo-predicao-row">
-            <mat-radio-group [(ngModel)]="tipoPredicao" (change)="onTipoPredicaoChange($event.value)" class="tipo-predicao-group">
-              <mat-radio-button value="regressao">
-                <span class="radio-label">Regressão</span>
-                <small class="radio-desc">Prever valor numérico</small>
-              </mat-radio-button>
-              <mat-radio-button value="classificacao">
-                <span class="radio-label">Classificação</span>
-                <small class="radio-desc">Prever categoria</small>
-              </mat-radio-button>
-              <mat-radio-button value="exploratorio">
-                <span class="radio-label">Exploratório</span>
-                <small class="radio-desc">Sem target específico</small>
-              </mat-radio-button>
-            </mat-radio-group>
-            <app-tutor [resumo]="dicaPredicao"></app-tutor>
-          </div>
-        </div>
-
-        <div class="configuracao-generica" *ngIf="tipoPredicao !== 'exploratorio'">
-          <mat-form-field appearance="outline">
-            <mat-label>Coluna alvo (target)</mat-label>
-            <mat-select (selectionChange)="selecaoTargetAtt($event, true)" [(ngModel)]="resultColetaDadoL.target">
-              <mat-option *ngFor="let item of resultColetaDadoL.colunasDetalhes"
-                [value]="item['nome_coluna']"
-                [disabled]="!isColunaHabilitada(item)"
-                [matTooltip]="getMotivoDesabilitado(item)"
-                [matTooltipDisabled]="isColunaHabilitada(item)">
-                {{ item['nome_coluna'] }} ({{ item['tipo_coluna'] }})
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          <app-tutor [resumo]="tutor.target"></app-tutor>
-        </div>
-
-        <ng-container *ngIf="!teste.nomeArquivo">
+        <nav class="configuracao-inicial">
           <div class="configuracao-generica">
+            <label class="label-secao">Tipo de Predição</label>
+            <div class="tipo-predicao-row">
+              <mat-radio-group [(ngModel)]="tipoPredicao" (change)="onTipoPredicaoChange($event.value)" class="tipo-predicao-group">
+                <mat-radio-button value="regressao">
+                  <span class="radio-label">Regressão</span>
+                  <small class="radio-desc">Prever valor numérico</small>
+                </mat-radio-button>
+                <mat-radio-button value="classificacao">
+                  <span class="radio-label">Classificação</span>
+                  <small class="radio-desc">Prever categoria</small>
+                </mat-radio-button>
+                <mat-radio-button value="exploratorio">
+                  <span class="radio-label">Exploratório</span>
+                  <small class="radio-desc">Sem target específico</small>
+                </mat-radio-button>
+              </mat-radio-group>
+              <app-tutor [resumo]="dicaPredicao"></app-tutor>
+            </div>
+          </div>
+
+          <div class="configuracao-generica" *ngIf="tipoPredicao !== 'exploratorio'">
             <mat-form-field appearance="outline">
-              <mat-label>Total Treino</mat-label>
-              <input matInput type="text" mask="percent" suffix="%" min="50" max="90" [step]="5"
-                [(ngModel)]="resultColetaDadoL.porcentagemTreino" (ngModelChange)="atualizarPocentagemTreino()"
-                name="valorSelecionado" step="5" />
-              <nav matSuffix class="botao-mais-menos">
-                <button [disabled]="resultColetaDadoL.porcentagemTreino >= 90" mat-raised-button class="botoes"
-                  (click)="incrementar(true)" aria-label="Aumentar">
-                  <mat-icon>add</mat-icon>
-                </button>
-                <button [disabled]="resultColetaDadoL.porcentagemTreino <= 50" mat-raised-button class="botoes"
-                  (click)="incrementar(false)" aria-label="Diminuir">
-                  <mat-icon>remove</mat-icon>
-                </button>
-              </nav>
-
+              <mat-label>Coluna alvo (target)</mat-label>
+              <mat-select (selectionChange)="selecaoTargetAtt($event, true)" [(ngModel)]="resultColetaDadoL.target">
+                <mat-option *ngFor="let item of resultColetaDadoL.colunasDetalhes"
+                  [value]="item['nome_coluna']"
+                  [disabled]="!isColunaHabilitada(item)"
+                  [matTooltip]="getMotivoDesabilitado(item)"
+                  [matTooltipDisabled]="isColunaHabilitada(item)">
+                  {{ item['nome_coluna'] }} ({{ item['tipo_coluna'] }})
+                </mat-option>
+              </mat-select>
             </mat-form-field>
-            <app-tutor [resumo]="tutor.treinamento"></app-tutor>
+            <app-tutor [resumo]="tutor.target"></app-tutor>
           </div>
-          <div class="configuracao-generica">
-            <mat-hint>
-              Total disponível: {{ treino.totalDados + teste.totalDados }} |
-              Treino: {{ treino.totalDados }} ({{ resultColetaDadoL.porcentagemTreino }}%) |
-              Teste: {{ teste.totalDados }} ({{ 100 - resultColetaDadoL.porcentagemTreino }}%)
-            </mat-hint>
-          </div>
-        </ng-container>
 
-      </nav>
-
-
-
-      <nav class="tabela-container">
-        <table mat-table [dataSource]="resultColetaDadoL.colunasDetalhes" class="mat-table mat-elevation-z1">
-
-          <!-- Nome -->
-          <ng-container matColumnDef="nome">
-            <th mat-header-cell *matHeaderCellDef>
-              <nav class="titulo">
-                Nome
-                <app-filtro-coluna id="filtro-nome" [opcoes]="opcoesNome" [value]="filtros['nome'] || ''"
-                  (valueChange)="onFiltroChange('nome', $event)">
-                </app-filtro-coluna>
-              </nav>
-            </th>
-            <td mat-cell *matCellDef="let linha"> {{ linha.nome_coluna }} </td>
+          <ng-container *ngIf="!teste.nomeArquivo">
+            <div class="configuracao-generica">
+              <mat-form-field appearance="outline">
+                <mat-label>Total Treino</mat-label>
+                <input matInput type="text" mask="percent" suffix="%" min="50" max="90" [step]="5"
+                  [(ngModel)]="resultColetaDadoL.porcentagemTreino" (ngModelChange)="atualizarPocentagemTreino()"
+                  name="valorSelecionado" step="5" />
+                <nav matSuffix class="botao-mais-menos">
+                  <button [disabled]="resultColetaDadoL.porcentagemTreino >= 90" mat-raised-button class="botoes"
+                    (click)="incrementar(true)" aria-label="Aumentar">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                  <button [disabled]="resultColetaDadoL.porcentagemTreino <= 50" mat-raised-button class="botoes"
+                    (click)="incrementar(false)" aria-label="Diminuir">
+                    <mat-icon>remove</mat-icon>
+                  </button>
+                </nav>
+              </mat-form-field>
+              <app-tutor [resumo]="tutor.treinamento"></app-tutor>
+            </div>
+            <div class="configuracao-generica">
+              <mat-hint>
+                Total disponível: {{ treino.totalDados + teste.totalDados }} |
+                Treino: {{ treino.totalDados }} ({{ resultColetaDadoL.porcentagemTreino }}%) |
+                Teste: {{ teste.totalDados }} ({{ 100 - resultColetaDadoL.porcentagemTreino }}%)
+              </mat-hint>
+            </div>
           </ng-container>
+        </nav>
 
-          <!-- Tipo -->
-          <ng-container matColumnDef="tipo">
-            <th mat-header-cell *matHeaderCellDef>
-              <nav class="titulo">
-                Tipo
-                <app-filtro-coluna id="filtro-tipo" [opcoes]="opcoesTipo" [value]="filtros['tipo'] || ''"
-                  (valueChange)="onFiltroChange('tipo', $event)">
-                </app-filtro-coluna>
-              </nav>
-            </th>
-            <td mat-cell *matCellDef="let linha"> {{ linha.tipo_coluna }} </td>
-          </ng-container>
+        <!-- Tabela de configuração das colunas -->
+        <nav class="tabela-container">
+          <table mat-table [dataSource]="resultColetaDadoL.colunasDetalhes" class="mat-table mat-elevation-z1">
+            <ng-container matColumnDef="nome">
+              <th mat-header-cell *matHeaderCellDef>
+                <nav class="titulo">
+                  Nome
+                  <app-filtro-coluna id="filtro-nome" [opcoes]="opcoesNome" [value]="filtros['nome'] || ''"
+                    (valueChange)="onFiltroChange('nome', $event)">
+                  </app-filtro-coluna>
+                </nav>
+              </th>
+              <td mat-cell *matCellDef="let linha"> {{ linha.nome_coluna }} </td>
+            </ng-container>
 
-          <!-- Atributos -->
-          <ng-container matColumnDef="atributos">
-            <th mat-header-cell *matHeaderCellDef>
-              <nav class="titulo">
-                <button mat-icon-button class="btn-toggle-atributos"
-                  [matTooltip]="todosMarcados ? 'Desmarcar todos' : 'Selecionar todos (exceto target)'"
-                  (click)="toggleTodosAtributos()">
-                  <mat-icon>{{ todosMarcados ? 'deselect' : 'select_all' }}</mat-icon>
-                </button>
-                Atributos
-                <app-filtro-coluna id="filtro-atributos" [opcoes]="['Marcados', 'Desmarcados']"
-                  [value]="filtros['atributos'] || ''" (valueChange)="onFiltroChange('atributos', $event)">
-                </app-filtro-coluna>
-              </nav>
-            </th>
-            <td mat-cell *matCellDef="let linha">
-              <mat-checkbox (change)="selecaoTargetAtt($event, false)"
-                [disabled]="linha.nome_coluna === resultColetaDadoL.target"
-                [(ngModel)]="resultColetaDadoL.atributos[linha.nome_coluna]">
-              </mat-checkbox>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="tipo">
+              <th mat-header-cell *matHeaderCellDef>
+                <nav class="titulo">
+                  Tipo
+                  <app-filtro-coluna id="filtro-tipo" [opcoes]="opcoesTipo" [value]="filtros['tipo'] || ''"
+                    (valueChange)="onFiltroChange('tipo', $event)">
+                  </app-filtro-coluna>
+                </nav>
+              </th>
+              <td mat-cell *matCellDef="let linha"> {{ linha.tipo_coluna }} </td>
+            </ng-container>
 
-          <tr class="thead" mat-header-row *matHeaderRowDef="colunasTabela; sticky: true"></tr>
-          <tr mat-row *matRowDef="let row; columns: colunasTabela;"></tr>
-        </table>
+            <ng-container matColumnDef="atributos">
+              <th mat-header-cell *matHeaderCellDef>
+                <nav class="titulo">
+                  <button mat-icon-button class="btn-toggle-atributos"
+                    [matTooltip]="todosMarcados ? 'Desmarcar todos' : 'Selecionar todos (exceto target)'"
+                    (click)="toggleTodosAtributos()">
+                    <mat-icon>{{ todosMarcados ? 'deselect' : 'select_all' }}</mat-icon>
+                  </button>
+                  Atributos
+                  <app-filtro-coluna id="filtro-atributos" [opcoes]="['Marcados', 'Desmarcados']"
+                    [value]="filtros['atributos'] || ''" (valueChange)="onFiltroChange('atributos', $event)">
+                  </app-filtro-coluna>
+                </nav>
+              </th>
+              <td mat-cell *matCellDef="let linha">
+                <mat-checkbox (change)="selecaoTargetAtt($event, false)"
+                  [disabled]="linha.nome_coluna === resultColetaDadoL.target"
+                  [(ngModel)]="resultColetaDadoL.atributos[linha.nome_coluna]">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <tr class="thead" mat-header-row *matHeaderRowDef="colunasTabela; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: colunasTabela;"></tr>
+          </table>
+        </nav>
       </nav>
     </ng-container>
 
-    <!-- Tabela para mostrar dados da planilha TREINO -->
-
-    <!-- Tabela para mostrar dados da planilha TREINO -->
+    <!-- Tabela de dados do treino -->
     <ng-container *ngIf="treino.dados.length && resultColetaDadoL.colunas.length">
-
-      <nav class="configuracao-generica">
-        Dataset de treino: {{treino.totalDados}} exemplos
-      </nav>
-      <nav class="tabela-container">
-        <table mat-table [dataSource]="treino.dados" class="mat-table mat-elevation-z1">
-
-          <!-- Colunas dinâmicas -->
-          <ng-container *ngFor="let coluna of resultColetaDadoL.colunas" [matColumnDef]="coluna">
-            <th mat-header-cell *matHeaderCellDef> {{ coluna }} </th>
-            <td mat-cell *matCellDef="let elemento"> {{ elemento[coluna] }} </td>
-          </ng-container>
-
-          <tr class="thead" mat-header-row *matHeaderRowDef="resultColetaDadoL.colunas; sticky: true"></tr>
-          <tr mat-row *matRowDef="let row; columns: resultColetaDadoL.colunas;"></tr>
-        </table>
+      <nav class="secao-dados">
+        <nav class="configuracao-generica">
+          Dataset de treino: {{treino.totalDados}} exemplos
+        </nav>
+        <nav class="tabela-container">
+          <table mat-table [dataSource]="treino.dados" class="mat-table mat-elevation-z1">
+            <ng-container *ngFor="let coluna of resultColetaDadoL.colunas" [matColumnDef]="coluna">
+              <th mat-header-cell *matHeaderCellDef> {{ coluna }} </th>
+              <td mat-cell *matCellDef="let elemento"> {{ elemento[coluna] }} </td>
+            </ng-container>
+            <tr class="thead" mat-header-row *matHeaderRowDef="resultColetaDadoL.colunas; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: resultColetaDadoL.colunas;"></tr>
+          </table>
+        </nav>
       </nav>
     </ng-container>
 
-
+    <!-- Tabela de dados do teste -->
     <ng-container *ngIf="teste.dados.length && resultColetaDadoL.colunas.length">
-
-      <nav class="configuracao-generica">
-        Dataset de teste: {{teste.totalDados}} exemplos
-      </nav>
-      <nav class="tabela-container">
-        <table mat-table [dataSource]="teste.dados" class="mat-table mat-elevation-z1">
-
-          <!-- Colunas dinâmicas -->
-          <ng-container *ngFor="let coluna of resultColetaDadoL.colunas" [matColumnDef]="coluna">
-            <th mat-header-cell *matHeaderCellDef> {{coluna}} </th>
-            <td mat-cell *matCellDef="let elemento"> {{ elemento[coluna] }} </td>
-          </ng-container>
-
-          <tr class="thead" mat-header-row *matHeaderRowDef="resultColetaDadoL.colunas; sticky: true"></tr>
-          <tr mat-row *matRowDef="let row; columns: resultColetaDadoL.colunas;"></tr>
-        </table>
+      <nav class="secao-dados">
+        <nav class="configuracao-generica">
+          Dataset de teste: {{teste.totalDados}} exemplos
+        </nav>
+        <nav class="tabela-container">
+          <table mat-table [dataSource]="teste.dados" class="mat-table mat-elevation-z1">
+            <ng-container *ngFor="let coluna of resultColetaDadoL.colunas" [matColumnDef]="coluna">
+              <th mat-header-cell *matHeaderCellDef> {{coluna}} </th>
+              <td mat-cell *matCellDef="let elemento"> {{ elemento[coluna] }} </td>
+            </ng-container>
+            <tr class="thead" mat-header-row *matHeaderRowDef="resultColetaDadoL.colunas; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: resultColetaDadoL.colunas;"></tr>
+          </table>
+        </nav>
       </nav>
     </ng-container>
   </nav>
