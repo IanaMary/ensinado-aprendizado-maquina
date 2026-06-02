@@ -39,20 +39,23 @@
       <nav class="configuracao-inicial">
         <div class="configuracao-generica">
           <label class="label-secao">Tipo de Predição</label>
-          <mat-radio-group [(ngModel)]="tipoPredicao" (change)="onTipoPredicaoChange($event.value)" class="tipo-predicao-group">
-            <mat-radio-button value="regressao">
-              <span class="radio-label">Regressão</span>
-              <small class="radio-desc">Prever valor numérico</small>
-            </mat-radio-button>
-            <mat-radio-button value="classificacao">
-              <span class="radio-label">Classificação</span>
-              <small class="radio-desc">Prever categoria</small>
-            </mat-radio-button>
-            <mat-radio-button value="exploratorio">
-              <span class="radio-label">Exploratório</span>
-              <small class="radio-desc">Sem target específico</small>
-            </mat-radio-button>
-          </mat-radio-group>
+          <div class="tipo-predicao-row">
+            <mat-radio-group [(ngModel)]="tipoPredicao" (change)="onTipoPredicaoChange($event.value)" class="tipo-predicao-group">
+              <mat-radio-button value="regressao">
+                <span class="radio-label">Regressão</span>
+                <small class="radio-desc">Prever valor numérico</small>
+              </mat-radio-button>
+              <mat-radio-button value="classificacao">
+                <span class="radio-label">Classificação</span>
+                <small class="radio-desc">Prever categoria</small>
+              </mat-radio-button>
+              <mat-radio-button value="exploratorio">
+                <span class="radio-label">Exploratório</span>
+                <small class="radio-desc">Sem target específico</small>
+              </mat-radio-button>
+            </mat-radio-group>
+            <app-tutor [resumo]="dicaPredicao"></app-tutor>
+          </div>
         </div>
 
         <div class="configuracao-generica" *ngIf="tipoPredicao !== 'exploratorio'">

@@ -436,6 +436,31 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     return 100 - this.resultColetaDadoL.porcentagemTreino;
   }
 
+  get dicaPredicao(): string[] {
+    switch (this.tipoPredicao) {
+      case 'regressao':
+        return [
+          'Aprendizado supervisionado com saída contínua.',
+          'Target numérico: como preço, idade, temperatura, nota.',
+          'Objetivo: prever valores contínuos com base nos atributos.'
+        ];
+      case 'classificacao':
+        return [
+          'Aprendizado supervisionado: o modelo aprende com exemplos rotulados.',
+          'Target do tipo texto (categorias): como sim/não, alto/médio/baixo.',
+          'Objetivo: classificar novas entradas em categorias.'
+        ];
+      case 'exploratorio':
+        return [
+          'Aprendizado não supervisionado: o modelo busca padrões nos dados.',
+          'Sem target definido — o algoritmo encontra estruturas sozinho.',
+          'Exemplos: agrupamento (K-means), redução de dimensionalidade (PCA).'
+        ];
+      default:
+        return [];
+    }
+  }
+
 
   incrementar(bool: boolean) {
     if (bool) {

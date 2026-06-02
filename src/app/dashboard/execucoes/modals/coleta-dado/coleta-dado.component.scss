@@ -220,6 +220,22 @@ input[type="file"] {
   }
 }
 
+.tipo-predicao-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+
+  mat-radio-group {
+    flex: 1;
+  }
+
+  app-tutor {
+    flex-shrink: 0;
+    max-width: 300px;
+  }
+}
+
 .configuracao-generica {
   mat-form-field {
     min-width: 250px;
