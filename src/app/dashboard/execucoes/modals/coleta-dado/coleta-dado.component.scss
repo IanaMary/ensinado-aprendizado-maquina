@@ -12,8 +12,8 @@
 .secao-arquivos {
   display: flex;
   gap: 16px;
-  padding: 8px 0;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 10px 0;
+  border-bottom: 1px solid $roxo-claro;
 
   .arquivo-item {
     flex: 1;
@@ -24,7 +24,7 @@
     label {
       font-weight: 600;
       font-size: 13px;
-      color: #333;
+      color: $roxo-escuro;
     }
   }
 
@@ -32,16 +32,18 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 8px;
-    background: #e8f5e9;
-    border-radius: 4px;
+    padding: 6px 10px;
+    background: $roxo-fundo;
+    border: 1px solid $roxo-claro;
+    border-radius: 6px;
     font-size: 12px;
-    color: #2e7d32;
+    color: $roxo-escuro;
 
     mat-icon {
       font-size: 16px;
       width: 16px;
       height: 16px;
+      color: $roxo-medio;
     }
   }
 }
@@ -71,7 +73,7 @@ label {
 
 small {
   display: block;
-  color: #444;
+  color: $cinza-escuro;
   font-size: 0.85rem;
 }
 
@@ -79,19 +81,21 @@ small {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: bold;
-  font-size: 1rem;
-  color: #333;
+  font-weight: 700;
+  font-size: 13px;
+  color: $roxo-escuro;
 }
 
 .btn-toggle-atributos {
-  width: 28px;
-  height: 28px;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  width: 26px;
+  height: 26px;
+  opacity: 0.8;
+  transition: all 0.2s;
+  color: $roxo-medio;
 
   &:hover {
     opacity: 1;
+    background: $roxo-fundo;
   }
 
   mat-icon {
@@ -101,12 +105,12 @@ small {
   }
 }
 
-.tipos-container,
 .tabela-container {
   display: flex;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background-color: #fafafa;
+  border: 1px solid $roxo-claro;
+  border-radius: 8px;
+  background-color: $branco;
+  overflow: hidden;
 }
 
 .mat-table {
@@ -116,13 +120,16 @@ small {
 
 .thead {
   position: sticky;
-  background-color: #f0f0f0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: $roxo-fundo;
+  box-shadow: 0 1px 3px rgba($roxo-escuro, 0.05);
 }
 
 .erro {
-  color: #d32f2f;
+  color: $erro;
   font-size: 0.85rem;
+  padding: 4px 8px;
+  background: $erro-claro;
+  border-radius: 4px;
 }
 
 input[type="file"] {
@@ -131,18 +138,20 @@ input[type="file"] {
   color: transparent;
 
   &::file-selector-button {
-    color: #000;
-    background-color: #e0e0e0;
-    border: 1px solid #ccc;
+    color: $roxo-escuro;
+    background-color: $roxo-fundo;
+    border: 1px solid $roxo-claro;
     padding: 0.4rem 0.8rem;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 12px;
-    transition: background-color 0.3s ease;
+    font-weight: 500;
+    transition: all 0.2s ease;
   }
 
   &::file-selector-button:hover {
-    background-color: #d5d5d5;
+    background-color: $roxo-claro;
+    border-color: $roxo-medio;
   }
 }
 
@@ -151,10 +160,10 @@ input[type="file"] {
   justify-content: flex-start;
   align-items: center;
   gap: 4px;
-  padding: 2px 0;
-  font-weight: 600;
+  padding: 4px 0;
+  font-weight: 700;
   font-size: 14px;
-  color: #333;
+  color: $roxo-escuro;
 }
 
 .configuracao-generica {
@@ -162,7 +171,7 @@ input[type="file"] {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
 }
 
 .configuracao-inicial {
@@ -180,14 +189,16 @@ input[type="file"] {
   .botoes {
     width: 100% !important;
     background-color: $branco !important;
-    border: none !important;
+    border: 1px solid $roxo-claro !important;
+    color: $roxo-medio !important;
+    border-radius: 6px !important;
   }
 }
 
 .label-secao {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 13px;
-  color: #333;
+  color: $roxo-escuro;
 }
 
 .tipo-predicao-group {
@@ -198,14 +209,16 @@ input[type="file"] {
   mat-radio-button {
     display: flex;
     align-items: flex-start;
-    padding: 6px 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border: 1px solid $roxo-claro;
+    border-radius: 8px;
     transition: all 0.2s ease;
+    background: $branco;
 
     &.mat-radio-checked {
-      border-color: #4caf50;
-      background-color: #e8f5e9;
+      border-color: $roxo-medio;
+      background-color: $roxo-fundo;
+      box-shadow: 0 2px 8px rgba($roxo-medio, 0.15);
     }
 
     ::ng-deep .mat-radio-container {
@@ -216,11 +229,12 @@ input[type="file"] {
       font-weight: 600;
       font-size: 12px;
       display: block;
+      color: $roxo-escuro;
     }
 
     .radio-desc {
       font-size: 11px;
-      color: #666;
+      color: $cinza-escuro;
       display: block;
       margin-top: 2px;
     }

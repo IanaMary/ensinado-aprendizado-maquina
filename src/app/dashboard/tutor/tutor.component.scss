@@ -1,6 +1,5 @@
 @use "../../../styles/styles.scss" as *;
 
-
 .tutor-painel {
   display: flex;
   flex-direction: column;
@@ -8,8 +7,6 @@
   overflow: auto;
   padding-right: 0.5rem;
 }
-
-
 
 .wrapper {
   position: relative;
@@ -20,20 +17,39 @@
     height: 20px;
     font-size: 20px;
     cursor: help;
+    color: $roxo-medio;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $roxo-vibrante;
+    }
   }
 
   .balao {
     display: none;
     position: absolute;
     right: 0;
-    padding: 1rem;
-    width: 250px;
-    border: 1px solid $vermelho-escuro;
-    border-radius: 4px;
-    background-color: $vermelho-claro;
-    color: $vermelho-escuro;
-    padding: 8px;
+    top: 100%;
+    margin-top: 4px;
+    padding: 10px 12px;
+    width: 260px;
+    border: 1px solid $roxo-claro;
+    border-radius: 8px;
+    background-color: $branco;
+    color: $roxo-escuro;
     z-index: 11;
+    box-shadow: 0 4px 16px rgba($roxo-escuro, 0.1);
+    font-size: 12px;
+    line-height: 1.5;
+
+    li {
+      margin-bottom: 4px;
+      padding-left: 4px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 
   &:hover .balao {

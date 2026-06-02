@@ -1,3 +1,5 @@
+@use "../../../../../styles/styles.scss" as *;
+
 :host {
   display: block;
 }
@@ -13,23 +15,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 24px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 14px 24px;
+  border-bottom: 1px solid $roxo-claro;
   flex-shrink: 0;
+  background: $branco;
 
   h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: 16px;
+    font-weight: 700;
+    color: $roxo-escuro;
   }
 
   .close-button {
     width: 32px;
     height: 32px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: $roxo-fundo;
+    }
 
     mat-icon {
       font-size: 22px;
       width: 22px;
       height: 22px;
+      color: $cinza-escuro;
     }
   }
 }
@@ -45,7 +57,7 @@
 mat-dialog-actions {
   flex-shrink: 0;
   padding: 12px 24px !important;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid $roxo-claro;
   margin: 0 !important;
 }
 
@@ -64,14 +76,14 @@ mat-dialog-actions {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  color: #666;
+  color: $cinza-escuro;
 }
 
 .erro {
-  color: #f44336;
+  color: $erro;
   padding: 12px;
-  background: #ffebee;
-  border-radius: 4px;
+  background: $erro-claro;
+  border-radius: 8px;
   margin-bottom: 8px;
 }
 
@@ -84,27 +96,28 @@ mat-dialog-actions {
   gap: 16px;
   margin-bottom: 8px;
   font-size: 13px;
-  color: #666;
+  color: $cinza-escuro;
 }
 
 .tabela-container {
   max-height: 35vh;
   overflow: auto;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  border: 1px solid $roxo-claro;
+  border-radius: 8px;
 
   table {
     width: 100%;
   }
 
   th {
-    background: #f5f5f5;
+    background: $roxo-fundo;
     font-weight: 600;
     font-size: 13px;
     white-space: nowrap;
     position: sticky;
     top: 0;
     z-index: 1;
+    color: $roxo-escuro;
   }
 
   td {
@@ -119,7 +132,7 @@ mat-dialog-actions {
 
   .col-type {
     font-weight: normal;
-    color: #999;
+    color: $cinza-medio;
     font-size: 11px;
   }
 }
@@ -133,7 +146,7 @@ mat-dialog-actions {
 
   .paginacao-info {
     font-size: 13px;
-    color: #666;
+    color: $cinza-escuro;
     min-width: 120px;
     text-align: center;
   }
@@ -141,5 +154,6 @@ mat-dialog-actions {
   button {
     width: 32px;
     height: 32px;
+    color: $roxo-medio;
   }
 }

@@ -10,18 +10,20 @@
 :host ::ng-deep .mat-mdc-dialog-container {
   max-width: 95vw;
   max-height: 95vh;
+  border-radius: 12px;
 }
 
 ::ng-deep .modal-layout {
   display: flex;
   box-sizing: border-box;
-  background: #fff;
-  border: 2px solid $cor-principal;
-  border-radius: 8px;
+  background: $branco;
+  border: 1px solid $roxo-claro;
+  border-radius: 12px;
   overflow: hidden;
   width: 700px;
   max-width: 90vw;
   max-height: 90vh;
+  box-shadow: 0 8px 32px rgba($roxo-escuro, 0.12);
 
   &.expanded {
     width: 900px;
@@ -36,19 +38,20 @@
 
     .modal-cabecalho {
       flex-shrink: 0;
-      padding: 12px 16px 0;
+      padding: 16px 20px 0;
+      background: $branco;
 
       .cabecalho-topo {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-bottom: 8px;
+        padding-bottom: 10px;
 
         h2 {
           margin: 0;
-          font-size: 15px;
-          font-weight: 600;
-          color: $cor-principal;
+          font-size: 16px;
+          font-weight: 700;
+          color: $roxo-escuro;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -56,13 +59,20 @@
 
         .close-button {
           flex-shrink: 0;
-          width: 28px;
-          height: 28px;
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: $roxo-fundo;
+          }
 
           mat-icon {
             font-size: 20px;
             width: 20px;
             height: 20px;
+            color: $cinza-escuro;
           }
         }
       }
@@ -71,20 +81,21 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 4px;
-        padding-bottom: 8px;
+        gap: 6px;
+        padding-bottom: 10px;
 
         .bolinha {
-          width: 26px;
-          height: 26px;
-          min-width: 26px;
+          width: 28px;
+          height: 28px;
+          min-width: 28px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-weight: bold;
+          font-weight: 700;
           font-size: 12px;
-          color: white;
+          color: $branco;
+          transition: all 0.2s ease;
         }
 
         .linha {
@@ -95,18 +106,19 @@
         }
 
         .visitada {
-          background-color: $azul-claro;
-          color: $azul-escuro;
+          background-color: $roxo-claro;
+          color: $roxo-escuro;
         }
 
         .atual {
-          background-color: $verde-claro;
-          color: $verde-medio;
+          background-color: $roxo-medio;
+          color: $branco;
+          box-shadow: 0 2px 8px rgba($roxo-medio, 0.4);
         }
 
         .desabilitada {
           background-color: $cinza-claro;
-          color: $cinza-escuro;
+          color: $cinza-medio;
         }
       }
     }
@@ -116,35 +128,37 @@
       min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 4px 16px;
+      padding: 4px 20px 8px;
     }
 
     .modal-footer {
       flex-shrink: 0;
       display: flex;
       justify-content: flex-end;
-      padding: 8px 16px 12px;
-      gap: 8px;
-      border-top: 1px solid #e0e0e0;
+      padding: 12px 20px 16px;
+      gap: 10px;
+      border-top: 1px solid $roxo-claro;
+      background: $branco;
     }
   }
 
   .main-content-pad {
-    border-right: 1px solid #e0e0e0;
+    border-right: 1px solid $roxo-claro;
   }
 
   .side-drawer {
-    width: 250px;
+    width: 260px;
     flex-shrink: 0;
     overflow-y: auto;
-    border-left: 1px solid #e0e0e0;
+    border-left: 1px solid $roxo-claro;
     display: flex;
     flex-direction: column;
+    background: $roxo-fundo;
   }
 }
 
 .drawer-toggle {
   border: none;
-  border-radius: 4px 0 0 4px;
+  border-radius: 8px 0 0 8px;
   cursor: pointer;
 }

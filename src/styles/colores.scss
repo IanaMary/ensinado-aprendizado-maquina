@@ -1,31 +1,46 @@
-/* Definindo tons de azul */
-$azul-claro: #ADD8E6;
-$azul-medio: #4682B4;
-$azul-escuro: #1E3A5F;
+/* ==============================
+   Paleta Hub IA UFPEL - Roxo + Branco
+   ============================== */
 
-/* Definindo tons de cinza */
-$cinza-claro: #f4f4f4;
-$cinza-medio: #808080;
-$cinza-escuro: #404040;
+/* Roxo principal */
+$roxo-escuro: #4A0E8F;
+$roxo-medio: #6A0DAD;
+$roxo-claro: #E8D5F5;
+$roxo-vibrante: #7B2FF7;
+$roxo-fundo: #F3E8FF;
 
-/* Definindo tons de verde */
+/* Branco e neutros */
+$branco: #FFFFFF;
+$branco-gelado: #FAFAFE;
+$preto: #2D2D3F;
+$preto-puro: #000000;
 
-$verde-claro: #e8f5e9;
-$verde-medio: #4caf50;
+/* Cinzas */
+$cinza-claro: #F5F3FA;
+$cinza-medio: #9E9EAF;
+$cinza-escuro: #4A4A5A;
 
-$vermelho-claro: #e4cfcf;
-$vermelho-escuro: #8B0000;
+/* Estados */
+$sucesso: #4CAF50;
+$sucesso-claro: #E8F5E9;
+$erro: #E53935;
+$erro-claro: #FFEBEE;
+$aviso: #FF9800;
+$aviso-claro: #FFF3E0;
+$info: #2196F3;
+$info-claro: #E3F2FD;
 
+/* Aliases de compatibilidade */
+$azul-claro: $roxo-claro;
+$azul-medio: $roxo-medio;
+$azul-escuro: $roxo-escuro;
+$verde-claro: $sucesso-claro;
+$verde-medio: $sucesso;
+$vermelho-claro: $erro-claro;
+$vermelho-escuro: $erro;
 
-$cor-principal: $vermelho-escuro;
-$cor-secundaria: $vermelho-claro;
-
-
-$cor-principal-escuro: #696969;
-$cor-secundaria-escuro: #DCDCDC;
-
-
-
-
-$branco: #fff;
-$preto: #000
+/* Tema principal */
+$cor-principal: $roxo-medio;
+$cor-secundaria: $roxo-claro;
+$cor-principal-escuro: $roxo-escuro;
+$cor-secundaria-escuro: $roxo-fundo;
