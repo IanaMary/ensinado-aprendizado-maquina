@@ -141,4 +141,13 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   onCellLeave() {
     this.tooltipInfo = null;
   }
+
+  getCellTooltip(linha: number, coluna: number, valor: number, classes: string[]): string {
+    const classeReal = classes[linha];
+    const classePredita = classes[coluna];
+    if (linha === coluna) {
+      return `VP: ${valor} amostras de "${classeReal}" classificadas corretamente`;
+    }
+    return `Erro: ${valor} amostras de "${classeReal}" classificadas como "${classePredita}"`;
+  }
 }

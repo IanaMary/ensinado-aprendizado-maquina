@@ -1,59 +1,169 @@
 @import '../../../../../styles/styles.scss';
 
-
-
 .modal-coleta {
   display: flex;
   flex-direction: column;
   width: 100%;
+  gap: 16px;
 
   .table-container {
     width: 100%;
     overflow-x: auto;
 
     table {
-      width: max-content;
-      /* permite que a tabela cresça horizontalmente */
+      width: 100%;
       border-collapse: collapse;
-      table-layout: fixed;
-      /* fixa largura das colunas */
 
-
-      th,
-      td {
-        width: 80px;
-        border: 1px solid #ccc;
-        padding: 0.5rem;
+      th, td {
+        border: 1px solid $roxo-claro;
+        padding: 8px 12px;
         text-align: center;
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        /* corta texto que ultrapassa */
+        font-size: 13px;
       }
 
       th {
-        background-color: #f0f0f0;
-        font-weight: bold;
+        background-color: $roxo-fundo;
+        font-weight: 600;
+        color: $roxo-escuro;
       }
 
       td {
-        background-color: #fafafa;
+        background-color: $branco;
       }
     }
-
-
   }
-
-
 
   .acoes {
     display: flex;
     justify-content: flex-end;
-    margin-top: 1rem;
     width: 100%;
   }
 
   button {
     min-width: 150px;
+  }
+}
+
+// Matriz de Confusão
+.confusion-section {
+  border: 1px solid $roxo-claro;
+  border-radius: 10px;
+  padding: 16px;
+  background: $branco;
+}
+
+.confusion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  .confusion-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: $roxo-escuro;
+  }
+
+  .confusion-acc {
+    font-size: 13px;
+    font-weight: 600;
+    color: $roxo-medio;
+    background: $roxo-fundo;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+}
+
+.confusion-wrapper {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.confusion-matrix {
+  display: grid;
+  gap: 2px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cm-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  font-size: 13px;
+  min-width: 60px;
+  min-height: 36px;
+}
+
+.cm-corner {
+  background: $cinza-claro;
+  font-size: 10px;
+  color: $cinza-escuro;
+
+  .cm-label-real {
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.3;
+  }
+}
+
+.cm-header-col {
+  background: $roxo-fundo;
+  font-weight: 700;
+  color: $roxo-escuro;
+  font-size: 12px;
+}
+
+.cm-header-row {
+  background: $roxo-fundo;
+  font-weight: 700;
+  color: $roxo-escuro;
+  font-size: 12px;
+}
+
+.cm-data {
+  border-radius: 4px;
+  cursor: default;
+  transition: transform 0.15s, box-shadow 0.15s;
+  font-weight: 600;
+
+  &:hover {
+    transform: scale(1.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    position: relative;
+  }
+}
+
+.confusion-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: $cinza-escuro;
+  }
+
+  .legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .legend-count {
+    font-weight: 600;
+
+    &.erros {
+      color: $erro;
+    }
   }
 }

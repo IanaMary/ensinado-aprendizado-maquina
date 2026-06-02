@@ -1,7 +1,18 @@
-<ng-container *ngIf="metricasDisponiveis.length">
-  <div *ngFor="let metrica of metricasDisponiveis">
-    <mat-checkbox (change)="toggleMetrica(metrica)" [(ngModel)]="metrica.movido">
-      {{ metrica?.label }}
-    </mat-checkbox>
+<nav class="selecao-metricas">
+  <div class="header-metricas">
+    <button mat-icon-button class="btn-toggle"
+      [matTooltip]="todasMarcadas ? 'Desmarcar todas' : 'Selecionar todas'"
+      (click)="toggleTodas()">
+      <mat-icon>{{ todasMarcadas ? 'deselect' : 'select_all' }}</mat-icon>
+    </button>
+    <span class="label">Métricas disponíveis</span>
   </div>
-</ng-container>
+
+  <ng-container *ngIf="metricasDisponiveis.length">
+    <div *ngFor="let metrica of metricasDisponiveis" class="metrica-item">
+      <mat-checkbox (change)="toggleMetrica(metrica)" [(ngModel)]="metrica.movido">
+        {{ metrica?.label }}
+      </mat-checkbox>
+    </div>
+  </ng-container>
+</nav>

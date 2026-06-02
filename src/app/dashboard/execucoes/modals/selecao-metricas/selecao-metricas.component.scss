@@ -1,0 +1,43 @@
+@use "../../../../../styles/styles.scss" as *;
+
+.selecao-metricas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.header-metricas {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid $roxo-claro;
+
+  .label {
+    font-weight: 700;
+    font-size: 14px;
+    color: $roxo-escuro;
+  }
+}
+
+.btn-toggle {
+  width: 28px;
+  height: 28px;
+  color: $roxo-medio;
+  transition: all 0.2s;
+
+  &:hover {
+    background: $roxo-fundo;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.metrica-item {
+  padding: 4px 0;
+}

@@ -14,15 +14,21 @@ export class SelecaoMetricasComponent implements OnChanges {
   @Output() selecaoMetricas = new EventEmitter<ItemPipeline[]>();
 
   metricasSelecionadas: ItemPipeline[] = [];
+  todasMarcadas: boolean = false;
 
   constructor(private dashboardService: DashboardService) { }
 
   ngOnChanges(changes: SimpleChanges): void { }
 
-
   toggleMetrica(metrica: ItemPipeline) {
+    this.todasMarcadas = this.metricasDisponiveis.every(m => m.movido);
     this.emitSelecaoMetricas();
+  }
 
+  toggleTodas() {
+    this.todasMarcadas = !this.todasMarcadas;
+    this.metricasDisponiveis.forEach(m => m.movido = this.todasMarcadas);
+    this.emitSelecaoMetricas();
   }
 
   emitSelecaoMetricas() {

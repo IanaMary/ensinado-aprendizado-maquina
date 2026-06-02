@@ -1,5 +1,6 @@
 <nav class="modal-coleta">
-  <div class="table-container">
+  <!-- Tabela de métricas escalares -->
+  <div class="table-container" *ngIf="metricsAvaliadas.length">
     <table>
       <thead>
         <tr>
@@ -8,19 +9,81 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let metrica of metricsAvaliadas">
-          <td>{{ metrica }}</td>
-          <td *ngFor="let modelo of modelosAvaliados">
-            {{
-            isNumber(resultadosDasAvaliacoes[metrica]?.[modelo])
-            ? (resultadosDasAvaliacoes[metrica][modelo] | number: '1.2-4')
-            : resultadosDasAvaliacoes[metrica]?.[modelo] || '-'
-            }}
-          </td>
-        </tr>
+        <ng-container *ngFor="let metrica of metricsAvaliadas">
+          <!-- Métricas escalares -->
+          <tr *ngIf="!isConfusionMatrix(resultadosDasAvaliacoes[metrica]?.[modelosAvaliados[0]])">
+            <td>{{ metrica }}</td>
+            <td *ngFor="let modelo of modelosAvaliados">
+              {{
+              isNumber(resultadosDasAvaliacoes[metrica]?.[modelo])
+              ? (resultadosDasAvaliacoes[metrica][modelo] | number: '1.2-4')
+              : resultadosDasAvaliacoes[metrica]?.[modelo] || '-'
+              }}
+            </td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>
+
+  <!-- Matriz de Confusão -->
+  <ng-container *ngFor="let metrica of metricsAvaliadas">
+    <ng-container *ngIf="isConfusionMatrix(resultadosDasAvaliacoes[metrica]?.[modelosAvaliados[0]])">
+      <div class="confusion-section" *ngFor="let modelo of modelosAvaliados">
+        <div class="confusion-header">
+          <span class="confusion-title">Matriz de Confusão — {{ modelo }}</span>
+          <span class="confusion-acc">
+            Acurácia: {{ getAcuracia(resultadosDasAvaliacoes[metrica][modelo].matriz) | percent:'1.1-2' }}
+          </span>
+        </div>
+
+        <div class="confusion-wrapper">
+          <div class="confusion-matrix" [style.grid-template-columns]="'repeat(' + (resultadosDasAvaliacoes[metrica][modelo].classes.length + 1) + ', 1fr)'">
+            <!-- Header: classes previstas -->
+            <div class="cm-cell cm-corner">
+              <span class="cm-label-real">Real ↓ / Prev →</span>
+            </div>
+            <div *ngFor="let classe of resultadosDasAvaliacoes[metrica][modelo].classes; let c = index"
+              class="cm-cell cm-header-col">
+              {{ classe }}
+            </div>
+
+            <!-- Linhas da matriz -->
+            <ng-container *ngFor="let linha of resultadosDasAvaliacoes[metrica][modelo].matriz; let i = index">
+              <!-- Label da classe real -->
+              <div class="cm-cell cm-header-row">
+                {{ resultadosDasAvaliacoes[metrica][modelo].classes[i] }}
+              </div>
+              <!-- Células -->
+              <div *ngFor="let valor of linha; let j = index"
+                class="cm-cell cm-data"
+                [style.background-color]="getCellColor(valor, resultadosDasAvaliacoes[metrica][modelo].total)"
+                [style.color]="getCellTextColor(valor, resultadosDasAvaliacoes[metrica][modelo].total)"
+                [matTooltip]="getCellTooltip(i, j, valor, resultadosDasAvaliacoes[metrica][modelo].classes)"
+                matTooltipPosition="above">
+                {{ valor }}
+              </div>
+            </ng-container>
+          </div>
+
+          <!-- Legenda -->
+          <div class="confusion-legend">
+            <div class="legend-item">
+              <span class="legend-color" style="background:#e8d5f5"></span>
+              <span>Diagonal = Acertos (VP)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background:#ffcdd2"></span>
+              <span>Fora diagonal = Erros</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-count erros">{{ getTotalErros(resultadosDasAvaliacoes[metrica][modelo].matriz) }} erros</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
 
   <section class="acoes">
     <button mat-raised-button color="primary" (click)="postAvaliacao()">
