@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { InternoRoutingModule } from './interno-routing.module';
 import { InternoComponent } from './interno.component';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -8,6 +9,7 @@ import { InternoComponent } from './interno.component';
   ],
   imports: [
     InternoRoutingModule,
+    SharedModule
   ],
   exports: [],
   providers: [],

@@ -76,20 +76,32 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     return `Classe ${idx}`;
   }
 
-  getCellColor(valor: number, max: number): string {
-    if (max === 0) return '#f5f5f5';
-    const intensidade = valor / max;
-    if (intensidade === 0) return '#f5f5f5';
-    if (intensidade < 0.3) return '#c8e6c9';
-    if (intensidade < 0.6) return '#81c784';
-    if (intensidade < 0.8) return '#4caf50';
-    return '#2e7d32';
+  getCellColor(valor: number, max: number, isDiagonal: boolean): string {
+    if (max === 0 || valor === 0) return '#f5f5f5';
+    const intensidade = Math.min(valor / max, 1);
+    
+    if (isDiagonal) {
+      // Verde para acertos (diagonal principal)
+      if (intensidade < 0.3) return '#c8e6c9';
+      if (intensidade < 0.6) return '#81c784';
+      if (intensidade < 0.8) return '#4caf50';
+      return '#2e7d32';
+    } else {
+      // Vermelho para erros (fora da diagonal)
+      if (intensidade < 0.1) return '#ffebee';
+      if (intensidade < 0.3) return '#ef9a9a';
+      if (intensidade < 0.6) return '#e57373';
+      return '#c62828';
+    }
   }
 
-  getCellTextColor(valor: number, max: number): string {
-    if (max === 0) return '#666';
-    const intensidade = valor / max;
-    return intensidade > 0.5 ? '#fff' : '#333';
+  getCellTextColor(valor: number, max: number, isDiagonal: boolean): string {
+    if (max === 0 || valor === 0) return '#666';
+    const intensidade = Math.min(valor / max, 1);
+    if (isDiagonal) {
+      return intensidade > 0.4 ? '#fff' : '#2e7d32';
+    }
+    return intensidade > 0.3 ? '#fff' : '#c62828';
   }
 
   getCellType(linha: number, coluna: number, total: number): string {

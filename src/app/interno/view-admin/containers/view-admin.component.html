@@ -1,13 +1,38 @@
-<div class="box-principal">
-  <div class="box" (click)="navegar('dashboard')">
-    DASHBOARD
+<div class="admin-container">
+  <div class="welcome-card">
+    <h1>Painel de Administracao</h1>
+    <p>Gerencie o pipeline de Machine Learning e as configuracoes do tutor.</p>
   </div>
 
-  <div class="box" (click)="navegar('conf-pipeline')">
-    CONFIGURAÇÃO DO PIPELINE
-  </div>
+  <div class="grid-cards">
+    <div class="admin-card" (click)="navegar('dashboard')">
+      <div class="card-icon">
+        <mat-icon>dashboard</mat-icon>
+      </div>
+      <div class="card-content">
+        <h3>Pipeline ML</h3>
+        <p>Acesse o pipeline interativo de Machine Learning para treinar e avaliar modelos.</p>
+      </div>
+    </div>
 
-  <div class="box" (click)="navegar('conf-tutor')">
-    CONFIGURAÇÃO DO TUTOR
+    <div class="admin-card" (click)="navegar('conf-pipeline')">
+      <div class="card-icon">
+        <mat-icon>settings</mat-icon>
+      </div>
+      <div class="card-content">
+        <h3>Config Pipeline</h3>
+        <p>Configure as etapas disponiveis no pipeline de treinamento.</p>
+      </div>
+    </div>
+
+    <div class="admin-card" (click)="navegar('conf-tutor')">
+      <div class="card-icon">
+        <mat-icon>school</mat-icon>
+      </div>
+      <div class="card-content">
+        <h3>Config Tutor</h3>
+        <p>Gerencie as mensagens e descricoes contextuais do tutor.</p>
+      </div>
+    </div>
   </div>
 </div>

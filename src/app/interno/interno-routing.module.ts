@@ -4,20 +4,23 @@ import { RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: 'view-aluno',
-    loadChildren: () => import('../interno/view-aluno/view-aluno.module').then(m => m.ViewAlunoModule)
+    loadChildren: () => import('../interno/view-aluno/view-aluno.module').then(m => m.ViewAlunoModule),
+    data: { breadcrumb: 'Dashboard' }
   },
   {
     path: 'view-professor',
-    loadChildren: () => import('../interno/view-professor/view-professor.module').then(m => m.ViewProfessorModule)
+    loadChildren: () => import('../interno/view-professor/view-professor.module').then(m => m.ViewProfessorModule),
+    data: { breadcrumb: 'Professor' }
   },
   {
     path: 'view-admin',
-    loadChildren: () => import('../interno/view-admin/view-admin.module').then(m => m.ViewAdminModule)
+    loadChildren: () => import('../interno/view-admin/view-admin.module').then(m => m.ViewAdminModule),
+    data: { breadcrumb: 'Administracao' }
   },
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'view-aluno' // ou outra rota padrão, conforme seu sistema
+    redirectTo: 'view-aluno'
   }
 ];
 

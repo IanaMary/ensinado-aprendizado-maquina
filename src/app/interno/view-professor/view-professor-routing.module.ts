@@ -6,9 +6,7 @@ const routes: Routes = [
   {
     path: '',
     component: ViewProfessorComponent,
-    data: {
-      breadcrumb: ''
-    }
+    data: { breadcrumb: 'Painel Professor' }
   }
 ];
 

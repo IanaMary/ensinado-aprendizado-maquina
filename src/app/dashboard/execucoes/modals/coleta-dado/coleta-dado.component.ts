@@ -115,7 +115,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       this.abrirConfigCSV(file, tipo);
     } else {
       const formData = this.criarBodyFromEvent(event, tipo);
-      this.enviarArquivo(formData, tipo);
+      if (formData) {
+        this.enviarArquivo(formData, tipo);
+      }
     }
   }
 

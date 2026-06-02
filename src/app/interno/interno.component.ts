@@ -3,15 +3,10 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-page',
   template: `
-  <div>
-    <router-outlet></router-outlet>
-  </div>
+    <app-shell></app-shell>
   `,
-  standalone: false,
-
+  standalone: false
 })
 export class InternoComponent {
-
   constructor() { }
-
 }

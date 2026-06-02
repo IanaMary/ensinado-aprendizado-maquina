@@ -41,7 +41,9 @@
           <div class="confusion-matrix" [style.grid-template-columns]="'repeat(' + (resultadosDasAvaliacoes[metrica][modelo].classes.length + 1) + ', 1fr)'">
             <!-- Header: classes previstas -->
             <div class="cm-cell cm-corner">
-              <span class="cm-label-real">Real ↓ / Prev →</span>
+              <span class="cm-label-real">Real</span>
+              <span class="cm-label-sep">/</span>
+              <span class="cm-label-prev">Prev</span>
             </div>
             <div *ngFor="let classe of resultadosDasAvaliacoes[metrica][modelo].classes; let c = index"
               class="cm-cell cm-header-col">
@@ -57,8 +59,10 @@
               <!-- Células -->
               <div *ngFor="let valor of linha; let j = index"
                 class="cm-cell cm-data"
-                [style.background-color]="getCellColor(valor, resultadosDasAvaliacoes[metrica][modelo].total)"
-                [style.color]="getCellTextColor(valor, resultadosDasAvaliacoes[metrica][modelo].total)"
+                [class.cm-diagonal]="i === j"
+                [class.cm-erro]="i !== j"
+                [style.background-color]="getCellColor(valor, resultadosDasAvaliacoes[metrica][modelo].total, i === j)"
+                [style.color]="getCellTextColor(valor, resultadosDasAvaliacoes[metrica][modelo].total, i === j)"
                 [matTooltip]="getCellTooltip(i, j, valor, resultadosDasAvaliacoes[metrica][modelo].classes)"
                 matTooltipPosition="above">
                 {{ valor }}
@@ -69,11 +73,11 @@
           <!-- Legenda -->
           <div class="confusion-legend">
             <div class="legend-item">
-              <span class="legend-color" style="background:#e8d5f5"></span>
+              <span class="legend-color legend-acerto"></span>
               <span>Diagonal = Acertos (VP)</span>
             </div>
             <div class="legend-item">
-              <span class="legend-color" style="background:#ffcdd2"></span>
+              <span class="legend-color legend-erro"></span>
               <span>Fora diagonal = Erros</span>
             </div>
             <div class="legend-item">

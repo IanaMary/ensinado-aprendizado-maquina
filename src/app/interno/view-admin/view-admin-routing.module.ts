@@ -9,30 +9,22 @@ const routes: Routes = [
   {
     path: '',
     component: ViewAdminComponent,
-    data: {
-      breadcrumb: ''
-    }
+    data: { breadcrumb: 'Painel Admin' }
   },
   {
     path: 'dashboard',
     component: DashboardComponent,
-    data: {
-      breadcrumb: ''
-    }
+    data: { breadcrumb: 'Pipeline' }
   },
   {
     path: 'conf-pipeline',
     component: ConfPipelineComponent,
-    data: {
-      breadcrumb: ''
-    }
+    data: { breadcrumb: 'Config Pipeline' }
   },
   {
     path: 'conf-tutor',
     component: ConfTutorComponent,
-    data: {
-      breadcrumb: ''
-    }
+    data: { breadcrumb: 'Config Tutor' }
   }
 ];
 

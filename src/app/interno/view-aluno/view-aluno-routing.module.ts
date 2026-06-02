@@ -6,9 +6,7 @@ const routes: Routes = [
   {
     path: '',
     component: ViewAlunoComponent,
-    data: {
-      breadcrumb: ''
-    }
+    data: { breadcrumb: 'Pipeline' }
   }
 ];
 

@@ -90,7 +90,6 @@ export class DashboardService {
   previewCSV(body: FormData) {
     return this.http.post(`${this.url}${this.endpointColeta}csv/preview`, body);
   }
-  }
 
   getColetaInfo(tipo: string, idConfigurcacaoTreinamento: string) {
     return this.http.get(`${this.url}${this.endpointConfiguraca}/${tipo}/${idConfigurcacaoTreinamento}`);

@@ -134,13 +134,12 @@ button[mat-raised-button] {
 
 ::ng-deep .tutor {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-direction: column;
   border: 1px solid $roxo-claro;
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: $roxo-fundo;
   color: $roxo-escuro;
-  padding: 8px;
+  padding: 12px;
   width: 100%;
 }
 

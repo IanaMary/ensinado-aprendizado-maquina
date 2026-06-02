@@ -1,0 +1,112 @@
+@import '../../../../styles/colores.scss';
+
+:host {
+  display: block;
+}
+
+.professor-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-card {
+  background: linear-gradient(135deg, $roxo-escuro, $roxo-medio);
+  color: $branco;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba($roxo-escuro, 0.2);
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+  }
+}
+
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.professor-card {
+  background: $branco;
+  border-radius: 16px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid $cinza-claro;
+  box-shadow: 0 4px 16px rgba($preto, 0.05);
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: $roxo-medio;
+    box-shadow: 0 8px 32px rgba($roxo-medio, 0.15);
+
+    .card-icon {
+      background: $roxo-medio;
+      color: $branco;
+    }
+  }
+
+  .card-icon {
+    width: 56px;
+    height: 56px;
+    background: $roxo-fundo;
+    color: $roxo-medio;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .card-content {
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: $roxo-escuro;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      font-size: 14px;
+      color: $cinza-medio;
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .professor-container {
+    padding: 16px;
+  }
+
+  .welcome-card {
+    padding: 24px;
+
+    h1 {
+      font-size: 22px;
+    }
+  }
+
+  .grid-cards {
+    grid-template-columns: 1fr;
+  }
+}

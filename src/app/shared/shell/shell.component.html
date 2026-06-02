@@ -1,0 +1,66 @@
+<div class="shell" [class.sidebar-collapsed]="sidebarCollapsed">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo" (click)="navigate('/view-aluno')">
+        <span class="logo-icon">IA</span>
+        <span class="logo-text" *ngIf="!sidebarCollapsed">Iana</span>
+      </div>
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        <mat-icon>{{ sidebarCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a
+        *ngFor="let item of filteredNavItems"
+        class="nav-item"
+        [class.active]="isActive(item.route)"
+        (click)="navigate(item.route)"
+        [matTooltip]="item.label"
+        matTooltipPosition="right"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info" *ngIf="!sidebarCollapsed">
+        <div class="user-avatar">{{ userName.charAt(0).toUpperCase() }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ userName }}</span>
+          <span class="user-role">{{ userRole }}</span>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()" matTooltip="Sair" matTooltipPosition="right">
+        <mat-icon>logout</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Sair</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" (click)="toggleSidebar()">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <app-breadcrumb></app-breadcrumb>
+      </div>
+      <div class="topbar-right">
+        <span class="user-name-mobile">{{ userName }}</span>
+        <button class="icon-btn" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
