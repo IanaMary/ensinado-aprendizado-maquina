@@ -15,6 +15,13 @@
   position: relative;
   display: inline-block;
 
+  mat-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    cursor: help;
+  }
+
   .balao {
     display: none;
     position: absolute;

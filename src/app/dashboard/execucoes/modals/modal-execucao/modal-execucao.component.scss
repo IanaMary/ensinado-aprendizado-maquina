@@ -1,47 +1,42 @@
 @use "../../../../../styles/styles.scss" as *;
 
-
 :host ::ng-deep .mat-mdc-dialog-surface {
   padding: 0 !important;
   background: transparent;
-  overflow: hidden;
+  overflow: visible;
   box-sizing: border-box;
 }
 
-// Estilo principal do modal
+:host ::ng-deep .mat-mdc-dialog-container {
+  max-width: 95vw;
+  max-height: 95vh;
+}
+
 ::ng-deep .modal-layout {
-
-  // transform: translate(-50%);
   display: flex;
-  height: 900px;
   box-sizing: border-box;
-  overflow: hidden;
   background: #fff;
-  padding: 1rem;
-  border: 3px solid;
-  position: fixed;
-  top: 2%;
-  left: 25%;
+  border: 2px solid $cor-principal;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 700px;
+  max-width: 90vw;
+  max-height: 90vh;
 
-  // Gaveta aberta → largura total: 900px
   &.expanded {
-    width: 900px !important;
-  }
-
-  // Gaveta fechada → só a main-content: 650px
-  &:not(.expanded) {
-    // width: 650px !important;
+    width: 900px;
   }
 
   .main-content {
     display: flex;
     flex-direction: column;
-    width: 650px;
-    box-sizing: border-box;
-    justify-content: space-between;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
 
     .modal-cabecalho {
-      // background-color: antiquewhite;
+      flex-shrink: 0;
+      padding: 12px 16px 0;
 
       .cabecalho-topo {
         display: flex;
@@ -51,15 +46,18 @@
 
         h2 {
           margin: 0;
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 600;
           color: $cor-principal;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .close-button {
+          flex-shrink: 0;
           width: 28px;
           height: 28px;
-          line-height: 28px;
 
           mat-icon {
             font-size: 20px;
@@ -68,92 +66,83 @@
           }
         }
       }
-    }
 
-    .modal-conteudo {
-      // display: flex;
-      padding: 4px 0 4px 0;
-      overflow: auto;
-      width: 100%;
-      height: 80%;
-    }
-
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      width: 100%;
-      // padding: 4px 0 4px 0;
-      gap: 1rem;
-    }
-
-    .box-linha {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-      align-content: center;
-      flex-wrap: nowrap;
-      align-items: center;
-    }
-
-    .breadcrumb {
-      display: flex;
-      justify-content: space-between;
-      padding-bottom: 0.5rem;
-      // width: 100%;
-
-      .bolinha {
-        width: 30px !important;
-        height: 30px !important;
-        border-radius: 50%;
+      .breadcrumb {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: bold;
-        color: white;
-        margin: 0 5px;
-      }
+        gap: 4px;
+        padding-bottom: 8px;
 
-      .linha {
-        height: 4px;
-        width: 5%;
-        border-radius: 2px;
-      }
+        .bolinha {
+          width: 26px;
+          height: 26px;
+          min-width: 26px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 12px;
+          color: white;
+        }
 
-      .visitada {
-        background-color: $azul-claro;
-        color: $azul-escuro;
-      }
+        .linha {
+          height: 3px;
+          flex: 1;
+          max-width: 40px;
+          border-radius: 2px;
+        }
 
-      .atual {
-        background-color: $verde-claro;
-        color: $verde-medio;
-      }
+        .visitada {
+          background-color: $azul-claro;
+          color: $azul-escuro;
+        }
 
-      .desabilitada {
-        background-color: $cinza-claro;
-        color: $cinza-escuro;
+        .atual {
+          background-color: $verde-claro;
+          color: $verde-medio;
+        }
+
+        .desabilitada {
+          background-color: $cinza-claro;
+          color: $cinza-escuro;
+        }
       }
     }
 
+    .modal-conteudo {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 4px 16px;
+    }
+
+    .modal-footer {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: flex-end;
+      padding: 8px 16px 12px;
+      gap: 8px;
+      border-top: 1px solid #e0e0e0;
+    }
   }
 
   .main-content-pad {
-    padding-right: 1rem;
+    border-right: 1px solid #e0e0e0;
   }
 
   .side-drawer {
     width: 250px;
-    // background-color: #f5f5f5;
-    // padding: 1rem;
-    box-sizing: border-box;
-    border-left: 1px solid #ccc;
+    flex-shrink: 0;
+    overflow-y: auto;
+    border-left: 1px solid #e0e0e0;
     display: flex;
     flex-direction: column;
   }
 }
 
-
-/* botão puxador */
 .drawer-toggle {
   border: none;
   border-radius: 4px 0 0 4px;
