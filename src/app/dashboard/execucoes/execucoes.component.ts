@@ -81,12 +81,6 @@ export class ExecucoesComponent implements OnInit {
     if (this.modalAberto) return;
     this.modalAberto = true;
 
-    // Verifica se e um toy dataset
-    if ((item as any).isDataset) {
-      this.carregarDatasetEabrirModal(item);
-      return;
-    }
-
     const dialogRef = this.dialog.open(ModalExecucaoComponent, {
       maxWidth: 'none',
       width: 'auto',
@@ -113,52 +107,6 @@ export class ExecucoesComponent implements OnInit {
         this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
         this.dashboardService.moverItensEmExecucao();
         this.atualizarTutorContexto();
-      }
-    });
-  }
-
-  carregarDatasetEabrirModal(item: ItemPipeline): void {
-    const datasetId = item.valor;
-    
-    this.dashboardService.carregarToyDataset(datasetId).subscribe({
-      next: (resultado: any) => {
-        // Processar o resultado do dataset
-        this.processarDatasetSelecionado(resultado);
-        
-        // Abrir o modal com os dados carregados
-        const dialogRef = this.dialog.open(ModalExecucaoComponent, {
-          maxWidth: 'none',
-          width: 'auto',
-          disableClose: true,
-          hasBackdrop: false,
-          data: {
-            etapa: 'coleta-dado',
-            tipoArquivoSelecionado: 'csv' as const,
-            resultadoColetaDado: this.resultadoColetaDado,
-            modeloSelecionado: this.modeloSelecionado,
-            resultadoTreinamento: this.resultadoTreinamento,
-            metricasSelecionadas: this.metricasSelecionadas,
-            resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
-            datasetResultado: resultado
-          }
-        });
-
-        dialogRef.afterClosed().subscribe((resultado: any) => {
-          this.modalAberto = false;
-          if (resultado) {
-            this.resultadoColetaDado = resultado.resultadoColetaDado;
-            this.modeloSelecionado = resultado.modeloSelecionado;
-            this.resultadoTreinamento = resultado.resultadoTreinamento;
-            this.metricasSelecionadas = resultado.metricasSelecionadas;
-            this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
-            this.dashboardService.moverItensEmExecucao();
-            this.atualizarTutorContexto();
-          }
-        });
-      },
-      error: (err: any) => {
-        console.error('Erro ao carregar dataset:', err);
-        this.modalAberto = false;
       }
     });
   }

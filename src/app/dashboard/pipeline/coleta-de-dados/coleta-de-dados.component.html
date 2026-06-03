@@ -3,7 +3,6 @@
      [cdkDropListSortingDisabled]="true"
      class="opcoesPipeline">
 
-  <!-- Itens de arquivo (CSV, Excel, JSON) -->
   <nav *ngFor="let item of itens"
        class="pipeline-item"
        cdkDrag
@@ -17,29 +16,6 @@
 
     <div class="item-icon">
       <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
-    </div>
-    <span class="item-label">{{ item.label }}</span>
-    <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
-  </nav>
-
-  <!-- Separador -->
-  <div class="separator" *ngIf="toyDatasets.length > 0">
-    <span>Datasets</span>
-  </div>
-
-  <!-- Toy Datasets (draggable) -->
-  <nav *ngFor="let item of toyDatasets"
-       class="pipeline-item dataset-item"
-       cdkDrag
-       [cdkDragData]="item"
-       [cdkDragDisabled]="item.movido"
-       [ngClass]="{
-         'item-movido': item.movido,
-         'item-habilitado': !item.movido
-       }">
-
-    <div class="item-icon dataset-icon">
-      <mat-icon>science</mat-icon>
     </div>
     <span class="item-label">{{ item.label }}</span>
     <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
