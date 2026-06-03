@@ -48,7 +48,6 @@
                   <small class="radio-desc">Sem target específico</small>
                 </mat-radio-button>
               </mat-radio-group>
-              <app-tutor [resumo]="dicaPredicao"></app-tutor>
             </div>
           </div>
 
@@ -65,7 +64,6 @@
                 </mat-option>
               </mat-select>
             </mat-form-field>
-            <app-tutor [resumo]="tutor.target"></app-tutor>
           </div>
 
           <ng-container *ngIf="!teste.nomeArquivo">
@@ -86,7 +84,6 @@
                   </button>
                 </nav>
               </mat-form-field>
-              <app-tutor [resumo]="tutor.treinamento"></app-tutor>
             </div>
             <div class="configuracao-generica">
               <mat-hint>
