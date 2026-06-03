@@ -65,6 +65,15 @@ export class ExecucoesComponent implements OnInit {
       .subscribe((item: ItemPipeline) => {
         this.mostrarInfoItem(item, new Event('click'));
       });
+
+    // Escuta selecao de toy dataset
+    this.dashboardService.resultadoDataset$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((resultado: any) => {
+        if (resultado) {
+          this.processarDatasetSelecionado(resultado);
+        }
+      });
   }
 
 
@@ -472,6 +481,29 @@ export class ExecucoesComponent implements OnInit {
       this.tutorTheme = 'default';
       this.tutorThemeClass = 'theme-default';
     }
+  }
+
+  processarDatasetSelecionado(resultado: any): void {
+    // Atualizar o tutor com informacoes sobre o dataset selecionado
+    const datasetNome = resultado.nome_dataset || resultado.nomeDataset || 'Dataset';
+    const nAmostras = resultado.n_amostras || resultado.total_dados || 0;
+    const nFeatures = resultado.n_features || resultado.colunas?.length || 0;
+    const target = resultado.target || '';
+    const tipo = resultado.prever_categoria ? 'Classificacao' : 'Regressao';
+    const fonte = resultado.fonte || 'sklearn';
+
+    this.tutorItemInfo = {
+      titulo: datasetNome,
+      descricao: `Dataset de ${tipo.toLowerCase()} com ${nAmostras} amostras e ${nFeatures} features. Fonte: ${fonte}.`,
+      dicas: [
+        `Target: ${target}`,
+        `Tipo: ${tipo}`,
+        `Amostras: ${nAmostras}`,
+        `Features: ${nFeatures}`
+      ]
+    };
+    this.tutorTheme = 'coleta';
+    this.tutorThemeClass = 'theme-coleta';
   }
 
   ngOnDestroy() {
