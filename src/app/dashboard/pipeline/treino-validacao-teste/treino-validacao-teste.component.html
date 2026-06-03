@@ -1,26 +1,56 @@
 <div class="modelos-container">
   <!-- Supervisionado -->
-  <div class="modelo-grupo" *ngIf="modelosSupervisionado.length > 0">
+  <div class="modelo-grupo" *ngIf="classificadores.length > 0 || regressores.length > 0">
     <div class="grupo-header">
       <mat-icon>school</mat-icon>
       <span>Supervisionado</span>
     </div>
-    <nav cdkDropList [cdkDropListData]="modelosSupervisionado" (cdkDropListDropped)="onItemDropped($event)"
-         [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
-      <nav *ngFor="let item of modelosSupervisionado" class="pipeline-item"
-           cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
-           [ngClass]="{
-             'item-movido': item.movido,
-             'item-desabilitado': !item.habilitado && !item.movido,
-             'item-habilitado': item.habilitado && !item.movido
-           }">
-        <div class="item-icon">
-          <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
-        </div>
-        <span class="item-label">{{ item.label }}</span>
-        <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
+
+    <!-- Classificadores -->
+    <div class="sub-grupo" *ngIf="classificadores.length > 0">
+      <div class="sub-grupo-header">
+        <span>Classificadores</span>
+      </div>
+      <nav cdkDropList [cdkDropListData]="classificadores" (cdkDropListDropped)="onItemDropped($event)"
+           [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
+        <nav *ngFor="let item of classificadores" class="pipeline-item"
+             cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
+             [ngClass]="{
+               'item-movido': item.movido,
+               'item-desabilitado': !item.habilitado && !item.movido,
+               'item-habilitado': item.habilitado && !item.movido
+             }">
+          <div class="item-icon">
+            <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+          </div>
+          <span class="item-label">{{ item.label }}</span>
+          <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
+        </nav>
       </nav>
-    </nav>
+    </div>
+
+    <!-- Regressores -->
+    <div class="sub-grupo" *ngIf="regressores.length > 0">
+      <div class="sub-grupo-header">
+        <span>Regressores</span>
+      </div>
+      <nav cdkDropList [cdkDropListData]="regressores" (cdkDropListDropped)="onItemDropped($event)"
+           [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
+        <nav *ngFor="let item of regressores" class="pipeline-item"
+             cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
+             [ngClass]="{
+               'item-movido': item.movido,
+               'item-desabilitado': !item.habilitado && !item.movido,
+               'item-habilitado': item.habilitado && !item.movido
+             }">
+          <div class="item-icon">
+            <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+          </div>
+          <span class="item-label">{{ item.label }}</span>
+          <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
+        </nav>
+      </nav>
+    </div>
   </div>
 
   <!-- Não Supervisionado -->

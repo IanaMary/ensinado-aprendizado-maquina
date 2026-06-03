@@ -10,7 +10,8 @@ import { ItemPipeline } from '../../../models/item-coleta-dado.model';
 })
 export class TreinoValidacaoTesteComponent {
   itens: ItemPipeline[] = [];
-  modelosSupervisionado: ItemPipeline[] = [];
+  classificadores: ItemPipeline[] = [];
+  regressores: ItemPipeline[] = [];
   modelosNaoSupervisionado: ItemPipeline[] = [];
 
   constructor(private dashboardService: DashboardService) { }
@@ -19,12 +20,22 @@ export class TreinoValidacaoTesteComponent {
     this.dashboardService.getModelos()
       .subscribe((itens: ItemPipeline[]) => {
         this.itens = itens;
-        this.modelosSupervisionado = itens.filter(i => i.dadosRotulados === true);
+
+        // Supervisionado - Classificadores (tipo = string, preverCategoria = true)
+        this.classificadores = itens.filter(i =>
+          i.dadosRotulados === true && i.tipo === 'string'
+        );
+
+        // Supervisionado - Regressores (tipo = number, preverCategoria = false)
+        this.regressores = itens.filter(i =>
+          i.dadosRotulados === true && i.tipo === 'number'
+        );
+
+        // Não Supervisionado
         this.modelosNaoSupervisionado = itens.filter(i => i.dadosRotulados === false);
       });
   }
 
-  // Manipulando o evento de soltar
   onItemDropped(event: any) {
     const item = event.item.data;
     event.item.data.movido = true;
