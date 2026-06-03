@@ -60,6 +60,8 @@
         <ng-container *ngSwitchCase="4">
           <app-metrica-avaliacao [resultadosDasAvaliacoes]="resultadosDasAvaliacoes"
             [metricasSelecionadas]="metricasSelecionadas" [resultadoTreinamento]="resultadoTreinamento"
+            [resultadoColetaDado]="resultadoColetaDado" [modeloSelecionado]="modeloSelecionado"
+            [hiperparametros]="hiperparametrosAtuais"
             (atualizarResultadoAvaliacoes)="funcResultadoAvaliacoes($event)">
           </app-metrica-avaliacao>
         </ng-container>

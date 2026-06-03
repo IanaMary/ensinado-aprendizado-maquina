@@ -52,6 +52,7 @@ export class ModalExecucaoComponent implements OnInit {
   metricasDisponiveis: ItemPipeline[] = [];
   metricasSelecionadas: ItemPipeline[] = [];
   resultadosDasAvaliacoes: any = {};
+  hiperparametrosAtuais: any = {};
 
   // Contexto do tutor por etapa
   tutorContexto: TutorContexto | null = null;
@@ -215,6 +216,16 @@ export class ModalExecucaoComponent implements OnInit {
         itens: modeloInfo.comoFunciona,
         modelo: modeloInfo
       };
+
+      // Extrair hiperparâmetros com valores padrão
+      if (modeloInfo.hiperparametros) {
+        this.hiperparametrosAtuais = {};
+        for (const [key, param] of Object.entries(modeloInfo.hiperparametros as any)) {
+          this.hiperparametrosAtuais[key] = (param as any).padrao;
+        }
+      } else {
+        this.hiperparametrosAtuais = {};
+      }
     }
 
     this.funcBodyTutor();

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { DashboardService } from '../../../services/dashboard.service';
-import { ItemPipeline, nomeMetricas } from '../../../../models/item-coleta-dado.model';
+import { ScriptGeneratorService } from '../../../../service/script-generator.service';
+import { ItemPipeline, nomeMetricas, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
 
 @Component({
   selector: 'app-metrica-avaliacao',
@@ -13,6 +14,9 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   @Input() resultadoTreinamento: any;
   @Input() resultadosDasAvaliacoes: any = {};
   @Input() metricasSelecionadas: ItemPipeline[] = [];
+  @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
+  @Input() modeloSelecionado: ItemPipeline | undefined;
+  @Input() hiperparametros: any = {};
 
   @Output() atualizarResultadoAvaliacoes = new EventEmitter<any>();
 
@@ -24,7 +28,10 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
 
   private mapaLabel = new Map<string, string>();
 
-  constructor(private dashboardService: DashboardService) { }
+  constructor(
+    private dashboardService: DashboardService,
+    private scriptGenerator: ScriptGeneratorService
+  ) { }
   cont = 0;
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -161,5 +168,18 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       return `VP: ${valor} amostras de "${classeReal}" classificadas corretamente`;
     }
     return `Erro: ${valor} amostras de "${classeReal}" classificadas como "${classePredita}"`;
+  }
+
+  baixarScript(): void {
+    const script = this.scriptGenerator.generatePythonScript(
+      this.resultadoColetaDado,
+      this.modeloSelecionado,
+      this.metricasSelecionadas,
+      this.hiperparametros
+    );
+
+    const nomeModelo = this.modeloSelecionado?.label || 'modelo';
+    const data = new Date().toISOString().slice(0, 10);
+    this.scriptGenerator.downloadScript(script, `pipeline_${nomeModelo}_${data}.py`);
   }
 }
