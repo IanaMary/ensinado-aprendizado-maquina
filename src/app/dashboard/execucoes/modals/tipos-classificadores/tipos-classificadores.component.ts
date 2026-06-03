@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { ItemPipeline, TipoTarget } from '../../../../models/item-coleta-dado.model';
 import itensPipeline from '../../../../constants/itens-coletas-dados.json'
+import tutor from '../../../../constants/tutor.json'
 import { DashboardService } from '../../../services/dashboard.service';
 
 
@@ -20,6 +21,8 @@ export class TiposClassificadoresComponent implements OnChanges {
 
   modelo!: ItemPipeline | undefined;
   modeloValor: string | undefined;
+  modeloInfo: any = null;
+  hiperparametrosArray: any[] = [];
 
 
   constructor(private dashboardService: DashboardService) { }
@@ -27,6 +30,7 @@ export class TiposClassificadoresComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['modeloSelecionado'] && this.modeloSelecionado?.valor) {
       this.modeloValor = this.modeloSelecionado.valor;
+      this.carregarModeloInfo();
     }
   }
 
@@ -35,8 +39,22 @@ export class TiposClassificadoresComponent implements OnChanges {
     this.modelo = this.modelosDisponiveis.find(m => m.valor === this.modeloValor);
     if (this.modelo) {
       this.selecaoModelo.emit(this.modelo);
+      this.carregarModeloInfo();
     }
   }
 
+  private carregarModeloInfo() {
+    const modelos = tutor.modelos as any;
+    this.modeloInfo = modelos?.[this.modeloValor || ''] || null;
+    
+    if (this.modeloInfo?.hiperparametros) {
+      this.hiperparametrosArray = Object.entries(this.modeloInfo.hiperparametros).map(([key, value]: [string, any]) => ({
+        key,
+        ...value
+      }));
+    } else {
+      this.hiperparametrosArray = [];
+    }
+  }
 
 }
