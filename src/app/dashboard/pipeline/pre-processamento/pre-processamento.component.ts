@@ -52,6 +52,12 @@ export class PreProcessamentoComponent {
     }));
   }
 
+  onItemDropped(event: any) {
+    const item = event.item.data;
+    event.item.data.movido = true;
+    this.dashboardService.movendoItemExecucao(item);
+  }
+
   onItemClicked(item: ItemPipeline, event: Event) {
     event.stopPropagation();
     event.preventDefault();

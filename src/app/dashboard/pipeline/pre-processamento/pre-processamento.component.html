@@ -5,9 +5,14 @@
       <span>{{ grupo.label }}</span>
     </div>
 
-    <div class="grupo-items">
+    <div class="grupo-items" cdkDropList [cdkDropListData]="grupo.itens"
+         [cdkDropListSortingDisabled]="true"
+         [cdkDropListConnectedTo]="['preprocessamentoList']">
       <div *ngFor="let item of grupo.itens"
            class="pipeline-item"
+           cdkDrag
+           [cdkDragData]="item"
+           [cdkDragDisabled]="item.movido || !item.habilitado"
            [ngClass]="{
              'item-movido': item.movido,
              'item-desabilitado': !item.habilitado && !item.movido,
