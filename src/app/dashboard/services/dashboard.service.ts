@@ -22,6 +22,7 @@ export class DashboardService {
 
   private itemsEmExecucao = new BehaviorSubject<ItemPipeline[]>([]);
   private itensColetasDados = new BehaviorSubject<ItemPipeline[]>([]);
+  private itensPreProcessamento = new BehaviorSubject<ItemPipeline[]>([]);
   private itensModelos = new BehaviorSubject<ItemPipeline[]>([]);
   private itensMetricas = new BehaviorSubject<ItemPipeline[]>([]);
 
@@ -43,6 +44,7 @@ export class DashboardService {
     if (this.loaded) return;
     this.loaded = true;
     this.carregarItensColetasDados();
+    this.carregarItensPreProcessamento();
     this.carregarItensModelos();
     this.carregarItensMetricas();
   }
@@ -154,6 +156,15 @@ export class DashboardService {
 
   getItensColetasDados(): Observable<ItemPipeline[]> {
     return this.itensColetasDados.asObservable();
+  }
+
+  carregarItensPreProcessamento() {
+    const itens = itensPipeline.itensPreProcessamento as ItemPipeline[];
+    this.itensPreProcessamento.next(itens);
+  }
+
+  getItensPreProcessamento(): Observable<ItemPipeline[]> {
+    return this.itensPreProcessamento.asObservable();
   }
 
   carregarItensModelos() {

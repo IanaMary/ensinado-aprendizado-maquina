@@ -1,17 +1,49 @@
-<nav cdkDropList [cdkDropListData]="itens" (cdkDropListDropped)="onItemDropped($event)"
-     [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
-  <nav *ngFor="let item of itens" class="pipeline-item"
-       cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
-       [ngClass]="{
-         'item-movido': item.movido,
-         'item-desabilitado': !item.habilitado && !item.movido,
-         'item-habilitado': item.habilitado && !item.movido
-       }">
-
-    <div class="item-icon">
-      <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+<div class="metricas-container">
+  <!-- Métricas -->
+  <div class="metrica-grupo" *ngIf="metricas.length > 0">
+    <div class="grupo-header">
+      <mat-icon>calculate</mat-icon>
+      <span>Métricas</span>
     </div>
-    <span class="item-label">{{ item.label }}</span>
-    <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
-  </nav>
-</nav>
+    <nav cdkDropList [cdkDropListData]="metricas" (cdkDropListDropped)="onItemDropped($event)"
+         [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
+      <nav *ngFor="let item of metricas" class="pipeline-item"
+           cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
+           [ngClass]="{
+             'item-movido': item.movido,
+             'item-desabilitado': !item.habilitado && !item.movido,
+             'item-habilitado': item.habilitado && !item.movido
+           }">
+        <div class="item-icon">
+          <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+        </div>
+        <span class="item-label">{{ item.label }}</span>
+        <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
+      </nav>
+    </nav>
+  </div>
+
+  <!-- Visualizadores -->
+  <div class="metrica-grupo" *ngIf="visualizadores.length > 0">
+    <div class="grupo-header">
+      <mat-icon>visibility</mat-icon>
+      <span>Visualizadores</span>
+    </div>
+    <nav cdkDropList [cdkDropListData]="visualizadores" (cdkDropListDropped)="onItemDropped($event)"
+         [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
+      <nav *ngFor="let item of visualizadores" class="pipeline-item"
+           cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
+           [ngClass]="{
+             'item-movido': item.movido,
+             'item-desabilitado': !item.habilitado && !item.movido,
+             'item-habilitado': item.habilitado && !item.movido
+           }">
+        <div class="item-icon">
+          <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+        </div>
+        <span class="item-label">{{ item.label }}</span>
+        <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
+      </nav>
+    </nav>
+  </div>
+</div>

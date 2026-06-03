@@ -1,1 +1,23 @@
-<p>pre-processamento works!</p>
+<nav cdkDropList [cdkDropListData]="itens"
+     (cdkDropListDropped)="onItemDropped($event)"
+     [cdkDropListSortingDisabled]="true"
+     class="opcoesPipeline">
+
+  <nav *ngFor="let item of itens"
+       class="pipeline-item"
+       cdkDrag
+       [cdkDragData]="item"
+       [cdkDragDisabled]="item.movido || !item.habilitado"
+       [ngClass]="{
+         'item-movido': item.movido,
+         'item-desabilitado': !item.habilitado && !item.movido,
+         'item-habilitado': item.habilitado && !item.movido
+       }">
+
+    <div class="item-icon">
+      <mat-icon>transform</mat-icon>
+    </div>
+    <span class="item-label">{{ item.label }}</span>
+    <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
+  </nav>
+</nav>

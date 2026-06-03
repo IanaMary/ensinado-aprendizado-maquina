@@ -1,22 +1,107 @@
 {
   "itensColetasDados": [
     {
-      "label": "XLXS",
-      "movido": false,
-      "tipoItem": "coleta-dado",
-      "habilitado": true
-    },
-    {
       "label": "CSV",
       "movido": false,
       "tipoItem": "coleta-dado",
-      "habilitado": true
+      "habilitado": true,
+      "valor": "csv"
     },
     {
       "label": "JSON",
       "movido": false,
       "tipoItem": "coleta-dado",
-      "habilitado": true
+      "habilitado": true,
+      "valor": "json"
+    },
+    {
+      "label": "Excel",
+      "movido": false,
+      "tipoItem": "coleta-dado",
+      "habilitado": true,
+      "valor": "xlxs"
+    }
+  ],
+  "itensPreProcessamento": [
+    {
+      "label": "StandardScaler",
+      "movido": false,
+      "tipoItem": "pre-processamento",
+      "habilitado": true,
+      "valor": "standard_scaler",
+      "resumo": "Remove a média e escala para variância unitária. Z = (X - μ) / σ"
+    },
+    {
+      "label": "MinMaxScaler",
+      "movido": false,
+      "tipoItem": "pre-processamento",
+      "habilitado": true,
+      "valor": "minmax_scaler",
+      "resumo": "Escala os dados para um intervalo fixo (padrão 0-1). Útil para algoritmos sensíveis à escala."
+    },
+    {
+      "label": "RobustScaler",
+      "movido": false,
+      "tipoItem": "pre-processamento",
+      "habilitado": true,
+      "valor": "robust_scaler",
+      "resumo": "Escala usando estatísticas robustas a outliers (mediana e IQR)."
+    },
+    {
+      "label": "Normalizer",
+      "movido": false,
+      "tipoItem": "pre-processamento",
+      "habilitado": true,
+      "valor": "normalizer",
+      "resumo": "Normaliza amostras individualmente para norma unitária (L1 ou L2)."
+    },
+    {
+      "label": "OneHotEncoder",
+      "movido": false,
+      "tipoItem": "pre-processamento",
+      "habilitado": true,
+      "valor": "onehot_encoder",
+      "resumo": "Codifica features categóricas como array numérico one-hot."
+    },
+    {
+      "label": "OrdinalEncoder",
+      "movido": false,
+      "tipoItem": "pre-processamento",
+      "habilitado": true,
+      "valor": "ordinal_encoder",
+      "resumo": "Codifica features categóricas como inteiros ordinais."
+    },
+    {
+      "label": "LabelEncoder",
+      "movido": false,
+      "tipoItem": "pre-processamento",
+      "habilitado": true,
+      "valor": "label_encoder",
+      "resumo": "Codifica rótulos de target entre 0 e n_classes-1."
+    },
+    {
+      "label": "SimpleImputer",
+      "movido": false,
+      "tipoItem": "pre-processamento",
+      "habilitado": true,
+      "valor": "simple_imputer",
+      "resumo": "Completa valores faltantes usando estratégia (média, mediana, moda, constante)."
+    },
+    {
+      "label": "PolynomialFeatures",
+      "movido": false,
+      "tipoItem": "pre-processamento",
+      "habilitado": true,
+      "valor": "polynomial_features",
+      "resumo": "Gera features polinomiais e de interação. Grau 2: [a, b] → [1, a, b, a², ab, b²]"
+    },
+    {
+      "label": "PowerTransformer",
+      "movido": false,
+      "tipoItem": "pre-processamento",
+      "habilitado": true,
+      "valor": "power_transformer",
+      "resumo": "Aplica transformação de potência para tornar os dados mais Gaussianos."
     }
   ],
   "itensTreino": [

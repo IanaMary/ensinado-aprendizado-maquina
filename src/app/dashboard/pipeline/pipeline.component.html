@@ -1,27 +1,36 @@
 <div class="pipeline-container">
-  <!-- Coleta -->
+  <!-- Dados -->
   <div class="pipeline-section">
     <div class="section-label">
       <div class="step-number">1</div>
-      <span>Coleta de Dados</span>
+      <span>Dados</span>
     </div>
     <app-coleta-de-dados></app-coleta-de-dados>
   </div>
 
-  <!-- Treino -->
+  <!-- Pré-processamento -->
   <div class="pipeline-section">
     <div class="section-label">
       <div class="step-number">2</div>
+      <span>Pré-processamento</span>
+    </div>
+    <app-pre-processamento></app-pre-processamento>
+  </div>
+
+  <!-- Modelos -->
+  <div class="pipeline-section">
+    <div class="section-label">
+      <div class="step-number">3</div>
       <span>Modelos</span>
     </div>
     <app-treino-validacao-teste></app-treino-validacao-teste>
   </div>
 
-  <!-- Métricas -->
+  <!-- Avaliação -->
   <div class="pipeline-section">
     <div class="section-label">
-      <div class="step-number">3</div>
-      <span>Métricas</span>
+      <div class="step-number">4</div>
+      <span>Avaliação</span>
     </div>
     <app-metricas></app-metricas>
   </div>

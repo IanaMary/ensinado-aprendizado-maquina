@@ -109,6 +109,9 @@ export class ExecucoesComponent implements OnInit {
     if (item.tipoItem === 'coleta-dado') {
       this.tutorTheme = 'coleta';
       this.tutorThemeClass = 'theme-coleta';
+    } else if (item.tipoItem === 'pre-processamento') {
+      this.tutorTheme = 'coleta';
+      this.tutorThemeClass = 'theme-coleta';
     } else if (item.tipoItem === 'treino-validacao-teste') {
       this.tutorTheme = 'treino';
       this.tutorThemeClass = 'theme-treino';
@@ -176,6 +179,167 @@ export class ExecucoesComponent implements OnInit {
         }
       };
       return coletaInfo[valor] || coletaInfo['csv'];
+    }
+
+    // Info para itens de pre-processamento
+    if (tipo === 'pre-processamento') {
+      const preProcessInfo: any = {
+        'standard_scaler': {
+          titulo: 'StandardScaler',
+          descricao: 'Padroniza features removendo a media e escalando para variancia unitaria. A formula e: Z = (X - media) / desvio_padrao. Resulta em dados com media 0 e desvio padrao 1.',
+          dicas: [
+            'Use quando os algoritmos sao sensiveis a escala (KNN, SVM, Regressao Logistica)',
+            'Nao e adequado para dados com distribuicao muito diferente da normal',
+            'Aplica-se coluna a coluna independentemente',
+            'Preserva a forma da distribuicao original'
+          ],
+          conceitos: [
+            { nome: 'Media', desc: 'Valor medio de cada feature (subtraido)' },
+            { nome: 'Desvio Padrao', desc: 'Medida de dispersao (usado para dividir)' },
+            { nome: 'Z-Score', desc: 'Resultado da padronizacao: quantos desvios da media' }
+          ]
+        },
+        'minmax_scaler': {
+          titulo: 'MinMaxScaler',
+          descricao: 'Escala os dados para um intervalo fixo, padrao [0, 1]. A formula e: X_scaled = (X - X_min) / (X_max - X_min). Util para algoritmos que requerem dados em escala limitada.',
+          dicas: [
+            'Ideal para redes neurais e algoritmos baseados em distancia',
+            'Sensivel a outliers (um outlier extremo comprime os outros dados)',
+            'Use quando voce sabe que os dados tem limites definidos',
+            'O intervalo pode ser customizado, ex: [-1, 1]'
+          ],
+          conceitos: [
+            { nome: 'Min/Max', desc: 'Valores minimo e maximo de cada feature' },
+            { nome: 'Intervalo', desc: 'Faixa de valores do resultado (padrao 0 a 1)' },
+            { nome: 'Outliers', desc: 'Valores extremos que podem distorcer a escala' }
+          ]
+        },
+        'robust_scaler': {
+          titulo: 'RobustScaler',
+          descricao: 'Escala usando estatisticas robustas a outliers: mediana e intervalo interquartil (IQR). A formula e: X_scaled = (X - mediana) / IQR. Menos sensivel a valores extremos que StandardScaler.',
+          dicas: [
+            'Use quando os dados contem outliers significativos',
+            'IQR = Q3 - Q1 (intervalo entre percentis 25 e 75)',
+            'Nao garante valores em intervalo fixo como MinMaxScaler',
+            'Ideal para dados com caudas pesadas'
+          ],
+          conceitos: [
+            { nome: 'Mediana', desc: 'Valor central dos dados (robusta a outliers)' },
+            { nome: 'IQR', desc: 'Intervalo interquartil: Q3 - Q1' },
+            { nome: 'Robustez', desc: 'Resistencia ao efeito de valores extremos' }
+          ]
+        },
+        'normalizer': {
+          titulo: 'Normalizer',
+          descricao: 'Normaliza amostras individualmente para norma unitaria. Cada linha (amostra) e transformada para ter norma L1 ou L2 igual a 1. Diferente dos outros scalers que operam por coluna.',
+          dicas: [
+            'Use para dados de texto (TF-IDF) ou dados esparsos',
+            'Opera por linha, nao por coluna',
+            'L1: soma dos valores absolutos = 1 (distribuicao de probabilidade)',
+            'L2: raiz da soma dos quadrados = 1 (vetor unitario)'
+          ],
+          conceitos: [
+            { nome: 'Norma L1', desc: 'Soma dos valores absolutos (Manhattan)' },
+            { nome: 'Norma L2', desc: 'Raiz da soma dos quadrados (Euclidiana)' },
+            { nome: 'Vetor Unitario', desc: 'Vetor com norma igual a 1' }
+          ]
+        },
+        'onehot_encoder': {
+          titulo: 'OneHotEncoder',
+          descricao: 'Codifica features categoricas como arrays numericos one-hot. Cada categoria vira uma coluna binaria (0 ou 1). Ex: [vermelho, azul, verde] -> [[1,0,0], [0,1,0], [0,0,1]].',
+          dicas: [
+            'Use para features categoricas nominais (sem ordem)',
+            'Cria N colunas para N categorias (pode aumentar dimensionalidade)',
+            'Use sparse_output=True para matrizes esparsas',
+            'Cuidado com categorias de alta cardinalidade (muitas categorias)'
+          ],
+          conceitos: [
+            { nome: 'One-Hot', desc: 'Representacao binaria: uma coluna ativa por amostra' },
+            { nome: 'Dummy Variable Trap', desc: 'Multicolinearidade quando todas as colunas sao incluidas' },
+            { nome: 'Sparse Matrix', desc: 'Matriz com maioria dos valores zero' }
+          ]
+        },
+        'ordinal_encoder': {
+          titulo: 'OrdinalEncoder',
+          descricao: 'Codifica features categoricas como inteiros ordinais. Cada categoria recebe um numero inteiro sequencial. Ex: [baixo, medio, alto] -> [0, 1, 2].',
+          dicas: [
+            'Use para features categoricas com ordem natural',
+            'Assume que ha relacao de ordem entre as categorias',
+            'Nao use para categorias sem ordem (use OneHotEncoder)',
+            'Os inteiros podem induzir ordem artificial se nao houver'
+          ],
+          conceitos: [
+            { nome: 'Ordinal', desc: 'Categorias com ordem natural (baixo < medio < alto)' },
+            { nome: 'Nominal', desc: 'Categorias sem ordem (vermelho, azul, verde)' },
+            { nome: 'Label Encoding', desc: 'Atribuir numeros inteiros as categorias' }
+          ]
+        },
+        'label_encoder': {
+          titulo: 'LabelEncoder',
+          descricao: 'Codifica rótulos de target (variavel alvo) entre 0 e n_classes-1. Ex: [gato, cachorro, gato, passaro] -> [0, 1, 0, 2]. Deve ser usado apenas para o target, nao para features.',
+          dicas: [
+            'Use APENAS para a variavel target (y), nao para features',
+            'Para features, use OrdinalEncoder ou OneHotEncoder',
+            'Decodifique previsoes com inverse_transform()',
+            'Alfabetico: a primeira classe encontrada recebe 0'
+          ],
+          conceitos: [
+            { nome: 'Target Encoding', desc: 'Codificacao da variavel que queremos prever' },
+            { nome: 'Classes', desc: 'Valores unicos do target' },
+            { nome: 'Inverse Transform', desc: 'Converter de volta para as labels originais' }
+          ]
+        },
+        'simple_imputer': {
+          titulo: 'SimpleImputer',
+          descricao: 'Completa valores faltantes (NaN) usando uma estrategia escolhida. Estrategias: media, mediana, moda (mais frequente), ou valor constante.',
+          dicas: [
+            'E geralmente o primeiro passo no pre-processamento',
+            'Use media para dados normais, mediana para dados com outliers',
+            'Moda e util para features categoricas',
+            'Pode usar valor constante como "missing" para categoricas'
+          ],
+          conceitos: [
+            { nome: 'NaN', desc: 'Not a Number - representa valores faltantes' },
+            { nome: 'Estrategia', desc: 'Como preencher: mean, median, most_frequent, constant' },
+            { nome: 'Dados Faltantes', desc: 'Valores ausentes que precisam ser tratados' }
+          ]
+        },
+        'polynomial_features': {
+          titulo: 'PolynomialFeatures',
+          descricao: 'Gera features polinomiais e de interacao. Para grau 2: [a, b] vira [1, a, b, a^2, ab, b^2]. Captura relacoes nao-lineares entre features.',
+          dicas: [
+            'Use quando suspeita de relacoes nao-lineares entre features',
+            'Aumenta significativamente o numero de features',
+            'Grau 2 e comum; grau 3+ pode causar overfitting',
+            'Combine com Regularizacao (Ridge, Lasso) para controlar overfitting'
+          ],
+          conceitos: [
+            { nome: 'Grau', desc: 'Nivel de combinacao polinomial (2 = quadratico)' },
+            { nome: 'Interacao', desc: 'Produto entre features (ab = a * b)' },
+            { nome: 'Feature Expansion', desc: 'Aumento do espaco de features' }
+          ]
+        },
+        'power_transformer': {
+          titulo: 'PowerTransformer',
+          descricao: 'Aplica transformacao de potencia para tornar os dados mais Gaussianos (normais). Metodos: Box-Cox (dados positivos) e Yeo-Johnson (dados com zeros/negativos).',
+          dicas: [
+            'Use quando os dados tem distribuicao muito assimetrica',
+            'Box-Cox so funciona com valores positivos',
+            'Yeo-Johnson funciona com qualquer valor real',
+            'Melhora performance de algoritmos que assumem normalidade'
+          ],
+          conceitos: [
+            { nome: 'Box-Cox', desc: 'Transformacao: (x^lambda - 1) / lambda para x > 0' },
+            { nome: 'Yeo-Johnson', desc: 'Generalizacao do Box-Cox para valores negativos' },
+            { nome: 'Gaussianizacao', desc: 'Tornar os dados mais proximos da distribuicao normal' }
+          ]
+        }
+      };
+      return preProcessInfo[valor] || {
+        titulo: item.label,
+        descricao: item.resumo || 'Tecnica de pre-processamento de dados.',
+        dicas: ['Configure os parametros conforme necessario']
+      };
     }
 
     // Info para modelos de treinamento

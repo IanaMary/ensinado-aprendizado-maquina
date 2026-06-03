@@ -9,14 +9,20 @@ import { ItemPipeline } from '../../../models/item-coleta-dado.model';
   standalone: false
 })
 export class MetricasComponent {
-itens: ItemPipeline[] = [];
+  itens: ItemPipeline[] = [];
+  metricas: ItemPipeline[] = [];
+  visualizadores: ItemPipeline[] = [];
 
+  // IDs que sao visualizadores (nao metricas numericas)
+  private visualizadorIds = ['confusion_matrix'];
 
   constructor(private dashboardService: DashboardService) { }
 
   ngOnInit() {
     this.dashboardService.getItensMetricas().subscribe(itens => {
       this.itens = itens;
+      this.metricas = itens.filter(i => !this.visualizadorIds.includes(i.valor));
+      this.visualizadores = itens.filter(i => this.visualizadorIds.includes(i.valor));
     });
   }
 
