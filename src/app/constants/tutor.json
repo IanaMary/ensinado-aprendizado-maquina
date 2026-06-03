@@ -1,58 +1,4 @@
 {
-  "itensColetasDados": [
-    {
-      "texto": "Vamos começar escolhendo um formato para coletar os dados. Existem algumas opções disponíveis, como arquivos .xlsx, .csv e .json. Cada um desses formatos possui características específicas, então é importante entender as diferenças para decidir qual se adapta melhor ao seu objetivo.",
-      "itens": [
-        "O .xlsx é o formato padrão de planilhas do Excel, ideal quando os dados estão organizados em tabelas e podem conter múltiplas abas.",
-        "O .csv é uma versão mais simples, onde os dados são separados por vírgulas — excelente para quando você precisa de um arquivo leve e fácil de processar.",
-        "Já o .json é um formato muito usado em aplicações web e APIs, ideal para dados mais estruturados ou hierárquicos."
-      ]
-    }
-  ],
-  "itensTreino": [
-    {
-      "texto": "Depois de carregar os dados, o próximo passo é selecionar quais atributos (ou colunas) vamos utilizar no nosso modelo. Esses atributos são as informações que ajudarão o algoritmo a identificar padrões e aprender com os dados.",
-      "itens": []
-    },
-    {
-      "texto": "Agora, é importante decidir se vamos ou não definir uma variável alvo, também chamada de target:",
-      "itens": [
-        "Se não escolhermos um target, estamos lidando com um problema de aprendizado não supervisionado. Isso significa que o modelo tentará encontrar padrões ou grupos nos dados sem saber a resposta certa. Um exemplo clássico é a clusterização.",
-        "Se escolhermos um target, entramos no campo do aprendizado supervisionado, onde o modelo aprende com base em entradas e saídas já conhecidas."
-      ]
-    },
-    {
-      "texto": "Aqui entra uma distinção importante:",
-      "itens": [
-        "Se o target for uma string (texto ou categoria), estamos tratando de um problema de classificação. O modelo aprenderá a identificar a qual categoria um novo dado pertence.",
-        "Se o target for numérico, estamos diante de um problema de regressão, onde o modelo tentará prever um valor contínuo, como o preço de um produto ou a temperatura de um dia."
-      ]
-    },
-    {
-      "texto": "Portanto, pense com atenção: você quer ensinar o modelo a prever algo (supervisionado) ou deixá-lo explorar os dados por conta própria (não supervisionado)? E, se for supervisionado, qual é o tipo de informação que ele deve prever.",
-      "itens": []
-    }
-  ],
-  "modelo": [
-    {
-      "texto": "Modelo com target do tipo texto (string): aprendizado supervisionado - classificação.",
-      "itens": [
-        "O modelo aprende a prever rótulos ou classes com base nos dados de entrada."
-      ]
-    },
-    {
-      "texto": "Modelo com target do tipo numérico: aprendizado supervisionado - regressão.",
-      "itens": [
-        "O modelo aprende a prever valores contínuos com base nos atributos fornecidos."
-      ]
-    },
-    {
-      "texto": "Modelo sem target: aprendizado não supervisionado - exemplo: clusterização.",
-      "itens": [
-        "Não há uma resposta certa a ser aprendida; o modelo busca estruturas ou padrões nos dados."
-      ]
-    }
-  ],
   "resumos": {
     "target": [
       "Sem target: Aprendizado não supervisionado",
@@ -80,389 +26,686 @@
       "Objetivo: identificar estruturas nos dados, como em agrupamentos ou segmentações."
     ],
     "xlsx": [
-      "O formato .xlsx é o padrão do Excel, adequado para dados em tabelas com múltiplas abas. Ao trabalhar com esses dados, é importante decidir se haverá uma variável alvo (target):"
+      "O formato .xlsx é o padrão do Excel, adequado para dados em tabelas com múltiplas abas."
     ]
   },
   "modelos": {
     "knn": {
-      "nome": "k-NN (K-Nearest Neighbors)",
-      "descricao": "O k-NN é um algoritmo de aprendizado baseado em instâncias. Ele classifica um novo ponto de dados com base na maioria dos k vizinhos mais próximos no conjunto de treinamento. Não há fase de treinamento explícita — o modelo memoriza todos os dados e faz previsões por comparação.",
-      "comoFunciona": [
-        "Para cada novo dado, calcula a distância até todos os pontos de treino",
-        "Seleciona os k vizinhos mais próximos",
-        "Atribui a classe mais frequente entre os k vizinhos (classificação) ou a média dos valores (regressão)"
+      "nome": "K-Nearest Neighbors (KNN)",
+      "sklearn": "sklearn.neighbors.KNeighborsClassifier",
+      "tipo": "Baseado em instâncias (lazy learner)",
+      "complexidade": "O(n·d) por predição",
+      "descricao": "O KNN classifica cada nova amostra observando as K amostras de treino mais próximas no espaço de atributos. Não existe fase de treinamento real — o modelo simplesmente memoriza todo o conjunto de dados. Na predição, calcula a distância (padrão: Euclidiana) entre o novo ponto e todos os pontos de treino, seleciona os K mais próximos e faz uma votação majoritária para decidir a classe.",
+      "intuicao": "Imagine que você quer saber se um filme vai gostar. Você olha para os 5 filmes mais parecidos que você já assistiu — se 4 de 5 são do gênero ação, provavelmente você vai gostar desse também. O KNN faz exatamente isso: classifica olhando os vizinhos mais próximos.",
+      "passoAPasso": [
+        "1. Recebe uma nova amostra para classificar",
+        "2. Calcula a distância entre essa amostra e TODAS as amostras de treino",
+        "3. Ordena as distâncias e seleciona as K menores",
+        "4. Conta a classe de cada um dos K vizinhos",
+        "5. Atribui a classe mais frequente (votação majoritária)"
       ],
       "quandoUsar": [
-        "Quando o conjunto de dados é pequeno a médio (até ~10k amostras)",
-        "Quando a fronteira de decisão é irregular ou não linear",
-        "Como baseline para comparar com outros modelos"
+        "Datasets pequenos a médios (até ~10k amostras) — acima disso a predição fica lenta",
+        "Quando a fronteira de decisão é irregular e não-linear",
+        "Como baseline rápido para comparar com modelos mais complexos",
+        "Quando você não quer assumir nenhuma distribuição sobre os dados"
       ],
-      "cuidados": [
-        "Sensível à escala dos dados — normalize os atributos antes de usar",
-        "Lento em predições para grandes conjuntos de dados",
-        "Escolher k muito baixo causa overfitting, k muito alto causa underfitting"
+      "naoUsarQuando": [
+        "Datasets grandes (>50k amostras) — a predição é O(n·d) e fica inviável",
+        "Atributos com escalas muito diferentes sem normalização",
+        "Muitos atributos irrelevantes (curse of dimensionality)",
+        "Você precisa de um modelo interpretável"
       ],
       "hiperparametros": {
         "n_neighbors": {
-          "nome": "Número de vizinhos (k)",
+          "nome": "Número de vizinhos (K)",
+          "sklearn": "n_neighbors",
           "padrao": 5,
           "tipo": "int",
-          "faixa": "1 a 50",
-          "descricao": "Define quantos vizinhos são considerados para a votação.",
-          "implicacoes": "Valores baixos (1-3) capturam detalhes locais mas podem causar overfitting. Valores altos (20+) suavizam a decisão mas podem perder padrões importantes."
+          "faixa": "1 a 50 (tipicamente 3 a 15)",
+          "descricao": "Define quantos vizinhos são consultados para cada predição. É o hiperparâmetro mais importante do KNN.",
+          "implicacoes": "K=1: modelo memoriza os dados (overfitting puro). K muito alto: as fronteiras ficam suaves demais e o modelo perde detalhes locais (underfitting). O valor ideal depende do dataset — use validação cruzada para encontrar.",
+          "dicaPratica": "Comece com K=5. Se o modelo erra muito nos dados de treino, aumente. Se erra muito nos dados de teste, diminua."
         },
         "weights": {
-          "nome": "Pesos",
+          "nome": "Pesos dos vizinhos",
+          "sklearn": "weights",
           "padrao": "uniform",
           "tipo": "str",
           "opcoes": ["uniform", "distance"],
-          "descricao": "Controla como cada vizinho contribui para a votação.",
-          "implicacoes": "'uniform' dá peso igual a todos. 'distance' dá mais peso a vizinhos mais próximos, reduzindo o efeito de outliers."
+          "descricao": "Controla se todos os vizinhos votam com o mesmo peso ou se vizinhos mais próximos têm mais influência.",
+          "implicacoes": "'uniform': cada vizinho vale 1 voto. 'distance': o voto é ponderado pelo inverso da distância — vizinhos mais próximos têm mais peso. 'distance' reduz o impacto de outliers e tende a melhorar a acurácia.",
+          "dicaPratica": "Se seus dados têm ruído, tente 'distance' — ele reduz a influência de pontos distantes."
+        },
+        "metric": {
+          "nome": "Métrica de distância",
+          "sklearn": "metric",
+          "padrao": "minkowski (p=2 → Euclidiana)",
+          "tipo": "str",
+          "opcoes": ["euclidean", "manhattan", "minkowski", "chebyshev"],
+          "descricao": "Define como a distância entre dois pontos é calculada.",
+          "implicacoes": "Euclidiana (p=2): distância 'comum em linha reta'. Manhattan (p=1): distância em blocos (soma das diferenças absolutas). Manhattan é mais robusta para dados de alta dimensionalidade.",
+          "dicaPratica": "Para dados normalizados, use Euclidiana. Para dados esparsos ou de alta dimensão, experimente Manhattan."
         }
       },
-      "vantagens": ["Simples de entender e implementar", "Não faz suposições sobre a distribuição dos dados", "Funciona bem com dados multi-classe"],
-      "desvantagens": ["Lento para grandes conjuntos", "Sensível a atributos irrelevantes", "Requer normalização dos dados"]
+      "vantagens": [
+        "Extremamente simples de entender e implementar",
+        "Não faz suposições sobre a distribuição dos dados",
+        "Naturalmente suporta multiclasse",
+        "Funciona bem com fronteiras de decisão não-lineares"
+      ],
+      "desvantagens": [
+        "Predição é O(n·d) — muito lento para datasets grandes",
+        "Sensível à escala dos dados (normalização é obrigatória)",
+        "Sofre com a maldição da dimensionalidade",
+        "Não gera um modelo interpretável"
+      ],
+      "curiosidade": "O KNN é chamado de 'lazy learner' (aprendedor preguiçoso) porque não faz nenhum trabalho durante o treinamento — todo o cálculo acontece na predição. Isso é o oposto de modelos como Árvore de Decisão, que fazem todo o trabalho no treinamento."
     },
     "arvore_decisao": {
       "nome": "Árvore de Decisão",
-      "descricao": "A Árvore de Decisão cria um modelo hierárquico em forma de árvore, onde cada nó interno representa uma decisão baseada em um atributo, cada ramo representa o resultado da decisão, e cada folha representa a classificação ou valor previsto.",
-      "comoFunciona": [
-        "Seleciona o atributo que melhor separa os dados (usando Gini ou Entropia)",
-        "Cria um nó de decisão e divide os dados em subconjuntos",
-        "Repete o processo recursivamente até atingir um critério de parada"
+      "sklearn": "sklearn.tree.DecisionTreeClassifier",
+      "tipo": "Baseado em árvore (tree-based)",
+      "complexidade": "O(log n) por predição",
+      "descricao": "A Árvore de Decisão constrói uma estrutura hierárquica de perguntas sobre os atributos. Cada nó interno testa uma condição (ex: 'Idade > 30?'), cada ramo é a resposta (Sim/Não), e cada folha é a classe prevista. O algoritmo escolhe automaticamente qual atributo e limiar melhor separam os dados em cada nível.",
+      "intuicao": "Pense no jogo '20 Perguntas'. Você faz perguntas sim/não para chegar à resposta. A Árvore de Decisão faz o mesmo: pergunta 'atributo X > valor?' sucessivamente até chegar a uma classificação. A diferença é que o algoritmo escolhe as perguntas que melhor separam os dados.",
+      "passoAPasso": [
+        "1. Começa com todos os dados na raiz",
+        "2. Para cada atributo, testa todos os limiares possíveis",
+        "3. Escolhe o atributo+limiar que melhor separa as classes (menor impureza)",
+        "4. Divide os dados em dois subconjuntos (esquerda/direita)",
+        "5. Repete recursivamente para cada subconjunto",
+        "6. Para quando atinge profundidade máxima ou folha pura"
       ],
       "quandoUsar": [
-        "Quando a explicabilidade do modelo é importante",
-        "Quando os dados possuem atributos categóricos e numéricos misturados",
-        "Quando você precisa de um modelo rápido para prototipagem"
+        "Quando você precisa de um modelo interpretável (pode visualizar a árvore)",
+        "Dados com atributos categóricos e numéricos misturados",
+        "Prototipagem rápida — treina muito rápido",
+        "Quando você quer entender quais atributos são mais importantes"
       ],
-      "cuidados": [
-        "Pode criar árvores muito complexas que decoram os dados (overfitting)",
-        "Sensível a pequenas variações nos dados",
-        "Pode criar árvores enviesadas se os classes forem desbalanceadas"
+      "naoUsarQuando": [
+        "Quando a estabilidade é importante (pequenas mudanças nos dados mudam a árvore inteira)",
+        "Dados com muitos ruídos — a árvore decorará o ruído",
+        "Relações lineares simples — modelos lineares são mais eficientes"
       ],
       "hiperparametros": {
         "max_depth": {
           "nome": "Profundidade máxima",
+          "sklearn": "max_depth",
           "padrao": null,
-          "tipo": "int",
-          "faixa": "1 a 30",
-          "descricao": "Limita a profundidade da árvore.",
-          "implicacoes": "Valores baixos impedem overfitting mas podem causar underfitting. Valores altos permitem capturar mais detalhes mas decoram os dados."
+          "tipo": "int ou null",
+          "faixa": "1 a 30 (tipicamente 3 a 15)",
+          "descricao": "Limita quantos níveis de perguntas a árvore pode fazer. É o principal controle contra overfitting.",
+          "implicacoes": "Profundidade 1-3: underfitting (árvore muito simples). Profundidade 10+: overfitting (decora os dados). Profundidade None: cresce até não precisar mais — risco máximo de overfitting.",
+          "dicaPratica": "Comece com max_depth=5 e ajuste com validação cruzada. Se a acurácia de treino for 100% e a de teste for baixa, diminua a profundidade."
         },
         "criterion": {
           "nome": "Critério de divisão",
+          "sklearn": "criterion",
           "padrao": "gini",
           "tipo": "str",
-          "opcoes": ["gini", "entropy"],
-          "descricao": "Mede a qualidade de uma divisão.",
-          "implicacoes": "'gini' é mais rápido e mede a impureza. 'entropy' usa ganho de informação e tende a criar árvores mais balanceadas."
+          "opcoes": ["gini", "entropy", "log_loss"],
+          "descricao": "Mede a 'impureza' de um nó. Quanto mais puro (uma só classe), melhor a divisão.",
+          "implicacoes": "Gini: mede a probabilidade de classificação errada. É mais rápido e é o padrão. Entropy: mede a incerteza (informação de Shannon). Tende a criar árvores ligeiramente mais balanceadas. Na prática, a diferença é mínima.",
+          "dicaPratica": "Use 'gini' (padrão) — é mais rápido e quase sempre dá o mesmo resultado que 'entropy'."
+        },
+        "min_samples_split": {
+          "nome": "Mínimo de amostras para dividir",
+          "sklearn": "min_samples_split",
+          "padrao": 2,
+          "tipo": "int",
+          "faixa": "2 a 100",
+          "descricao": "Número mínimo de amostras que um nó deve ter para ser dividido.",
+          "implicacoes": "Valor baixo (2): a árvore divide até o último ponto (overfitting). Valor alto (50+): a árvore para de dividir cedo demais (underfitting).",
+          "dicaPratica": "Se sua árvore está muito complexa, aumente para 10-20."
+        },
+        "min_samples_leaf": {
+          "nome": "Mínimo de amostras por folha",
+          "sklearn": "min_samples_leaf",
+          "padrao": 1,
+          "tipo": "int",
+          "faixa": "1 a 50",
+          "descricao": "Número mínimo de amostras que uma folha deve ter.",
+          "implicacoes": "Valor 1: folhas podem ter uma única amostra (overfitting). Valor 10+: folhas maiores = decisões mais generalizadas.",
+          "dicaPratica": "Aumente para 5-10 se a árvore estiver decorando os dados."
         }
       },
-      "vantagens": ["Fácil de interpretar e visualizar", "Não requer normalização", "Captura relações não lineares"],
-      "desvantagens": ["Propensa a overfitting", "Instável (pequenas mudanças geram árvores diferentes)", "Viés para atributos com mais níveis"]
+      "vantagens": [
+        "Fácil de interpretar e visualizar (pode desenhar a árvore)",
+        "Não requer normalização dos dados",
+        "Captura relações não-lineares e interações entre atributos",
+        "Rápido para treinar e prever",
+        "Pode lidar com dados faltantes nativamente"
+      ],
+      "desvantagens": [
+        "Propensa a overfitting (decora os dados de treino)",
+        "Instável — pequenas mudanças nos dados geram árvores completamente diferentes",
+        "Viés para atributos com mais níveis/categorias",
+        "Fronteiras de decisão são sempre paralelas aos eixos"
+      ],
+      "curiosidade": "Uma única Árvore de Decisão tem alta variância (instável). Por isso, na prática, usamos conjuntos como Random Forest (muitas árvores votando juntas), que reduz a variância e melhora muito a generalização."
     },
     "svm": {
-      "nome": "SVM (Support Vector Machine)",
-      "descricao": "O SVM encontra o hiperplano que melhor separa as classes no espaço de características, maximizando a margem entre os pontos mais próximos de cada classe (vetores de suporte). Com o truque do kernel, pode lidar com problemas não lineares.",
-      "comoFunciona": [
-        "Mapeia os dados para um espaço de alta dimensionalidade",
-        "Encontra o hiperplano que maximiza a margem entre as classes",
-        "Usa kernels para lidar com dados que não são linearmente separáveis"
+      "nome": "Support Vector Machine (SVM)",
+      "sklearn": "sklearn.svm.SVC",
+      "tipo": "Baseado em margem (kernel trick)",
+      "complexidade": "O(n² · d) a O(n³) no treino",
+      "descricao": "O SVM encontra o hiperplano (linha de decisão) que separa as classes com a maior margem possível. A margem é a distância entre a linha de decisão e os pontos mais próximos de cada classe (chamados vetores de suporte). Quando os dados não são linearmente separáveis, o 'truque do kernel' mapeia os dados para um espaço de maior dimensão onde a separação linear é possível.",
+      "intuicao": "Imagine duas classes de pontos em uma mesa. O SVM encontra a régua que separa os pontos, mas não qualquer régua — a que fica mais longe de ambos os grupos (maior margem). Se os pontos estão misturados, o SVM 'levanta' os pontos para o 3D onde consegue separar com um plano.",
+      "passoAPasso": [
+        "1. Mapeia os dados para alta dimensionalidade (kernel trick)",
+        "2. Encontra o hiperplano que maximiza a margem entre as classes",
+        "3. Os pontos mais próximos do hiperplano são os 'vetores de suporte'",
+        "4. A classificação de novos pontos depende apenas dos vetores de suporte"
       ],
       "quandoUsar": [
-        "Quando o número de atributos é alto (text mining, genômica)",
-        "Quando a fronteira de decisão é complexa",
-        "Quando o conjunto de dados é de tamanho moderado"
+        "Alta dimensionalidade (text mining, genômica, NLP)",
+        "Datasets de tamanho moderado (1k-100k amostras)",
+        "Quando a fronteira de decisão é complexa e não-linear",
+        "Classificação binária — SVM foi originalmente projetado para isso"
       ],
-      "cuidados": [
-        "Lento para grandes conjuntos de dados (>100k amostras)",
-        "Requer escolha cuidadosa do kernel e parâmetros",
-        "Não fornece probabilidades diretamente (requer CalibratedClassifierCV)"
+      "naoUsarQuando": [
+        "Datasets grandes (>100k) — treino é O(n²) a O(n³)",
+        "Quando você precisa de probabilidades (SVM não as fornece nativamente)",
+        "Dados com muito ruído — os vetores de suporte serão pontos de ruído",
+        "Quando interpretabilidade é necessária"
       ],
       "hiperparametros": {
         "C": {
-          "nome": "Regularização (C)",
+          "nome": "Parâmetro de regularização",
+          "sklearn": "C",
           "padrao": 1.0,
           "tipo": "float",
-          "faixa": "0.001 a 1000",
-          "descricao": "Controla o trade-off entre margem larga e classificação correta dos dados de treino.",
-          "implicacoes": "C baixo: margem mais larga, mais tolerante a erros (underfitting). C alto: margem mais estreita, tenta classificar tudo corretamente (overfitting)."
+          "faixa": "0.001 a 1000 (escala logarítmica)",
+          "descricao": "Controla o trade-off entre ter uma margem larga e classificar corretamente os pontos de treino.",
+          "implicacoes": "C baixo (0.01-0.1): margem larga, tolera alguns erros de classificação (underfitting). C alto (10-1000): margem estreita, tenta classificar tudo corretamente (overfitting). O valor ideal depende do dataset.",
+          "dicaPratica": "Comece com C=1. Se o modelo underfita, aumente. Se overfita, diminua. Use GridSearchCV com valores [0.01, 0.1, 1, 10, 100]."
         },
         "kernel": {
-          "nome": "Kernel",
+          "nome": "Função kernel",
+          "sklearn": "kernel",
           "padrao": "rbf",
           "tipo": "str",
           "opcoes": ["linear", "rbf", "poly", "sigmoid"],
-          "descricao": "Define a função usada para transformar os dados.",
-          "implicacoes": "'linear' para dados linearmente separáveis. 'rbf' (gaussiano) é o mais versátil. 'poly' captura interações polinomiais."
+          "descricao": "Define como os dados são transformados para o espaço de alta dimensionalidade. É o hiperparâmetro que mais impacta o desempenho do SVM.",
+          "implicacoes": "'linear': separa com uma reta/plano. Rápido, ideal quando os dados já são linearmente separáveis. 'rbf' (gaussiano): o mais versátil, cria fronteiras suaves e não-lineares. 'poly': captura relações polinomiais, mas pode overfitar com graus altos.",
+          "dicaPratica": "Comece com 'rbf'. Se o dataset for grande e os dados linearmente separáveis, use 'linear' (muito mais rápido)."
+        },
+        "gamma": {
+          "nome": "Coeficiente do kernel",
+          "sklearn": "gamma",
+          "padrao": "scale",
+          "tipo": "float ou str",
+          "faixa": "0.0001 a 10 (escala logarítmica)",
+          "descricao": "Define o alcance da influência de um único ponto de treino. Só afeta kernels não-lineares (rbf, poly, sigmoid).",
+          "implicacoes": "Gamma baixo: cada ponto influencia uma grande região (fronteira suave, underfitting). Gamma alto: cada ponto influencia apenas sua vizinhança (fronteira complexa, overfitting).",
+          "dicaPratica": "Use 'scale' (padrão). Se o modelo overfita, diminua gamma. Se underfita, aumente."
         }
       },
-      "vantagens": ["Efetivo em alta dimensionalidade", "Versátil com diferentes kernels", "Robusto contra overfitting em espaços de alta dimensão"],
-      "desvantagens": ["Lento para grandes datasets", "Difícil de interpretar", "Sensível à escolha do kernel"]
+      "vantagens": [
+        "Efetivo em alta dimensionalidade",
+        "Memória eficiente — usa apenas vetores de suporte",
+        "Versátil com diferentes kernels",
+        "Robusto contra overfitting em dimensões altas (com regularização adequada)"
+      ],
+      "desvantagens": [
+        "Lento para grandes datasets (treino quadrático/cúbico)",
+        "Não fornece probabilidades diretamente",
+        "Muito sensível à escolha do kernel e parâmetros",
+        "Difícil de interpretar"
+      ],
+      "curiosidade": "O 'truque do kernel' é uma das ideias mais elegantes do ML. Em vez de realmente transformar os dados para alta dimensionalidade (que seria computacionalmente caro), o kernel calcula a similaridade entre pontos diretamente — o resultado é o mesmo, mas sem o custo da transformação explícita."
     },
     "regressao_logistica": {
       "nome": "Regressão Logística",
-      "descricao": "Apesar do nome, a Regressão Logística é um algoritmo de classificação. Ela modela a probabilidade de uma amostra pertencer a uma classe usando a função logística (sigmoide). É um dos algoritmos mais utilizados como baseline em problemas de classificação.",
-      "comoFunciona": [
-        "Calcula uma combinação linear dos atributos de entrada",
-        "Aplica a função sigmoide para converter em probabilidade (0 a 1)",
-        "Classifica com base em um limiar (geralmente 0.5)"
+      "sklearn": "sklearn.linear_model.LogisticRegression",
+      "tipo": "Modelo linear generalizado",
+      "complexidade": "O(n · d) no treino",
+      "descricao": "Apesar do nome, a Regressão Logística é um classificador. Ela ajusta uma combinação linear dos atributos (como a Regressão Linear), mas aplica a função sigmoide para converter o resultado em uma probabilidade entre 0 e 1. Se a probabilidade for >= 0.5, classifica como classe positiva.",
+      "intuicao": "Imagine que você quer prever se um aluno vai passar na prova. A Regressão Logística calcula uma nota ponderada (horas de estudo × peso1 + sono × peso2 + ...) e depois transforma essa nota em uma probabilidade de 0% a 100% usando uma curva em S (sigmoide). Se for >= 50%, prevê 'passa'.",
+      "passoAPasso": [
+        "1. Calcula z = w1·x1 + w2·x2 + ... + wn·xn + bias",
+        "2. Aplica a sigmoide: probabilidade = 1 / (1 + e^(-z))",
+        "3. Se probabilidade >= 0.5 → classe 1, senão → classe 0",
+        "4. Os pesos (w) são ajustados por máxima verossimilhança"
       ],
       "quandoUsar": [
-        "Como modelo baseline para problemas de classificação",
+        "Baseline para qualquer problema de classificação",
         "Quando você precisa de probabilidades calibradas",
+        "Problemas binários ou multiclasse",
         "Quando a relação entre atributos e target é aproximadamente linear"
       ],
-      "cuidados": [
-        "Assume linearidade entre atributos e o log-odds do target",
-        "Pode underfitting em problemas com fronteiras complexas",
-        "Sensível a atributos correlacionados (multicolinearidade)"
+      "naoUsarQuando": [
+        "Fronteiras de decisão muito complexas e não-lineares",
+        "Atributos com interações complexas que modelos lineares não capturam",
+        "Overfitting é um risco com muitos atributos correlacionados"
       ],
       "hiperparametros": {
         "C": {
-          "nome": "Regularização (C)",
+          "nome": "Inverso da regularização",
+          "sklearn": "C",
           "padrao": 1.0,
           "tipo": "float",
           "faixa": "0.001 a 1000",
-          "descricao": "Inverso da força de regularização.",
-          "implicacoes": "C baixo: mais regularização, modelo mais simples. C alto: menos regularização, modelo mais complexo."
+          "descricao": "C é o inverso da força de regularização. Valores maiores = menos regularização.",
+          "implicacoes": "C baixo (0.001-0.1): forte regularização, modelo simples, pode underfitar. C alto (10-1000): fraca regularização, modelo complexo, pode overfitar.",
+          "dicaPratica": "Use GridSearchCV com [0.001, 0.01, 0.1, 1, 10, 100]. Para problemas com muitos atributos, prefira C baixo."
         },
         "solver": {
-          "nome": "Solver",
+          "nome": "Algoritmo de otimização",
+          "sklearn": "solver",
           "padrao": "lbfgs",
           "tipo": "str",
           "opcoes": ["lbfgs", "liblinear", "newton-cg", "sag", "saga"],
-          "descricao": "Algoritmo de otimização usado.",
-          "implicacoes": "'lbfgs' é bom para datasets pequenos/médios. 'liblinear' é bom para datasets pequenos e problemas binários. 'saga' é eficiente para datasets grandes."
+          "descricao": "Algoritmo matemático usado para encontrar os melhores pesos.",
+          "implicacoes": "'lbfgs': bom para datasets pequenos/médios, suporta multiclasse. 'liblinear': bom para datasets pequenos e classificação binária. 'saga': eficiente para datasets grandes e esparsos.",
+          "dicaPratica": "Use 'lbfgs' (padrão). Para datasets grandes (>100k), use 'saga'."
+        },
+        "penalty": {
+          "nome": "Tipo de regularização",
+          "sklearn": "penalty",
+          "padrao": "l2",
+          "tipo": "str",
+          "opcoes": ["l1", "l2", "elasticnet", "none"],
+          "descricao": "Define como a regularização é aplicada aos pesos.",
+          "implicacoes": "'l2' (Ridge): reduz todos os pesos proporcionalmente. 'l1' (Lasso): zera pesos irrelevantes (seleção de atributos). 'elasticnet': combina L1+L2.",
+          "dicaPratica": "Use 'l2' (padrão). Se tiver muitos atributos irrelevantes, experimente 'l1'."
         }
       },
-      "vantagens": ["Rápido e eficiente", "Fornece probabilidades interpretáveis", "Boa regularização disponível"],
-      "desvantagens": ["Assume linearidade", "Underfitting em problemas complexos", "Sensível a outliers"]
+      "vantagens": [
+        "Rápido para treinar e prever",
+        "Fornece probabilidades interpretáveis",
+        "Boa regularização disponível (L1, L2)",
+        "Funciona bem com dados esparsos (text mining)",
+        "Não requer normalização (mas ajuda)"
+      ],
+      "desvantagens": [
+        "Assume linearidade entre atributos e log-odds",
+        "Underfitting em problemas com fronteiras complexas",
+        "Sensível a atributos correlacionados (multicolinearidade)",
+        "Sensível a outliers"
+      ],
+      "curiosidade": "A Regressão Logística é o 'cavalo de batalha' do ML em produção. Empresas como Google e Facebook usam extensivamente para previsão de cliques em anúncios, detecção de spam e muito mais — porque é rápida, calibrada e escalável."
     },
     "regressao_linear": {
       "nome": "Regressão Linear",
-      "descricao": "A Regressão Linear ajusta uma reta (ou hiperplano) que minimiza o erro quadrático médio entre as previsões e os valores reais. É o modelo mais simples para problemas de regressão.",
-      "comoFunciona": [
-        "Encontra os coeficientes que minimizam a soma dos erros quadrados",
-        "A fórmula é: y = b0 + b1*x1 + b2*x2 + ... + bn*xn",
-        "Cada coeficiente representa o impacto do atributo no target"
+      "sklearn": "sklearn.linear_model.LinearRegression",
+      "tipo": "Modelo linear",
+      "complexidade": "O(n · d²) no treino",
+      "descricao": "A Regressão Linear encontra a reta (ou hiperplano) que minimiza a soma dos erros quadrados (MSE) entre as previsões e os valores reais. É o modelo mais simples e fundamental de Machine Learning para problemas de regressão.",
+      "intuicao": "Imagine que você plota 'horas de estudo' no eixo X e 'nota da prova' no Y. A Regressão Linear encontra a melhor reta que passa 'no meio' dos pontos. Com essa reta, você pode prever a nota de alguém dado o número de horas de estudo.",
+      "passoAPasso": [
+        "1. Assume que y = w1·x1 + w2·x2 + ... + bias",
+        "2. Encontra os pesos que minimizam o erro quadrático médio",
+        "3. Cada peso wi indica quanto o target muda quando xi muda 1 unidade"
       ],
       "quandoUsar": [
-        "Como baseline para problemas de regressão",
+        "Baseline para qualquer problema de regressão",
         "Quando a relação entre atributos e target é linear",
-        "Quando a interpretabilidade é importante"
+        "Quando interpretabilidade é importante",
+        "Dados com poucos atributos e sem multicolinearidade"
       ],
-      "cuidados": [
-        "Assume linearidade e homocedasticidade",
-        "Sensível a outliers",
-        "Multicolinearidade afeta a estabilidade dos coeficientes"
+      "naoUsarQuando": [
+        "Relações não-lineares entre atributos e target",
+        "Muitos outliers nos dados",
+        "Atributos altamente correlacionados entre si"
       ],
       "hiperparametros": {},
-      "vantagens": ["Simples e interpretável", "Rápido", "Não requer hiperparâmetros complexos"],
-      "desvantagens": ["Assume linearidade", "Sensível a outliers", "Underfitting em relações não lineares"]
+      "vantagens": [
+        "Simples e altamente interpretável",
+        "Rápido para treinar",
+        "Não requer hiperparâmetros",
+        "Base teórica sólida (estatística)"
+      ],
+      "desvantagens": [
+        "Assume linearidade (raramente verdade na prática)",
+        "Sensível a outliers",
+        "Multicolinearidade afeta a estabilidade dos coeficientes",
+        "Underfitting em relações não-lineares"
+      ],
+      "curiosidade": "A Regressão Linear existe desde 1805 (Legendre). É o ponto de partida de todo cientista de dados — se a Regressão Linear não resolve, o problema provavelmente precisa de um modelo mais complexo."
     },
     "k_means": {
       "nome": "K-Means",
-      "descricao": "O K-Means é um algoritmo de agrupamento que particiona os dados em k clusters, onde cada ponto pertence ao cluster cujo centroide é o mais próximo.",
-      "comoFunciona": [
-        "Escolhe k centroides aleatórios",
-        "Atribui cada ponto ao centroide mais próximo",
-        "Recalcula os centroides como a média dos pontos do cluster",
-        "Repete até convergência"
+      "sklearn": "sklearn.cluster.KMeans",
+      "tipo": "Agrupamento por partição",
+      "complexidade": "O(n · k · d · i) onde i=iterações",
+      "descricao": "O K-Means particiona os dados em K grupos (clusters) minimizando a distância intra-cluster. Cada ponto pertence ao cluster cujo centroide (média dos pontos do cluster) é o mais próximo.",
+      "intuicao": "Imagine que você tem 100 pontos espalhados e quer dividir em 3 grupos. O K-Means coloca 3 'centros' aleatórios, cada ponto vai para o centro mais perto, depois os centros se movem para a média dos seus pontos. Repete até os centros pararem de se mover.",
+      "passoAPasso": [
+        "1. Escolhe K centroides aleatórios",
+        "2. Atribui cada ponto ao centroide mais próximo",
+        "3. Recalcula cada centroide como a média dos pontos do cluster",
+        "4. Repete passos 2-3 até convergência (centroides não mudam mais)"
       ],
       "quandoUsar": [
-        "Quando você quer segmentar dados em grupos",
-        "Quando os clusters são esféricos e de tamanho similar",
-        "Para análise exploratória de dados"
+        "Segmentação de clientes, agrupamento de documentos",
+        "Quando você sabe (ou tem uma estimativa) do número de grupos",
+        "Análise exploratória de dados",
+        "Pré-processamento para outros algoritmos"
       ],
-      "cuidados": [
-        "Requer que k seja definido previamente",
-        "Sensível à inicialização dos centroides",
-        "Assume clusters esféricos e de tamanho similar"
+      "naoUsarQuando": [
+        "Clusters de formas não-esféricas (use DBSCAN)",
+        "Clusters de tamanhos muito diferentes",
+        "Presença de muito ruído ou outliers"
       ],
       "hiperparametros": {
         "n_clusters": {
-          "nome": "Número de clusters (k)",
+          "nome": "Número de clusters (K)",
+          "sklearn": "n_clusters",
           "padrao": 8,
           "tipo": "int",
-          "faixa": "2 a 20",
-          "descricao": "Define o número de grupos a serem formados.",
-          "implicacoes": "Muito baixo: grupos muito genéricos. Muito alto: grupos muito específicos e sem significado."
+          "faixa": "2 a sqrt(n/2)",
+          "descricao": "Define quantos grupos os dados serão divididos. É o hiperparâmetro mais importante.",
+          "implicacoes": "K muito baixo: grupos genéricos demais. K muito alto: grupos específicos demais, sem utilidade prática.",
+          "dicaPratica": "Use o 'Método do Cotovelo' (Elbow Method): rode o K-Means com K de 2 a 15, plote a inércia vs K, e escolha o 'cotovelo' (onde a inércia para de cair rápido)."
+        },
+        "init": {
+          "nome": "Inicialização dos centroides",
+          "sklearn": "init",
+          "padrao": "k-means++",
+          "tipo": "str",
+          "opcoes": ["k-means++", "random"],
+          "descricao": "Define como os centroides iniciais são escolhidos.",
+          "implicacoes": "'k-means++': escolhe centroides distantes uns dos outros — converge mais rápido e evita soluções ruins. 'random': escolhe aleatoriamente — mais rápido mas resultados piores.",
+          "dicaPratica": "Sempre use 'k-means++' (padrão)."
         }
       },
-      "vantagens": ["Simples e rápido", "Escalável para grandes datasets", "Fácil de interpretar"],
-      "desvantagens": ["Requer k definido", "Sensível à inicialização", "Assume clusters esféricos"]
+      "vantagens": [
+        "Simples e rápido",
+        "Escalável para grandes datasets",
+        "Fácil de interpretar",
+        "Garante convergência"
+      ],
+      "desvantagens": [
+        "Requer K definido previamente",
+        "Sensível à inicialização",
+        "Assume clusters esféricos e de tamanho similar",
+        "Sensível a outliers"
+      ],
+      "curiosidade": "O K-Means é um dos algoritmos mais antigos do ML (1957). Apesar de suas limitações, continua sendo um dos mais usados na prática por sua simplicidade e eficiência."
     },
     "pca": {
-      "nome": "PCA (Análise de Componentes Principais)",
-      "descricao": "O PCA é uma técnica de redução de dimensionalidade que transforma os dados em um novo sistema de coordenadas, onde as primeiras componentes capturam a maior variância dos dados.",
-      "comoFunciona": [
-        "Calcula os autovetores da matriz de covariância",
-        "Ordena pela variância explicada (autovalores)",
-        "Projeta os dados nas primeiras n componentes"
+      "nome": "Principal Component Analysis (PCA)",
+      "sklearn": "sklearn.decomposition.PCA",
+      "tipo": "Redução de dimensionalidade",
+      "complexidade": "O(min(n³, d³))",
+      "descricao": "O PCA transforma os dados em um novo sistema de coordenadas onde as primeiras dimensões (componentes principais) capturam a maior variância dos dados. É uma técnica de compressão que preserva a informação mais importante.",
+      "intuicao": "Imagine uma nuvem de pontos 3D (altura, peso, idade). O PCA encontra a 'direção' onde os pontos variam mais (componente 1), depois a segunda direção mais variada (componente 2), e assim por diante. Você pode projetar os pontos em 2D sem perder muita informação.",
+      "passoAPasso": [
+        "1. Centraliza os dados (subtrai a média)",
+        "2. Calcula a matriz de covariância",
+        "3. Encontra os autovetores (direções de máxima variância)",
+        "4. Ordena pelos autovalores (quantidade de variância)",
+        "5. Projeta os dados nas primeiras N componentes"
       ],
       "quandoUsar": [
-        "Quando o dataset tem muitos atributos (alta dimensionalidade)",
-        "Para visualização de dados em 2D ou 3D",
-        "Como pré-processamento antes de treinar outro modelo"
+        "Redução de dimensionalidade antes de treinar outro modelo",
+        "Visualização de dados em 2D ou 3D",
+        "Remoção de multicolinearidade",
+        "Compressão de dados"
       ],
-      "cuidados": [
-        "As componentes não são diretamente interpretáveis",
-        "Assume linearidade nas relações",
-        "Pode perder informação importante se poucas componentes forem usadas"
+      "naoUsarQuando": [
+        "Quando as componentes precisam ser interpretáveis",
+        "Relações não-lineares (use Kernel PCA ou t-SNE)",
+        "Poucos atributos (não precisa reduzir)"
       ],
       "hiperparametros": {
         "n_components": {
           "nome": "Número de componentes",
+          "sklearn": "n_components",
           "padrao": null,
-          "tipo": "int",
-          "faixa": "1 a n_atributos",
-          "descricao": "Número de componentes principais a manter.",
-          "implicacoes": "Menos componentes = mais compressão, mas possível perda de informação. O ideal é escolher o número que explica ~95% da variância."
+          "tipo": "int, float ou str",
+          "faixa": "1 a min(n, d)",
+          "descricao": "Número de componentes principais a manter. Pode ser inteiro (número fixo) ou float (proporção da variância a manter).",
+          "implicacoes": "Menos componentes = mais compressão, mas possível perda de informação. O ideal é manter componentes que explicam ~95% da variância.",
+          "dicaPratica": "Use n_components=0.95 para manter 95% da variância. Ou plote a variância acumulada e escolha o 'cotovelo'."
         }
       },
-      "vantagens": ["Reduz dimensionalidade efetivamente", "Remove correlação entre atributos", "Melhora performance de outros algoritmos"],
-      "desvantagens": ["Perde interpretabilidade", "Assume linearidade", "Sensível à escala dos dados"]
+      "vantagens": [
+        "Reduz dimensionalidade efetivamente",
+        "Remove correlação entre atributos",
+        "Melhora performance de outros algoritmos",
+        "Útil para visualização"
+      ],
+      "desvantagens": [
+        "Perde interpretabilidade (componentes são combinações lineares)",
+        "Assume linearidade",
+        "Sensível à escala dos dados (normalize antes)",
+        "Pode perder informação importante"
+      ],
+      "curiosidade": "O PCA é uma das técnicas mais fundamentais da estatística. Foi inventado por Karl Pearson em 1901 e é usado em praticamente todas as áreas da ciência — de genômica a processamento de imagens."
     }
   },
   "metricas": {
     "accuracy_score": {
-      "nome": "Acurácia",
-      "formula": "Acertos / Total",
-      "descricao": "A acurácia mede a proporção de previsões corretas em relação ao total de amostras. É a métrica mais intuitiva, mas pode ser enganosa em datasets desbalanceados.",
+      "nome": "Acurácia (Accuracy)",
+      "sklearn": "sklearn.metrics.accuracy_score",
+      "formula": "acurácia = (VP + VN) / (VP + VN + FP + FN)",
+      "intuicao": "De todas as previsões que o modelo fez, qual porcentagem ele acertou?",
+      "descricao": "A acurácia é a métrica mais intuitiva: mede a proporção de previsões corretas sobre o total. É a primeira métrica que todo mundo olha, mas pode ser enganosa em datasets desbalanceados.",
+      "exemploReal": "Imagine um dataset de detecção de fraude com 99% de transações legítimas e 1% de fraudes. Um modelo que SEMPRE diz 'legítima' tem 99% de acurácia — mas é completamente inútil para detectar fraudes!",
       "quandoUsar": [
-        "Quando as classes estão balanceadas",
-        "Como primeira métrica de avaliação geral",
+        "Datasets balanceados (classes com tamanho similar)",
+        "Primeira avaliação geral do modelo",
         "Quando todos os tipos de erro têm o mesmo custo"
       ],
-      "cuidados": [
-        "Em datasets desbalanceados, pode ser alta mesmo com um modelo inútil",
-        "Não indica o tipo de erro (falsos positivos vs falsos negativos)",
-        "Use junto com precision, recall e F1 para uma avaliação mais completa"
+      "naoUsarQuando": [
+        "Datasets desbalanceados (use F1-Score ou AUC-ROC)",
+        "Quando falsos positivos e falsos negativos têm custos diferentes",
+        "Problemas onde uma classe é muito mais importante que outra"
       ],
-      "exemplo": "Se o modelo acerta 85 de 100 previsões, a acurácia é 85%.",
-      "intervalo": "0 a 1 (quanto maior, melhor)"
+      "limitacoes": [
+        "Não indica o TIPO de erro (FP vs FN)",
+        "Em datasets desbalanceados, pode ser alta mesmo com modelo inútil",
+        "Não é uma métrica diferenciável (não pode ser usada como loss function)"
+      ],
+      "interpretacao": "0.95 = 95% das previsões estão corretas. 0.50 = acerto de cara ou coroa. Abaixo de 0.50 = pior que aleatório."
     },
     "precision_score": {
-      "nome": "Precisão",
-      "formula": "Verdadeiros Positivos / (Verdadeiros Positivos + Falsos Positivos)",
-      "descricao": "A precisão mede, entre todas as previsões positivas, quantas eram realmente positivas. Responde à pergunta: 'Quando o modelo diz que é positivo, com que frequência ele está certo?'",
+      "nome": "Precisão (Precision)",
+      "sklearn": "sklearn.metrics.precision_score",
+      "formula": "precisão = VP / (VP + FP)",
+      "intuicao": "Quando o modelo diz 'é positivo', com que frequência ele está certo?",
+      "descricao": "A precisão mede a qualidade das previsões positivas. Se o modelo classifica 100 amostras como positivas e 90 realmente são, a precisão é 90%. É a métrica do 'quando eu digo sim, eu acerto'.",
+      "exemploReal": "Em detecção de spam: se o modelo marca 100 emails como spam e 5 são legítimos (FP), a precisão é 95%. Isso é importante porque um email legítimo na caixa de spam pode ser um problema sério.",
       "quandoUsar": [
-        "Quando o custo de um falso positivo é alto",
-        "Ex: filtrar spam (não queremos marcar emails legítimos como spam)",
-        "Ex: diagnóstico médico (não queremos diagnosticar erradamente uma doença)"
+        "Quando o custo de falso positivo é alto",
+        "Filtragem de spam (não queremos emails legítimos no spam)",
+        "Diagnóstico médico (não queremos diagnosticar alguém que não tem a doença)",
+        "Sistemas de recomendação (não queremos recomendar coisas irrelevantes)"
       ],
-      "cuidados": [
-        "Alta precisão pode vir com baixo recall (o modelo é conservador)",
-        "Deve ser analisada junto com recall",
-        "Em problemas multiclasse, considere macro, micro ou weighted average"
+      "naoUsarQuando": [
+        "Quando o custo de falso negativo é alto (use recall)",
+        "Sozinha — sempre analise junto com recall"
       ],
-      "exemplo": "Se o modelo prevê 100 positivos e 90 realmente são, a precisão é 90%.",
-      "intervalo": "0 a 1 (quanto maior, melhor)"
+      "tradeOff": "Existe um trade-off natural entre precisão e recall: aumentar a precisão geralmente diminui o recall (e vice-versa). O limiar de decisão (threshold) controla esse trade-off.",
+      "interpretacao": "0.90 = quando o modelo diz 'sim', ele acerta 90% das vezes. 0.50 = metade das previsões positivas estão erradas."
     },
     "recall_score": {
-      "nome": "Recall (Sensibilidade)",
-      "formula": "Verdadeiros Positivos / (Verdadeiros Positivos + Falsos Negativos)",
-      "descricao": "O recall mede, entre todos os positivos reais, quantos o modelo conseguiu identificar. Responde à pergunta: 'De todos os positivos reais, quantos o modelo encontrou?'",
+      "nome": "Recall (Sensibilidade / Taxa de Verdadeiros Positivos)",
+      "sklearn": "sklearn.metrics.recall_score",
+      "formula": "recall = VP / (VP + FN)",
+      "intuicao": "De todos os positivos reais, quantos o modelo encontrou?",
+      "descricao": "O recall mede a capacidade do modelo de encontrar TODOS os positivos. Se existem 100 pacientes com câncer e o modelo detecta 80, o recall é 80%. É a métrica do 'eu não deixo passar nenhum caso'.",
+      "exemploReal": "Em detecção de câncer: se 100 pacientes têm a doença e o modelo detecta apenas 70, o recall é 70%. Os 30 não detectados (FN) podem ter consequências graves. Neste caso, recall alto é mais importante que precisão alta.",
       "quandoUsar": [
-        "Quando o custo de um falso negativo é alto",
-        "Ex: detectar câncer (não queremos perder casos positivos)",
-        "Ex: detectar fraudes (não queremos deixar fraudes passarem)"
+        "Quando o custo de falso negativo é alto",
+        "Detecção de câncer (não queremos perder casos positivos)",
+        "Detecção de fraudes (não queremos deixar fraudes passarem)",
+        "Sistemas de segurança (não queremos ameaças não detectadas)"
       ],
-      "cuidados": [
-        "Alto recall pode vir com baixa precisão (o modelo marca tudo como positivo)",
-        "Deve ser analisado junto com precisão",
-        "O trade-off precisão/recall depende do contexto do problema"
+      "naoUsarQuando": [
+        "Quando o custo de falso positivo é alto (use precisão)",
+        "Sozinha — sempre analise junto com precisão"
       ],
-      "exemplo": "Se existem 100 positivos reais e o modelo encontra 80, o recall é 80%.",
-      "intervalo": "0 a 1 (quanto maior, melhor)"
+      "tradeOff": "Alto recall geralmente vem com baixa precisão — o modelo marca muita coisa como positiva para não perder nenhum caso real.",
+      "interpretacao": "0.90 = o modelo encontra 90% dos positivos reais. 0.50 = o modelo perde metade dos positivos."
     },
     "f1_score": {
       "nome": "F1-Score",
-      "formula": "2 * (Precisão * Recall) / (Precisão + Recall)",
-      "descricao": "O F1-Score é a média harmônica entre precisão e recall. Ele equilibra ambas as métricas em um único valor, sendo especialmente útil quando as classes estão desbalanceadas.",
+      "sklearn": "sklearn.metrics.f1_score",
+      "formula": "F1 = 2 × (precisão × recall) / (precisão + recall)",
+      "intuicao": "Qual é o equilíbrio entre precisão e recall?",
+      "descricao": "O F1-Score é a média harmônica entre precisão e recall. A média harmônica penaliza desequilíbrios: se precisão é alta e recall é baixo (ou vice-versa), o F1 será baixo. Só é alto quando AMBAS as métricas são razoáveis.",
+      "exemploReal": "Precisão=0.9, Recall=0.1 → F1=0.18 (péssimo, apesar da precisão alta). Precisão=0.7, Recall=0.7 → F1=0.7 (bom equilíbrio).",
       "quandoUsar": [
-        "Quando você precisa de um equilíbrio entre precisão e recall",
-        "Em datasets desbalanceados",
-        "Quando tanto falsos positivos quanto falsos negativos são importantes"
+        "Datasets desbalanceados",
+        "Quando tanto FP quanto FN são importantes",
+        "Quando você precisa de UMA métrica que capture precisão E recall",
+        "Comparação entre modelos"
       ],
-      "cuidados": [
-        "Não diferencia se o problema é mais precisão ou recall",
-        "Em problemas multiclasse, escolha entre macro, micro ou weighted",
-        "Um F1 alto não garante bom desempenho em todas as classes"
+      "naoUsarQuando": [
+        "Quando FP e FN têm custos muito diferentes (use weighted F1 ou métricas customizadas)",
+        "Problemas multiclasse sem escolher averaging (macro, micro, weighted)"
       ],
-      "exemplo": "Precisão=0.8, Recall=0.6 → F1 = 2*(0.8*0.6)/(0.8+0.6) = 0.686",
-      "intervalo": "0 a 1 (quanto maior, melhor)"
+      "variantees": "macro-F1: média simples entre classes. weighted-F1: ponderada pelo tamanho das classes. micro-F1: calculada globalmente.",
+      "interpretacao": "0.90 = excelente equilíbrio. 0.50 = equilíbrio mediano. Abaixo de 0.30 = modelo fraco."
     },
     "confusion_matrix": {
       "nome": "Matriz de Confusão",
-      "formula": "Tabela N×N onde N é o número de classes",
-      "descricao": "A matriz de confusão mostra como as previsões se distribuem entre as classes. A diagonal principal mostra os acertos (verdadeiros positivos e verdadeiros negativos), enquanto os demais elementos mostram os erros de classificação.",
+      "sklearn": "sklearn.metrics.confusion_matrix",
+      "formula": "Tabela N×N (N = número de classes)",
+      "intuicao": "Mostra exatamente onde o modelo acerta e onde ele erra, classe por classe.",
+      "descricao": "A matriz de confusão é a tabela que resume todas as previsões do modelo. As linhas representam as classes REAIS, as colunas representam as classes PREVISTAS. A diagonal principal mostra os acertos; tudo fora da diagonal são erros.",
       "comoLer": [
-        "Cada linha representa a classe real",
-        "Cada coluna representa a classe prevista",
-        "A diagonal principal = acertos (verde)",
-        "Fora da diagonal = erros (vermelho)"
+        "Linha = classe real, Coluna = classe prevista",
+        "Diagonal principal (canto superior esquerdo ao inferior direito) = ACERTOS",
+        "Fora da diagonal = ERROS (confusões entre classes)",
+        "Cada célula[i,j] = quantas vezes a classe real i foi prevista como classe j"
       ],
+      "exemploReal": "Para um classificador de gato/cachorro/pássaro:\n- Matriz[0,0]=50: 50 gatos classificados como gatos (correto)\n- Matriz[0,1]=3: 3 gatos classificados como cachorro (erro)\n- Matriz[1,0]=2: 2 cachorros classificados como gato (erro)\n\nSe os valores fora da diagonal são altos, o modelo está confundindo classes específicas.",
       "quandoUsar": [
-        "Sempre que fizer classificação — é a base para calcular todas as outras métricas",
+        "SEMPRE que fizer classificação — é a base para todas as outras métricas",
         "Para entender quais classes o modelo confunde entre si",
-        "Para identificar padrões de erro específicos"
+        "Para identificar se o modelo tem viés para alguma classe",
+        "Para calcular precisão, recall, F1 por classe"
       ],
-      "cuidados": [
-        "Para muitas classes, a matriz pode ser difícil de visualizar",
-        "Considere normalizar por linha ou coluna para comparar proporções",
-        "Use junto com classification_report para métricas por classe"
+      "dicas": [
+        "Normalize por linha para ver o recall de cada classe",
+        "Normalize por coluna para ver a precisão de cada classe",
+        "Classes com muitos erros fora da diagonal precisam de mais dados ou features melhores",
+        "Use heatmap para visualizar — cores mais escuras = mais erros"
       ],
-      "exemplo": "Uma matriz 2×2 mostra: VP (diagonal), FP (coluna), FN (linha), VN (diagonal).",
-      "intervalo": "Valores inteiros >= 0"
+      "interpretacao": "Valores altos na diagonal = bom. Valores altos fora da diagonal = o modelo confunde classes específicas."
     }
   },
   "pipeline": {
     "coleta": {
       "titulo": "Coleta de Dados",
-      "descricao": "Nesta etapa, você importa seus dados para o pipeline. Pode usar arquivos Excel (.xlsx), CSV ou JSON. Após o upload, selecione quais colunas serão usadas como atributos (features) e qual será a variável alvo (target).",
+      "subtitulo": "Importar e configurar os dados",
+      "descricao": "Esta é a primeira etapa do pipeline. Aqui você carrega seus dados e configura como eles serão usados. A qualidade dos dados define a qualidade do modelo — dados sujos geram modelos ruins.",
       "dicas": [
-        "Verifique se os dados estão limpos e sem valores faltantes",
-        "Selecione apenas atributos relevantes para o problema",
+        "Verifique se os dados estão limpos: valores faltantes, outliers e erros de formatação comprometem o modelo",
+        "Selecione apenas atributos relevantes: atributos irrelevantes adicionam ruído e aumentam o tempo de treino",
         "A divisão treino/teste (padrão 70/30) define quanto dos dados serão usados para treinar vs avaliar"
+      ],
+      "conceitos": [
+        {
+          "nome": "Atributos (Features)",
+          "descricao": "As colunas de entrada que o modelo usa para aprender padrões. Ex: idade, renda, histórico de compras."
+        },
+        {
+          "nome": "Target (Variável Alvo)",
+          "descricao": "A coluna que o modelo deve prever. Ex: 'comprou' (sim/não), 'preço' (valor contínuo)."
+        },
+        {
+          "nome": "Divisão Treino/Teste",
+          "descricao": "Separar dados para treinar e dados para avaliar. O modelo nunca vê os dados de teste durante o treino — isso simula dados novos do mundo real."
+        }
       ]
     },
     "selecao_modelo": {
       "titulo": "Seleção do Modelo",
-      "descricao": "Escolha o algoritmo de Machine Learning que será usado para treinar o modelo. Cada algoritmo tem características diferentes e se adapta melhor a diferentes tipos de problemas.",
+      "subtitulo": "Escolher o algoritmo",
+      "descricao": "Cada algoritmo de ML tem características diferentes. Alguns são rápidos mas simples, outros são poderosos mas lentos. A escolha depende do tipo de problema, tamanho dos dados e necessidade de interpretabilidade.",
       "dicas": [
-        "Comece com modelos simples (Regressão Logística, k-NN) como baseline",
-        "Compare pelo menos 2-3 modelos para encontrar o melhor",
-        "Considere o trade-off entre complexidade e desempenho"
+        "Comece com modelos simples (Regressão Logística, KNN) como baseline",
+        "Compare pelo menos 2-3 modelos antes de decidir",
+        "Considere o trade-off entre desempenho e interpretabilidade"
+      ],
+      "conceitos": [
+        {
+          "nome": "Baseline",
+          "descricao": "O modelo mais simples que serve como referência. Se um modelo complexo não supera o baseline, algo está errado."
+        },
+        {
+          "nome": "Overfitting",
+          "descricao": "Quando o modelo decora os dados de treino mas não generaliza para dados novos. Sinal: acurácia de treino muito maior que a de teste."
+        },
+        {
+          "nome": "Underfitting",
+          "descricao": "Quando o modelo é simples demais para capturar os padrões. Sinal: acurácia baixa tanto no treino quanto no teste."
+        }
       ]
     },
     "treinamento": {
       "titulo": "Treinamento",
-      "descricao": "O modelo aprende padrões a partir dos dados de treinamento. O algoritmo ajusta seus parâmetros internos para minimizar o erro nas previsões.",
+      "subtitulo": "O modelo aprende os padrões",
+      "descricao": "Nesta etapa, o algoritmo analisa os dados de treino e ajusta seus parâmetros internos para minimizar o erro. É como estudar para uma prova — o modelo 'estuda' os exemplos para aprender a prever.",
       "dicas": [
-        "O treinamento pode levar alguns segundos a minutos dependendo do tamanho dos dados",
-        "Modelos mais complexos (SVM com kernel RBF) podem demorar mais",
-        "Após o treinamento, o modelo estará pronto para fazer previsões"
+        "O treinamento pode levar de segundos a minutos dependendo do tamanho dos dados e complexidade do modelo",
+        "Modelos como SVM com kernel RBF são mais lentos que Regressão Logística",
+        "Após o treinamento, o modelo está pronto para fazer previsões nos dados de teste"
+      ],
+      "conceitos": [
+        {
+          "nome": "Parâmetros vs Hiperparâmetros",
+          "descricao": "Parâmetros são aprendidos automaticamente (ex: pesos da Regressão Logística). Hiperparâmetros são definidos por você (ex: K no KNN, profundidade da árvore)."
+        },
+        {
+          "nome": "Convergência",
+          "descricao": "Quando o modelo para de melhorar durante o treinamento. Algoritmos iterativos (como Gradiente Descendente) convergem quando o erro estabiliza."
+        }
       ]
     },
     "selecao_metricas": {
       "titulo": "Seleção de Métricas",
-      "descricao": "Escolha como o modelo será avaliado. Diferentes métricas capturam diferentes aspectos do desempenho. A acurácia é a mais intuitiva, mas métricas como precisão, recall e F1-Score oferecem uma visão mais completa.",
+      "subtitulo": "Definir como avaliar o modelo",
+      "descricao": "Diferentes métricas capturam diferentes aspectos do desempenho. A escolha da métrica depende do contexto: em detecção de câncer, recall é mais importante que precisão; em filtragem de spam, precisão é mais importante.",
       "dicas": [
-        "Use acurácia para datasets balanceados",
+        "Use acurácia para datasets balanceados como primeira avaliação",
         "Use F1-Score para datasets desbalanceados",
         "A matriz de confusão mostra exatamente onde o modelo erra"
+      ],
+      "conceitos": [
+        {
+          "nome": "Verdadeiro Positivo (VP)",
+          "descricao": "O modelo prevê positivo e a resposta é positiva. Ex: detectou câncer e o paciente realmente tem."
+        },
+        {
+          "nome": "Falso Positivo (FP)",
+          "descricao": "O modelo prevê positivo mas a resposta é negativa. Ex: detectou câncer mas o paciente não tem (alarme falso)."
+        },
+        {
+          "nome": "Verdadeiro Negativo (VN)",
+          "descricao": "O modelo prevê negativo e a resposta é negativa. Ex: disse que não tem câncer e o paciente realmente não tem."
+        },
+        {
+          "nome": "Falso Negativo (FN)",
+          "descricao": "O modelo prevê negativo mas a resposta é positiva. Ex: disse que não tem câncer mas o paciente tem (erro grave)."
+        }
       ]
     },
     "avaliacao": {
       "titulo": "Avaliação",
-      "descricao": "Aqui você vê os resultados do modelo nos dados de teste. Compare as métricas escolhidas para decidir se o modelo está adequado ou se precisa de ajustes.",
+      "subtitulo": "Analisar os resultados",
+      "descricao": "Aqui você vê os resultados do modelo nos dados de teste. Os dados de teste nunca foram vistos pelo modelo durante o treino — isso simula como ele se comportaria com dados novos do mundo real.",
       "dicas": [
-        "Compare os resultados entre diferentes modelos",
+        "Compare os resultados entre diferentes modelos para escolher o melhor",
         "Se a acurácia de treino é muito maior que a de teste, há overfitting",
-        "A matriz de confusão revela quais classes o modelo confunde"
+        "A matriz de confusão revela quais classes o modelo confunde entre si",
+        "Um bom modelo generaliza bem — funciona tanto no treino quanto no teste"
+      ],
+      "conceitos": [
+        {
+          "nome": "Generalização",
+          "descricao": "A capacidade do modelo de performar bem em dados que nunca viu. É o objetivo final do Machine Learning."
+        },
+        {
+          "nome": "Validação Cruzada",
+          "descricao": "Técnica que divide os dados em K partes e treina K vezes, cada vez usando uma parte diferente para teste. Dá uma estimativa mais robusta do desempenho."
+        }
       ]
     }
   }

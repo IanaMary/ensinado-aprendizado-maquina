@@ -13,32 +13,36 @@
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 0.5rem;
+  gap: 10px;
   max-height: 70vh;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $roxo-claro;
+    border-radius: 4px;
+  }
 }
 
+// Tooltip
 .wrapper {
   position: relative;
   display: inline-flex;
-  align-items: flex-start;
   width: fit-content;
 
   mat-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 24px;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
     cursor: help;
     color: $roxo-medio;
-    transition: color 0.2s;
-    flex-shrink: 0;
-
-    &:hover {
-      color: $roxo-vibrante;
-    }
 
     ::ng-deep svg {
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
     }
   }
 
@@ -47,94 +51,245 @@
     position: absolute;
     left: 0;
     top: 100%;
-    margin-top: 8px;
-    padding: 12px 16px;
-    min-width: 280px;
-    max-width: 320px;
+    margin-top: 6px;
+    padding: 10px 14px;
+    min-width: 240px;
+    max-width: 280px;
     border: 1px solid $roxo-claro;
-    border-radius: 12px;
-    background-color: $branco;
-    color: $roxo-escuro;
+    border-radius: 10px;
+    background: $branco;
+    color: $cinza-escuro;
     z-index: 11;
-    box-shadow: 0 4px 16px rgba($roxo-escuro, 0.12);
-    font-size: 13px;
-    line-height: 1.6;
+    box-shadow: 0 4px 16px rgba($roxo-escuro, 0.1);
+    font-size: 12px;
+    line-height: 1.5;
     list-style: none;
 
     li {
-      margin-bottom: 8px;
-      padding-left: 12px;
+      margin-bottom: 6px;
+      padding-left: 10px;
       position: relative;
 
       &::before {
         content: '';
         position: absolute;
         left: 0;
-        top: 8px;
+        top: 7px;
         width: 4px;
         height: 4px;
         border-radius: 50%;
-        background-color: $roxo-medio;
+        background: $roxo-medio;
       }
 
-      &:last-child {
-        margin-bottom: 0;
-      }
+      &:last-child { margin-bottom: 0; }
     }
   }
 
-  &:hover .balao {
-    display: block;
+  &:hover .balao { display: block; }
+}
+
+// Sections base
+.section {
+  background: $branco;
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid rgba($roxo-claro, 0.5);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: $roxo-escuro;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: $roxo-medio;
   }
 }
 
-// Contexto dinâmico
-.contexto-info {
-  background: $branco;
-  border: 1px solid $roxo-claro;
-  border-radius: 12px;
+.section-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: $cinza-escuro;
+}
+
+.desc-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: $cinza-escuro;
+}
+
+// Model header
+.model-header {
+  background: linear-gradient(135deg, $roxo-escuro, $roxo-medio);
+  color: $branco;
+  border: none;
   padding: 16px;
-  animation: fadeIn 0.3s ease-out;
 
-  .contexto-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-
-    .contexto-icon {
-      color: $roxo-medio;
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-    }
-
-    h4 {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 700;
-      color: $roxo-escuro;
-    }
+  .model-badge {
+    display: inline-block;
+    background: rgba($branco, 0.2);
+    color: $branco;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
-  .contexto-descricao {
-    margin: 0 0 12px 0;
-    font-size: 13px;
+  h3 {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .sklearn-path {
+    font-size: 10px;
+    background: rgba($branco, 0.15);
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    opacity: 0.9;
+  }
+}
+
+// Metric header
+.metric-header {
+  background: linear-gradient(135deg, darken($info, 10%), $info);
+  color: $branco;
+  border: none;
+  padding: 16px;
+
+  h3 {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .sklearn-path {
+    font-size: 10px;
+    background: rgba($branco, 0.2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+}
+
+// Intuition card
+.intuition-card {
+  display: flex;
+  gap: 10px;
+  background: #FFF8E1;
+  border-color: #FFE082;
+
+  .card-icon mat-icon {
+    color: #F9A825;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #F57F17;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
     line-height: 1.6;
     color: $cinza-escuro;
   }
+}
 
-  .contexto-lista {
-    margin: 0 0 12px 0;
-    padding-left: 16px;
+// Steps list
+.steps-list {
+  margin: 0;
+  padding-left: 20px;
+  counter-reset: step;
+
+  li {
+    font-size: 12px;
+    line-height: 1.5;
+    color: $cinza-escuro;
+    margin-bottom: 6px;
+    padding-left: 4px;
+
+    &:last-child { margin-bottom: 0; }
+  }
+}
+
+// Dual cards (use/avoid)
+.dual-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  .use-card, .avoid-card {
+    background: $branco;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid rgba($roxo-claro, 0.5);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &.good {
+      color: darken($sucesso, 10%);
+      mat-icon { color: $sucesso; }
+    }
+
+    &.bad {
+      color: darken($erro, 10%);
+      mat-icon { color: $erro; }
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 14px;
     list-style: none;
 
     li {
-      font-size: 12px;
+      font-size: 11px;
       line-height: 1.5;
       color: $cinza-escuro;
-      margin-bottom: 6px;
-      padding-left: 12px;
+      margin-bottom: 4px;
+      padding-left: 8px;
       position: relative;
 
       &::before {
@@ -142,192 +297,362 @@
         position: absolute;
         left: 0;
         top: 6px;
-        width: 6px;
-        height: 6px;
+        width: 4px;
+        height: 4px;
         border-radius: 50%;
-        background: $roxo-medio;
       }
     }
   }
 
-  // Hiperparâmetros
-  .contexto-params {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid $cinza-claro;
+  .use-card li::before { background: $sucesso; }
+  .avoid-card li::before { background: $erro; }
+}
 
-    h5 {
-      margin: 0 0 8px 0;
-      font-size: 13px;
-      font-weight: 600;
+// Pros/cons
+.pros-cons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  .pros, .cons {
+    background: $branco;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid rgba($roxo-claro, 0.5);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &.good {
+      color: darken($sucesso, 10%);
+      mat-icon { color: $sucesso; }
+    }
+
+    &.bad {
+      color: darken($erro, 10%);
+      mat-icon { color: $erro; }
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 14px;
+    list-style: none;
+
+    li {
+      font-size: 11px;
+      line-height: 1.5;
+      color: $cinza-escuro;
+      margin-bottom: 4px;
+      padding-left: 8px;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 6px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+      }
+    }
+  }
+
+  .pros li::before { background: $sucesso; }
+  .cons li::before { background: $erro; }
+}
+
+// Hyperparameters
+.params-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.param-card {
+  background: $cinza-claro;
+  border-radius: 8px;
+  padding: 10px;
+
+  .param-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+
+    .param-name {
+      font-size: 12px;
+      font-weight: 700;
       color: $roxo-escuro;
     }
 
-    .param-item {
-      background: $cinza-claro;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-
-      .param-nome {
-        font-weight: 600;
-        font-size: 12px;
-        color: $roxo-escuro;
-      }
-
-      .param-valor {
-        font-size: 11px;
-        color: $roxo-medio;
-        margin-left: 8px;
-        background: $roxo-fundo;
-        padding: 2px 6px;
-        border-radius: 4px;
-      }
-
-      .param-desc {
-        margin: 6px 0 0 0;
-        font-size: 11px;
-        line-height: 1.5;
-        color: $cinza-escuro;
-      }
-    }
-  }
-
-  // Vantagens/Desvantagens
-  .contexto-pros-cons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid $cinza-claro;
-
-    h5 {
-      margin: 0 0 6px 0;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    ul {
-      margin: 0;
-      padding-left: 14px;
-      list-style: none;
-
-      li {
-        font-size: 11px;
-        line-height: 1.4;
-        margin-bottom: 4px;
-        padding-left: 8px;
-        position: relative;
-
-        &::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 5px;
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-        }
-      }
-    }
-
-    .pros {
-      h5 { color: $sucesso; }
-      li { color: $cinza-escuro; }
-      li::before { background: $sucesso; }
-    }
-
-    .cons {
-      h5 { color: $erro; }
-      li { color: $cinza-escuro; }
-      li::before { background: $erro; }
-    }
-  }
-
-  // Cuidados
-  .contexto-cuidados {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid $cinza-claro;
-
-    h5 {
-      margin: 0 0 6px 0;
-      font-size: 12px;
-      font-weight: 600;
-      color: $aviso;
-    }
-
-    ul {
-      margin: 0;
-      padding-left: 14px;
-      list-style: none;
-
-      li {
-        font-size: 11px;
-        line-height: 1.4;
-        color: $cinza-escuro;
-        margin-bottom: 4px;
-        padding-left: 8px;
-        position: relative;
-
-        &::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 5px;
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: $aviso;
-        }
-      }
-    }
-  }
-
-  // Métricas
-  .metrica-info {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid $cinza-claro;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-
-    div {
-      font-size: 12px;
-      color: $cinza-escuro;
-      line-height: 1.5;
-
-      strong {
-        color: $roxo-escuro;
-      }
-    }
-
-    .metrica-formula {
+    .param-sklearn {
+      font-size: 10px;
       background: $roxo-fundo;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-family: monospace;
-      font-size: 12px;
+      color: $roxo-medio;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  }
+
+  .param-meta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    color: $cinza-medio;
+
+    strong {
+      color: $roxo-medio;
+    }
+  }
+
+  .param-desc {
+    margin: 0 0 6px 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: $cinza-escuro;
+  }
+
+  .param-implication {
+    display: flex;
+    gap: 6px;
+    font-size: 11px;
+    color: $cinza-escuro;
+    background: rgba($aviso-claro, 0.5);
+    padding: 6px 8px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      color: $aviso;
+      flex-shrink: 0;
+    }
+  }
+
+  .param-tip {
+    display: flex;
+    gap: 6px;
+    font-size: 11px;
+    color: $cinza-escuro;
+    background: rgba($sucesso-claro, 0.5);
+    padding: 6px 8px;
+    border-radius: 6px;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      color: $sucesso;
+      flex-shrink: 0;
     }
   }
 }
 
-.explicacao-lista {
+// Info list
+.info-list {
+  margin: 0;
+  padding-left: 14px;
+  list-style: none;
+
+  li {
+    font-size: 12px;
+    line-height: 1.5;
+    color: $cinza-escuro;
+    margin-bottom: 6px;
+    padding-left: 8px;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: $roxo-medio;
+    }
+  }
+}
+
+// Example card
+.example-card {
+  display: flex;
+  gap: 10px;
+  background: #E8F5E9;
+  border-color: #A5D6A7;
+
+  .card-icon mat-icon {
+    color: $sucesso;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: darken($sucesso, 10%);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
   p {
-    margin: 0 0 8px 0;
-    font-size: 13px;
+    margin: 0;
+    font-size: 12px;
     line-height: 1.6;
     color: $cinza-escuro;
   }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+// Curiosity card
+.curiosity-card {
+  display: flex;
+  gap: 10px;
+  background: #F3E5F5;
+  border-color: #CE93D8;
+
+  .card-icon mat-icon {
+    color: #8E24AA;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #6A1B9A;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: $cinza-escuro;
+  }
+}
+
+// Interpretation card
+.interpretation-card {
+  display: flex;
+  gap: 10px;
+  background: #E3F2FD;
+  border-color: #90CAF9;
+
+  .card-icon mat-icon {
+    color: $info;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: darken($info, 10%);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: $cinza-escuro;
+  }
+}
+
+// Tradeoff card
+.tradeoff-card {
+  display: flex;
+  gap: 10px;
+  background: #FFF3E0;
+  border-color: #FFCC80;
+
+  .card-icon mat-icon {
+    color: #EF6C00;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #E65100;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: $cinza-escuro;
+  }
+}
+
+// Formula card
+.formula-card {
+  background: $cinza-claro;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .formula-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: $roxo-medio;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .formula-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: $roxo-escuro;
+    font-family: 'Courier New', monospace;
+  }
 }
 
 :host ::ng-deep p {
   margin: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -1,91 +1,247 @@
 <div class="tutor">
-  <!-- Resumo em balao (tooltip) -->
+  <!-- Tooltip balao -->
   <ng-container *ngIf="resumo.length">
     <div class="wrapper">
       <mat-icon [svgIcon]="'tutor'"></mat-icon>
       <div class="balao">
-        <li *ngFor="let item of resumo">
-          {{item}}
-        </li>
+        <li *ngFor="let item of resumo">{{item}}</li>
       </div>
     </div>
   </ng-container>
 
   <!-- Painel principal -->
   <div class="tutor-painel">
-    <!-- Tutor geral (HTML do backend) -->
-    <div *ngIf="tutorGeral" [innerHTML]="tutorGeral"></div>
-
-    <!-- Contexto dinâmico (modelo ou métrica selecionada) -->
-    <div *ngIf="contexto" class="contexto-info">
-      <div class="contexto-header">
-        <mat-icon class="contexto-icon">info</mat-icon>
-        <h4>{{ contexto.titulo }}</h4>
+    <!-- Pipeline info -->
+    <div *ngIf="tutorPipelineInfo" class="section pipeline-section">
+      <div class="section-header">
+        <mat-icon>route</mat-icon>
+        <span>{{ tutorPipelineInfo.titulo }}</span>
       </div>
-
-      <p class="contexto-descricao">{{ contexto.descricao }}</p>
-
-      <!-- Lista de itens (como funciona / quando usar) -->
-      <ul *ngIf="contexto.itens?.length" class="contexto-lista">
-        <li *ngFor="let item of contexto.itens">{{ item }}</li>
-      </ul>
-
-      <!-- Detalhes do modelo -->
-      <ng-container *ngIf="contexto.modelo">
-        <!-- Hiperparâmetros -->
-        <div *ngIf="contexto.modelo.hiperparametros && objectKeys(contexto.modelo.hiperparametros).length" class="contexto-params">
-          <h5>Hiperparâmetros</h5>
-          <div *ngFor="let param of objectKeys(contexto.modelo.hiperparametros)" class="param-item">
-            <span class="param-nome">{{ contexto.modelo.hiperparametros[param].nome }}</span>
-            <span class="param-valor">Padrão: {{ contexto.modelo.hiperparametros[param].padrao }}</span>
-            <p class="param-desc">{{ contexto.modelo.hiperparametros[param].implicacoes }}</p>
-          </div>
-        </div>
-
-        <!-- Vantagens e Desvantagens -->
-        <div class="contexto-pros-cons">
-          <div *ngIf="contexto.modelo.vantagens?.length" class="pros">
-            <h5>Vantagens</h5>
-            <ul>
-              <li *ngFor="let v of contexto.modelo.vantagens">{{ v }}</li>
-            </ul>
-          </div>
-          <div *ngIf="contexto.modelo.desvantagens?.length" class="cons">
-            <h5>Desvantagens</h5>
-            <ul>
-              <li *ngFor="let d of contexto.modelo.desvantagens">{{ d }}</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Cuidados -->
-        <div *ngIf="contexto.modelo.cuidados?.length" class="contexto-cuidados">
-          <h5>Cuidados</h5>
-          <ul>
-            <li *ngFor="let c of contexto.modelo.cuidados">{{ c }}</li>
-          </ul>
-        </div>
-      </ng-container>
-
-      <!-- Detalhes da métrica -->
-      <ng-container *ngIf="contexto.metrica">
-        <div class="metrica-info">
-          <div *ngIf="contexto.metrica.formula" class="metrica-formula">
-            <strong>Fórmula:</strong> {{ contexto.metrica.formula }}
-          </div>
-          <div *ngIf="contexto.metrica.intervalo" class="metrica-intervalo">
-            <strong>Intervalo:</strong> {{ contexto.metrica.intervalo }}
-          </div>
-          <div *ngIf="contexto.metrica.exemplo" class="metrica-exemplo">
-            <strong>Exemplo:</strong> {{ contexto.metrica.exemplo }}
-          </div>
-        </div>
-      </ng-container>
+      <p class="section-desc">{{ tutorPipelineInfo.descricao }}</p>
     </div>
 
-    <!-- Explicação (array de strings) -->
-    <div *ngIf="explicacao.length && !contexto" class="explicacao-lista">
-      <p *ngFor="let item of explicacao">{{ item }}</p>
+    <!-- Tutor geral (HTML do backend) -->
+    <div *ngIf="tutorGeral && !contexto" class="section backend-section" [innerHTML]="tutorGeral"></div>
+
+    <!-- CONTEXTO DO MODELO -->
+    <ng-container *ngIf="contexto?.modelo">
+      <!-- Header do modelo -->
+      <div class="section model-header">
+        <div class="model-badge">{{ contexto?.modelo?.tipo || 'Classificador' }}</div>
+        <h3>{{ contexto?.titulo }}</h3>
+        <code class="sklearn-path">{{ contexto?.modelo?.sklearn }}</code>
+      </div>
+
+      <!-- Descricao -->
+      <div class="section">
+        <p class="desc-text">{{ contexto?.descricao }}</p>
+      </div>
+
+      <!-- Intuicao -->
+      <div class="section intuition-card" *ngIf="contexto?.modelo?.intuicao">
+        <div class="card-icon">
+          <mat-icon>lightbulb</mat-icon>
+        </div>
+        <div class="card-content">
+          <span class="card-label">Intuicao</span>
+          <p>{{ contexto?.modelo?.intuicao }}</p>
+        </div>
+      </div>
+
+      <!-- Como funciona (passos) -->
+      <div class="section" *ngIf="contexto?.modelo?.passoAPasso?.length">
+        <div class="section-header">
+          <mat-icon>list_alt</mat-icon>
+          <span>Como funciona</span>
+        </div>
+        <ol class="steps-list">
+          <li *ngFor="let passo of contexto?.modelo?.passoAPasso">{{ passo }}</li>
+        </ol>
+      </div>
+
+      <!-- Quando usar / Nao usar -->
+      <div class="section dual-cards">
+        <div class="use-card" *ngIf="contexto?.modelo?.quandoUsar?.length">
+          <div class="card-header good">
+            <mat-icon>check_circle</mat-icon>
+            <span>Quando usar</span>
+          </div>
+          <ul>
+            <li *ngFor="let item of contexto?.modelo?.quandoUsar">{{ item }}</li>
+          </ul>
+        </div>
+        <div class="avoid-card" *ngIf="contexto?.modelo?.naoUsarQuando?.length">
+          <div class="card-header bad">
+            <mat-icon>cancel</mat-icon>
+            <span>Evitar quando</span>
+          </div>
+          <ul>
+            <li *ngFor="let item of contexto?.modelo?.naoUsarQuando">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Hiperparametros -->
+      <div class="section" *ngIf="contexto?.modelo?.hiperparametros && objectKeys(contexto?.modelo?.hiperparametros || {}).length">
+        <div class="section-header">
+          <mat-icon>tune</mat-icon>
+          <span>Hiperparametros</span>
+        </div>
+        <div class="params-list">
+          <div class="param-card" *ngFor="let param of objectKeys(contexto?.modelo?.hiperparametros || {})">
+            <div class="param-header">
+              <span class="param-name">{{ contexto?.modelo?.hiperparametros[param]?.nome }}</span>
+              <code class="param-sklearn">{{ contexto?.modelo?.hiperparametros[param]?.sklearn }}</code>
+            </div>
+            <div class="param-meta">
+              <span class="param-default">Padrao: <strong>{{ contexto?.modelo?.hiperparametros[param]?.padrao }}</strong></span>
+              <span class="param-range" *ngIf="contexto?.modelo?.hiperparametros[param]?.faixa">Faixa: {{ contexto?.modelo?.hiperparametros[param]?.faixa }}</span>
+            </div>
+            <p class="param-desc">{{ contexto?.modelo?.hiperparametros[param]?.descricao }}</p>
+            <div class="param-implication" *ngIf="contexto?.modelo?.hiperparametros[param]?.implicacoes">
+              <mat-icon>swap_horiz</mat-icon>
+              <span>{{ contexto?.modelo?.hiperparametros[param]?.implicacoes }}</span>
+            </div>
+            <div class="param-tip" *ngIf="contexto?.modelo?.hiperparametros[param]?.dicaPratica">
+              <mat-icon>tips_and_updates</mat-icon>
+              <span>{{ contexto?.modelo?.hiperparametros[param]?.dicaPratica }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vantagens / Desvantagens -->
+      <div class="section pros-cons">
+        <div class="pros" *ngIf="contexto?.modelo?.vantagens?.length">
+          <div class="card-header good">
+            <mat-icon>thumb_up</mat-icon>
+            <span>Vantagens</span>
+          </div>
+          <ul>
+            <li *ngFor="let v of contexto?.modelo?.vantagens">{{ v }}</li>
+          </ul>
+        </div>
+        <div class="cons" *ngIf="contexto?.modelo?.desvantagens?.length">
+          <div class="card-header bad">
+            <mat-icon>thumb_down</mat-icon>
+            <span>Desvantagens</span>
+          </div>
+          <ul>
+            <li *ngFor="let d of contexto?.modelo?.desvantagens">{{ d }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Curiosidade -->
+      <div class="section curiosity-card" *ngIf="contexto?.modelo?.curiosidade">
+        <div class="card-icon">
+          <mat-icon>school</mat-icon>
+        </div>
+        <div class="card-content">
+          <span class="card-label">Voce sabia?</span>
+          <p>{{ contexto?.modelo?.curiosidade }}</p>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- CONTEXTO DA METRICA -->
+    <ng-container *ngIf="contexto?.metrica">
+      <div class="section metric-header">
+        <h3>{{ contexto?.titulo }}</h3>
+        <code class="sklearn-path">{{ contexto?.metrica?.sklearn }}</code>
+      </div>
+
+      <div class="section">
+        <p class="desc-text">{{ contexto?.descricao }}</p>
+      </div>
+
+      <!-- Formula -->
+      <div class="section formula-card" *ngIf="contexto?.metrica?.formula">
+        <span class="formula-label">Formula</span>
+        <code class="formula-value">{{ contexto?.metrica?.formula }}</code>
+      </div>
+
+      <!-- Intuicao -->
+      <div class="section intuition-card" *ngIf="contexto?.metrica?.intuicao">
+        <div class="card-icon">
+          <mat-icon>lightbulb</mat-icon>
+        </div>
+        <div class="card-content">
+          <span class="card-label">Intuicao</span>
+          <p>{{ contexto?.metrica?.intuicao }}</p>
+        </div>
+      </div>
+
+      <!-- Exemplo real -->
+      <div class="section example-card" *ngIf="contexto?.metrica?.exemploReal">
+        <div class="card-icon">
+          <mat-icon>format_quote</mat-icon>
+        </div>
+        <div class="card-content">
+          <span class="card-label">Exemplo pratico</span>
+          <p>{{ contexto?.metrica?.exemploReal }}</p>
+        </div>
+      </div>
+
+      <!-- Quando usar / Nao usar -->
+      <div class="section dual-cards">
+        <div class="use-card" *ngIf="contexto?.metrica?.quandoUsar?.length">
+          <div class="card-header good">
+            <mat-icon>check_circle</mat-icon>
+            <span>Quando usar</span>
+          </div>
+          <ul>
+            <li *ngFor="let item of contexto?.metrica?.quandoUsar">{{ item }}</li>
+          </ul>
+        </div>
+        <div class="avoid-card" *ngIf="contexto?.metrica?.naoUsarQuando?.length">
+          <div class="card-header bad">
+            <mat-icon>cancel</mat-icon>
+            <span>Evitar quando</span>
+          </div>
+          <ul>
+            <li *ngFor="let item of contexto?.metrica?.naoUsarQuando">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Como ler (para matriz de confusao) -->
+      <div class="section" *ngIf="contexto?.metrica?.comoLer?.length">
+        <div class="section-header">
+          <mat-icon>grid_on</mat-icon>
+          <span>Como ler</span>
+        </div>
+        <ul class="info-list">
+          <li *ngFor="let item of contexto?.metrica?.comoLer">{{ item }}</li>
+        </ul>
+      </div>
+
+      <!-- Interpretacao -->
+      <div class="section interpretation-card" *ngIf="contexto?.metrica?.interpretacao">
+        <div class="card-icon">
+          <mat-icon>analytics</mat-icon>
+        </div>
+        <div class="card-content">
+          <span class="card-label">Interpretacao</span>
+          <p>{{ contexto?.metrica?.interpretacao }}</p>
+        </div>
+      </div>
+
+      <!-- Trade-off -->
+      <div class="section tradeoff-card" *ngIf="contexto?.metrica?.tradeOff">
+        <div class="card-icon">
+          <mat-icon>swap_horiz</mat-icon>
+        </div>
+        <div class="card-content">
+          <span class="card-label">Trade-off</span>
+          <p>{{ contexto?.metrica?.tradeOff }}</p>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Explicacao (fallback) -->
+    <div *ngIf="explicacao.length && !contexto" class="section">
+      <p *ngFor="let item of explicacao" class="desc-text">{{ item }}</p>
     </div>
   </div>
 </div>
