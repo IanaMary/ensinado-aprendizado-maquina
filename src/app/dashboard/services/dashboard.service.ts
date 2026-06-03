@@ -59,6 +59,15 @@ export class DashboardService {
     this.infoItemClicked.next(item);
   }
 
+  // TOY DATASETS
+  getToyDatasets() {
+    return this.http.get<any[]>(`${this.url}toy_datasets/`);
+  }
+
+  carregarToyDataset(nome: string) {
+    return this.http.get<any>(`${this.url}toy_datasets/${nome}`);
+  }
+
   // SERVIÇOS COM LIGAÇÃO COM BANCO 
 
   getTutor(params: any) {

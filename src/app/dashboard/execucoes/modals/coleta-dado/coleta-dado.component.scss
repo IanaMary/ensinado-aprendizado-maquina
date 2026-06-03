@@ -8,6 +8,176 @@
   padding: 0 4px;
 }
 
+// Fonte de dados tabs
+.fonte-dados {
+  margin-bottom: 8px;
+
+  .fonte-tabs {
+    display: flex;
+    gap: 4px;
+    background: $cinza-claro;
+    padding: 4px;
+    border-radius: 10px;
+
+    .fonte-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: $cinza-medio;
+      transition: all 0.2s ease;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      &.active {
+        background: $branco;
+        color: $roxo-escuro;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+      }
+
+      &:hover:not(.active) {
+        color: $roxo-medio;
+      }
+    }
+  }
+}
+
+// Datasets prontos
+.secao-datasets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .dataset-filters {
+    .filtro-tipo {
+      display: flex;
+      gap: 16px;
+    }
+  }
+
+  .dataset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 2px;
+  }
+
+  .dataset-card {
+    background: $branco;
+    border: 2px solid $cinza-claro;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $roxo-claro;
+      box-shadow: 0 2px 8px rgba($roxo-escuro, 0.06);
+    }
+
+    &.selected {
+      border-color: $roxo-medio;
+      background: $roxo-fundo;
+    }
+
+    .dataset-header {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+
+      .dataset-fonte {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+
+        &.sklearn {
+          background: #FFE0B2;
+          color: #E65100;
+        }
+
+        &.uci {
+          background: #E3F2FD;
+          color: #1565C0;
+        }
+      }
+
+      .dataset-tipo {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+
+        &.classificacao {
+          background: $roxo-fundo;
+          color: $roxo-medio;
+        }
+
+        &.regressao {
+          background: #E8F5E9;
+          color: #2E7D32;
+        }
+      }
+    }
+
+    .dataset-nome {
+      margin: 0 0 4px 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: $roxo-escuro;
+    }
+
+    .dataset-desc {
+      margin: 0 0 8px 0;
+      font-size: 11px;
+      color: $cinza-medio;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .dataset-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 10px;
+      color: $cinza-medio;
+    }
+  }
+
+  .dataset-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: $roxo-fundo;
+    border-radius: 8px;
+    font-size: 13px;
+    color: $roxo-escuro;
+
+    mat-icon {
+      color: $roxo-medio;
+    }
+  }
+}
+
 // Seção de arquivos
 .secao-arquivos {
   display: flex;

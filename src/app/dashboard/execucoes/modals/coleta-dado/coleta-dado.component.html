@@ -1,7 +1,21 @@
 <nav class="modal-coleta">
 
-    <!-- Seção de seleção de arquivos -->
-    <nav class="secao-arquivos">
+    <!-- Seletor de fonte de dados -->
+    <div class="fonte-dados">
+      <div class="fonte-tabs">
+        <button class="fonte-tab" [class.active]="fonteDados === 'arquivo'" (click)="fonteDados = 'arquivo'">
+          <mat-icon>upload_file</mat-icon>
+          <span>Upload Arquivo</span>
+        </button>
+        <button class="fonte-tab" [class.active]="fonteDados === 'dataset'" (click)="fonteDados = 'dataset'; carregarDatasets()">
+          <mat-icon>science</mat-icon>
+          <span>Datasets Prontos</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Upload de arquivo -->
+    <nav class="secao-arquivos" *ngIf="fonteDados === 'arquivo'">
       <div class="arquivo-item">
         <label for="arquivo-treino">Planilha de Treino (obrigatória)</label>
         <input id="arquivo-treino" type="file" (change)="postArquivo($event, 'treino')" [accept]="aceitarArquivos" />
@@ -22,6 +36,44 @@
         </div>
       </div>
     </nav>
+
+    <!-- Datasets prontos -->
+    <div class="secao-datasets" *ngIf="fonteDados === 'dataset'">
+      <div class="dataset-filters">
+        <mat-radio-group [(ngModel)]="filtroTipoDataset" class="filtro-tipo">
+          <mat-radio-button value="">Todos</mat-radio-button>
+          <mat-radio-button value="classificacao">Classificação</mat-radio-button>
+          <mat-radio-button value="regressao">Regressão</mat-radio-button>
+        </mat-radio-group>
+      </div>
+
+      <div class="dataset-grid">
+        <div *ngFor="let ds of datasetsFiltrados" 
+             class="dataset-card"
+             [class.selected]="datasetSelecionado === ds.valor"
+             (click)="selecionarDataset(ds)">
+          <div class="dataset-header">
+            <span class="dataset-fonte" [class.sklearn]="ds.fonte === 'sklearn'" [class.uci]="ds.fonte === 'uci'">
+              {{ ds.fonte === 'sklearn' ? 'sklearn' : 'UCI' }}
+            </span>
+            <span class="dataset-tipo" [class.classificacao]="ds.tipo === 'classificacao'" [class.regressao]="ds.tipo === 'regressao'">
+              {{ ds.tipo === 'classificacao' ? 'Classificação' : 'Regressão' }}
+            </span>
+          </div>
+          <h4 class="dataset-nome">{{ ds.nome }}</h4>
+          <p class="dataset-desc">{{ ds.descricao }}</p>
+          <div class="dataset-meta">
+            <span>{{ ds.n_amostras | number }} amostras</span>
+            <span>{{ ds.n_features }} features</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="datasetSelecionado" class="dataset-info">
+        <mat-icon>info</mat-icon>
+        <span>Dataset selecionado: <strong>{{ datasetSelecionadoNome }}</strong></span>
+      </div>
+    </div>
 
     <!-- Seção de configuração do dataset -->
     <ng-container *ngIf="treino.dados.length > 0">

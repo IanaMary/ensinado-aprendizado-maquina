@@ -67,6 +67,14 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   testeArquivo: any;
   todosMarcados: boolean = false;
 
+  // Toy Datasets
+  fonteDados: 'arquivo' | 'dataset' = 'arquivo';
+  datasets: any[] = [];
+  filtroTipoDataset: string = '';
+  datasetSelecionado: string = '';
+  datasetSelecionadoNome: string = '';
+  carregandoDataset: boolean = false;
+
 
   constructor(private planilhaService: PlanilhaService,
     private dashboardService: DashboardService,
@@ -103,7 +111,80 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     }
   }
 
+  get datasetsFiltrados(): any[] {
+    if (!this.filtroTipoDataset) return this.datasets;
+    return this.datasets.filter(ds => ds.tipo === this.filtroTipoDataset);
+  }
 
+  carregarDatasets() {
+    if (this.datasets.length > 0) return;
+    
+    this.dashboardService.getToyDatasets().subscribe({
+      next: (datasets: any[]) => {
+        this.datasets = datasets;
+      },
+      error: (err: any) => {
+        console.error('Erro ao carregar datasets:', err);
+      }
+    });
+  }
+
+  selecionarDataset(ds: any) {
+    this.datasetSelecionado = ds.valor;
+    this.datasetSelecionadoNome = ds.nome;
+    this.carregandoDataset = true;
+
+    this.dashboardService.carregarToyDataset(ds.valor).subscribe({
+      next: (resultado: any) => {
+        this.processarResultadoDataset(resultado);
+        this.carregandoDataset = false;
+      },
+      error: (err: any) => {
+        console.error('Erro ao carregar dataset:', err);
+        this.carregandoDataset = false;
+      }
+    });
+  }
+
+  processarResultadoDataset(resultado: any) {
+    // Configurar dados de treino
+    this.treino.dados = resultado.dados;
+    this.treino.totalDados = resultado.total_dados;
+    this.treino.nomeArquivo = resultado.nome_dataset;
+
+    // Configurar colunas
+    this.resultColetaDadoL.colunas = resultado.colunas;
+    this.resultColetaDadoL.colunasDetalhes = resultado.colunas_detalhes;
+
+    // Configurar target
+    this.resultColetaDadoL.target = resultado.target;
+    this.resultColetaDadoL.preverCategoria = resultado.prever_categoria;
+    this.resultColetaDadoL.dadosRotulados = resultado.dados_rotulados;
+    this.resultColetaDadoL.tipoTarget = resultado.tipo_target;
+
+    // Configurar tipo de predição
+    if (resultado.prever_categoria) {
+      this.tipoPredicao = 'classificacao';
+    } else if (resultado.tipo_target === 'number') {
+      this.tipoPredicao = 'regressao';
+    } else {
+      this.tipoPredicao = 'exploratorio';
+    }
+
+    // Marcar todos os atributos exceto target
+    this.att = {};
+    for (const col of resultado.colunas) {
+      this.att[col] = col !== resultado.target;
+    }
+    this.resultColetaDadoL.atributos = this.att;
+
+    // Atualizar opções de filtro
+    this.opcoesNome = resultado.colunas;
+    this.opcoesTipo = [...new Set(resultado.colunas_detalhes.map((c: any) => c.tipo_coluna))] as string[];
+
+    this.todosMarcados = true;
+    this.resultadoColetaDadoModificado.emit(this.resultColetaDadoL);
+  }
 
   postArquivo(event: Event, tipo: 'treino' | 'teste') {
     const input = event.target as HTMLInputElement;
