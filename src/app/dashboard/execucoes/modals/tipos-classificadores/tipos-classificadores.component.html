@@ -13,82 +13,53 @@
     </div>
   </div>
 
-  <!-- Informações do modelo selecionado -->
-  <div class="modelo-detalhes" *ngIf="modeloInfo">
-    <div class="detalhes-header">
-      <mat-icon>info</mat-icon>
-      <span>{{ modeloInfo.nome }}</span>
-    </div>
-    
-    <p class="modelo-descricao">{{ modeloInfo.descricao }}</p>
-
-    <!-- Tipo e Complexidade -->
-    <div class="modelo-meta">
-      <div class="meta-item" *ngIf="modeloInfo.tipo">
-        <span class="meta-label">Tipo</span>
-        <span class="meta-value">{{ modeloInfo.tipo }}</span>
-      </div>
-      <div class="meta-item" *ngIf="modeloInfo.complexidade">
-        <span class="meta-label">Complexidade</span>
-        <span class="meta-value">{{ modeloInfo.complexidade }}</span>
-      </div>
+  <!-- Hiperparâmetros do modelo selecionado -->
+  <div class="hiperparametros-section" *ngIf="hiperparametrosArray.length > 0">
+    <div class="section-header">
+      <mat-icon>tune</mat-icon>
+      <span>Hiperparâmetros</span>
     </div>
 
-    <!-- Hiperparâmetros -->
-    <div class="hiperparametros-section" *ngIf="hiperparametrosArray.length > 0">
-      <div class="section-header">
-        <mat-icon>tune</mat-icon>
-        <span>Hiperparâmetros</span>
-      </div>
-      
-      <div class="hiperparametros-list">
-        <div *ngFor="let param of hiperparametrosArray" class="hiperparametro-card">
-          <div class="param-header">
-            <span class="param-nome">{{ param.nome }}</span>
-            <code class="param-sklearn">{{ param.sklearn }}</code>
-          </div>
-          <p class="param-descricao">{{ param.descricao }}</p>
-          <div class="param-meta">
-            <span class="param-default">Padrão: <strong>{{ param.padrao }}</strong></span>
-            <span class="param-tipo">Tipo: {{ param.tipo }}</span>
-          </div>
-          <div class="param-opcoes" *ngIf="param.opcoes?.length">
-            <span class="param-opcoes-label">Opções:</span>
-            <div class="opcoes-tags">
-              <span *ngFor="let opcao of param.opcoes" class="opcao-tag">{{ opcao }}</span>
-            </div>
-          </div>
-          <p class="param-implicacoes" *ngIf="param.implicacoes">
-            <mat-icon>warning</mat-icon>
-            {{ param.implicacoes }}
-          </p>
-          <p class="param-dica" *ngIf="param.dicaPratica">
-            <mat-icon>tips_and_updates</mat-icon>
-            {{ param.dicaPratica }}
-          </p>
-        </div>
-      </div>
-    </div>
+    <div class="hiperparametros-grid">
+      <div *ngFor="let param of hiperparametrosArray" class="param-field">
+        <label class="param-label">
+          {{ param.nome }}
+          <code class="param-sklearn">{{ param.sklearn }}</code>
+        </label>
 
-    <!-- Vantagens e Desvantagens -->
-    <div class="vantagens-section" *ngIf="modeloInfo.vantagens?.length || modeloInfo.desvantagens?.length">
-      <div class="vantagens" *ngIf="modeloInfo.vantagens?.length">
-        <div class="section-header good">
-          <mat-icon>thumb_up</mat-icon>
-          <span>Vantagens</span>
-        </div>
-        <ul>
-          <li *ngFor="let v of modeloInfo.vantagens">{{ v }}</li>
-        </ul>
-      </div>
-      <div class="desvantagens" *ngIf="modeloInfo.desvantagens?.length">
-        <div class="section-header bad">
-          <mat-icon>thumb_down</mat-icon>
-          <span>Desvantagens</span>
-        </div>
-        <ul>
-          <li *ngFor="let d of modeloInfo.desvantagens">{{ d }}</li>
-        </ul>
+        <!-- Campo de texto para números -->
+        <input 
+          *ngIf="param.tipo === 'int' || param.tipo === 'float'"
+          matInput
+          [type]="param.tipo === 'int' ? 'number' : 'number'"
+          [step]="param.tipo === 'float' ? '0.1' : '1'"
+          [value]="param.valor"
+          (change)="atualizarHiperparametro(param, $any($event.target).value)"
+          class="param-input"
+          [placeholder]="'Padrão: ' + param.padrao">
+
+        <!-- Campo de seleção para opções -->
+        <mat-select
+          *ngIf="param.opcoes?.length"
+          [value]="param.valor"
+          (selectionChange)="atualizarHiperparametro(param, $event.value)"
+          class="param-select">
+          <mat-option *ngFor="let opcao of param.opcoes" [value]="opcao">
+            {{ opcao }}
+          </mat-option>
+        </mat-select>
+
+        <!-- Campo de texto para strings sem opções -->
+        <input 
+          *ngIf="param.tipo === 'str' && !param.opcoes?.length"
+          matInput
+          type="text"
+          [value]="param.valor"
+          (change)="atualizarHiperparametro(param, $any($event.target).value)"
+          class="param-input"
+          [placeholder]="'Padrão: ' + param.padrao">
+
+        <span class="param-hint" *ngIf="param.implicacoes">{{ param.implicacoes }}</span>
       </div>
     </div>
   </div>

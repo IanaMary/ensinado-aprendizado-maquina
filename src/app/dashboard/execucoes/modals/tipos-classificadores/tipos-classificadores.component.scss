@@ -7,45 +7,32 @@
 .modal-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-height: 70vh;
-  overflow-y: auto;
-  padding-right: 4px;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: $roxo-claro;
-    border-radius: 4px;
-  }
+  gap: 24px;
 }
 
 // Grid de modelos
 .modelos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 12px;
 }
 
 .modelo-card {
   background: $branco;
   border: 2px solid $cinza-claro;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
     border-color: $roxo-claro;
-    box-shadow: 0 2px 8px rgba($roxo-escuro, 0.08);
+    box-shadow: 0 2px 8px rgba($roxo-escuro, 0.06);
   }
 
   &.selected {
     border-color: $roxo-medio;
     background: $roxo-fundo;
-    box-shadow: 0 4px 12px rgba($roxo-medio, 0.2);
 
     .modelo-icon {
       color: $branco;
@@ -57,25 +44,25 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 
     .modelo-icon {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       background: $cinza-claro;
       color: $cinza-medio;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
       transition: all 0.2s ease;
     }
 
     .modelo-label {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: $roxo-escuro;
     }
@@ -83,7 +70,7 @@
 
   .modelo-resumo {
     margin: 0;
-    font-size: 12px;
+    font-size: 11px;
     color: $cinza-medio;
     line-height: 1.4;
     display: -webkit-box;
@@ -93,79 +80,17 @@
   }
 }
 
-// Detalhes do modelo
-.modelo-detalhes {
-  background: $branco;
-  border: 1px solid $cinza-claro;
-  border-radius: 12px;
-  padding: 20px;
-
-  .detalhes-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid $cinza-claro;
-
-    mat-icon {
-      color: $roxo-medio;
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-    }
-
-    span {
-      font-size: 16px;
-      font-weight: 700;
-      color: $roxo-escuro;
-    }
-  }
-
-  .modelo-descricao {
-    font-size: 13px;
-    line-height: 1.6;
-    color: $cinza-escuro;
-    margin: 0 0 16px 0;
-  }
-
-  .modelo-meta {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
-
-    .meta-item {
-      background: $cinza-claro;
-      padding: 8px 12px;
-      border-radius: 8px;
-
-      .meta-label {
-        display: block;
-        font-size: 10px;
-        font-weight: 600;
-        color: $cinza-medio;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .meta-value {
-        font-size: 12px;
-        font-weight: 500;
-        color: $roxo-escuro;
-      }
-    }
-  }
-}
-
 // Hiperparâmetros
 .hiperparametros-section {
-  margin-bottom: 16px;
+  background: $cinza-claro;
+  border-radius: 10px;
+  padding: 16px;
 
   .section-header {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 
     mat-icon {
       color: $roxo-medio;
@@ -175,213 +100,82 @@
     }
 
     span {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: $roxo-escuro;
     }
   }
 }
 
-.hiperparametros-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.hiperparametros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
 }
 
-.hiperparametro-card {
-  background: $cinza-claro;
-  border-radius: 10px;
-  padding: 14px;
+.param-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 
-  .param-header {
+  .param-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: $roxo-escuro;
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-
-    .param-nome {
-      font-size: 13px;
-      font-weight: 600;
-      color: $roxo-escuro;
-    }
+    gap: 6px;
 
     .param-sklearn {
       font-size: 10px;
       background: $roxo-fundo;
       color: $roxo-medio;
-      padding: 2px 6px;
+      padding: 1px 5px;
       border-radius: 4px;
-      font-family: monospace;
+      font-weight: 400;
     }
   }
 
-  .param-descricao {
-    font-size: 12px;
-    color: $cinza-escuro;
-    margin: 0 0 8px 0;
-    line-height: 1.4;
-  }
-
-  .param-meta {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 8px;
-
-    span {
-      font-size: 11px;
-      color: $cinza-medio;
-
-      strong {
-        color: $roxo-medio;
-      }
-    }
-  }
-
-  .param-opcoes {
-    margin-bottom: 8px;
-
-    .param-opcoes-label {
-      display: block;
-      font-size: 11px;
-      color: $cinza-medio;
-      margin-bottom: 4px;
-    }
-
-    .opcoes-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-
-      .opcao-tag {
-        font-size: 10px;
-        background: $roxo-fundo;
-        color: $roxo-medio;
-        padding: 2px 8px;
-        border-radius: 12px;
-      }
-    }
-  }
-
-  .param-implicacoes {
-    display: flex;
-    gap: 6px;
-    font-size: 11px;
-    color: $cinza-escuro;
-    background: rgba($aviso, 0.1);
-    padding: 8px 10px;
-    border-radius: 6px;
-    margin: 8px 0 0 0;
-    line-height: 1.4;
-
-    mat-icon {
-      font-size: 14px;
-      width: 14px;
-      height: 14px;
-      color: $aviso;
-      flex-shrink: 0;
-    }
-  }
-
-  .param-dica {
-    display: flex;
-    gap: 6px;
-    font-size: 11px;
-    color: $cinza-escuro;
-    background: rgba($sucesso, 0.1);
-    padding: 8px 10px;
-    border-radius: 6px;
-    margin: 6px 0 0 0;
-    line-height: 1.4;
-
-    mat-icon {
-      font-size: 14px;
-      width: 14px;
-      height: 14px;
-      color: $sucesso;
-      flex-shrink: 0;
-    }
-  }
-}
-
-// Vantagens / Desvantagens
-.vantagens-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-
-  .vantagens, .desvantagens {
+  .param-input {
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid rgba($roxo-claro, 0.6);
+    border-radius: 8px;
     background: $branco;
-    border: 1px solid $cinza-claro;
-    border-radius: 10px;
-    padding: 12px;
-  }
+    font-size: 13px;
+    color: $cinza-escuro;
+    transition: border-color 0.2s;
 
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 8px;
-
-    mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
+    &:focus {
+      outline: none;
+      border-color: $roxo-medio;
+      box-shadow: 0 0 0 2px rgba($roxo-medio, 0.1);
     }
 
-    span {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    &.good {
-      color: $sucesso;
-      mat-icon { color: $sucesso; }
-    }
-
-    &.bad {
-      color: $erro;
-      mat-icon { color: $erro; }
+    &::placeholder {
+      color: $cinza-medio;
+      font-size: 11px;
     }
   }
 
-  ul {
-    margin: 0;
-    padding-left: 16px;
-    list-style: none;
-
-    li {
-      font-size: 12px;
-      color: $cinza-escuro;
-      margin-bottom: 4px;
-      padding-left: 8px;
-      position: relative;
-      line-height: 1.4;
-
-      &::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 6px;
-        width: 4px;
-        height: 4px;
-        border-radius: 50%;
-      }
-    }
+  .param-select {
+    height: 36px;
   }
 
-  .vantagens li::before { background: $sucesso; }
-  .desvantagens li::before { background: $erro; }
+  .param-hint {
+    font-size: 10px;
+    color: $cinza-medio;
+    line-height: 1.3;
+  }
 }
 
 // Responsivo
 @media (max-width: 768px) {
   .modelos-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
-  .vantagens-section {
+  .hiperparametros-grid {
     grid-template-columns: 1fr;
   }
 }
