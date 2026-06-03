@@ -23,7 +23,7 @@
     <div class="dataset-grid">
       <div *ngFor="let ds of datasetsFiltrados"
            class="dataset-card"
-           [class.selected]="datasetSelecionado === ds.valor"
+           [class.selected]="datasetSelecionado === ds.id"
            (click)="selecionarDataset(ds)">
         <div class="card-header">
           <span class="fonte-badge" [class.sklearn]="ds.fonte === 'sklearn'" [class.uci]="ds.fonte === 'uci'">

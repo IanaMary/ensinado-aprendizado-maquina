@@ -42,10 +42,10 @@ export class ToyDatasetsDialogComponent implements OnInit {
   }
 
   selecionarDataset(ds: any) {
-    this.datasetSelecionado = ds.valor;
+    this.datasetSelecionado = ds.id;
     this.carregando = true;
     
-    this.dashboardService.carregarToyDataset(ds.valor).subscribe({
+    this.dashboardService.carregarToyDataset(ds.id).subscribe({
       next: (resultado: any) => {
         this.dialogRef.close(resultado);
       },
