@@ -14,8 +14,8 @@
   <!-- Columns -->
   <div class="execucoes-columns">
     <!-- Coleta -->
-    <div class="column">
-      <div class="column-header">
+    <div class="column column-coleta">
+      <div class="column-header coleta-header">
         <div class="column-icon coleta">
           <mat-icon>upload_file</mat-icon>
         </div>
@@ -23,19 +23,23 @@
       </div>
       <div class="column-content" cdkDropList [cdkDropListData]="colunaColeta"
         [cdkDropListConnectedTo]="['treinoList', 'metricaList']" id="coletaList">
-        <div *ngFor="let item of colunaColeta" cdkDrag class="item-card" (click)="abrirModalExecucao(item)">
-          <div class="item-icon">
-            <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+        <div *ngFor="let item of colunaColeta" cdkDrag class="item-card">
+          <div class="item-main" (click)="abrirModalExecucao(item)">
+            <div class="item-icon">
+              <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+            </div>
+            <span>{{ item.label }}</span>
           </div>
-          <span>{{ item.label }}</span>
-          <mat-icon class="item-arrow">chevron_right</mat-icon>
+          <button class="btn-info" (click)="mostrarInfoItem(item, $event)" matTooltip="Ver informações">
+            <mat-icon>info_outline</mat-icon>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Treino -->
-    <div class="column">
-      <div class="column-header">
+    <div class="column column-treino">
+      <div class="column-header treino-header">
         <div class="column-icon treino">
           <mat-icon>model_training</mat-icon>
         </div>
@@ -43,19 +47,23 @@
       </div>
       <div class="column-content" cdkDropList #treinoList="cdkDropList" [cdkDropListData]="colunaTreino"
         [cdkDropListConnectedTo]="['coletaList', 'metricaList']">
-        <div *ngFor="let item of colunaTreino" cdkDrag class="item-card" (click)="abrirModalExecucao(item)">
-          <div class="item-icon">
-            <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+        <div *ngFor="let item of colunaTreino" cdkDrag class="item-card">
+          <div class="item-main" (click)="abrirModalExecucao(item)">
+            <div class="item-icon">
+              <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+            </div>
+            <span>{{ item.label }}</span>
           </div>
-          <span>{{ item.label }}</span>
-          <mat-icon class="item-arrow">chevron_right</mat-icon>
+          <button class="btn-info" (click)="mostrarInfoItem(item, $event)" matTooltip="Ver informações">
+            <mat-icon>info_outline</mat-icon>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Métricas -->
-    <div class="column">
-      <div class="column-header">
+    <div class="column column-metrica">
+      <div class="column-header metrica-header">
         <div class="column-icon metrica">
           <mat-icon>analytics</mat-icon>
         </div>
@@ -63,19 +71,23 @@
       </div>
       <div class="column-content" cdkDropList #metricaList="cdkDropList" [cdkDropListData]="colunaMetrica"
         [cdkDropListConnectedTo]="['coletaList', 'treinoList']">
-        <div *ngFor="let item of colunaMetrica" cdkDrag class="item-card" (click)="abrirModalExecucao(item)">
-          <div class="item-icon">
-            <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+        <div *ngFor="let item of colunaMetrica" cdkDrag class="item-card">
+          <div class="item-main" (click)="abrirModalExecucao(item)">
+            <div class="item-icon">
+              <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+            </div>
+            <span>{{ item.label }}</span>
           </div>
-          <span>{{ item.label }}</span>
-          <mat-icon class="item-arrow">chevron_right</mat-icon>
+          <button class="btn-info" (click)="mostrarInfoItem(item, $event)" matTooltip="Ver informações">
+            <mat-icon>info_outline</mat-icon>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Tutor -->
-    <div class="column tutor-column">
-      <div class="column-header">
+    <div class="column tutor-column" [ngClass]="tutorThemeClass">
+      <div class="column-header" [ngClass]="tutorThemeClass + '-header'">
         <div class="column-icon tutor">
           <mat-icon>school</mat-icon>
         </div>
@@ -86,7 +98,9 @@
           [tutorGeral]="tutor"
           [modeloSelecionado]="modeloSelecionado"
           [metricaSelecionada]="metricasSelecionadas[0]"
-          [tutorPipelineInfo]="tutorPipelineInfo">
+          [tutorPipelineInfo]="tutorPipelineInfo"
+          [tutorItemInfo]="tutorItemInfo"
+          [tutorTheme]="tutorTheme">
         </app-tutor>
       </div>
     </div>

@@ -9,6 +9,19 @@ export interface TutorContexto {
   metrica?: any;
 }
 
+export interface TutorItemInfo {
+  titulo: string;
+  descricao: string;
+  dicas?: string[];
+  conceitos?: { nome: string; desc: string }[];
+  hiperparametros?: any;
+  vantagens?: string[];
+  desvantagens?: string[];
+  formula?: string;
+  intuicao?: string;
+  exemplo?: string;
+}
+
 @Component({
   selector: 'app-tutor',
   templateUrl: './tutor.component.html',
@@ -24,15 +37,21 @@ export class TutorComponent implements OnChanges {
   @Input() modeloSelecionado: any = null;
   @Input() metricaSelecionada: any = null;
   @Input() tutorPipelineInfo: any = null;
+  @Input() tutorItemInfo: TutorItemInfo | null = null;
+  @Input() tutorTheme: string = 'default';
 
   tutor = tutor;
   objectKeys = Object.keys;
 
+  get themeClass(): string {
+    return 'theme-' + this.tutorTheme;
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['modeloSelecionado'] && this.modeloSelecionado) {
+    if (changes['modeloSelecionado'] && this.modeloSelecionado && !this.tutorItemInfo) {
       this.buildModeloContexto();
     }
-    if (changes['metricaSelecionada'] && this.metricaSelecionada) {
+    if (changes['metricaSelecionada'] && this.metricaSelecionada && !this.tutorItemInfo) {
       this.buildMetricaContexto();
     }
   }

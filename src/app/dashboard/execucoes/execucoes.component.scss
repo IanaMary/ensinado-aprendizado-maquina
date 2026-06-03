@@ -1,5 +1,18 @@
 @use '../../../styles/styles.scss' as *;
 
+// Cores dos temas
+$coleta-cor: #4CAF50;
+$coleta-cor-claro: #E8F5E9;
+$coleta-cor-escuro: #2E7D32;
+
+$treino-cor: #2196F3;
+$treino-cor-claro: #E3F2FD;
+$treino-cor-escuro: #1565C0;
+
+$metrica-cor: #FF9800;
+$metrica-cor-claro: #FFF3E0;
+$metrica-cor-escuro: #E65100;
+
 .execucoes-container {
   display: flex;
   flex-direction: column;
@@ -81,7 +94,6 @@
   gap: 10px;
   padding: 14px 16px;
   border-bottom: 1px solid rgba($roxo-claro, 0.4);
-  background: rgba($cinza-claro, 0.3);
 
   .column-icon {
     width: 32px;
@@ -98,9 +110,9 @@
       color: $branco;
     }
 
-    &.coleta { background: linear-gradient(135deg, #4CAF50, #2E7D32); }
-    &.treino { background: linear-gradient(135deg, #2196F3, #1565C0); }
-    &.metrica { background: linear-gradient(135deg, #FF9800, #E65100); }
+    &.coleta { background: linear-gradient(135deg, $coleta-cor, $coleta-cor-escuro); }
+    &.treino { background: linear-gradient(135deg, $treino-cor, $treino-cor-escuro); }
+    &.metrica { background: linear-gradient(135deg, $metrica-cor, $metrica-cor-escuro); }
     &.tutor { background: linear-gradient(135deg, $roxo-medio, $roxo-escuro); }
   }
 
@@ -112,6 +124,11 @@
     letter-spacing: 0.5px;
   }
 }
+
+// Headers com cor de fundo por tema
+.coleta-header { background: rgba($coleta-cor-claro, 0.5); }
+.treino-header { background: rgba($treino-cor-claro, 0.5); }
+.metrica-header { background: rgba($metrica-cor-claro, 0.5); }
 
 .column-content {
   flex: 1;
@@ -135,22 +152,23 @@
 .item-card {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 8px;
+  padding: 8px 10px;
   background: $branco;
   border: 1px solid rgba($roxo-claro, 0.5);
   border-radius: 8px;
-  cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {
-    background: $roxo-fundo;
-    border-color: $roxo-medio;
-    transform: translateX(2px);
+  .item-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    min-width: 0;
 
-    .item-arrow {
-      opacity: 1;
-      transform: translateX(0);
+    &:hover {
+      color: $roxo-medio;
     }
   }
 
@@ -171,28 +189,70 @@
   }
 
   span {
-    flex: 1;
     font-size: 12px;
     font-weight: 500;
     color: $cinza-escuro;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .item-arrow {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    color: $roxo-medio;
-    opacity: 0;
-    transform: translateX(-4px);
+  .btn-info {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: rgba($info, 0.1);
+    color: $info;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
     transition: all 0.2s ease;
+    flex-shrink: 0;
+    opacity: 0;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      background: rgba($info, 0.2);
+      transform: scale(1.1);
+    }
+  }
+
+  &:hover {
+    border-color: $roxo-medio;
+    box-shadow: 0 2px 8px rgba($roxo-escuro, 0.08);
+
+    .btn-info {
+      opacity: 1;
+    }
   }
 }
 
-// Tutor column
+// Tutor column com tema
 .tutor-column {
-  .tutor-content {
-    padding: 12px;
+  transition: border-color 0.3s ease;
+
+  &.theme-coleta {
+    border-color: rgba($coleta-cor, 0.3);
   }
+
+  &.theme-treino {
+    border-color: rgba($treino-cor, 0.3);
+  }
+
+  &.theme-metrica {
+    border-color: rgba($metrica-cor, 0.3);
+  }
+}
+
+.tutor-content {
+  padding: 12px;
 }
 
 // Responsive

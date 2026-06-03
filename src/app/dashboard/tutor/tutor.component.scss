@@ -656,3 +656,75 @@
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+// Temas por estagio do pipeline
+$coleta-cor: #4CAF50;
+$coleta-cor-claro: #E8F5E9;
+$coleta-cor-escuro: #2E7D32;
+
+$treino-cor: #2196F3;
+$treino-cor-claro: #E3F2FD;
+$treino-cor-escuro: #1565C0;
+
+$metrica-cor: #FF9800;
+$metrica-cor-claro: #FFF3E0;
+$metrica-cor-escuro: #E65100;
+
+// Item header com tema
+.item-header {
+  &.theme-coleta { background: linear-gradient(135deg, $coleta-cor-escuro, $coleta-cor); color: $branco; }
+  &.theme-treino { background: linear-gradient(135deg, $treino-cor-escuro, $treino-cor); color: $branco; }
+  &.theme-metrica { background: linear-gradient(135deg, $metrica-cor-escuro, $metrica-cor); color: $branco; }
+}
+
+// Tema do tutor
+.tutor.theme-coleta {
+  .item-header { background: linear-gradient(135deg, $coleta-cor-escuro, $coleta-cor); color: $branco; border: none; }
+  .section-header mat-icon { color: $coleta-cor; }
+  .conceito-nome { color: $coleta-cor-escuro; }
+  .info-list li::before { background: $coleta-cor; }
+}
+
+.tutor.theme-treino {
+  .item-header { background: linear-gradient(135deg, $treino-cor-escuro, $treino-cor); color: $branco; border: none; }
+  .section-header mat-icon { color: $treino-cor; }
+  .conceito-nome { color: $treino-cor-escuro; }
+  .info-list li::before { background: $treino-cor; }
+  .param-card { border-left: 3px solid $treino-cor; }
+}
+
+.tutor.theme-metrica {
+  .item-header { background: linear-gradient(135deg, $metrica-cor-escuro, $metrica-cor); color: $branco; border: none; }
+  .section-header mat-icon { color: $metrica-cor; }
+  .conceito-nome { color: $metrica-cor-escuro; }
+  .info-list li::before { background: $metrica-cor; }
+  .formula-card { border-left: 3px solid $metrica-cor; }
+}
+
+// Conceitos list
+.conceitos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.conceito-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: $cinza-claro;
+  border-radius: 6px;
+
+  .conceito-nome {
+    font-size: 12px;
+    font-weight: 700;
+    color: $roxo-escuro;
+  }
+
+  .conceito-desc {
+    font-size: 11px;
+    color: $cinza-escuro;
+    line-height: 1.4;
+  }
+}
