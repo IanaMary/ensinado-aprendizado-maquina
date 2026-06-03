@@ -283,10 +283,62 @@ export class ModalExecucaoComponent implements OnInit {
         todosExistem = true;
         this.funcResultadoAvaliacoes(data.resultadosDasAvaliacoes)
       }
+      // Processar datasetResultado se existir
+      if (data.datasetResultado) {
+        todosExistem = true;
+        this.processarDatasetResultado(data.datasetResultado);
+      }
       if (!todosExistem) {
         this.funcBodyTutor();
       }
       this.atualizarTutorContexto();
+    }
+  }
+
+  processarDatasetResultado(resultado: any) {
+    // Configurar dados de treino
+    const treino: any = {
+      dados: resultado.dados || [],
+      totalDados: resultado.total_dados || 0,
+      nomeArquivo: resultado.nome_dataset || 'Dataset'
+    };
+
+    // Configurar colunas
+    const colunas = resultado.colunas || [];
+    const colunasDetalhes = resultado.colunas_detalhes || [];
+
+    // Configurar target
+    const target = resultado.target || '';
+    const preverCategoria = resultado.prever_categoria || false;
+    const dadosRotulados = resultado.dados_rotulados !== false;
+    const tipoTarget = resultado.tipo_target || null;
+
+    // Configurar atributos (todos exceto target)
+    const att: any = {};
+    for (const col of colunas) {
+      att[col] = col !== target;
+    }
+
+    // Atualizar resultado da coleta
+    this.resultadoColetaDado = {
+      target: target,
+      preverCategoria: preverCategoria,
+      dadosRotulados: dadosRotulados,
+      colunas: colunas,
+      colunasDetalhes: colunasDetalhes,
+      porcentagemTreino: 70,
+      tipoTarget: tipoTarget,
+      atributos: att,
+      tipos: {},
+      treino: treino,
+      teste: { dados: [], totalDados: 0, nomeArquivo: '' }
+    };
+
+    // Configurar tipo de predição
+    if (preverCategoria) {
+      this.tipoArquivoSelecionado = 'csv';
+    } else if (tipoTarget === 'number') {
+      this.tipoArquivoSelecionado = 'csv';
     }
   }
 

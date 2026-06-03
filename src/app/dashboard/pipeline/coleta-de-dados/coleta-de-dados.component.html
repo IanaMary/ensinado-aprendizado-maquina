@@ -3,6 +3,7 @@
      [cdkDropListSortingDisabled]="true"
      class="opcoesPipeline">
 
+  <!-- Itens de arquivo (CSV, Excel, JSON) -->
   <nav *ngFor="let item of itens"
        class="pipeline-item"
        cdkDrag
@@ -21,11 +22,26 @@
     <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
   </nav>
 
-  <!-- Botao para datasets prontos - mesmo estilo dos outros itens -->
-  <div class="pipeline-item item-habilitado btn-toy-datasets" (click)="abrirDialogDatasets($event)">
-    <div class="item-icon">
+  <!-- Separador -->
+  <div class="separator" *ngIf="toyDatasets.length > 0">
+    <span>Datasets</span>
+  </div>
+
+  <!-- Toy Datasets (draggable) -->
+  <nav *ngFor="let item of toyDatasets"
+       class="pipeline-item dataset-item"
+       cdkDrag
+       [cdkDragData]="item"
+       [cdkDragDisabled]="item.movido"
+       [ngClass]="{
+         'item-movido': item.movido,
+         'item-habilitado': !item.movido
+       }">
+
+    <div class="item-icon dataset-icon">
       <mat-icon>science</mat-icon>
     </div>
-    <span class="item-label">Datasets Prontos</span>
-  </div>
+    <span class="item-label">{{ item.label }}</span>
+    <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
+  </nav>
 </nav>

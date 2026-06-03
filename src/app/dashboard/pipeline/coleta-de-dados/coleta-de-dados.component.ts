@@ -14,6 +14,7 @@ import { ToyDatasetsDialogComponent } from './toy-datasets-dialog/toy-datasets-d
 export class ColetaDeDadosComponent implements OnInit {
 
   itens: ItemPipeline[] = [];
+  toyDatasets: ItemPipeline[] = [];
 
   constructor(
     private dashboardService: DashboardService,
@@ -25,6 +26,31 @@ export class ColetaDeDadosComponent implements OnInit {
       .subscribe((itens: ItemPipeline[]) => {
         this.itens = itens;
       });
+
+    // Carregar toy datasets como itens do pipeline
+    this.carregarToyDatasets();
+  }
+
+  carregarToyDatasets() {
+    this.dashboardService.getToyDatasets().subscribe({
+      next: (datasets: any[]) => {
+        this.toyDatasets = datasets.map(ds => ({
+          label: ds.nome,
+          movido: false,
+          tipoItem: 'coleta-dado' as const,
+          habilitado: true,
+          valor: ds.id,
+          resumo: ds.descricao,
+          preverCategoria: ds.tipo === 'classificacao',
+          dadosRotulados: true,
+          isDataset: true,
+          datasetInfo: ds
+        }) as any);
+      },
+      error: (err: any) => {
+        console.error('Erro ao carregar toy datasets:', err);
+      }
+    });
   }
 
   onItemDropped(event: any) {
