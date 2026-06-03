@@ -4,6 +4,7 @@
      class="opcoesPipeline">
 
   <nav *ngFor="let item of itens"
+       class="pipeline-item"
        cdkDrag
        [cdkDragData]="item"
        [cdkDragDisabled]="item.movido || !item.habilitado"
@@ -23,6 +24,9 @@
         {{ item.label }}
       </mat-card-content>
     </mat-card>
-    
+
+    <button class="btn-info-sidebar" (click)="onInfoClick(item, $event)" matTooltip="Ver informações">
+      <mat-icon>info_outline</mat-icon>
+    </button>
   </nav>
 </nav>

@@ -1,19 +1,24 @@
 <nav cdkDropList [cdkDropListData]="itens" (cdkDropListDropped)="onItemDropped($event)"
      [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
-     <nav *ngFor="let item of itens" cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
+  <nav *ngFor="let item of itens" class="pipeline-item"
+       cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
        [ngClass]="{
          'item-movido': item.movido,
          'item-desabilitado': !item.habilitado && !item.movido,
          'item-habilitado': item.habilitado && !item.movido
        }">
 
-          <mat-card appearance="outlined" >
-               <mat-card-header>
-                    <mat-card-title><img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" /></mat-card-title>
-               </mat-card-header>
-               <mat-card-content>
-                    {{ item.label }}
-               </mat-card-content>
-          </mat-card>
-     </nav>
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title><img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" /></mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        {{ item.label }}
+      </mat-card-content>
+    </mat-card>
+
+    <button class="btn-info-sidebar" (click)="onInfoClick(item, $event)" matTooltip="Ver informações">
+      <mat-icon>info_outline</mat-icon>
+    </button>
+  </nav>
 </nav>

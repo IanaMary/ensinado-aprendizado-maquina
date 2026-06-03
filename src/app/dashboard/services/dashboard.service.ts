@@ -13,6 +13,9 @@ export class DashboardService {
   private proximaEtapaPipe = new Subject<any>();
   proximaEtapaPipe$ = this.proximaEtapaPipe.asObservable();
 
+  private infoItemClicked = new Subject<ItemPipeline>();
+  infoItemClicked$ = this.infoItemClicked.asObservable();
+
   // todosItensColetasDados = itensPipeline.itensColetasDados as ItemPipeline[];
   // todosModelos = itensPipeline.itensTreino as ItemPipeline[];
   // todosItensMetricas = itensPipeline.itensMetricas as any[];
@@ -48,6 +51,10 @@ export class DashboardService {
   // EVENTO DE MUDANÇA NO PIPE
   emitirProximaEtapaPipe(dado: any) {
     this.proximaEtapaPipe.next(dado);
+  }
+
+  emitInfoItemClicked(item: ItemPipeline) {
+    this.infoItemClicked.next(item);
   }
 
   // SERVIÇOS COM LIGAÇÃO COM BANCO 

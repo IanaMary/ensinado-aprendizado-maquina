@@ -28,4 +28,10 @@ export class TreinoValidacaoTesteComponent {
     event.item.data.movido = true;
     this.dashboardService.movendoItemExecucao(item);
   }
+
+  onInfoClick(item: ItemPipeline, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.dashboardService.emitInfoItemClicked(item);
+  }
 }

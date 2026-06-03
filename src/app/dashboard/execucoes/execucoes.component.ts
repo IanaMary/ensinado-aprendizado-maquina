@@ -58,6 +58,13 @@ export class ExecucoesComponent implements OnInit {
       .subscribe((event: any) => {
         this.getTutor(event.etapaAtual, event.chaves);
       });
+
+    // Escuta cliques de info do pipeline sidebar
+    this.dashboardService.infoItemClicked$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((item: ItemPipeline) => {
+        this.mostrarInfoItem(item, new Event('click'));
+      });
   }
 
 
