@@ -18,73 +18,58 @@ export class PreProcessamentoConfigComponent {
 
   tutor = tutor;
   itensDisponiveis: any[] = [];
-  itensSelecionados: { valor: string; label: string; colunas: string[] }[] = [];
-  itemSelecionado: any = null;
+  itensSelecionados: any[] = [];
   colunas: string[] = [];
-  colunasSelecionadas: string[] = [];
 
   ngOnInit() {
     this.carregarItensPreProcessamento();
     if (this.resultadoColetaDado?.colunas) {
-      this.colunas = this.resultadoColetaDado.colunas;
+      this.colunas = this.resultadoColetaDado.colunas.filter(
+        c => c !== this.resultadoColetaDado?.target
+      );
     }
   }
 
   carregarItensPreProcessamento() {
     const itens = (tutor as any).itensPreProcessamento || [];
-    this.itensDisponiveis = itens;
+    this.itensDisponiveis = [...itens];
   }
 
-  selecionarItem(item: any) {
-    this.itemSelecionado = item;
-    this.colunasSelecionadas = [];
-  }
-
-  toggleColuna(coluna: string) {
-    const idx = this.colunasSelecionadas.indexOf(coluna);
-    if (idx >= 0) {
-      this.colunasSelecionadas.splice(idx, 1);
-    } else {
-      this.colunasSelecionadas.push(coluna);
-    }
-  }
-
-  isColunaSelecionada(coluna: string): boolean {
-    return this.colunasSelecionadas.includes(coluna);
-  }
-
-  selecionarTodas() {
-    this.colunasSelecionadas = [...this.colunas];
-  }
-
-  limparSelecao() {
-    this.colunasSelecionadas = [];
-  }
-
-  adicionarItem() {
-    if (!this.itemSelecionado || this.colunasSelecionadas.length === 0) return;
-
+  adicionarItem(item: any) {
+    // Adicionar com todas as colunas por padrão
     this.itensSelecionados.push({
-      valor: this.itemSelecionado.valor,
-      label: this.itemSelecionado.label,
-      colunas: [...this.colunasSelecionadas]
+      valor: item.valor,
+      label: item.label,
+      colunas: [...this.colunas]
     });
 
-    // Remover item da lista de disponiveis
-    this.itensDisponiveis = this.itensDisponiveis.filter(i => i.valor !== this.itemSelecionado.valor);
-    this.itemSelecionado = null;
-    this.colunasSelecionadas = [];
-
+    // Remover da lista de disponíveis
+    this.itensDisponiveis = this.itensDisponiveis.filter(i => i.valor !== item.valor);
     this.emitirConfig();
   }
 
   removerItem(idx: number) {
     const item = this.itensSelecionados[idx];
     this.itensSelecionados.splice(idx, 1);
-
-    // Recolocar na lista de disponiveis
     this.itensDisponiveis.push(item);
     this.emitirConfig();
+  }
+
+  toggleColuna(itemIdx: number, coluna: string) {
+    const item = this.itensSelecionados[itemIdx];
+    if (!item) return;
+
+    const idx = item.colunas.indexOf(coluna);
+    if (idx >= 0) {
+      item.colunas.splice(idx, 1);
+    } else {
+      item.colunas.push(coluna);
+    }
+    this.emitirConfig();
+  }
+
+  isColunaSelecionada(item: any, coluna: string): boolean {
+    return item.colunas?.includes(coluna);
   }
 
   private emitirConfig() {
