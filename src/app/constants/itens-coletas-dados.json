@@ -29,6 +29,7 @@
       "tipoItem": "pre-processamento",
       "habilitado": true,
       "valor": "standard_scaler",
+      "grupo": "scalers",
       "resumo": "Remove a média e escala para variância unitária. Z = (X - μ) / σ"
     },
     {
@@ -37,6 +38,7 @@
       "tipoItem": "pre-processamento",
       "habilitado": true,
       "valor": "minmax_scaler",
+      "grupo": "scalers",
       "resumo": "Escala os dados para um intervalo fixo (padrão 0-1). Útil para algoritmos sensíveis à escala."
     },
     {
@@ -45,6 +47,7 @@
       "tipoItem": "pre-processamento",
       "habilitado": true,
       "valor": "robust_scaler",
+      "grupo": "scalers",
       "resumo": "Escala usando estatísticas robustas a outliers (mediana e IQR)."
     },
     {
@@ -53,6 +56,7 @@
       "tipoItem": "pre-processamento",
       "habilitado": true,
       "valor": "normalizer",
+      "grupo": "scalers",
       "resumo": "Normaliza amostras individualmente para norma unitária (L1 ou L2)."
     },
     {
@@ -61,6 +65,7 @@
       "tipoItem": "pre-processamento",
       "habilitado": true,
       "valor": "onehot_encoder",
+      "grupo": "encoders",
       "resumo": "Codifica features categóricas como array numérico one-hot."
     },
     {
@@ -69,6 +74,7 @@
       "tipoItem": "pre-processamento",
       "habilitado": true,
       "valor": "ordinal_encoder",
+      "grupo": "encoders",
       "resumo": "Codifica features categóricas como inteiros ordinais."
     },
     {
@@ -77,6 +83,7 @@
       "tipoItem": "pre-processamento",
       "habilitado": true,
       "valor": "label_encoder",
+      "grupo": "encoders",
       "resumo": "Codifica rótulos de target entre 0 e n_classes-1."
     },
     {
@@ -85,6 +92,7 @@
       "tipoItem": "pre-processamento",
       "habilitado": true,
       "valor": "simple_imputer",
+      "grupo": "imputers",
       "resumo": "Completa valores faltantes usando estratégia (média, mediana, moda, constante)."
     },
     {
@@ -93,6 +101,7 @@
       "tipoItem": "pre-processamento",
       "habilitado": true,
       "valor": "polynomial_features",
+      "grupo": "transformers",
       "resumo": "Gera features polinomiais e de interação. Grau 2: [a, b] → [1, a, b, a², ab, b²]"
     },
     {
@@ -101,6 +110,7 @@
       "tipoItem": "pre-processamento",
       "habilitado": true,
       "valor": "power_transformer",
+      "grupo": "transformers",
       "resumo": "Aplica transformação de potência para tornar os dados mais Gaussianos."
     }
   ],

@@ -5,6 +5,10 @@ $coleta-cor: #4CAF50;
 $coleta-cor-claro: #E8F5E9;
 $coleta-cor-escuro: #2E7D32;
 
+$preprocessamento-cor: #9C27B0;
+$preprocessamento-cor-claro: #F3E5F5;
+$preprocessamento-cor-escuro: #7B1FA2;
+
 $treino-cor: #2196F3;
 $treino-cor-claro: #E3F2FD;
 $treino-cor-escuro: #1565C0;
@@ -72,8 +76,8 @@ $metrica-cor-escuro: #E65100;
 // Columns
 .execucoes-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1.5fr;
-  gap: 16px;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1.5fr;
+  gap: 12px;
   flex: 1;
   min-height: 0;
 }
@@ -111,6 +115,7 @@ $metrica-cor-escuro: #E65100;
     }
 
     &.coleta { background: linear-gradient(135deg, $coleta-cor, $coleta-cor-escuro); }
+    &.preprocessamento { background: linear-gradient(135deg, $preprocessamento-cor, $preprocessamento-cor-escuro); }
     &.treino { background: linear-gradient(135deg, $treino-cor, $treino-cor-escuro); }
     &.metrica { background: linear-gradient(135deg, $metrica-cor, $metrica-cor-escuro); }
     &.tutor { background: linear-gradient(135deg, $roxo-medio, $roxo-escuro); }
@@ -127,6 +132,7 @@ $metrica-cor-escuro: #E65100;
 
 // Headers com cor de fundo por tema
 .coleta-header { background: rgba($coleta-cor-claro, 0.5); }
+.preprocessamento-header { background: rgba($preprocessamento-cor-claro, 0.5); }
 .treino-header { background: rgba($treino-cor-claro, 0.5); }
 .metrica-header { background: rgba($metrica-cor-claro, 0.5); }
 

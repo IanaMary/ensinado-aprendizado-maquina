@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../../services/dashboard.service';
 import { ItemPipeline } from '../../../models/item-coleta-dado.model';
+import { PreProcessamentoDialogComponent } from './pre-processamento-dialog/pre-processamento-dialog.component';
 
 @Component({
   selector: 'app-pre-processamento',
@@ -10,19 +12,64 @@ import { ItemPipeline } from '../../../models/item-coleta-dado.model';
 })
 export class PreProcessamentoComponent {
   itens: ItemPipeline[] = [];
+  grupos: { nome: string; label: string; icon: string; itens: ItemPipeline[] }[] = [];
 
-  constructor(private dashboardService: DashboardService) { }
+  private grupoConfig: Record<string, { label: string; icon: string }> = {
+    'scalers': { label: 'Scalers', icon: 'scale' },
+    'encoders': { label: 'Encoders', icon: 'code' },
+    'imputers': { label: 'Imputers', icon: 'build' },
+    'transformers': { label: 'Transformers', icon: 'auto_fix_high' }
+  };
+
+  constructor(
+    private dashboardService: DashboardService,
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit() {
     this.dashboardService.getItensPreProcessamento().subscribe(itens => {
-      this.itens = itens;
+      this.itens = itens as any;
+      this.agruparItens();
     });
   }
 
-  onItemDropped(event: any) {
-    const item = event.item.data;
-    event.item.data.movido = true;
-    this.dashboardService.movendoItemExecucao(item);
+  agruparItens() {
+    const gruposMap = new Map<string, ItemPipeline[]>();
+
+    for (const item of this.itens) {
+      const grupo = (item as any).grupo || 'outros';
+      if (!gruposMap.has(grupo)) {
+        gruposMap.set(grupo, []);
+      }
+      gruposMap.get(grupo)!.push(item);
+    }
+
+    this.grupos = Array.from(gruposMap.entries()).map(([key, itens]) => ({
+      nome: key,
+      label: this.grupoConfig[key]?.label || key,
+      icon: this.grupoConfig[key]?.icon || 'settings',
+      itens
+    }));
+  }
+
+  onItemClicked(item: ItemPipeline, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    // Abrir dialog de configuração
+    const dialogRef = this.dialog.open(PreProcessamentoDialogComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      data: { item }
+    });
+
+    dialogRef.afterClosed().subscribe((resultado: any) => {
+      if (resultado) {
+        // Marcar item como movido e adicionar ao pipeline
+        item.movido = true;
+        this.dashboardService.movendoItemExecucao(item);
+      }
+    });
   }
 
   onInfoClick(item: ItemPipeline, event: Event) {

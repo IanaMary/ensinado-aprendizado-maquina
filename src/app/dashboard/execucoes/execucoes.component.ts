@@ -30,6 +30,7 @@ export class ExecucoesComponent implements OnInit {
 
   itens: ItemPipeline[] = [];
   colunaColeta: ItemPipeline[] = [];
+  colunaPreProcessamento: ItemPipeline[] = [];
   colunaTreino: ItemPipeline[] = [];
   colunaMetrica: ItemPipeline[] = [];
 
@@ -49,6 +50,7 @@ export class ExecucoesComponent implements OnInit {
     this.dashboardService.getItemsEmExecucao().subscribe(itens => {
       this.itens = [...itens];
       this.colunaColeta = itens.filter(i => i.tipoItem === 'coleta-dado');
+      this.colunaPreProcessamento = itens.filter(i => i.tipoItem === 'pre-processamento');
       this.colunaTreino = itens.filter(i => i.tipoItem === 'treino-validacao-teste');
       this.colunaMetrica = itens.filter(i => i.tipoItem === 'metrica');
       this.metricasSelecionadas = this.colunaMetrica.filter(i => i.movido);

@@ -26,6 +26,7 @@ import { ExecucoesComponent } from './execucoes/execucoes.component';
 import { ColetaDeDadosComponent } from './pipeline/coleta-de-dados/coleta-de-dados.component';
 import { ToyDatasetsDialogComponent } from './pipeline/coleta-de-dados/toy-datasets-dialog/toy-datasets-dialog.component';
 import { PreProcessamentoComponent } from './pipeline/pre-processamento/pre-processamento.component';
+import { PreProcessamentoDialogComponent } from './pipeline/pre-processamento/pre-processamento-dialog/pre-processamento-dialog.component';
 import { FiltroColunaComponent } from './execucoes/filtro-coluna/filtro-coluna.component';
 import { TreinoValidacaoTesteComponent } from './pipeline/treino-validacao-teste/treino-validacao-teste.component';
 import { ClasificadorComponent } from './execucoes/modals/classificador/classificador.component';
@@ -50,6 +51,7 @@ import { SessionService } from '../service/sessao-store.service';
     ColetaDeDadosComponent,
     ToyDatasetsDialogComponent,
     PreProcessamentoComponent,
+    PreProcessamentoDialogComponent,
     ColetaDadoComponent,
     FiltroColunaComponent,
     TreinoValidacaoTesteComponent,

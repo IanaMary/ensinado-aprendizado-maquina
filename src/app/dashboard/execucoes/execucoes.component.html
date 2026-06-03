@@ -22,11 +22,33 @@
         <span>Coleta</span>
       </div>
       <div class="column-content" cdkDropList [cdkDropListData]="colunaColeta"
-        [cdkDropListConnectedTo]="['treinoList', 'metricaList']" id="coletaList">
+        [cdkDropListConnectedTo]="['preprocessamentoList', 'treinoList', 'metricaList']" id="coletaList">
         <div *ngFor="let item of colunaColeta" cdkDrag class="item-card">
           <div class="item-main" (click)="abrirModalExecucao(item)">
             <div class="item-icon">
               <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+            </div>
+            <span>{{ item.label }}</span>
+          </div>
+          <mat-icon class="btn-info" (click)="mostrarInfoItem(item, $event)">info_outline</mat-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pré-processamento -->
+    <div class="column column-preprocessamento">
+      <div class="column-header preprocessamento-header">
+        <div class="column-icon preprocessamento">
+          <mat-icon>transform</mat-icon>
+        </div>
+        <span>Pré-processamento</span>
+      </div>
+      <div class="column-content" cdkDropList #preprocessamentoList="cdkDropList" [cdkDropListData]="colunaPreProcessamento"
+        [cdkDropListConnectedTo]="['coletaList', 'treinoList', 'metricaList']">
+        <div *ngFor="let item of colunaPreProcessamento" cdkDrag class="item-card">
+          <div class="item-main" (click)="abrirModalExecucao(item)">
+            <div class="item-icon">
+              <mat-icon>transform</mat-icon>
             </div>
             <span>{{ item.label }}</span>
           </div>
@@ -44,7 +66,7 @@
         <span>Treinamento</span>
       </div>
       <div class="column-content" cdkDropList #treinoList="cdkDropList" [cdkDropListData]="colunaTreino"
-        [cdkDropListConnectedTo]="['coletaList', 'metricaList']">
+        [cdkDropListConnectedTo]="['coletaList', 'preprocessamentoList', 'metricaList']">
         <div *ngFor="let item of colunaTreino" cdkDrag class="item-card">
           <div class="item-main" (click)="abrirModalExecucao(item)">
             <div class="item-icon">
@@ -66,7 +88,7 @@
         <span>Métricas</span>
       </div>
       <div class="column-content" cdkDropList #metricaList="cdkDropList" [cdkDropListData]="colunaMetrica"
-        [cdkDropListConnectedTo]="['coletaList', 'treinoList']">
+        [cdkDropListConnectedTo]="['coletaList', 'preprocessamentoList', 'treinoList']">
         <div *ngFor="let item of colunaMetrica" cdkDrag class="item-card">
           <div class="item-main" (click)="abrirModalExecucao(item)">
             <div class="item-icon">

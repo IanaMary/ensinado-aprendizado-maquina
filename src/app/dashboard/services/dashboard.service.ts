@@ -175,8 +175,8 @@ export class DashboardService {
   }
 
   carregarItensPreProcessamento() {
-    const itens = itensPipeline.itensPreProcessamento as ItemPipeline[];
-    this.itensPreProcessamento.next(itens);
+    const itens = itensPipeline.itensPreProcessamento as any[];
+    this.itensPreProcessamento.next(itens as any);
   }
 
   getItensPreProcessamento(): Observable<ItemPipeline[]> {

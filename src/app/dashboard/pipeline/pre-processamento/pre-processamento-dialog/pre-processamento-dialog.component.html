@@ -1,0 +1,45 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h3>{{ item?.label }}</h3>
+    <p>{{ item?.resumo }}</p>
+    <button class="btn-close" (click)="fechar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <div class="section-label">
+      <mat-icon>view_column</mat-icon>
+      <span>Selecione as colunas para aplicar</span>
+    </div>
+
+    <div class="colunas-actions">
+      <button class="btn-action" (click)="selecionarTodas()">Selecionar todas</button>
+      <button class="btn-action" (click)="limparSelecao()">Limpar</button>
+    </div>
+
+    <div class="colunas-grid">
+      <div *ngFor="let coluna of colunas"
+           class="coluna-item"
+           [class.selected]="isColunaSelecionada(coluna)"
+           (click)="toggleColuna(coluna)">
+        <mat-icon *ngIf="isColunaSelecionada(coluna)">check_circle</mat-icon>
+        <mat-icon *ngIf="!isColunaSelecionada(coluna)">radio_button_unchecked</mat-icon>
+        <span>{{ coluna }}</span>
+      </div>
+    </div>
+
+    <div class="selection-info" *ngIf="colunasSelecionadas.length > 0">
+      <mat-icon>info</mat-icon>
+      <span>{{ colunasSelecionadas.length }} coluna(s) selecionada(s)</span>
+    </div>
+  </div>
+
+  <div class="dialog-footer">
+    <button class="btn-cancel" (click)="fechar()">Cancelar</button>
+    <button class="btn-confirm" (click)="confirmar()" [disabled]="colunasSelecionadas.length === 0">
+      <mat-icon>check</mat-icon>
+      Aplicar
+    </button>
+  </div>
+</div>
