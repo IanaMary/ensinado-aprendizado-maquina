@@ -1,0 +1,32 @@
+@use '../../../../styles/colores.scss' as *;
+
+.modelos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modelo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .grupo-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    font-size: 10px;
+    font-weight: 600;
+    color: $cinza-medio;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      color: $cinza-medio;
+    }
+  }
+}

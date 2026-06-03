@@ -1,20 +1,49 @@
-<nav cdkDropList [cdkDropListData]="itens" (cdkDropListDropped)="onItemDropped($event)"
-     [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
-  <nav *ngFor="let item of itens" class="pipeline-item"
-       cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
-       [ngClass]="{
-         'item-movido': item.movido,
-         'item-desabilitado': !item.habilitado && !item.movido,
-         'item-habilitado': item.habilitado && !item.movido
-       }">
-
-    <div class="item-icon">
-      <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+<div class="modelos-container">
+  <!-- Supervisionado -->
+  <div class="modelo-grupo" *ngIf="modelosSupervisionado.length > 0">
+    <div class="grupo-header">
+      <mat-icon>school</mat-icon>
+      <span>Supervisionado</span>
     </div>
-    <span class="item-label">{{ item.label }}</span>
+    <nav cdkDropList [cdkDropListData]="modelosSupervisionado" (cdkDropListDropped)="onItemDropped($event)"
+         [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
+      <nav *ngFor="let item of modelosSupervisionado" class="pipeline-item"
+           cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
+           [ngClass]="{
+             'item-movido': item.movido,
+             'item-desabilitado': !item.habilitado && !item.movido,
+             'item-habilitado': item.habilitado && !item.movido
+           }">
+        <div class="item-icon">
+          <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+        </div>
+        <span class="item-label">{{ item.label }}</span>
+        <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
+      </nav>
+    </nav>
+  </div>
 
-    <button class="btn-info-sidebar" (click)="onInfoClick(item, $event)" matTooltip="Ver informações">
-      <mat-icon>info_outline</mat-icon>
-    </button>
-  </nav>
-</nav>
+  <!-- Não Supervisionado -->
+  <div class="modelo-grupo" *ngIf="modelosNaoSupervisionado.length > 0">
+    <div class="grupo-header">
+      <mat-icon>explore</mat-icon>
+      <span>Não Supervisionado</span>
+    </div>
+    <nav cdkDropList [cdkDropListData]="modelosNaoSupervisionado" (cdkDropListDropped)="onItemDropped($event)"
+         [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
+      <nav *ngFor="let item of modelosNaoSupervisionado" class="pipeline-item"
+           cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"
+           [ngClass]="{
+             'item-movido': item.movido,
+             'item-desabilitado': !item.habilitado && !item.movido,
+             'item-habilitado': item.habilitado && !item.movido
+           }">
+        <div class="item-icon">
+          <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
+        </div>
+        <span class="item-label">{{ item.label }}</span>
+        <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
+      </nav>
+    </nav>
+  </div>
+</div>

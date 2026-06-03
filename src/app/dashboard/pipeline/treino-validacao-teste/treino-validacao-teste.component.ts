@@ -10,7 +10,8 @@ import { ItemPipeline } from '../../../models/item-coleta-dado.model';
 })
 export class TreinoValidacaoTesteComponent {
   itens: ItemPipeline[] = [];
-
+  modelosSupervisionado: ItemPipeline[] = [];
+  modelosNaoSupervisionado: ItemPipeline[] = [];
 
   constructor(private dashboardService: DashboardService) { }
 
@@ -18,8 +19,9 @@ export class TreinoValidacaoTesteComponent {
     this.dashboardService.getModelos()
       .subscribe((itens: ItemPipeline[]) => {
         this.itens = itens;
+        this.modelosSupervisionado = itens.filter(i => i.dadosRotulados === true);
+        this.modelosNaoSupervisionado = itens.filter(i => i.dadosRotulados === false);
       });
-
   }
 
   // Manipulando o evento de soltar

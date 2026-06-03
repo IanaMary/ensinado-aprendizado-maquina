@@ -12,9 +12,6 @@
       <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
     </div>
     <span class="item-label">{{ item.label }}</span>
-
-    <button class="btn-info-sidebar" (click)="onInfoClick(item, $event)" matTooltip="Ver informações">
-      <mat-icon>info_outline</mat-icon>
-    </button>
+    <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
   </nav>
 </nav>
