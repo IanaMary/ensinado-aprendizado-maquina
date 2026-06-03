@@ -504,6 +504,95 @@ export class ExecucoesComponent implements OnInit {
     };
     this.tutorTheme = 'coleta';
     this.tutorThemeClass = 'theme-coleta';
+
+    // Preparar dados para o modal
+    const treino: any = {
+      dados: resultado.dados || [],
+      totalDados: resultado.total_dados || 0,
+      nomeArquivo: datasetNome
+    };
+
+    const colunas = resultado.colunas || [];
+    const colunasDetalhes = resultado.colunas_detalhes || [];
+    const preverCategoria = resultado.prever_categoria || false;
+    const dadosRotulados = resultado.dados_rotulados !== false;
+    const tipoTarget = resultado.tipo_target || null;
+
+    // Configurar atributos (todos exceto target)
+    const att: any = {};
+    for (const col of colunas) {
+      att[col] = col !== target;
+    }
+
+    // Atualizar resultado da coleta
+    this.resultadoColetaDado = {
+      target: target,
+      preverCategoria: preverCategoria,
+      dadosRotulados: dadosRotulados,
+      colunas: colunas,
+      colunasDetalhes: colunasDetalhes,
+      porcentagemTreino: 70,
+      tipoTarget: tipoTarget,
+      atributos: att,
+      tipos: {},
+      treino: treino,
+      teste: { dados: [], totalDados: 0, nomeArquivo: '' }
+    };
+
+    // Criar item para a coluna de coleta
+    const datasetItem: ItemPipeline = {
+      label: datasetNome,
+      movido: true,
+      tipoItem: 'coleta-dado',
+      habilitado: true,
+      valor: 'dataset',
+      preverCategoria: preverCategoria,
+      dadosRotulados: dadosRotulados,
+      icon: 'coleta-dado',
+      id: 'dataset-' + Date.now()
+    };
+
+    // Adicionar item a coluna de coleta
+    this.dashboardService.movendoItemExecucao(datasetItem);
+
+    // Abrir modal com dados pre-configurados
+    setTimeout(() => {
+      this.abrirModalComDataset();
+    }, 300);
+  }
+
+  abrirModalComDataset(): void {
+    if (this.modalAberto) return;
+    this.modalAberto = true;
+
+    const dialogRef = this.dialog.open(ModalExecucaoComponent, {
+      maxWidth: 'none',
+      width: 'auto',
+      disableClose: true,
+      hasBackdrop: false,
+      data: {
+        etapa: 'coleta-dado',
+        tipoArquivoSelecionado: 'csv',
+        resultadoColetaDado: this.resultadoColetaDado,
+        modeloSelecionado: this.modeloSelecionado,
+        resultadoTreinamento: this.resultadoTreinamento,
+        metricasSelecionadas: this.metricasSelecionadas,
+        resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((resultado: any) => {
+      this.modalAberto = false;
+      if (resultado) {
+        this.resultadoColetaDado = resultado.resultadoColetaDado;
+        this.modeloSelecionado = resultado.modeloSelecionado;
+        this.resultadoTreinamento = resultado.resultadoTreinamento;
+        this.metricasSelecionadas = resultado.metricasSelecionadas;
+        this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
+        this.dashboardService.moverItensEmExecucao();
+        this.atualizarTutorContexto();
+      }
+    });
   }
 
   ngOnDestroy() {
