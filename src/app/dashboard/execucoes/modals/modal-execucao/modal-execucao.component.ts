@@ -48,6 +48,7 @@ export class ModalExecucaoComponent implements OnInit {
   modeloSelecionado?: ItemPipeline;
   modelosDisponiveis: ItemPipeline[] = [];
   tutorModeloTarget: any[] = [];
+  preProcessamentoConfig: any = null;
 
   tipoArquivoSelecionado: 'xlxs' | 'csv' | 'json' = 'xlxs';
 
@@ -255,7 +256,7 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   atualizarPreProcessamento(event: any) {
-    // Processar configuracao de pre-processamento
+    this.preProcessamentoConfig = event;
     console.log('Pre-processamento configurado:', event);
   }
 
@@ -304,6 +305,7 @@ export class ModalExecucaoComponent implements OnInit {
       resultadoTreinamento: this.resultadoTreinamento,
       metricasSelecionadas: this.metricasSelecionadas,
       resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
+      preProcessamentoConfig: this.preProcessamentoConfig,
       etapa: this.etapaAtual
     });
   }

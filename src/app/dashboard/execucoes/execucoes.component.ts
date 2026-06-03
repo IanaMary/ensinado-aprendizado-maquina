@@ -107,6 +107,12 @@ export class ExecucoesComponent implements OnInit {
         this.resultadoTreinamento = resultado.resultadoTreinamento;
         this.metricasSelecionadas = resultado.metricasSelecionadas;
         this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
+
+        // Processar itens de pre-processamento
+        if (resultado.preProcessamentoConfig?.itens) {
+          this.processarItensPreProcessamento(resultado.preProcessamentoConfig.itens);
+        }
+
         this.dashboardService.moverItensEmExecucao();
         this.atualizarTutorContexto();
       }
@@ -595,6 +601,37 @@ export class ExecucoesComponent implements OnInit {
         this.atualizarTutorContexto();
       }
     });
+  }
+
+  processarItensPreProcessamento(itens: any[]): void {
+    // Criar itens de pre-processamento para a coluna
+    for (const item of itens) {
+      const itemPipeline: ItemPipeline = {
+        label: item.label,
+        movido: true,
+        tipoItem: 'pre-processamento',
+        habilitado: true,
+        preverCategoria: false,
+        dadosRotulados: false,
+        valor: item.valor,
+        icon: 'pre-processamento',
+        id: 'preproc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9)
+      };
+      this.dashboardService.movendoItemExecucao(itemPipeline);
+    }
+
+    // Atualizar itens de pre-processamento no servico
+    const itensAtuais = this.dashboardService.getItensPreProcessamentoSync();
+    const novosItens = itens.map(item => ({
+      ...item,
+      movido: true,
+      tipoItem: 'pre-processamento' as const,
+      habilitado: true,
+      preverCategoria: false,
+      dadosRotulados: false,
+      icon: 'pre-processamento'
+    }));
+    this.dashboardService.atualizarItensPreProcessamento([...itensAtuais, ...novosItens]);
   }
 
   ngOnDestroy() {

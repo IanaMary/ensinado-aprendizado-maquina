@@ -183,6 +183,14 @@ export class DashboardService {
     return this.itensPreProcessamento.asObservable();
   }
 
+  getItensPreProcessamentoSync(): ItemPipeline[] {
+    return this.itensPreProcessamento.value;
+  }
+
+  atualizarItensPreProcessamento(itens: ItemPipeline[]) {
+    this.itensPreProcessamento.next(itens);
+  }
+
   carregarItensModelos() {
     this.fetchItensModelos()
       .subscribe({
@@ -280,6 +288,7 @@ export class DashboardService {
 
     const itensMovidos = [
       ...this.itensColetasDados.value.filter(item => item.movido),
+      ...this.itensPreProcessamento.value.filter(item => item.movido),
       ...this.itensModelos.value.filter(item => item.movido),
       ...this.itensMetricas.value.filter(item => item.movido)
     ];
