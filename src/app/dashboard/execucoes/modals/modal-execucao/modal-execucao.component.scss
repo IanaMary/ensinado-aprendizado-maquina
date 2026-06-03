@@ -96,6 +96,19 @@
           font-size: 12px;
           color: $branco;
           transition: all 0.2s ease;
+
+          &.clickable {
+            cursor: pointer;
+
+            &:hover {
+              transform: scale(1.15);
+              box-shadow: 0 2px 8px rgba($roxo-medio, 0.3);
+            }
+
+            &:active {
+              transform: scale(0.95);
+            }
+          }
         }
 
         .linha {

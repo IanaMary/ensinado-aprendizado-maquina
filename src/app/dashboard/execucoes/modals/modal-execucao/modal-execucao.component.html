@@ -13,7 +13,9 @@
       <nav class="box-linha breadcrumb">
         <ng-container *ngFor="let key of etapaKeys; let idx = index">
           <div [matTooltip]="etapas[key].titulo" matTooltipPosition="above" class="bolinha"
-            [ngClass]="getClasseLinhaPipe(idx)">
+            [ngClass]="getClasseLinhaPipe(idx)"
+            [class.clickable]="idx < etapas[etapaAtual].indice"
+            (click)="irParaEtapa(idx)">
             {{ idx + 1 }}
           </div>
           <div *ngIf="idx < etapaKeys.length - 1" class="linha" [ngClass]="getClasseLinhaPipe(idx)"></div>

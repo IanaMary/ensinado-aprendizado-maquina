@@ -1,8 +1,9 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { BodyTutor, ItemPipeline, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import { TutorContexto } from '../../../tutor/tutor.component';
+import { MetricaAvaliacaoComponent } from '../metrica-avaliacao/metrica-avaliacao.component';
 import tutor from '../../../../constants/tutor.json';
 
 const COLETA_DADO = 'coleta-dado';
@@ -20,6 +21,8 @@ const AVALIACAO = 'avaliacao'
 })
 
 export class ModalExecucaoComponent implements OnInit {
+
+  @ViewChild(MetricaAvaliacaoComponent) metricaAvaliacao?: MetricaAvaliacaoComponent;
 
   tutor = tutor;
 
@@ -76,6 +79,7 @@ export class ModalExecucaoComponent implements OnInit {
 
     this.validarProximaEtapa();
     this.atualizarTutorContexto();
+    this.autoGerarMetricas();
 
   }
 
@@ -88,6 +92,26 @@ export class ModalExecucaoComponent implements OnInit {
 
     this.validarProximaEtapa();
     this.atualizarTutorContexto();
+  }
+
+  irParaEtapa(idx: number): void {
+    const indiceAtual = this.etapas[this.etapaAtual].indice;
+
+    // So permite voltar para etapas anteriores
+    if (idx < indiceAtual) {
+      this.etapaAtual = this.ordemEtapas[idx];
+      this.validarProximaEtapa();
+      this.atualizarTutorContexto();
+    }
+  }
+
+  autoGerarMetricas(): void {
+    // Ao chegar na etapa 5 (avaliacao), gera metricas automaticamente
+    if (this.etapaAtual === AVALIACAO && this.metricasSelecionadas.length > 0 && this.resultadoTreinamento) {
+      if (this.metricaAvaliacao && !Object.keys(this.resultadosDasAvaliacoes).length) {
+        setTimeout(() => this.metricaAvaliacao?.postAvaliacao(), 300);
+      }
+    }
   }
 
   atualizarTutorContexto(): void {
