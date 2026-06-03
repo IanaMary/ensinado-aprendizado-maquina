@@ -21,14 +21,14 @@ export class TreinoValidacaoTesteComponent {
       .subscribe((itens: ItemPipeline[]) => {
         this.itens = itens;
 
-        // Supervisionado - Classificadores (tipo = string, preverCategoria = true)
+        // Supervisionado - Classificadores (preverCategoria = true, dadosRotulados = true)
         this.classificadores = itens.filter(i =>
-          i.dadosRotulados === true && i.tipo === 'string'
+          i.dadosRotulados === true && i.preverCategoria === true
         );
 
-        // Supervisionado - Regressores (tipo = number, preverCategoria = false)
+        // Supervisionado - Regressores (preverCategoria = false, dadosRotulados = true)
         this.regressores = itens.filter(i =>
-          i.dadosRotulados === true && i.tipo === 'number'
+          i.dadosRotulados === true && i.preverCategoria === false
         );
 
         // Não Supervisionado
