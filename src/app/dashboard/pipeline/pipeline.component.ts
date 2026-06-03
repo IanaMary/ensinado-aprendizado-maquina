@@ -13,6 +13,13 @@ export class PipelineComponent implements OnInit {
 
   role: string = sessionStorage.getItem('role') || '';
 
+  collapsedSections: Record<string, boolean> = {
+    dados: false,
+    preprocessamento: false,
+    modelos: false,
+    avaliacao: false
+  };
+
   constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
@@ -21,6 +28,14 @@ export class PipelineComponent implements OnInit {
 
   ngOnInit() {
 
+  }
+
+  toggleSection(section: string): void {
+    this.collapsedSections[section] = !this.collapsedSections[section];
+  }
+
+  isCollapsed(section: string): boolean {
+    return this.collapsedSections[section] || false;
   }
 
   navegar(bool: boolean) {

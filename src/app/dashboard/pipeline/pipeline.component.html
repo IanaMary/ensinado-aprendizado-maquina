@@ -1,38 +1,50 @@
 <div class="pipeline-container">
   <!-- Dados -->
-  <div class="pipeline-section">
-    <div class="section-label">
+  <div class="pipeline-section" [class.collapsed]="isCollapsed('dados')">
+    <div class="section-label" (click)="toggleSection('dados')">
       <div class="step-number">1</div>
       <span>Dados</span>
+      <mat-icon class="toggle-icon">{{ isCollapsed('dados') ? 'expand_more' : 'expand_less' }}</mat-icon>
     </div>
-    <app-coleta-de-dados></app-coleta-de-dados>
+    <div class="section-content">
+      <app-coleta-de-dados></app-coleta-de-dados>
+    </div>
   </div>
 
   <!-- Pré-processamento -->
-  <div class="pipeline-section">
-    <div class="section-label">
+  <div class="pipeline-section" [class.collapsed]="isCollapsed('preprocessamento')">
+    <div class="section-label" (click)="toggleSection('preprocessamento')">
       <div class="step-number">2</div>
       <span>Pré-processamento</span>
+      <mat-icon class="toggle-icon">{{ isCollapsed('preprocessamento') ? 'expand_more' : 'expand_less' }}</mat-icon>
     </div>
-    <app-pre-processamento></app-pre-processamento>
+    <div class="section-content">
+      <app-pre-processamento></app-pre-processamento>
+    </div>
   </div>
 
   <!-- Modelos -->
-  <div class="pipeline-section">
-    <div class="section-label">
+  <div class="pipeline-section" [class.collapsed]="isCollapsed('modelos')">
+    <div class="section-label" (click)="toggleSection('modelos')">
       <div class="step-number">3</div>
       <span>Modelos</span>
+      <mat-icon class="toggle-icon">{{ isCollapsed('modelos') ? 'expand_more' : 'expand_less' }}</mat-icon>
     </div>
-    <app-treino-validacao-teste></app-treino-validacao-teste>
+    <div class="section-content">
+      <app-treino-validacao-teste></app-treino-validacao-teste>
+    </div>
   </div>
 
   <!-- Avaliação -->
-  <div class="pipeline-section">
-    <div class="section-label">
+  <div class="pipeline-section" [class.collapsed]="isCollapsed('avaliacao')">
+    <div class="section-label" (click)="toggleSection('avaliacao')">
       <div class="step-number">4</div>
       <span>Avaliação</span>
+      <mat-icon class="toggle-icon">{{ isCollapsed('avaliacao') ? 'expand_more' : 'expand_less' }}</mat-icon>
     </div>
-    <app-metricas></app-metricas>
+    <div class="section-content">
+      <app-metricas></app-metricas>
+    </div>
   </div>
 
   <!-- Ações -->

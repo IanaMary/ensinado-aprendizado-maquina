@@ -68,24 +68,73 @@
           "dicaPratica": "Comece com K=5. Se o modelo erra muito nos dados de treino, aumente. Se erra muito nos dados de teste, diminua."
         },
         "weights": {
-          "nome": "Pesos dos vizinhos",
+          "nome": "Função de peso",
           "sklearn": "weights",
           "padrao": "uniform",
+          "tipo": "str ou callable",
+          "opcoes": ["uniform", "distance", "callable"],
+          "descricao": "Controla como os votos dos vizinhos são ponderados na predição.",
+          "implicacoes": "'uniform': todos os vizinhos votam igualmente (1 voto cada). 'distance': vizinhos mais próximos têm peso maior (inverso da distância). Callable: função personalizada que recebe distâncias e retorna pesos.",
+          "dicaPratica": "Use 'distance' quando há outliers ou quando a qualidade dos vizinhos varia muito. Reduz o impacto de pontos distantes."
+        },
+        "algorithm": {
+          "nome": "Algoritmo de busca",
+          "sklearn": "algorithm",
+          "padrao": "auto",
           "tipo": "str",
-          "opcoes": ["uniform", "distance"],
-          "descricao": "Controla se todos os vizinhos votam com o mesmo peso ou se vizinhos mais próximos têm mais influência.",
-          "implicacoes": "'uniform': cada vizinho vale 1 voto. 'distance': o voto é ponderado pelo inverso da distância — vizinhos mais próximos têm mais peso. 'distance' reduz o impacto de outliers e tende a melhorar a acurácia.",
-          "dicaPratica": "Se seus dados têm ruído, tente 'distance' — ele reduz a influência de pontos distantes."
+          "opcoes": ["auto", "ball_tree", "kd_tree", "brute"],
+          "descricao": "Algoritmo usado para calcular os vizinhos mais próximos.",
+          "implicacoes": "'auto': escolhe automaticamente o melhor algoritmo. 'ball_tree': eficiente para dados de média dimensionalidade. 'kd_tree': eficiente para baixa dimensionalidade. 'brute': força bruta, eficiente para poucos dados ou alta dimensionalidade.",
+          "dicaPratica": "Use 'auto' (padrão). Só mude se tiver problemas de performance específicos."
+        },
+        "leaf_size": {
+          "nome": "Tamanho da folha",
+          "sklearn": "leaf_size",
+          "padrao": 30,
+          "tipo": "int",
+          "faixa": "1 a 1000",
+          "descricao": "Tamanho da folha passado para BallTree ou KDTree. Afeta a velocidade de construção e consulta, além da memória necessária.",
+          "implicacoes": "Valores menores: mais folhas, mais memória, consultas mais rápidas. Valores maiores: menos folhas, menos memória, construções mais rápidas.",
+          "dicaPratica": "O valor padrão (30) funciona bem na maioria dos casos. Ajuste apenas se precisar otimizar memória ou velocidade."
+        },
+        "p": {
+          "nome": "Parâmetro da métrica Minkowski",
+          "sklearn": "p",
+          "padrao": 2,
+          "tipo": "float",
+          "faixa": "1 a infinito",
+          "descricao": "Parâmetro de potência para a métrica de Minkowski. Quando p=1, é equivalente à distância de Manhattan (L1). Quando p=2, é a distância Euclidiana (L2).",
+          "implicacoes": "p=1 (Manhattan): mais robusto a outliers, bom para dados esparsos. p=2 (Euclidiana): padrão, bom para dados densos. p>2: distâncias maiores têm mais peso.",
+          "dicaPratica": "Use p=2 (padrão) para a maioria dos casos. Experimente p=1 se tiver muitos outliers."
         },
         "metric": {
           "nome": "Métrica de distância",
           "sklearn": "metric",
-          "padrao": "minkowski (p=2 → Euclidiana)",
-          "tipo": "str",
-          "opcoes": ["euclidean", "manhattan", "minkowski", "chebyshev"],
-          "descricao": "Define como a distância entre dois pontos é calculada.",
-          "implicacoes": "Euclidiana (p=2): distância 'comum em linha reta'. Manhattan (p=1): distância em blocos (soma das diferenças absolutas). Manhattan é mais robusta para dados de alta dimensionalidade.",
-          "dicaPratica": "Para dados normalizados, use Euclidiana. Para dados esparsos ou de alta dimensão, experimente Manhattan."
+          "padrao": "minkowski",
+          "tipo": "str ou callable",
+          "opcoes": ["minkowski", "euclidean", "manhattan", "chebyshev", "wminkowski", "seuclidean", "mahalanobis", "precomputed"],
+          "descricao": "Métrica usada para calcular a distância entre pontos. O padrão 'minkowski' com p=2 resulta em distância Euclidiana.",
+          "implicacoes": "'euclidean': distância em linha reta. 'manhattan': soma das diferenças absolutas. 'chebyshev': maior diferença em qualquer dimensão. 'precomputed': assume que X já é uma matriz de distância.",
+          "dicaPratica": "Use 'minkowski' (padrão) com p=2 para distância Euclidiana. Para dados esparsos, experimente 'manhattan'."
+        },
+        "metric_params": {
+          "nome": "Parâmetros da métrica",
+          "sklearn": "metric_params",
+          "padrao": null,
+          "tipo": "dict ou None",
+          "descricao": "Argumentos adicionais para a função de métrica.",
+          "implicacoes": "Usado para passar parâmetros específicos da métrica, como pesos para dimensões diferentes.",
+          "dicaPratica": "Geralmente não precisa alterar. Use apenas se estiver usando uma métrica customizada."
+        },
+        "n_jobs": {
+          "nome": "Número de jobs paralelos",
+          "sklearn": "n_jobs",
+          "padrao": null,
+          "tipo": "int ou None",
+          "opcoes": ["null (1 job)", "-1 (todos os CPUs)", "1, 2, 4, ..."],
+          "descricao": "Número de jobs paralelos para a busca de vizinhos. None significa 1 job. -1 usa todos os processadores.",
+          "implicacoes": "Mais jobs = mais rápido em datasets grandes, mas usa mais memória. Não afeta o método fit(), apenas predict().",
+          "dicaPratica": "Use n_jobs=-1 se tiver muitos CPUs disponíveis e o dataset for grande. Caso contrário, deixe o padrão."
         }
       },
       "vantagens": [
@@ -129,33 +178,43 @@
         "Relações lineares simples — modelos lineares são mais eficientes"
       ],
       "hiperparametros": {
-        "max_depth": {
-          "nome": "Profundidade máxima",
-          "sklearn": "max_depth",
-          "padrao": null,
-          "tipo": "int ou null",
-          "faixa": "1 a 30 (tipicamente 3 a 15)",
-          "descricao": "Limita quantos níveis de perguntas a árvore pode fazer. É o principal controle contra overfitting.",
-          "implicacoes": "Profundidade 1-3: underfitting (árvore muito simples). Profundidade 10+: overfitting (decora os dados). Profundidade None: cresce até não precisar mais — risco máximo de overfitting.",
-          "dicaPratica": "Comece com max_depth=5 e ajuste com validação cruzada. Se a acurácia de treino for 100% e a de teste for baixa, diminua a profundidade."
-        },
         "criterion": {
           "nome": "Critério de divisão",
           "sklearn": "criterion",
           "padrao": "gini",
           "tipo": "str",
           "opcoes": ["gini", "entropy", "log_loss"],
-          "descricao": "Mede a 'impureza' de um nó. Quanto mais puro (uma só classe), melhor a divisão.",
-          "implicacoes": "Gini: mede a probabilidade de classificação errada. É mais rápido e é o padrão. Entropy: mede a incerteza (informação de Shannon). Tende a criar árvores ligeiramente mais balanceadas. Na prática, a diferença é mínima.",
-          "dicaPratica": "Use 'gini' (padrão) — é mais rápido e quase sempre dá o mesmo resultado que 'entropy'."
+          "descricao": "Função para medir a qualidade de uma divisão. Gini mede a impureza de Gini. Entropy e log_loss medem o ganho de informação de Shannon.",
+          "implicacoes": "Gini: mais rápido, mede probabilidade de classificação errada. Entropy: mede incerteza, tende a criar árvores mais balanceadas. log_loss: similar ao entropy. Na prática, a diferença é mínima.",
+          "dicaPratica": "Use 'gini' (padrão) — é mais rápido e quase sempre dá o mesmo resultado."
+        },
+        "splitter": {
+          "nome": "Estratégia de divisão",
+          "sklearn": "splitter",
+          "padrao": "best",
+          "tipo": "str",
+          "opcoes": ["best", "random"],
+          "descricao": "Estratégia usada para escolher a divisão em cada nó.",
+          "implicacoes": "'best': escolhe a melhor divisão (mais lento, mais preciso). 'random': escolhe a melhor divisão aleatória (mais rápido, mais variância).",
+          "dicaPratica": "Use 'best' (padrão). 'random' é útil para ensemble methods como Random Forest."
+        },
+        "max_depth": {
+          "nome": "Profundidade máxima",
+          "sklearn": "max_depth",
+          "padrao": null,
+          "tipo": "int ou null",
+          "faixa": "1 a 30 (tipicamente 3 a 15)",
+          "descricao": "Profundidade máxima da árvore. None significa que os nós são expandidos até todas as folhas serem puras ou conter menos que min_samples_split amostras.",
+          "implicacoes": "Profundidade 1-3: underfitting (árvore muito simples). Profundidade 10+: overfitting (decora os dados). None: risco máximo de overfitting.",
+          "dicaPratica": "Comece com max_depth=5 e ajuste com validação cruzada."
         },
         "min_samples_split": {
           "nome": "Mínimo de amostras para dividir",
           "sklearn": "min_samples_split",
           "padrao": 2,
-          "tipo": "int",
+          "tipo": "int ou float",
           "faixa": "2 a 100",
-          "descricao": "Número mínimo de amostras que um nó deve ter para ser dividido.",
+          "descricao": "Número mínimo de amostras que um nó deve ter para ser dividido. Se float, é uma fração de ceil(min_samples_split * n_samples).",
           "implicacoes": "Valor baixo (2): a árvore divide até o último ponto (overfitting). Valor alto (50+): a árvore para de dividir cedo demais (underfitting).",
           "dicaPratica": "Se sua árvore está muito complexa, aumente para 10-20."
         },
@@ -163,11 +222,80 @@
           "nome": "Mínimo de amostras por folha",
           "sklearn": "min_samples_leaf",
           "padrao": 1,
-          "tipo": "int",
+          "tipo": "int ou float",
           "faixa": "1 a 50",
-          "descricao": "Número mínimo de amostras que uma folha deve ter.",
+          "descricao": "Número mínimo de amostras que uma folha deve ter. Um ponto de divisão só é considerado se deixa pelo menos min_samples_leaf amostras em cada ramo.",
           "implicacoes": "Valor 1: folhas podem ter uma única amostra (overfitting). Valor 10+: folhas maiores = decisões mais generalizadas.",
           "dicaPratica": "Aumente para 5-10 se a árvore estiver decorando os dados."
+        },
+        "min_weight_fraction_leaf": {
+          "nome": "Fração mínima de peso por folha",
+          "sklearn": "min_weight_fraction_leaf",
+          "padrao": 0.0,
+          "tipo": "float",
+          "faixa": "0.0 a 0.5",
+          "descricao": "Fração mínima ponderada do total de pesos requerida em uma folha.",
+          "implicacoes": "Valor 0: sem restrição. Valores maiores criam folhas maiores e mais generalizadas.",
+          "dicaPratica": "Geralmente deixe em 0. Use se tiver sample_weight desbalanceados."
+        },
+        "max_features": {
+          "nome": "Máximo de features por divisão",
+          "sklearn": "max_features",
+          "padrao": null,
+          "tipo": "int, float, 'sqrt', 'log2' ou null",
+          "opcoes": ["null (todas)", "int (número fixo)", "float (fração)", "sqrt", "log2"],
+          "descricao": "Número de features consideradas para a melhor divisão em cada nó.",
+          "implicacoes": "None: todas as features. 'sqrt': raiz do total (bom para Random Forest). 'log2': log2 do total. Menos features = mais aleatoriedade.",
+          "dicaPratica": "Para árvore única, use None (todas). Para Random Forest, use 'sqrt'."
+        },
+        "random_state": {
+          "nome": "Semente aleatória",
+          "sklearn": "random_state",
+          "padrao": null,
+          "tipo": "int ou None",
+          "descricao": "Controla a aleatoriedade do estimador. Features são permutadas aleatoriamente em cada divisão.",
+          "implicacoes": "None: resultados variam entre execuções. Int fixo: resultados reproduzíveis.",
+          "dicaPratica": "Use um inteiro fixo (ex: 42) para resultados reproduzíveis."
+        },
+        "max_leaf_nodes": {
+          "nome": "Máximo de folhas",
+          "sklearn": "max_leaf_nodes",
+          "padrao": null,
+          "tipo": "int ou null",
+          "faixa": "2 a 10000",
+          "descricao": "Cresce a árvore com max_leaf_nodes em ordem de melhor redução de impureza. None = número ilimitado de folhas.",
+          "implicacoes": "Limitar folhas é uma alternativa a limitar profundidade. Pode ser mais eficiente em alguns casos.",
+          "dicaPratica": "Use como alternativa a max_depth. Valores como 10-100 funcionam bem."
+        },
+        "min_impurity_decrease": {
+          "nome": "Decréscimo mínimo de impureza",
+          "sklearn": "min_impurity_decrease",
+          "padrao": 0.0,
+          "tipo": "float",
+          "faixa": "0.0 a 1.0",
+          "descricao": "Um nó será dividido se a divisão induzir um decréscimo na impureza maior ou igual a este valor.",
+          "implicacoes": "Valor 0: sem restrição. Valores maiores criam árvores mais simples (regularização).",
+          "dicaPratica": "Use valores como 0.01-0.1 para controlar overfitting sem limitar profundidade."
+        },
+        "class_weight": {
+          "nome": "Peso das classes",
+          "sklearn": "class_weight",
+          "padrao": null,
+          "tipo": "dict, 'balanced' ou null",
+          "opcoes": ["null (pesos iguais)", "dict ({classe: peso})", "balanced"],
+          "descricao": "Pesos associados às classes. 'balanced' ajusta pesos inversamente proporcional à frequência das classes.",
+          "implicacoes": "None: todas as classes têm peso 1. 'balanced': útil para classes desbalanceadas. Dict: controle manual dos pesos.",
+          "dicaPratica": "Use 'balanced' se suas classes forem desbalanceadas."
+        },
+        "ccp_alpha": {
+          "nome": "Parâmetro de poda CCP",
+          "sklearn": "ccp_alpha",
+          "padrao": 0.0,
+          "tipo": "float",
+          "faixa": "0.0 a 1.0",
+          "descricao": "Parâmetro de complexidade para Poda de Custo-Complexidade Mínima. A subárvore com maior custo-complexidade menor que ccp_alpha será escolhida.",
+          "implicacoes": "0: sem poda. Valores maiores: mais poda, árvore mais simples, menos overfitting.",
+          "dicaPratica": "Use valores como 0.01-0.1 para poda suave. Valores maiores simplificam muito a árvore."
         }
       },
       "vantagens": [
@@ -217,7 +345,7 @@
           "padrao": 1.0,
           "tipo": "float",
           "faixa": "0.001 a 1000 (escala logarítmica)",
-          "descricao": "Controla o trade-off entre ter uma margem larga e classificar corretamente os pontos de treino.",
+          "descricao": "Controla o trade-off entre ter uma margem larga e classificar corretamente os pontos de treino. A penalidade é L2 ao quadrado.",
           "implicacoes": "C baixo (0.01-0.1): margem larga, tolera alguns erros de classificação (underfitting). C alto (10-1000): margem estreita, tenta classificar tudo corretamente (overfitting). O valor ideal depende do dataset.",
           "dicaPratica": "Comece com C=1. Se o modelo underfita, aumente. Se overfita, diminua. Use GridSearchCV com valores [0.01, 0.1, 1, 10, 100]."
         },
@@ -225,21 +353,108 @@
           "nome": "Função kernel",
           "sklearn": "kernel",
           "padrao": "rbf",
-          "tipo": "str",
-          "opcoes": ["linear", "rbf", "poly", "sigmoid"],
+          "tipo": "str ou callable",
+          "opcoes": ["linear", "poly", "rbf", "sigmoid", "precomputed"],
           "descricao": "Define como os dados são transformados para o espaço de alta dimensionalidade. É o hiperparâmetro que mais impacta o desempenho do SVM.",
-          "implicacoes": "'linear': separa com uma reta/plano. Rápido, ideal quando os dados já são linearmente separáveis. 'rbf' (gaussiano): o mais versátil, cria fronteiras suaves e não-lineares. 'poly': captura relações polinomiais, mas pode overfitar com graus altos.",
+          "implicacoes": "'linear': separa com uma reta/plano. Rápido, ideal quando os dados já são linearmente separáveis. 'rbf' (gaussiano): o mais versátil, cria fronteiras suaves e não-lineares. 'poly': captura relações polinomiais, mas pode overfitar com graus altos. 'sigmoid': similar à regressão logística.",
           "dicaPratica": "Comece com 'rbf'. Se o dataset for grande e os dados linearmente separáveis, use 'linear' (muito mais rápido)."
+        },
+        "degree": {
+          "nome": "Grau do polinômio",
+          "sklearn": "degree",
+          "padrao": 3,
+          "tipo": "int",
+          "faixa": "2 a 10",
+          "descricao": "Grau da função kernel polinomial ('poly'). Ignorado por todos os outros kernels.",
+          "implicacoes": "Grau 2: relações quadráticas. Grau 3: relações cúbicas. Graus altos: mais complexidade, mais overfitting.",
+          "dicaPratica": "Use degree=3 (padrão) para kernel 'poly'. Para kernels 'rbf', este parâmetro é ignorado."
         },
         "gamma": {
           "nome": "Coeficiente do kernel",
           "sklearn": "gamma",
           "padrao": "scale",
           "tipo": "float ou str",
-          "faixa": "0.0001 a 10 (escala logarítmica)",
-          "descricao": "Define o alcance da influência de um único ponto de treino. Só afeta kernels não-lineares (rbf, poly, sigmoid).",
+          "opcoes": ["scale", "auto", "float"],
+          "descricao": "Coeficiente do kernel para 'rbf', 'poly' e 'sigmoid'. 'scale' usa 1/(n_features * X.var()). 'auto' usa 1/n_features.",
           "implicacoes": "Gamma baixo: cada ponto influencia uma grande região (fronteira suave, underfitting). Gamma alto: cada ponto influencia apenas sua vizinhança (fronteira complexa, overfitting).",
           "dicaPratica": "Use 'scale' (padrão). Se o modelo overfita, diminua gamma. Se underfita, aumente."
+        },
+        "coef0": {
+          "nome": "Termo independente do kernel",
+          "sklearn": "coef0",
+          "padrao": 0.0,
+          "tipo": "float",
+          "faixa": "0.0 a 10.0",
+          "descricao": "Termo independente na função kernel. Só é significativo nos kernels 'poly' e 'sigmoid'.",
+          "implicacoes": "Afeta o grau de influência dos termos de alto grau no kernel polinomial.",
+          "dicaPratica": "Geralmente deixe em 0.0. Ajuste apenas se estiver usando kernel 'poly' ou 'sigmoid'."
+        },
+        "shrinking": {
+          "nome": "Heurística de encolhimento",
+          "sklearn": "shrinking",
+          "padrao": true,
+          "tipo": "bool",
+          "descricao": "Se deve usar a heurística de encolhimento para acelerar o treinamento.",
+          "implicacoes": "true: pode acelerar o treinamento em muitos casos. false: mais lento, mas pode encontrar melhor solução em alguns casos.",
+          "dicaPratica": "Deixe como true (padrão). Mude para false apenas se tiver problemas de convergência."
+        },
+        "tol": {
+          "nome": "Tolerância de parada",
+          "sklearn": "tol",
+          "padrao": 0.001,
+          "tipo": "float",
+          "faixa": "1e-5 a 1e-1",
+          "descricao": "Tolerância para o critério de parada do algoritmo de otimização.",
+          "implicacoes": "Valores menores: mais iterações, mais preciso, mais lento. Valores maiores: menos iterações, menos preciso, mais rápido.",
+          "dicaPratica": "Use 0.001 (padrão). Diminua se precisar de mais precisão."
+        },
+        "cache_size": {
+          "nome": "Tamanho do cache do kernel",
+          "sklearn": "cache_size",
+          "padrao": 200,
+          "tipo": "float",
+          "faixa": "50 a 1000 (MB)",
+          "descricao": "Tamanho do cache do kernel em MB. Afeta a velocidade do treinamento.",
+          "implicacoes": "Mais cache = mais rápido para datasets grandes, mas usa mais memória.",
+          "dicaPratica": "Use 200 MB (padrão). Aumente para 500-1000 se tiver RAM disponível e dataset grande."
+        },
+        "class_weight": {
+          "nome": "Peso das classes",
+          "sklearn": "class_weight",
+          "padrao": null,
+          "tipo": "dict ou 'balanced'",
+          "descricao": "Pesos associados às classes. 'balanced' ajusta pesos inversamente proporcional à frequência das classes.",
+          "implicacoes": "None: todas as classes têm peso 1. 'balanced': útil para classes desbalanceadas. Dict: controle manual dos pesos.",
+          "dicaPratica": "Use 'balanced' se suas classes forem desbalanceadas."
+        },
+        "max_iter": {
+          "nome": "Máximo de iterações",
+          "sklearn": "max_iter",
+          "padrao": -1,
+          "tipo": "int",
+          "faixa": "-1 (sem limite) ou 100 a 10000",
+          "descricao": "Limite máximo de iterações do solver. -1 significa sem limite.",
+          "implicacoes": "Valores baixos: pode não converger. Valores altos ou -1: converge mas pode ser lento.",
+          "dicaPratica": "Use -1 (padrão). Se receber warning de convergência, aumente para 10000."
+        },
+        "decision_function_shape": {
+          "nome": "Formato da função de decisão",
+          "sklearn": "decision_function_shape",
+          "padrao": "ovr",
+          "tipo": "str",
+          "opcoes": ["ovo", "ovr"],
+          "descricao": "Se retorna formato one-vs-rest ('ovr') ou one-vs-one ('ovo') para classificação multiclasse.",
+          "implicacoes": "'ovr': formato padrão, compatível com outros classificadores. 'ovo': formato original do libsvm.",
+          "dicaPratica": "Use 'ovr' (padrão). Internamente, 'ovo' é sempre usado para treinar."
+        },
+        "random_state": {
+          "nome": "Semente aleatória",
+          "sklearn": "random_state",
+          "padrao": null,
+          "tipo": "int ou None",
+          "descricao": "Controla a geração de números pseudo-aleatórios para embaralhar dados para estimativas de probabilidade. Ignorado quando probability=False.",
+          "implicacoes": "None: resultados variam entre execuções. Int fixo: resultados reproduzíveis.",
+          "dicaPratica": "Use um inteiro fixo (ex: 42) para resultados reproduzíveis."
         }
       },
       "vantagens": [
@@ -287,7 +502,7 @@
           "padrao": 1.0,
           "tipo": "float",
           "faixa": "0.001 a 1000",
-          "descricao": "C é o inverso da força de regularização. Valores maiores = menos regularização.",
+          "descricao": "C é o inverso da força de regularização. Valores maiores = menos regularização. C=np.inf resulta em regressão logística sem penalidade.",
           "implicacoes": "C baixo (0.001-0.1): forte regularização, modelo simples, pode underfitar. C alto (10-1000): fraca regularização, modelo complexo, pode overfitar.",
           "dicaPratica": "Use GridSearchCV com [0.001, 0.01, 0.1, 1, 10, 100]. Para problemas com muitos atributos, prefira C baixo."
         },
@@ -296,9 +511,9 @@
           "sklearn": "solver",
           "padrao": "lbfgs",
           "tipo": "str",
-          "opcoes": ["lbfgs", "liblinear", "newton-cg", "sag", "saga"],
+          "opcoes": ["lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"],
           "descricao": "Algoritmo matemático usado para encontrar os melhores pesos.",
-          "implicacoes": "'lbfgs': bom para datasets pequenos/médios, suporta multiclasse. 'liblinear': bom para datasets pequenos e classificação binária. 'saga': eficiente para datasets grandes e esparsos.",
+          "implicacoes": "'lbfgs': bom para datasets pequenos/médios, suporta multiclasse. 'liblinear': bom para datasets pequenos e classificação binária. 'saga': eficiente para datasets grandes e esparsos. 'newton-cholesky': bom para n_samples >> n_features.",
           "dicaPratica": "Use 'lbfgs' (padrão). Para datasets grandes (>100k), use 'saga'."
         },
         "penalty": {
@@ -307,9 +522,75 @@
           "padrao": "l2",
           "tipo": "str",
           "opcoes": ["l1", "l2", "elasticnet", "none"],
-          "descricao": "Define como a regularização é aplicada aos pesos.",
+          "descricao": "Define como a regularização é aplicada aos pesos. Nota: este parâmetro está deprecated desde v1.8, use l1_ratio.",
           "implicacoes": "'l2' (Ridge): reduz todos os pesos proporcionalmente. 'l1' (Lasso): zera pesos irrelevantes (seleção de atributos). 'elasticnet': combina L1+L2.",
           "dicaPratica": "Use 'l2' (padrão). Se tiver muitos atributos irrelevantes, experimente 'l1'."
+        },
+        "l1_ratio": {
+          "nome": "Proporção L1/L2 (Elastic-Net)",
+          "sklearn": "l1_ratio",
+          "padrao": 0.0,
+          "tipo": "float",
+          "faixa": "0.0 a 1.0",
+          "descricao": "Parâmetro de mistura para Elastic-Net. l1_ratio=0 dá L2 puro, l1_ratio=1 dá L1 puro. Valores entre 0 e 1 dão Elastic-Net.",
+          "implicacoes": "0: L2 puro (Ridge). 1: L1 puro (Lasso). Entre 0 e 1: combinação L1+L2.",
+          "dicaPratica": "Use l1_ratio=0 (L2 puro) por padrão. Para seleção de atributos, use l1_ratio=1 (L1)."
+        },
+        "tol": {
+          "nome": "Tolerância de parada",
+          "sklearn": "tol",
+          "padrao": 0.0001,
+          "tipo": "float",
+          "faixa": "1e-6 a 1e-2",
+          "descricao": "Tolerância para o critério de parada do algoritmo de otimização.",
+          "implicacoes": "Valores menores: mais iterações, mais preciso, mais lento. Valores maiores: menos iterações, menos preciso, mais rápido.",
+          "dicaPratica": "Use 0.0001 (padrão). Se receber warning de convergência, diminua para 1e-5."
+        },
+        "max_iter": {
+          "nome": "Máximo de iterações",
+          "sklearn": "max_iter",
+          "padrao": 100,
+          "tipo": "int",
+          "faixa": "10 a 10000",
+          "descricao": "Número máximo de iterações para o solver convergir.",
+          "implicacoes": "Valores baixos: pode não converger (warning). Valores altos: converge mas pode ser lento.",
+          "dicaPratica": "Use 100 (padrão). Se receber warning de convergência, aumente para 1000."
+        },
+        "fit_intercept": {
+          "nome": "Calcular intercepto",
+          "sklearn": "fit_intercept",
+          "padrao": true,
+          "tipo": "bool",
+          "descricao": "Se deve calcular o intercepto (bias) na função de decisão.",
+          "implicacoes": "true: adiciona termo de bias. false: força que a reta passe pela origem.",
+          "dicaPratica": "Deixe como true (padrão). Mude para false apenas se seus dados já estiverem centralizados."
+        },
+        "class_weight": {
+          "nome": "Peso das classes",
+          "sklearn": "class_weight",
+          "padrao": null,
+          "tipo": "dict ou 'balanced'",
+          "descricao": "Pesos associados às classes. 'balanced' ajusta pesos inversamente proporcional à frequência das classes.",
+          "implicacoes": "None: todas as classes têm peso 1. 'balanced': útil para classes desbalanceadas. Dict: controle manual dos pesos.",
+          "dicaPratica": "Use 'balanced' se suas classes forem desbalanceadas."
+        },
+        "random_state": {
+          "nome": "Semente aleatória",
+          "sklearn": "random_state",
+          "padrao": null,
+          "tipo": "int ou None",
+          "descricao": "Controla a geração de números pseudo-aleatórios para embaralhar dados. Usado quando solver='sag', 'saga' ou 'liblinear'.",
+          "implicacoes": "None: resultados variam entre execuções. Int fixo: resultados reproduzíveis.",
+          "dicaPratica": "Use um inteiro fixo (ex: 42) para resultados reproduzíveis."
+        },
+        "warm_start": {
+          "nome": "Inicialização quente",
+          "sklearn": "warm_start",
+          "padrao": false,
+          "tipo": "bool",
+          "descricao": "Se deve reutilizar a solução da chamada anterior como inicialização.",
+          "implicacoes": "true: reutiliza pesos anteriores, mais rápido para treinos incrementais. false: começa do zero.",
+          "dicaPratica": "Use true se estiver fazendo GridSearchCV e quiser acelerar."
         }
       },
       "vantagens": [
@@ -404,11 +685,60 @@
           "nome": "Inicialização dos centroides",
           "sklearn": "init",
           "padrao": "k-means++",
-          "tipo": "str",
-          "opcoes": ["k-means++", "random"],
-          "descricao": "Define como os centroides iniciais são escolhidos.",
+          "tipo": "str ou array-like",
+          "opcoes": ["k-means++", "random", "array-like"],
+          "descricao": "Define como os centroides iniciais são escolhidos. Pode ser um array com centroides iniciais.",
           "implicacoes": "'k-means++': escolhe centroides distantes uns dos outros — converge mais rápido e evita soluções ruins. 'random': escolhe aleatoriamente — mais rápido mas resultados piores.",
           "dicaPratica": "Sempre use 'k-means++' (padrão)."
+        },
+        "max_iter": {
+          "nome": "Máximo de iterações",
+          "sklearn": "max_iter",
+          "padrao": 300,
+          "tipo": "int",
+          "faixa": "10 a 1000",
+          "descricao": "Número máximo de iterações do algoritmo em uma única execução.",
+          "implicacoes": "Valores baixos: pode não converger. Valores altos: converge mas pode ser lento.",
+          "dicaPratica": "Use 300 (padrão). Se receber warning de convergência, aumente."
+        },
+        "tol": {
+          "nome": "Tolerância de convergência",
+          "sklearn": "tol",
+          "padrao": 0.0001,
+          "tipo": "float",
+          "faixa": "1e-6 a 1e-2",
+          "descricao": "Tolerância para o critério de convergência (relativa à inércia).",
+          "implicacoes": "Valores menores: mais iterações, mais preciso. Valores maiores: menos iterações, menos preciso.",
+          "dicaPratica": "Use 0.0001 (padrão)."
+        },
+        "n_init": {
+          "nome": "Número de inicializações",
+          "sklearn": "n_init",
+          "padrao": "auto",
+          "tipo": "int ou 'auto'",
+          "faixa": "1 a 20",
+          "descricao": "Número de vezes que o K-Means é executado com diferentes centroides iniciais. O melhor resultado é escolhido.",
+          "implicacoes": "Mais inicializações: melhor resultado, mais lento. 'auto': 1 se init='k-means++', 10 se init='random'.",
+          "dicaPratica": "Use 'auto' (padrão). Se quiser resultados mais estáveis, aumente para 10."
+        },
+        "algorithm": {
+          "nome": "Algoritmo de Lloyd",
+          "sklearn": "algorithm",
+          "padrao": "lloyd",
+          "tipo": "str",
+          "opcoes": ["lloyd", "elkan"],
+          "descricao": "Algoritmo para o K-Means. 'lloyd' é o algoritmo clássico. 'elkan' usa a desigualdade triangular para acelerar.",
+          "implicacoes": "'lloyd': funciona para qualquer caso. 'elkan': mais rápido para clusters bem separados, não funciona com dados esparsos.",
+          "dicaPratica": "Use 'lloyd' (padrão). 'elkan' pode ser mais rápido para clusters esféricos."
+        },
+        "random_state": {
+          "nome": "Semente aleatória",
+          "sklearn": "random_state",
+          "padrao": null,
+          "tipo": "int ou None",
+          "descricao": "Controla a geração de números pseudo-aleatórios para inicialização dos centroides.",
+          "implicacoes": "None: resultados variam entre execuções. Int fixo: resultados reproduzíveis.",
+          "dicaPratica": "Use um inteiro fixo (ex: 42) para resultados reproduzíveis."
         }
       },
       "vantagens": [
@@ -456,10 +786,58 @@
           "sklearn": "n_components",
           "padrao": null,
           "tipo": "int, float ou str",
-          "faixa": "1 a min(n, d)",
-          "descricao": "Número de componentes principais a manter. Pode ser inteiro (número fixo) ou float (proporção da variância a manter).",
+          "opcoes": ["null (min(n, d))", "int (número fixo)", "float (0-1, proporção da variância)", "mle"],
+          "descricao": "Número de componentes principais a manter. Se None, mantém min(n, d). Se float entre 0 e 1, é a proporção da variância a manter. Se 'mle', usa estimativa de máxima verossimilhança.",
           "implicacoes": "Menos componentes = mais compressão, mas possível perda de informação. O ideal é manter componentes que explicam ~95% da variância.",
           "dicaPratica": "Use n_components=0.95 para manter 95% da variância. Ou plote a variância acumulada e escolha o 'cotovelo'."
+        },
+        "whiten": {
+          "nome": "Esbranquiçar componentes",
+          "sklearn": "whiten",
+          "padrao": false,
+          "tipo": "bool",
+          "descricao": "Se True, divide os componentes pelo desvio padrão dos componentes para garantir que cada componente tenha variância unitária.",
+          "implicacoes": "true: cada componente tem variância 1 (útil para algoritmos subsequentes que assumem escala uniforme). false: mantém a variância original.",
+          "dicaPratica": "Use true se for usar os componentes como input para outro algoritmo (ex: KNN, SVM)."
+        },
+        "svd_solver": {
+          "nome": "Solver SVD",
+          "sklearn": "svd_solver",
+          "padrao": "auto",
+          "tipo": "str",
+          "opcoes": ["auto", "full", "arpack", "randomized"],
+          "descricao": "Algoritmo para calcular a decomposição SVD.",
+          "implicacoes": "'auto': escolhe automaticamente. 'full': exato, mas lento para grandes datasets. 'arpack': eficiente para matrizes esparsas. 'randomized': aproximado, muito mais rápido para grandes datasets.",
+          "dicaPratica": "Use 'auto' (padrão). Para datasets grandes (>1000 features), experimente 'randomized'."
+        },
+        "tol": {
+          "nome": "Tolerância SVD",
+          "sklearn": "tol",
+          "padrao": 0.0,
+          "tipo": "float",
+          "faixa": "0.0 a 1.0",
+          "descricao": "Tolerância para o solver 'arpack'. Valores maiores convergem mais rápido.",
+          "implicacoes": "0: convergência automática. Valores maiores: mais rápido, menos preciso.",
+          "dicaPratica": "Use 0.0 (padrão) para convergência automática."
+        },
+        "iterated_power": {
+          "nome": "Iterações do solver",
+          "sklearn": "iterated_power",
+          "padrao": "auto",
+          "tipo": "int ou 'auto'",
+          "faixa": "1 a 20",
+          "descricao": "Número de iterações para o solver 'randomized'.",
+          "implicacoes": "Mais iterações: mais preciso, mais lento.",
+          "dicaPratica": "Use 'auto' (padrão)."
+        },
+        "random_state": {
+          "nome": "Semente aleatória",
+          "sklearn": "random_state",
+          "padrao": null,
+          "tipo": "int ou None",
+          "descricao": "Controla a geração de números pseudo-aleatórios para o solver 'randomized'.",
+          "implicacoes": "None: resultados variam entre execuções. Int fixo: resultados reproduzíveis.",
+          "dicaPratica": "Use um inteiro fixo (ex: 42) para resultados reproduzíveis."
         }
       },
       "vantagens": [
