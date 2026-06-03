@@ -39,6 +39,7 @@ export class ExecucoesComponent implements OnInit {
   resultadoTreinamento?: any;
   metricasSelecionadas: ItemPipeline[] = [];
   resultadosDasAvaliacoes: any = {};
+  preProcessamentoConfig: any = null;
 
   constructor(
     private dashboardService: DashboardService,
@@ -89,27 +90,32 @@ export class ExecucoesComponent implements OnInit {
       disableClose: true,
       hasBackdrop: false,
       data: {
-        etapa: item.tipoItem === 'metrica' ? 'avaliacao' : item.tipoItem === 'treino-validacao-teste' ? 'treinamento' : item.tipoItem,
+        etapa: item.tipoItem === 'metrica' ? 'avaliacao' : item.tipoItem === 'treino-validacao-teste' ? 'treinamento' : item.tipoItem === 'pre-processamento' ? 'pre-processamento' : item.tipoItem,
         tipoArquivoSelecionado: item.tipoItem === 'coleta-dado' ? item.valor : undefined,
         resultadoColetaDado: this.resultadoColetaDado,
         modeloSelecionado: item.tipoItem === 'treino-validacao-teste' ? item : this.modeloSelecionado,
         resultadoTreinamento: this.resultadoTreinamento,
         metricasSelecionadas: this.metricasSelecionadas,
-        resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
+        resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
+        preProcessamentoConfig: this.preProcessamentoConfig
       }
     });
 
     dialogRef.afterClosed().subscribe((resultado: any) => {
       this.modalAberto = false;
       if (resultado) {
+        console.log('Modal fechado com resultado:', resultado);
+        console.log('preProcessamentoConfig:', resultado.preProcessamentoConfig);
         this.resultadoColetaDado = resultado.resultadoColetaDado
         this.modeloSelecionado = resultado.modeloSelecionado
         this.resultadoTreinamento = resultado.resultadoTreinamento;
         this.metricasSelecionadas = resultado.metricasSelecionadas;
         this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
+        this.preProcessamentoConfig = resultado.preProcessamentoConfig;
 
         // Processar itens de pre-processamento
         if (resultado.preProcessamentoConfig?.itens) {
+          console.log('Processando itens pre-processamento:', resultado.preProcessamentoConfig.itens);
           this.processarItensPreProcessamento(resultado.preProcessamentoConfig.itens);
         }
 
@@ -604,6 +610,7 @@ export class ExecucoesComponent implements OnInit {
   }
 
   processarItensPreProcessamento(itens: any[]): void {
+    console.log('processarItensPreProcessamento chamado com:', itens);
     // Criar itens de pre-processamento para a coluna
     for (const item of itens) {
       const itemPipeline: ItemPipeline = {
@@ -617,11 +624,13 @@ export class ExecucoesComponent implements OnInit {
         icon: 'pre-processamento',
         id: 'preproc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9)
       };
+      console.log('Criando item pipeline:', itemPipeline);
       this.dashboardService.movendoItemExecucao(itemPipeline);
     }
 
     // Atualizar itens de pre-processamento no servico
     const itensAtuais = this.dashboardService.getItensPreProcessamentoSync();
+    console.log('Itens atuais pre-processamento:', itensAtuais);
     const novosItens = itens.map(item => ({
       ...item,
       movido: true,
@@ -631,6 +640,7 @@ export class ExecucoesComponent implements OnInit {
       dadosRotulados: false,
       icon: 'pre-processamento'
     }));
+    console.log('Novos itens pre-processamento:', novosItens);
     this.dashboardService.atualizarItensPreProcessamento([...itensAtuais, ...novosItens]);
   }
 

@@ -291,6 +291,9 @@ export class ModalExecucaoComponent implements OnInit {
         todosExistem = true;
         this.funcResultadoAvaliacoes(data.resultadosDasAvaliacoes)
       }
+      if (data.preProcessamentoConfig) {
+        this.preProcessamentoConfig = data.preProcessamentoConfig;
+      }
       if (!todosExistem) {
         this.funcBodyTutor();
       }

@@ -14,6 +14,7 @@ export interface PreProcessamentoConfig {
 })
 export class PreProcessamentoConfigComponent implements OnInit {
   @Input() resultadoColetaDado?: ResultadoColetaDado;
+  @Input() preProcessamentoConfig?: PreProcessamentoConfig;
   @Output() preProcessamentoModificado = new EventEmitter<PreProcessamentoConfig>();
 
   itensDisponiveis: any[] = [];
@@ -25,6 +26,13 @@ export class PreProcessamentoConfigComponent implements OnInit {
   ngOnInit() {
     this.carregarItensPreProcessamento();
     this.carregarColunas();
+    this.carregarConfiguracaoExistente();
+  }
+
+  carregarConfiguracaoExistente() {
+    if (this.preProcessamentoConfig?.itens) {
+      this.itensSelecionados = [...this.preProcessamentoConfig.itens];
+    }
   }
 
   carregarColunas() {

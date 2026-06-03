@@ -41,6 +41,7 @@
         <ng-container *ngSwitchCase="1">
           <app-pre-processamento-config
             [resultadoColetaDado]="resultadoColetaDado"
+            [preProcessamentoConfig]="preProcessamentoConfig"
             (preProcessamentoModificado)="atualizarPreProcessamento($event)">
           </app-pre-processamento-config>
         </ng-container>
