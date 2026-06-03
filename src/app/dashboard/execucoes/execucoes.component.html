@@ -82,7 +82,12 @@
         <span>Tutor</span>
       </div>
       <div class="column-content tutor-content">
-        <app-tutor [tutorGeral]="tutor"></app-tutor>
+        <app-tutor
+          [tutorGeral]="tutor"
+          [modeloSelecionado]="modeloSelecionado"
+          [metricaSelecionada]="metricasSelecionadas[0]"
+          [tutorPipelineInfo]="tutorPipelineInfo">
+        </app-tutor>
       </div>
     </div>
   </div>

@@ -3,7 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
 import { ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
 import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.component';
+import { TutorContexto } from '../tutor/tutor.component';
 import { Subject, takeUntil } from 'rxjs';
+import tutor from '../../constants/tutor.json';
 
 
 @Component({
@@ -15,9 +17,11 @@ import { Subject, takeUntil } from 'rxjs';
 export class ExecucoesComponent implements OnInit {
 
   private destroy$ = new Subject<void>();
-
+  private modalAberto = false;
+  private tutorRef = tutor;
 
   tutor: any;
+  tutorPipelineInfo: any = null;
   paramsTutor = '';
   etapaAtual = '';
 
@@ -55,7 +59,9 @@ export class ExecucoesComponent implements OnInit {
 
 
   abrirModalExecucao(item: ItemPipeline): void {
-    // this.getTutor(item.tipoItem);
+    if (this.modalAberto) return;
+    this.modalAberto = true;
+
     const dialogRef = this.dialog.open(ModalExecucaoComponent, {
       maxWidth: 'none',
       width: 'auto',
@@ -73,6 +79,7 @@ export class ExecucoesComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((resultado: any) => {
+      this.modalAberto = false;
       if (resultado) {
         this.resultadoColetaDado = resultado.resultadoColetaDado
         this.modeloSelecionado = resultado.modeloSelecionado
@@ -80,6 +87,7 @@ export class ExecucoesComponent implements OnInit {
         this.metricasSelecionadas = resultado.metricasSelecionadas;
         this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
         this.dashboardService.moverItensEmExecucao();
+        this.atualizarTutorContexto();
       }
     });
   }
@@ -121,7 +129,34 @@ export class ExecucoesComponent implements OnInit {
     this.resultadoTreinamento = undefined;
     this.metricasSelecionadas = [];
     this.resultadosDasAvaliacoes = {};
+    this.tutorPipelineInfo = null;
     this.dashboardService.limparItensExecucao();
+  }
+
+  atualizarTutorContexto(): void {
+    if (this.modeloSelecionado) {
+      const modelos = this.tutorRef.modelos as any;
+      const modeloInfo = modelos?.[this.modeloSelecionado.valor];
+      if (modeloInfo) {
+        this.tutorPipelineInfo = {
+          titulo: modeloInfo.nome,
+          descricao: modeloInfo.descricao,
+          dicas: modeloInfo.quandoUsar?.slice(0, 3) || []
+        };
+      }
+    } else if (this.metricasSelecionadas.length > 0) {
+      const metricas = this.tutorRef.metricas as any;
+      const metricaInfo = metricas?.[this.metricasSelecionadas[0].valor];
+      if (metricaInfo) {
+        this.tutorPipelineInfo = {
+          titulo: metricaInfo.nome,
+          descricao: metricaInfo.descricao,
+          dicas: metricaInfo.quandoUsar?.slice(0, 3) || []
+        };
+      }
+    } else {
+      this.tutorPipelineInfo = null;
+    }
   }
 
   ngOnDestroy() {
