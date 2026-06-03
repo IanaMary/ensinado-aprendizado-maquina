@@ -82,7 +82,7 @@
   align-items: flex-start;
 }
 
-// Novo layout da matriz
+// Container da matriz
 .confusion-matrix-container {
   display: flex;
   flex-direction: column;
@@ -90,10 +90,9 @@
 }
 
 // Label "Previsto" acima
-.cm-label-previsto {
+.cm-label-top {
   text-align: center;
   padding: 8px 0;
-  margin-left: 60px; // Alinha com as colunas
 
   span {
     font-size: 13px;
@@ -104,96 +103,76 @@
   }
 }
 
-// Header das colunas
-.cm-header-row-container {
-  display: flex;
-  gap: 2px;
-}
+// Tabela da matriz
+.cm-table {
+  border-collapse: separate;
+  border-spacing: 2px;
 
-.cm-corner-empty {
-  width: 60px;
-  min-width: 60px;
-}
-
-.cm-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 12px;
-  font-size: 13px;
-  min-width: 60px;
-  min-height: 36px;
-}
-
-.cm-header-col {
-  background: $roxo-fundo;
-  font-weight: 700;
-  color: $roxo-escuro;
-  font-size: 12px;
-  border-radius: 6px 6px 0 0;
-}
-
-// Corpo da matriz com label "Real"
-.cm-body {
-  display: flex;
-  gap: 2px;
-}
-
-// Label "Real" na lateral
-.cm-label-real {
-  width: 60px;
-  min-width: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  span {
+  th, td {
+    padding: 10px 14px;
+    text-align: center;
     font-size: 13px;
+    border: none;
+  }
+
+  // Canto superior esquerdo (label Real)
+  .cm-corner {
+    background: transparent;
+    width: 80px;
+    min-width: 80px;
+
+    .cm-label-real {
+      font-size: 12px;
+      font-weight: 700;
+      color: $roxo-escuro;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  }
+
+  // Header das colunas (classes previstas)
+  .cm-header-col {
+    background: $roxo-fundo;
     font-weight: 700;
     color: $roxo-escuro;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-  }
-}
-
-// Grid da matriz
-.cm-grid {
-  display: grid;
-  gap: 2px;
-  flex: 1;
-}
-
-.cm-header-row {
-  background: $roxo-fundo;
-  font-weight: 700;
-  color: $roxo-escuro;
-  font-size: 12px;
-  border-radius: 6px 0 0 6px;
-}
-
-.cm-data {
-  border-radius: 4px;
-  cursor: default;
-  transition: transform 0.15s, box-shadow 0.15s;
-  font-weight: 600;
-
-  &.cm-diagonal {
-    border-left: 2px solid rgba(#2e7d32, 0.3);
-    border-top: 2px solid rgba(#2e7d32, 0.3);
+    font-size: 12px;
+    border-radius: 6px 6px 0 0;
+    min-width: 70px;
   }
 
-  &.cm-erro {
-    border-left: 2px solid rgba(#c62828, 0.2);
-    border-top: 2px solid rgba(#c62828, 0.2);
+  // Header das linhas (classes reais)
+  .cm-header-row {
+    background: $roxo-fundo;
+    font-weight: 700;
+    color: $roxo-escuro;
+    font-size: 12px;
+    border-radius: 6px 0 0 6px;
+    text-align: right;
+    padding-right: 12px;
   }
 
-  &:hover {
-    transform: scale(1.08);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    z-index: 2;
-    position: relative;
+  // Células de dados
+  .cm-data {
+    border-radius: 4px;
+    cursor: default;
+    transition: transform 0.15s, box-shadow 0.15s;
+    font-weight: 600;
+    min-width: 70px;
+
+    &.cm-diagonal {
+      border: 2px solid rgba(#2e7d32, 0.3);
+    }
+
+    &.cm-erro {
+      border: 2px solid rgba(#c62828, 0.2);
+    }
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 2;
+      position: relative;
+    }
   }
 }
 
