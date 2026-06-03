@@ -39,7 +39,10 @@ export class ColetaDeDadosComponent implements OnInit {
     this.dashboardService.emitInfoItemClicked(item);
   }
 
-  abrirDialogDatasets() {
+  abrirDialogDatasets(event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+
     const dialogRef = this.dialog.open(ToyDatasetsDialogComponent, {
       width: '750px',
       maxWidth: '90vw',
@@ -48,7 +51,6 @@ export class ColetaDeDadosComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((resultado: any) => {
       if (resultado) {
-        // Emite o resultado como se fosse um item de coleta selecionado
         this.dashboardService.emitirResultadoDataset(resultado);
       }
     });
