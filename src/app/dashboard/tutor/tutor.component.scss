@@ -33,16 +33,16 @@
   display: inline-flex;
   width: fit-content;
 
-  mat-icon {
-    width: 20px;
-    height: 20px;
-    font-size: 20px;
+  .btn-info {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: $cinza-medio;
     cursor: help;
-    color: $roxo-medio;
+    transition: color 0.2s;
 
-    ::ng-deep svg {
-      width: 20px;
-      height: 20px;
+    &:hover {
+      color: $roxo-medio;
     }
   }
 
