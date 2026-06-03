@@ -119,29 +119,17 @@
           "nomeHiperparametro": "n_neighbors",
           "valorPadrao": 5,
           "tipo": "int",
-          "resumo": [
-            "Define o número de vizinhos a serem considerados. Um valor comum é 5, mas isso pode ser ajustado conforme necessário."
-          ]
+          "resumo": ["Define o número de vizinhos a serem considerados."]
         },
         {
           "label": "Pesos",
           "nomeHiperparametro": "weights",
-          "valorPadrao": 5,
-          "tipo": "int",
-          "resumo": [
-            "Determina como os vizinhos influenciam a classificação. Pode ser: uniform e distance",
-            "'uniform': todos os vizinhos têm o mesmo peso.",
-            "'distance': vizinhos mais próximos têm maior peso.",
-            "Função personalizada: você pode definir sua própria função para calcular os pesos."
-          ]
+          "valorPadrao": "uniform",
+          "tipo": "str",
+          "resumo": ["'uniform': todos os vizinhos têm o mesmo peso.", "'distance': vizinhos mais próximos têm maior peso."]
         }
       ],
-      "metricas": [
-        "precision_score",
-        "recall_score",
-        "f1_score",
-        "confusion_matrix"
-      ],
+      "metricas": ["precision_score", "recall_score", "f1_score", "confusion_matrix"],
       "preverCategoria": true,
       "dadosRotulados": true
     },
@@ -154,32 +142,33 @@
       "resumo": "Árvore de Decisão cria um modelo em forma de árvore para tomar decisões baseadas em características dos dados.",
       "tipo": "string",
       "hiperparametros": [],
-      "metricas": [
-        "accuracy_score",
-        "precision_score",
-        "recall_score",
-        "f1_score",
-        "confusion_matrix"
-      ],
+      "metricas": ["accuracy_score", "precision_score", "recall_score", "f1_score", "confusion_matrix"],
       "preverCategoria": true,
       "dadosRotulados": true
     },
     {
-      "label": "SVM",
+      "label": "SVM (RBF)",
       "movido": false,
       "tipoItem": "treino-validacao-teste",
       "habilitado": false,
       "valor": "svm",
-      "resumo": "SVM busca um hiperplano que separa as classes com a maior margem possível no espaço de características.",
+      "resumo": "SVM com kernel RBF busca um hiperplano que separa as classes com a maior margem possível.",
       "tipo": "string",
       "hiperparametros": [],
-      "metricas": [
-        "accuracy_score",
-        "precision_score",
-        "recall_score",
-        "f1_score",
-        "confusion_matrix"
-      ],
+      "metricas": ["accuracy_score", "precision_score", "recall_score", "f1_score", "confusion_matrix"],
+      "preverCategoria": true,
+      "dadosRotulados": true
+    },
+    {
+      "label": "SVM Linear",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "svm_linear",
+      "resumo": "SVM com kernel linear. Mais rápido que RBF para dados linearmente separáveis.",
+      "tipo": "string",
+      "hiperparametros": [],
+      "metricas": ["accuracy_score", "precision_score", "recall_score", "f1_score", "confusion_matrix"],
       "preverCategoria": true,
       "dadosRotulados": true
     },
@@ -192,13 +181,72 @@
       "resumo": "Regressão Logística modela a probabilidade de uma classe binária usando a função logística.",
       "tipo": "string",
       "hiperparametros": [],
-      "metricas": [
-        "accuracy_score",
-        "precision_score",
-        "recall_score",
-        "f1_score",
-        "confusion_matrix"
-      ],
+      "metricas": ["accuracy_score", "precision_score", "recall_score", "f1_score", "confusion_matrix"],
+      "preverCategoria": true,
+      "dadosRotulados": true
+    },
+    {
+      "label": "Random Forest",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "random_forest",
+      "resumo": "Conjunto de árvores de decisão que votam na classe final. Reduz overfitting e melhora generalização.",
+      "tipo": "string",
+      "hiperparametros": [],
+      "metricas": ["accuracy_score", "precision_score", "recall_score", "f1_score", "confusion_matrix"],
+      "preverCategoria": true,
+      "dadosRotulados": true
+    },
+    {
+      "label": "AdaBoost",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "adaboost",
+      "resumo": "Combina múltiplos classificadores fracos (stumps) em um classificador forte, focando nos erros anteriores.",
+      "tipo": "string",
+      "hiperparametros": [],
+      "metricas": ["accuracy_score", "precision_score", "recall_score", "f1_score", "confusion_matrix"],
+      "preverCategoria": true,
+      "dadosRotulados": true
+    },
+    {
+      "label": "Naive Bayes",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "naive_bayes",
+      "resumo": "Classificador probabilístico baseado no Teorema de Bayes. Assume independência entre features. Rápido e eficaz para texto.",
+      "tipo": "string",
+      "hiperparametros": [],
+      "metricas": ["accuracy_score", "precision_score", "recall_score", "f1_score", "confusion_matrix"],
+      "preverCategoria": true,
+      "dadosRotulados": true
+    },
+    {
+      "label": "Rede Neural (MLP)",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "mlp",
+      "resumo": "Multi-Layer Perceptron: rede neural com camadas ocultas. Pode aprender padrões complexos não-lineares.",
+      "tipo": "string",
+      "hiperparametros": [],
+      "metricas": ["accuracy_score", "precision_score", "recall_score", "f1_score", "confusion_matrix"],
+      "preverCategoria": true,
+      "dadosRotulados": true
+    },
+    {
+      "label": "QDA",
+      "movido": false,
+      "tipoItem": "treino-validacao-teste",
+      "habilitado": false,
+      "valor": "qda",
+      "resumo": "Quadratic Discriminant Analysis: assume que cada classe tem sua própria matriz de covariância. Fronteiras quadráticas.",
+      "tipo": "string",
+      "hiperparametros": [],
+      "metricas": ["accuracy_score", "precision_score", "recall_score", "f1_score", "confusion_matrix"],
       "preverCategoria": true,
       "dadosRotulados": true
     },
@@ -232,7 +280,7 @@
       "tipoItem": "treino-validacao-teste",
       "habilitado": false,
       "valor": "pca",
-      "resumo": "PCA (Análise de Componentes Principais) é uma técnica de redução de dimensionalidade que transforma os dados em um novo sistema de coordenadas.",
+      "resumo": "PCA (Análise de Componentes Principais) é uma técnica de redução de dimensionalidade.",
       "tipo": null,
       "hiperparametros": [],
       "preverCategoria": false,
