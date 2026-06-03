@@ -1,0 +1,65 @@
+<div class="preprocessamento-container">
+  <!-- Descricao -->
+  <div class="section-desc">
+    <mat-icon>transform</mat-icon>
+    <p>Selecione os métodos de pré-processamento e as colunas onde serão aplicados.</p>
+  </div>
+
+  <!-- Itens selecionados -->
+  <div class="itens-selecionados" *ngIf="itensSelecionados.length > 0">
+    <h4>Transformações configuradas</h4>
+    <div class="item-config" *ngFor="let item of itensSelecionados; let idx = index">
+      <div class="item-header">
+        <mat-icon>transform</mat-icon>
+        <span class="item-label">{{ item.label }}</span>
+        <button class="btn-remove" (click)="removerItem(idx)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="item-colunas">
+        <span class="coluna-tag" *ngFor="let col of item.colunas">{{ col }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selecionar novo item -->
+  <div class="selecao-area">
+    <h4>Adicionar transformação</h4>
+    
+    <div class="itens-grid">
+      <div *ngFor="let item of itensDisponiveis"
+           class="item-option"
+           [class.selected]="itemSelecionado?.valor === item.valor"
+           (click)="selecionarItem(item)">
+        <mat-icon>transform</mat-icon>
+        <span>{{ item.label }}</span>
+      </div>
+    </div>
+
+    <!-- Selecionar colunas -->
+    <div class="colunas-area" *ngIf="itemSelecionado">
+      <div class="colunas-header">
+        <span>Aplicar em:</span>
+        <div class="colunas-actions">
+          <button (click)="selecionarTodas()">Todas</button>
+          <button (click)="limparSelecao()">Limpar</button>
+        </div>
+      </div>
+      
+      <div class="colunas-grid">
+        <div *ngFor="let col of colunas"
+             class="coluna-item"
+             [class.selected]="isColunaSelecionada(col)"
+             (click)="toggleColuna(col)">
+          <mat-icon>{{ isColunaSelecionada(col) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          <span>{{ col }}</span>
+        </div>
+      </div>
+
+      <button class="btn-adicionar" (click)="adicionarItem()" [disabled]="colunasSelecionadas.length === 0">
+        <mat-icon>add</mat-icon>
+        Adicionar {{ itemSelecionado.label }}
+      </button>
+    </div>
+  </div>
+</div>

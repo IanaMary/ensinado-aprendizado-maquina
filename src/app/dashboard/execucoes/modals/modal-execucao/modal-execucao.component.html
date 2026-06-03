@@ -39,25 +39,32 @@
         </ng-container>
 
         <ng-container *ngSwitchCase="1">
+          <app-pre-processamento-config
+            [resultadoColetaDado]="resultadoColetaDado"
+            (preProcessamentoModificado)="atualizarPreProcessamento($event)">
+          </app-pre-processamento-config>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="2">
           <app-tipos-classificadores [modelosDisponiveis]="modelosDisponiveis" [modeloSelecionado]="modeloSelecionado"
             (selecaoModelo)="atualizarModelo($event)">
           </app-tipos-classificadores>
         </ng-container>
 
-        <ng-container *ngSwitchCase="2">
+        <ng-container *ngSwitchCase="3">
           <app-classificador [resultadoTreinamento]="resultadoTreinamento" [resultadoColetaDado]="resultadoColetaDado"
             [modeloSelecionado]="modeloSelecionado"
             (atualizarResultadoTreinamento)="atualizarResultadoTreinamento($event)">
           </app-classificador>
         </ng-container>
 
-        <ng-container *ngSwitchCase="3">
+        <ng-container *ngSwitchCase="4">
           <app-selecao-metricas [metricasDisponiveis]="metricasDisponiveis"
             (selecaoMetricas)="atualizarMetricasSelecionadas($event)">
           </app-selecao-metricas>
         </ng-container>
 
-        <ng-container *ngSwitchCase="4">
+        <ng-container *ngSwitchCase="5">
           <app-metrica-avaliacao [resultadosDasAvaliacoes]="resultadosDasAvaliacoes"
             [metricasSelecionadas]="metricasSelecionadas" [resultadoTreinamento]="resultadoTreinamento"
             [resultadoColetaDado]="resultadoColetaDado" [modeloSelecionado]="modeloSelecionado"

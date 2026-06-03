@@ -6,6 +6,7 @@ import { TutorContexto } from '../../../tutor/tutor.component';
 import tutor from '../../../../constants/tutor.json';
 
 const COLETA_DADO = 'coleta-dado';
+const PRE_PROCESSAMENTO = 'pre-processamento';
 const SELECAO_MODELO = 'selecao-modelo';
 const TREINAMENTO = 'treinamento';
 const SELECAO_METRICAS = 'selecao-metricas';
@@ -29,10 +30,11 @@ export class ModalExecucaoComponent implements OnInit {
 
   etapas: Record<string, { indice: number; proximo: boolean; titulo: string; botaoProximo?: string }> = {
     [COLETA_DADO]: { indice: 0, proximo: true, titulo: 'Importar Planilha' },
-    [SELECAO_MODELO]: { indice: 1, proximo: false, titulo: 'Seleção do Modelo', botaoProximo: 'Treinar' },
-    [TREINAMENTO]: { indice: 2, proximo: true, titulo: 'Treinamento' },
-    [SELECAO_METRICAS]: { indice: 3, proximo: true, titulo: 'Seleção das Métricas' },
-    [AVALIACAO]: { indice: 4, proximo: true, titulo: 'Visualizar Avaliações' }
+    [PRE_PROCESSAMENTO]: { indice: 1, proximo: true, titulo: 'Pré-processamento' },
+    [SELECAO_MODELO]: { indice: 2, proximo: false, titulo: 'Seleção do Modelo', botaoProximo: 'Treinar' },
+    [TREINAMENTO]: { indice: 3, proximo: true, titulo: 'Treinamento' },
+    [SELECAO_METRICAS]: { indice: 4, proximo: true, titulo: 'Seleção das Métricas' },
+    [AVALIACAO]: { indice: 5, proximo: true, titulo: 'Visualizar Avaliações' }
   };
 
   etapaKeys = Object.keys(this.etapas);
@@ -250,6 +252,11 @@ export class ModalExecucaoComponent implements OnInit {
   atualizarMetricasSelecionadas(event: any) {
     this.metricasSelecionadas = event;
     this.validarProximaEtapa();
+  }
+
+  atualizarPreProcessamento(event: any) {
+    // Processar configuracao de pre-processamento
+    console.log('Pre-processamento configurado:', event);
   }
 
   funcResultadoAvaliacoes(event: any) {

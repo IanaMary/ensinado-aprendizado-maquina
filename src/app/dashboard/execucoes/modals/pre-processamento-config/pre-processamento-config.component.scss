@@ -1,0 +1,265 @@
+@use '../../../../../styles/colores.scss' as *;
+
+.preprocessamento-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-desc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: $roxo-fundo;
+  border-radius: 10px;
+
+  mat-icon {
+    color: $roxo-medio;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: $cinza-escuro;
+    line-height: 1.5;
+  }
+}
+
+.itens-selecionados {
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: $roxo-escuro;
+    margin: 0 0 10px 0;
+  }
+}
+
+.item-config {
+  background: $branco;
+  border: 1px solid rgba($roxo-claro, 0.5);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+
+  .item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    mat-icon {
+      color: $roxo-medio;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .item-label {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 600;
+      color: $roxo-escuro;
+    }
+
+    .btn-remove {
+      background: none;
+      border: none;
+      color: $cinza-medio;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+
+      &:hover {
+        color: $erro;
+        background: rgba($erro, 0.1);
+      }
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .item-colunas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+
+    .coluna-tag {
+      font-size: 10px;
+      background: $roxo-fundo;
+      color: $roxo-medio;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+  }
+}
+
+.selecao-area {
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: $roxo-escuro;
+    margin: 0 0 10px 0;
+  }
+}
+
+.itens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.item-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid rgba($roxo-claro, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  mat-icon {
+    color: $cinza-medio;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  span {
+    font-size: 12px;
+    color: $cinza-escuro;
+  }
+
+  &:hover {
+    border-color: $roxo-medio;
+    background: $roxo-fundo;
+  }
+
+  &.selected {
+    border-color: $roxo-medio;
+    background: $roxo-fundo;
+
+    mat-icon { color: $roxo-medio; }
+  }
+}
+
+.colunas-area {
+  background: $cinza-claro;
+  border-radius: 10px;
+  padding: 12px;
+
+  .colunas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    span {
+      font-size: 12px;
+      font-weight: 600;
+      color: $roxo-escuro;
+    }
+
+    .colunas-actions {
+      display: flex;
+      gap: 6px;
+
+      button {
+        padding: 4px 10px;
+        border: 1px solid $cinza-claro;
+        border-radius: 6px;
+        background: $branco;
+        font-size: 11px;
+        color: $cinza-escuro;
+        cursor: pointer;
+
+        &:hover {
+          border-color: $roxo-medio;
+          color: $roxo-medio;
+        }
+      }
+    }
+  }
+}
+
+.colunas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.coluna-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid rgba($roxo-claro, 0.5);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  mat-icon {
+    color: $cinza-medio;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  span {
+    font-size: 12px;
+    color: $cinza-escuro;
+  }
+
+  &:hover {
+    border-color: $roxo-medio;
+  }
+
+  &.selected {
+    background: $roxo-fundo;
+    border-color: $roxo-medio;
+
+    mat-icon { color: $roxo-medio; }
+  }
+}
+
+.btn-adicionar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px;
+  background: $roxo-medio;
+  color: $branco;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover:not(:disabled) {
+    background: $roxo-vibrante;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
