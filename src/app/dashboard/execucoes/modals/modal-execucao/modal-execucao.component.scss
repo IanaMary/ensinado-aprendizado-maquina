@@ -77,61 +77,109 @@
         }
       }
 
-      .breadcrumb {
+      .breadcrumb-trail {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
-        gap: 6px;
-        padding-bottom: 10px;
+        padding: 12px 0 8px;
+        gap: 0;
 
-        .bolinha {
-          width: 28px;
-          height: 28px;
-          min-width: 28px;
-          border-radius: 50%;
+        .step {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-size: 12px;
-          color: $branco;
-          transition: all 0.2s ease;
+          gap: 6px;
+          position: relative;
+          z-index: 1;
+
+          .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.25s ease;
+            border: 2px solid transparent;
+
+            mat-icon {
+              font-size: 16px;
+              width: 16px;
+              height: 16px;
+            }
+          }
+
+          .step-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-align: center;
+            max-width: 70px;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          &.visitada {
+            .step-circle {
+              background: $sucesso;
+              color: $branco;
+              border-color: $sucesso;
+            }
+            .step-label {
+              color: $sucesso;
+            }
+          }
+
+          &.atual {
+            .step-circle {
+              background: $branco;
+              color: $roxo-medio;
+              border-color: $roxo-medio;
+              box-shadow: 0 0 0 4px rgba($roxo-medio, 0.15);
+            }
+            .step-label {
+              color: $roxo-escuro;
+              font-weight: 700;
+            }
+          }
+
+          &.desabilitada {
+            .step-circle {
+              background: $cinza-claro;
+              color: $cinza-medio;
+              border-color: $cinza-claro;
+            }
+            .step-label {
+              color: $cinza-medio;
+            }
+          }
 
           &.clickable {
             cursor: pointer;
 
-            &:hover {
-              transform: scale(1.15);
-              box-shadow: 0 2px 8px rgba($roxo-medio, 0.3);
+            &:hover .step-circle {
+              transform: scale(1.1);
             }
 
-            &:active {
+            &:active .step-circle {
               transform: scale(0.95);
             }
           }
         }
 
-        .linha {
-          height: 3px;
-          flex: 1;
-          max-width: 40px;
-          border-radius: 2px;
-        }
+        .step-line {
+          width: 40px;
+          height: 2px;
+          background: $cinza-claro;
+          margin-top: 16px;
+          transition: background 0.25s ease;
 
-        .visitada {
-          background-color: $roxo-claro;
-          color: $roxo-escuro;
-        }
-
-        .atual {
-          background-color: $roxo-medio;
-          color: $branco;
-          box-shadow: 0 2px 8px rgba($roxo-medio, 0.4);
-        }
-
-        .desabilitada {
-          background-color: $cinza-claro;
-          color: $cinza-medio;
+          &.completed {
+            background: $sucesso;
+          }
         }
       }
     }

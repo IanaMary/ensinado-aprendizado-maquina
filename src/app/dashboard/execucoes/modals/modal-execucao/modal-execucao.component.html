@@ -10,17 +10,20 @@
         </button>
       </div>
 
-      <nav class="box-linha breadcrumb">
-        <ng-container *ngFor="let key of etapaKeys; let idx = index">
-          <div [matTooltip]="etapas[key].titulo" matTooltipPosition="above" class="bolinha"
-            [ngClass]="getClasseLinhaPipe(idx)"
+      <div class="breadcrumb-trail">
+        <ng-container *ngFor="let key of etapaKeys; let idx = index; let last = last">
+          <div class="step" [ngClass]="getClasseLinhaPipe(idx)"
             [class.clickable]="idx < etapas[etapaAtual].indice"
             (click)="irParaEtapa(idx)">
-            {{ idx + 1 }}
+            <div class="step-circle">
+              <mat-icon *ngIf="idx < etapas[etapaAtual].indice">check</mat-icon>
+              <span *ngIf="idx >= etapas[etapaAtual].indice">{{ idx + 1 }}</span>
+            </div>
+            <span class="step-label">{{ etapas[key].titulo }}</span>
           </div>
-          <div *ngIf="idx < etapaKeys.length - 1" class="linha" [ngClass]="getClasseLinhaPipe(idx)"></div>
+          <div *ngIf="!last" class="step-line" [class.completed]="idx < etapas[etapaAtual].indice"></div>
         </ng-container>
-      </nav>
+      </div>
 
       <mat-divider></mat-divider>
     </nav>
