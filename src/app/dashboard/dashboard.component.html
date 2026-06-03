@@ -1,8 +1,17 @@
-<nav class="dashboard">
-  <nav class="dashboard-pipeline">
-   <app-pipeline></app-pipeline>
-  </nav>
-  <nav class="dashboard-execucoes">
+<div class="dashboard">
+  <!-- Pipeline sidebar -->
+  <aside class="dashboard-pipeline">
+    <div class="pipeline-header">
+      <mat-icon>account_tree</mat-icon>
+      <span>Pipeline</span>
+    </div>
+    <div class="pipeline-content">
+      <app-pipeline></app-pipeline>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="dashboard-execucoes">
     <app-execucoes></app-execucoes>
-  </nav>
-</nav>
+  </main>
+</div>

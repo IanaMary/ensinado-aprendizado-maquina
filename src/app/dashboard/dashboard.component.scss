@@ -3,42 +3,79 @@
 .dashboard {
   display: flex;
   width: 100%;
-  box-sizing: border-box;
-  min-height: calc(100vh - #{$topbar-height + 48px}); // Adjust for topbar and padding
-  overflow: hidden;
-  background-color: $branco;
+  min-height: calc(100vh - #{$topbar-height + 48px});
+  background: linear-gradient(135deg, #f8f9fe 0%, #f0f2ff 100%);
+  gap: 0;
+}
 
-  .dashboard-pipeline {
-    width: 25%;
-    background-color: $cinza-claro;
-    padding: 1rem;
+// Pipeline sidebar
+.dashboard-pipeline {
+  width: 260px;
+  min-width: 260px;
+  background: $branco;
+  border-right: 1px solid rgba($roxo-claro, 0.6);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 12px rgba($roxo-escuro, 0.04);
+
+  .pipeline-header {
     display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    border-right: 1px solid $roxo-claro;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba($roxo-claro, 0.4);
+
+    mat-icon {
+      color: $roxo-medio;
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+
+    span {
+      font-size: 15px;
+      font-weight: 700;
+      color: $roxo-escuro;
+      letter-spacing: 0.3px;
+    }
   }
 
-  .dashboard-execucoes {
-    width: 75%;
-    background-color: $branco;
-    padding: 1rem;
+  .pipeline-content {
+    flex: 1;
     overflow-y: auto;
+    padding: 12px;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $roxo-claro;
+      border-radius: 4px;
+    }
   }
 }
 
+// Main content
+.dashboard-execucoes {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+// Responsive
 @media (max-width: 1024px) {
   .dashboard {
     flex-direction: column;
     min-height: auto;
+  }
 
-    .dashboard-pipeline,
-    .dashboard-execucoes {
-      width: 100%;
-    }
-
-    .dashboard-pipeline {
-      border-right: none;
-      border-bottom: 1px solid $roxo-claro;
-    }
+  .dashboard-pipeline {
+    width: 100%;
+    min-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba($roxo-claro, 0.6);
+    max-height: 300px;
   }
 }

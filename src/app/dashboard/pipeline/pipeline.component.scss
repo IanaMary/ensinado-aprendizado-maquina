@@ -1,43 +1,97 @@
 @use '../dashboard.component' as *;
 
-.container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  overflow: auto;
+.pipeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
 
-  .container-interno {
+.pipeline-section {
+  background: $cinza-claro;
+  border-radius: 10px;
+  padding: 10px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: darken($cinza-claro, 2%);
+  }
+
+  .section-label {
     display: flex;
-    flex-direction: column;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-between;
-    height: 100%;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
 
-    .bloco {
-      padding: 20px;
-      border-bottom: 2px solid $preto;
-      width: 100%;
-
-    }
-
-    .bloco:last-child {
-      padding: 20px;
-      gap: 8px;
+    .step-number {
+      width: 22px;
+      height: 22px;
+      background: $roxo-medio;
+      color: $branco;
+      border-radius: 50%;
       display: flex;
-      align-items: flex-end;
-      justify-content: flex-end;
-      border-bottom: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
     }
 
-
+    span {
+      font-size: 12px;
+      font-weight: 600;
+      color: $roxo-escuro;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
   }
 }
 
+.pipeline-actions {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba($roxo-claro, 0.5);
+  display: flex;
+  gap: 8px;
 
-.linha {
-  border-top: 2px solid $preto;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &.btn-secondary {
+      background: $branco;
+      color: $roxo-medio;
+      border: 1px solid $roxo-claro;
+
+      &:hover {
+        background: $roxo-fundo;
+        border-color: $roxo-medio;
+      }
+    }
+
+    &.btn-danger {
+      background: rgba($erro, 0.1);
+      color: $erro;
+
+      &:hover {
+        background: rgba($erro, 0.2);
+      }
+    }
+  }
 }
