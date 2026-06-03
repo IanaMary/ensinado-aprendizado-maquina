@@ -1,30 +1,80 @@
-<div class="box-principal">
-  <div class="box">
-    <div class="box-linha titulo-principal-modal">
-      login
+<div class="login-page">
+  <!-- Left side - Branding -->
+  <div class="login-branding">
+    <div class="branding-content">
+      <div class="logo-container">
+        <div class="logo-icon">IA</div>
+        <h1 class="logo-text">Iana</h1>
+      </div>
+      <p class="branding-subtitle">Plataforma de Ensino de Machine Learning</p>
+      <div class="branding-features">
+        <div class="feature-item">
+          <mat-icon>school</mat-icon>
+          <span>Aprenda na prática com pipelines interativos</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>psychology</mat-icon>
+          <span>Tutor contextual para cada etapa</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>analytics</mat-icon>
+          <span>Métricas e visualizações em tempo real</span>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <form [formGroup]="loginForm" class="box-linha">
-      <mat-form-field appearance="outline" class="campos">
-        <mat-label>Email</mat-label>
-        <input [(ngModel)]="email" matInput placeholder="pat@example.com" formControlName="email">
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="campos">
-        <mat-label>Enter your password</mat-label>
-        <input [(ngModel)]="senha" formControlName="senha" matInput [type]="hide ? 'password' : 'text'">
-        <button class="botao-icone " matSuffix (click)="hide = !hide">
-          <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+  <!-- Right side - Login Form -->
+  <div class="login-form-section">
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Bem-vindo de volta</h2>
+        <p>Entre com suas credenciais para acessar a plataforma</p>
+      </div>
+
+      <form [formGroup]="loginForm" class="login-form">
+        <div class="field-group">
+          <label class="field-label">Email</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">email</mat-icon>
+            <input 
+              [(ngModel)]="email" 
+              formControlName="email" 
+              matInput 
+              placeholder="seu@email.com"
+              class="form-input">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Senha</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">lock</mat-icon>
+            <input 
+              [(ngModel)]="senha" 
+              formControlName="senha" 
+              matInput 
+              [type]="hide ? 'password' : 'text'"
+              placeholder="Sua senha"
+              class="form-input">
+            <button class="btn-toggle-password" matSuffix (click)="hide = !hide">
+              <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <button (click)="entrar()" class="btn-login" [disabled]="!loginForm.valid">
+          <mat-icon>login</mat-icon>
+          Entrar
         </button>
-      </mat-form-field>
-    </form>
+      </form>
 
-    <div class="box-linha">
-      <button (click)="entrar()" class="botao-principal">
-        ENTRAR
-      </button>
-      <button (click)="cadastroUsuario()" class="botao-principal">
-        CRIAR UM USUÁRIO
-      </button>
+      <div class="form-footer">
+        <p>Não tem uma conta?</p>
+        <button (click)="cadastroUsuario()" class="btn-register">
+          Criar conta
+        </button>
+      </div>
     </div>
   </div>
 </div>

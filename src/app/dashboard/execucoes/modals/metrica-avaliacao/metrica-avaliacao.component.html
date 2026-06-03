@@ -38,36 +38,49 @@
         </div>
 
         <div class="confusion-wrapper">
-          <div class="confusion-matrix" [style.grid-template-columns]="'repeat(' + (resultadosDasAvaliacoes[metrica][modelo].classes.length + 1) + ', 1fr)'">
-            <!-- Header: classes previstas -->
-            <div class="cm-cell cm-corner">
-              <span class="cm-label-real">Real</span>
-              <span class="cm-label-sep">/</span>
-              <span class="cm-label-prev">Prev</span>
-            </div>
-            <div *ngFor="let classe of resultadosDasAvaliacoes[metrica][modelo].classes; let c = index"
-              class="cm-cell cm-header-col">
-              {{ classe }}
+          <div class="confusion-matrix-container">
+            <!-- Label "Previsto" acima -->
+            <div class="cm-label-previsto">
+              <span>Previsto</span>
             </div>
 
-            <!-- Linhas da matriz -->
-            <ng-container *ngFor="let linha of resultadosDasAvaliacoes[metrica][modelo].matriz; let i = index">
-              <!-- Label da classe real -->
-              <div class="cm-cell cm-header-row">
-                {{ resultadosDasAvaliacoes[metrica][modelo].classes[i] }}
+            <!-- Header das colunas (classes previstas) -->
+            <div class="cm-header-row-container">
+              <div class="cm-corner-empty"></div>
+              <div *ngFor="let classe of resultadosDasAvaliacoes[metrica][modelo].classes"
+                class="cm-cell cm-header-col">
+                {{ classe }}
               </div>
-              <!-- Células -->
-              <div *ngFor="let valor of linha; let j = index"
-                class="cm-cell cm-data"
-                [class.cm-diagonal]="i === j"
-                [class.cm-erro]="i !== j"
-                [style.background-color]="getCellColor(valor, resultadosDasAvaliacoes[metrica][modelo].total, i === j)"
-                [style.color]="getCellTextColor(valor, resultadosDasAvaliacoes[metrica][modelo].total, i === j)"
-                [matTooltip]="getCellTooltip(i, j, valor, resultadosDasAvaliacoes[metrica][modelo].classes)"
-                matTooltipPosition="above">
-                {{ valor }}
+            </div>
+
+            <!-- Linhas da matriz com label "Real" -->
+            <div class="cm-body">
+              <!-- Label "Real" na lateral -->
+              <div class="cm-label-real">
+                <span>Real</span>
               </div>
-            </ng-container>
+
+              <!-- Grid da matriz -->
+              <div class="cm-grid" [style.grid-template-columns]="'repeat(' + resultadosDasAvaliacoes[metrica][modelo].classes.length + ', 1fr)'">
+                <ng-container *ngFor="let linha of resultadosDasAvaliacoes[metrica][modelo].matriz; let i = index">
+                  <!-- Classe real (label da linha) -->
+                  <div class="cm-cell cm-header-row">
+                    {{ resultadosDasAvaliacoes[metrica][modelo].classes[i] }}
+                  </div>
+                  <!-- Células de dados -->
+                  <div *ngFor="let valor of linha; let j = index"
+                    class="cm-cell cm-data"
+                    [class.cm-diagonal]="i === j"
+                    [class.cm-erro]="i !== j"
+                    [style.background-color]="getCellColor(valor, resultadosDasAvaliacoes[metrica][modelo].total, i === j)"
+                    [style.color]="getCellTextColor(valor, resultadosDasAvaliacoes[metrica][modelo].total, i === j)"
+                    [matTooltip]="getCellTooltip(i, j, valor, resultadosDasAvaliacoes[metrica][modelo].classes)"
+                    matTooltipPosition="above">
+                    {{ valor }}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
           </div>
 
           <!-- Legenda -->
