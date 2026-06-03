@@ -1,0 +1,217 @@
+@use '../../../../../styles/colores.scss' as *;
+
+.dialog-container {
+  max-width: 700px;
+  width: 100%;
+}
+
+.dialog-header {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid $cinza-claro;
+  position: relative;
+
+  h3 {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: $roxo-escuro;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: $cinza-medio;
+  }
+
+  .btn-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: $cinza-medio;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s;
+
+    &:hover {
+      background: $cinza-claro;
+      color: $cinza-escuro;
+    }
+  }
+}
+
+.dialog-filters {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px;
+  border-bottom: 1px solid $cinza-claro;
+
+  .filter-btn {
+    padding: 6px 16px;
+    border: 1px solid $cinza-claro;
+    border-radius: 20px;
+    background: $branco;
+    color: $cinza-escuro;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: $roxo-claro;
+    }
+
+    &.active {
+      background: $roxo-medio;
+      color: $branco;
+      border-color: $roxo-medio;
+    }
+
+    &.classificacao.active {
+      background: $roxo-medio;
+      border-color: $roxo-medio;
+    }
+
+    &.regressao.active {
+      background: $sucesso;
+      border-color: $sucesso;
+    }
+  }
+}
+
+.dialog-content {
+  padding: 16px 24px 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $roxo-claro;
+    border-radius: 4px;
+  }
+}
+
+.dataset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.dataset-card {
+  background: $branco;
+  border: 2px solid $cinza-claro;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $roxo-claro;
+    box-shadow: 0 4px 12px rgba($roxo-escuro, 0.08);
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    border-color: $roxo-medio;
+    background: $roxo-fundo;
+  }
+
+  .card-header {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+
+    .fonte-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+
+      &.sklearn {
+        background: #FFE0B2;
+        color: #E65100;
+      }
+
+      &.uci {
+        background: #E3F2FD;
+        color: #1565C0;
+      }
+    }
+
+    .tipo-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+
+      &.classificacao {
+        background: $roxo-fundo;
+        color: $roxo-medio;
+      }
+
+      &.regressao {
+        background: #E8F5E9;
+        color: #2E7D32;
+      }
+    }
+  }
+
+  h4 {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: $roxo-escuro;
+  }
+
+  p {
+    margin: 0 0 10px 0;
+    font-size: 11px;
+    color: $cinza-medio;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: $cinza-medio;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+}
+
+.dialog-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 12px;
+
+  span {
+    font-size: 13px;
+    color: $cinza-medio;
+  }
+}

@@ -1,7 +1,9 @@
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { Component, Input, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../../services/dashboard.service';
 import { ItemPipeline } from '../../../models/item-coleta-dado.model';
+import { ToyDatasetsDialogComponent } from './toy-datasets-dialog/toy-datasets-dialog.component';
 
 @Component({
   selector: 'app-coleta-de-dados',
@@ -13,18 +15,18 @@ export class ColetaDeDadosComponent implements OnInit {
 
   itens: ItemPipeline[] = [];
 
-
-  constructor(private dashboardService: DashboardService) { }
+  constructor(
+    private dashboardService: DashboardService,
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit() {
-
     this.dashboardService.getItensColetasDados()
       .subscribe((itens: ItemPipeline[]) => {
         this.itens = itens;
       });
   }
 
-  // Manipulando o evento de soltar
   onItemDropped(event: any) {
     const item = event.item.data;
     event.item.data.movido = true;
@@ -37,4 +39,18 @@ export class ColetaDeDadosComponent implements OnInit {
     this.dashboardService.emitInfoItemClicked(item);
   }
 
+  abrirDialogDatasets() {
+    const dialogRef = this.dialog.open(ToyDatasetsDialogComponent, {
+      width: '750px',
+      maxWidth: '90vw',
+      panelClass: 'toy-datasets-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe((resultado: any) => {
+      if (resultado) {
+        // Emite o resultado como se fosse um item de coleta selecionado
+        this.dashboardService.emitirResultadoDataset(resultado);
+      }
+    });
+  }
 }

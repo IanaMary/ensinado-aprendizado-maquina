@@ -68,6 +68,13 @@ export class DashboardService {
     return this.http.get<any>(`${this.url}toy_datasets/${nome}`);
   }
 
+  private resultadoDataset = new Subject<any>();
+  resultadoDataset$ = this.resultadoDataset.asObservable();
+
+  emitirResultadoDataset(resultado: any) {
+    this.resultadoDataset.next(resultado);
+  }
+
   // SERVIÇOS COM LIGAÇÃO COM BANCO 
 
   getTutor(params: any) {

@@ -1,0 +1,50 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h3>Datasets Prontos</h3>
+    <p>Selecione um dataset para carregar automaticamente</p>
+    <button class="btn-close" (click)="fechar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-filters">
+    <button class="filter-btn" [class.active]="filtroTipo === ''" (click)="filtroTipo = ''">
+      Todos
+    </button>
+    <button class="filter-btn classificacao" [class.active]="filtroTipo === 'classificacao'" (click)="filtroTipo = 'classificacao'">
+      Classificação
+    </button>
+    <button class="filter-btn regressao" [class.active]="filtroTipo === 'regressao'" (click)="filtroTipo = 'regressao'">
+      Regressão
+    </button>
+  </div>
+
+  <div class="dialog-content" *ngIf="!carregando">
+    <div class="dataset-grid">
+      <div *ngFor="let ds of datasetsFiltrados"
+           class="dataset-card"
+           [class.selected]="datasetSelecionado === ds.valor"
+           (click)="selecionarDataset(ds)">
+        <div class="card-header">
+          <span class="fonte-badge" [class.sklearn]="ds.fonte === 'sklearn'" [class.uci]="ds.fonte === 'uci'">
+            {{ ds.fonte === 'sklearn' ? 'sklearn' : 'UCI' }}
+          </span>
+          <span class="tipo-badge" [class.classificacao]="ds.tipo === 'classificacao'" [class.regressao]="ds.tipo === 'regressao'">
+            {{ ds.tipo === 'classificacao' ? 'Classificação' : 'Regressão' }}
+          </span>
+        </div>
+        <h4>{{ ds.nome }}</h4>
+        <p>{{ ds.descricao }}</p>
+        <div class="card-meta">
+          <span><mat-icon>dataset</mat-icon> {{ ds.n_amostras | number }}</span>
+          <span><mat-icon>grid_view</mat-icon> {{ ds.n_features }} features</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-loading" *ngIf="carregando">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Carregando dataset...</span>
+  </div>
+</div>

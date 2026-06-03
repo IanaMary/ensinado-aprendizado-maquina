@@ -222,3 +222,39 @@
     border-color: rgba($roxo-claro, 0.5);
   }
 }
+
+// Botao de datasets prontos
+.btn-toy-datasets {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, $roxo-fundo, rgba($roxo-claro, 0.3));
+  border: 2px dashed $roxo-claro;
+  border-radius: 8px;
+  color: $roxo-medio;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 4px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: $roxo-fundo;
+    border-color: $roxo-medio;
+    color: $roxo-escuro;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($roxo-medio, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

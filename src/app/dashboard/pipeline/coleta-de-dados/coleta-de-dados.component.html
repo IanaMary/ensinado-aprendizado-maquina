@@ -20,4 +20,10 @@
     <span class="item-label">{{ item.label }}</span>
     <mat-icon class="btn-info-sidebar" (click)="onInfoClick(item, $event)">info_outline</mat-icon>
   </nav>
+
+  <!-- Botao para datasets prontos -->
+  <button class="btn-toy-datasets" (click)="abrirDialogDatasets()">
+    <mat-icon>science</mat-icon>
+    <span>Datasets Prontos</span>
+  </button>
 </nav>
