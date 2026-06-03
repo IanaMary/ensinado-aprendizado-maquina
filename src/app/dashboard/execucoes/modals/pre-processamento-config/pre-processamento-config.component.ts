@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { ItemPipeline, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
-import tutor from '../../../../constants/tutor.json';
+import { DashboardService } from '../../../services/dashboard.service';
 
 export interface PreProcessamentoConfig {
   itens: { valor: string; label: string; colunas: string[] }[];
@@ -12,17 +12,22 @@ export interface PreProcessamentoConfig {
   styleUrls: ['./pre-processamento-config.component.scss'],
   standalone: false
 })
-export class PreProcessamentoConfigComponent {
+export class PreProcessamentoConfigComponent implements OnInit {
   @Input() resultadoColetaDado?: ResultadoColetaDado;
   @Output() preProcessamentoModificado = new EventEmitter<PreProcessamentoConfig>();
 
-  tutor = tutor;
   itensDisponiveis: any[] = [];
   itensSelecionados: any[] = [];
   colunas: string[] = [];
 
+  constructor(private dashboardService: DashboardService) {}
+
   ngOnInit() {
     this.carregarItensPreProcessamento();
+    this.carregarColunas();
+  }
+
+  carregarColunas() {
     if (this.resultadoColetaDado?.colunas) {
       this.colunas = this.resultadoColetaDado.colunas.filter(
         c => c !== this.resultadoColetaDado?.target
@@ -31,8 +36,9 @@ export class PreProcessamentoConfigComponent {
   }
 
   carregarItensPreProcessamento() {
-    const itens = (tutor as any).itensPreProcessamento || [];
-    this.itensDisponiveis = [...itens];
+    this.dashboardService.getItensPreProcessamento().subscribe(itens => {
+      this.itensDisponiveis = [...itens];
+    });
   }
 
   adicionarItem(item: any) {
