@@ -208,12 +208,16 @@ export class ScriptGeneratorService {
         : 'todas as colunas numéricas';
       
       lines.push(`# ${item.label} nas colunas: ${cols}`);
+      const colsList = item.colunas && item.colunas.length > 0 
+        ? `[${item.colunas.map((c: string) => `"${c}"`).join(', ')}]` 
+        : '';
+      
       switch (item.valor) {
         case 'standard_scaler':
           lines.push(`scaler = StandardScaler()`);
-          if (item.colunas && item.colunas.length > 0) {
-            lines.push(`X_train[${[item.colunas]}] = scaler.fit_transform(X_train[${[item.colunas]}])`);
-            lines.push(`X_test[${[item.colunas]}] = scaler.transform(X_test[${[item.colunas]}])`);
+          if (colsList) {
+            lines.push(`X_train${colsList} = scaler.fit_transform(X_train${colsList})`);
+            lines.push(`X_test${colsList} = scaler.transform(X_test${colsList})`);
           } else {
             lines.push(`X_train = scaler.fit_transform(X_train)`);
             lines.push(`X_test = scaler.transform(X_test)`);
@@ -221,9 +225,9 @@ export class ScriptGeneratorService {
           break;
         case 'min_max_scaler':
           lines.push(`scaler = MinMaxScaler()`);
-          if (item.colunas && item.colunas.length > 0) {
-            lines.push(`X_train[${[item.colunas]}] = scaler.fit_transform(X_train[${[item.colunas]}])`);
-            lines.push(`X_test[${[item.colunas]}] = scaler.transform(X_test[${[item.colunas]}])`);
+          if (colsList) {
+            lines.push(`X_train${colsList} = scaler.fit_transform(X_train${colsList})`);
+            lines.push(`X_test${colsList} = scaler.transform(X_test${colsList})`);
           } else {
             lines.push(`X_train = scaler.fit_transform(X_train)`);
             lines.push(`X_test = scaler.transform(X_test)`);
@@ -231,9 +235,9 @@ export class ScriptGeneratorService {
           break;
         case 'robust_scaler':
           lines.push(`scaler = RobustScaler()`);
-          if (item.colunas && item.colunas.length > 0) {
-            lines.push(`X_train[${[item.colunas]}] = scaler.fit_transform(X_train[${[item.colunas]}])`);
-            lines.push(`X_test[${[item.colunas]}] = scaler.transform(X_test[${[item.colunas]}])`);
+          if (colsList) {
+            lines.push(`X_train${colsList} = scaler.fit_transform(X_train${colsList})`);
+            lines.push(`X_test${colsList} = scaler.transform(X_test${colsList})`);
           } else {
             lines.push(`X_train = scaler.fit_transform(X_train)`);
             lines.push(`X_test = scaler.transform(X_test)`);
@@ -257,9 +261,9 @@ export class ScriptGeneratorService {
           break;
         case 'simple_imputer':
           lines.push(`imputer = SimpleImputer(strategy='mean')`);
-          if (item.colunas && item.colunas.length > 0) {
-            lines.push(`X_train[${[item.colunas]}] = imputer.fit_transform(X_train[${[item.colunas]}])`);
-            lines.push(`X_test[${[item.colunas]}] = imputer.transform(X_test[${[item.colunas]}])`);
+          if (colsList) {
+            lines.push(`X_train${colsList} = imputer.fit_transform(X_train${colsList})`);
+            lines.push(`X_test${colsList} = imputer.transform(X_test${colsList})`);
           } else {
             lines.push(`X_train = imputer.fit_transform(X_train)`);
             lines.push(`X_test = imputer.transform(X_test)`);
