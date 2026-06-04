@@ -68,6 +68,13 @@ export class ShellComponent implements OnInit, OnDestroy {
     this.router.navigate([route]);
   }
 
+  abrirManual(): void {
+    // Abrir manual baseado no role do usuário
+    this.router.navigate(['/manual'], { 
+      queryParams: { tipo: this.userRole } 
+    });
+  }
+
   logout(): void {
     this.authService.logout();
   }

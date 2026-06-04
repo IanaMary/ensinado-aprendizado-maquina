@@ -51,6 +51,10 @@
         <app-breadcrumb></app-breadcrumb>
       </div>
       <div class="topbar-right">
+        <button class="manual-btn" (click)="abrirManual()" matTooltip="Manual">
+          <mat-icon>help_outline</mat-icon>
+          <span>Manual</span>
+        </button>
         <span class="user-name-mobile">{{ userName }}</span>
         <button class="icon-btn" (click)="logout()">
           <mat-icon>logout</mat-icon>

@@ -1,0 +1,227 @@
+<div class="gerenciar-usuarios-container">
+  <!-- Header -->
+  <div class="usuarios-header">
+    <div class="header-info">
+      <h1>Gerenciar Usuários</h1>
+      <p>Crie usuários e envie convites por email</p>
+    </div>
+    <button class="btn-novo" (click)="abrirFormulario()">
+      <mat-icon>person_add</mat-icon>
+      Novo Usuário
+    </button>
+  </div>
+
+  <!-- Formulario de Criacao -->
+  <div class="formulario-container" *ngIf="mostrarFormulario">
+    <div class="formulario-header">
+      <h2>
+        <mat-icon>person_add</mat-icon>
+        Criar Novo Usuário
+      </h2>
+      <button class="btn-fechar" (click)="fecharFormulario()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <form [formGroup]="formUsuario" (ngSubmit)="enviarConvite()" class="form-usuario">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nome">Nome Completo *</label>
+          <input id="nome" 
+                 type="text" 
+                 formControlName="nome" 
+                 placeholder="Ex: João Silva"
+                 [class.error]="formUsuario.get('nome')?.touched && formUsuario.get('nome')?.invalid">
+          <span class="erro" *ngIf="formUsuario.get('nome')?.touched && formUsuario.get('nome')?.invalid">
+            {{ getErroCampo('nome') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input id="email" 
+                 type="email" 
+                 formControlName="email" 
+                 placeholder="Ex: joao@email.com"
+                 [class.error]="formUsuario.get('email')?.touched && formUsuario.get('email')?.invalid">
+          <span class="erro" *ngIf="formUsuario.get('email')?.touched && formUsuario.get('email')?.invalid">
+            {{ getErroCampo('email') }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tipo">Tipo de Usuário *</label>
+          <select id="tipo" formControlName="tipo">
+            <option value="aluno">Aluno</option>
+            <option value="professor">Professor</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-info">
+        <mat-icon>info</mat-icon>
+        <span>Um email de convite será enviado para o usuário criar sua senha no primeiro acesso.</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancelar" (click)="fecharFormulario()">Cancelar</button>
+        <button type="submit" class="btn-enviar" [disabled]="enviandoConvite || formUsuario.invalid">
+          <mat-spinner *ngIf="enviandoConvite" diameter="20"></mat-spinner>
+          <mat-icon *ngIf="!enviandoConvite">send</mat-icon>
+          {{ enviandoConvite ? 'Enviando...' : 'Enviar Convite' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Filtros e Busca -->
+  <div class="filtros-container">
+    <div class="busca">
+      <mat-icon>search</mat-icon>
+      <input type="text" 
+             [(ngModel)]="termoBusca" 
+             placeholder="Buscar por nome ou email...">
+    </div>
+    
+    <div class="filtros-grupo">
+      <div class="filtro-tipo">
+        <button *ngFor="let tipo of ['todos', 'aluno', 'professor', 'admin']"
+                [class.active]="filtroTipo === tipo"
+                (click)="filtroTipo = tipo">
+          {{ tipo === 'todos' ? 'Todos' : getTipoLabel(tipo) }}
+        </button>
+      </div>
+      
+      <div class="filtro-status">
+        <button *ngFor="let status of ['todos', 'ativo', 'pendente', 'inativo']"
+                [class.active]="filtroStatus === status"
+                (click)="filtroStatus = status">
+          {{ status === 'todos' ? 'Todos' : getStatusLabel(status) }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estatisticas -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <mat-icon>people</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{ usuarios.length }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>check_circle</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{ getUsuariosPorStatus('ativo').length }}</span>
+        <span class="stat-label">Ativos</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>pending</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{ getUsuariosPorStatus('pendente').length }}</span>
+        <span class="stat-label">Pendentes</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>school</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{ getUsuariosPorTipo('aluno').length }}</span>
+        <span class="stat-label">Alunos</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>person</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{ getUsuariosPorTipo('professor').length }}</span>
+        <span class="stat-label">Professores</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="carregando">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Carregando usuários...</span>
+  </div>
+
+  <!-- Tabela de Usuarios -->
+  <div class="tabela-container" *ngIf="!carregando">
+    <table class="usuarios-table">
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Tipo</th>
+          <th>Status</th>
+          <th>Convite</th>
+          <th>Último Acesso</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuariosFiltrados" [class.pendente]="usuario.status === 'pendente'">
+          <td class="usuario-cell">
+            <div class="usuario-avatar">
+              <mat-icon>{{ getTipoIcon(usuario.tipo) }}</mat-icon>
+            </div>
+            <div class="usuario-info">
+              <span class="usuario-nome">{{ usuario.nome }}</span>
+              <span class="usuario-email">{{ usuario.email }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="tipo-badge" [attr.data-tipo]="usuario.tipo">
+              {{ getTipoLabel(usuario.tipo) }}
+            </span>
+          </td>
+          <td>
+            <span class="status-badge" [attr.data-status]="usuario.status">
+              <mat-icon>{{ getStatusIcon(usuario.status) }}</mat-icon>
+              {{ getStatusLabel(usuario.status) }}
+            </span>
+          </td>
+          <td>{{ getDataFormatada(usuario.dataConvite) }}</td>
+          <td>{{ getDataFormatada(usuario.ultimoAcesso) }}</td>
+          <td class="acoes-cell">
+            <button *ngIf="usuario.status === 'pendente'" 
+                    class="btn-acao reenviar" 
+                    (click)="reenviarConvite(usuario)"
+                    matTooltip="Reenviar convite">
+              <mat-icon>mail</mat-icon>
+            </button>
+            <button *ngIf="usuario.status === 'ativo'" 
+                    class="btn-acao desativar" 
+                    (click)="alterarStatus(usuario, 'inativo')"
+                    matTooltip="Desativar usuário">
+              <mat-icon>block</mat-icon>
+            </button>
+            <button *ngIf="usuario.status === 'inativo'" 
+                    class="btn-acao ativar" 
+                    (click)="alterarStatus(usuario, 'ativo')"
+                    matTooltip="Ativar usuário">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+            <button class="btn-acao excluir" 
+                    (click)="excluirUsuario(usuario)"
+                    matTooltip="Excluir usuário">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Estado vazio -->
+  <div class="estado-vazio" *ngIf="!carregando && usuariosFiltrados.length === 0">
+    <mat-icon>people_outline</mat-icon>
+    <h3>Nenhum usuário encontrado</h3>
+    <p *ngIf="termoBusca">Tente buscar com outros termos</p>
+    <p *ngIf="!termoBusca">Crie um novo usuário clicando no botão acima</p>
+  </div>
+</div>

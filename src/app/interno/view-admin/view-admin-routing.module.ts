@@ -25,6 +25,11 @@ const routes: Routes = [
     path: 'conf-tutor',
     component: ConfTutorComponent,
     data: { breadcrumb: 'Config Tutor' }
+  },
+  {
+    path: 'usuarios',
+    loadChildren: () => import('./gerenciar-usuarios/gerenciar-usuarios.module').then(m => m.GerenciarUsuariosModule),
+    data: { breadcrumb: 'Gerenciar Usuários' }
   }
 ];
 

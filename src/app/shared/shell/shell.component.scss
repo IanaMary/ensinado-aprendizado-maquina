@@ -330,6 +330,32 @@ $transition-speed: 0.3s;
     align-items: center;
     gap: 16px;
 
+    .manual-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: rgba($roxo-medio, 0.08);
+      border: 1px solid rgba($roxo-medio, 0.15);
+      border-radius: 8px;
+      color: $roxo-medio;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      &:hover {
+        background: rgba($roxo-medio, 0.15);
+        border-color: rgba($roxo-medio, 0.3);
+      }
+    }
+
     .user-name-mobile {
       display: none;
       font-size: 14px;

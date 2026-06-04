@@ -1,0 +1,50 @@
+<div class="manual-container" *ngIf="manualAtual">
+  <!-- Header -->
+  <div class="manual-header">
+    <div class="header-left">
+      <button class="btn-voltar" (click)="voltar()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-info">
+        <div class="header-icon">
+          <mat-icon>{{ manualAtual.icone }}</mat-icon>
+        </div>
+        <div>
+          <h1>{{ manualAtual.titulo }}</h1>
+          <p>{{ manualAtual.descricao }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tabs de Tipo de Usuário -->
+    <div class="tipo-tabs">
+      <button *ngFor="let tipo of ['aluno', 'professor', 'admin']"
+              [class.active]="manualAtual.tipo === tipo"
+              (click)="selecionarManual(tipo)">
+        <mat-icon>{{ tipo === 'aluno' ? 'school' : tipo === 'professor' ? 'person' : 'admin_panel_settings' }}</mat-icon>
+        {{ tipo === 'aluno' ? 'Aluno' : tipo === 'professor' ? 'Professor' : 'Admin' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Conteúdo -->
+  <div class="manual-content">
+    <!-- Sidebar com seções -->
+    <nav class="manual-sidebar">
+      <h3>Conteúdo</h3>
+      <ul class="secoes-lista">
+        <li *ngFor="let secao of manualAtual.secoes"
+            [class.active]="secaoAtiva === secao.id"
+            (click)="selecionarSecao(secao.id)">
+          <mat-icon>{{ secao.icone }}</mat-icon>
+          <span>{{ secao.titulo }}</span>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Área principal -->
+    <main class="manual-main">
+      <div class="conteudo-secao" [innerHTML]="getConteudoSecaoAtiva()"></div>
+    </main>
+  </div>
+</div>

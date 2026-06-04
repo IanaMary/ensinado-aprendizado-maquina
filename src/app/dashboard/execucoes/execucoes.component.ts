@@ -7,6 +7,8 @@ import { TutorContexto } from '../tutor/tutor.component';
 import { Subject, takeUntil } from 'rxjs';
 import tutor from '../../constants/tutor.json';
 import { ScriptGeneratorService } from '../../service/script-generator.service';
+import { PipelineService, PipelineState } from '../../service/pipeline.service';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -45,7 +47,9 @@ export class ExecucoesComponent implements OnInit {
   constructor(
     private dashboardService: DashboardService,
     public dialog: MatDialog,
-    private scriptGenerator: ScriptGeneratorService
+    private scriptGenerator: ScriptGeneratorService,
+    private pipelineService: PipelineService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -79,6 +83,13 @@ export class ExecucoesComponent implements OnInit {
           this.processarDatasetSelecionado(resultado);
         }
       });
+
+    // Verificar se ha um pipeline para carregar
+    this.route.queryParams.subscribe(params => {
+      if (params['pipeline']) {
+        this.carregarPipeline(params['pipeline']);
+      }
+    });
   }
 
 
@@ -475,6 +486,37 @@ export class ExecucoesComponent implements OnInit {
       {},
       this.preProcessamentoConfig
     );
+  }
+
+  carregarPipeline(id: string): void {
+    this.pipelineService.carregarPipeline(id).subscribe(pipeline => {
+      if (pipeline) {
+        this.resultadoColetaDado = pipeline.resultadoColetaDado;
+        this.modeloSelecionado = pipeline.modeloSelecionado;
+        this.metricasSelecionadas = pipeline.metricasSelecionadas || [];
+        this.preProcessamentoConfig = pipeline.preProcessamentoConfig;
+        this.resultadoTreinamento = pipeline.resultadoTreinamento;
+        this.resultadosDasAvaliacoes = pipeline.resultadosDasAvaliacoes;
+        this.atualizarTutorContexto();
+      }
+    });
+  }
+
+  salvarPipeline(): void {
+    const state: PipelineState = {
+      nome: 'Meu Pipeline',
+      resultadoColetaDado: this.resultadoColetaDado,
+      modeloSelecionado: this.modeloSelecionado,
+      metricasSelecionadas: this.metricasSelecionadas,
+      preProcessamentoConfig: this.preProcessamentoConfig,
+      resultadoTreinamento: this.resultadoTreinamento,
+      resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
+    };
+
+    this.pipelineService.salvarPipeline(state).subscribe(() => {
+      // Feedback visual
+      console.log('Pipeline salvo com sucesso');
+    });
   }
 
   atualizarTutorContexto(): void {
