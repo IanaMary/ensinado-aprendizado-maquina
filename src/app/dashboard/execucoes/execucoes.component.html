@@ -6,9 +6,21 @@
       <p>Arraste os itens do pipeline ou clique para executar</p>
     </div>
     <div class="header-actions">
+      <button class="btn-nav" (click)="navegarParaProjetos()" matTooltip="Meus Projetos">
+        <mat-icon>folder</mat-icon>
+        <span>Meus Projetos</span>
+      </button>
+      <button class="btn-nav" (click)="navegarParaGaleria()" matTooltip="Galeria de Pipelines">
+        <mat-icon>explore</mat-icon>
+        <span>Galeria</span>
+      </button>
       <button class="btn-download" (click)="baixarPipeline()" [disabled]="!modeloSelecionado">
         <mat-icon>download</mat-icon>
         Baixar Pipeline
+      </button>
+      <button class="btn-salvar" (click)="salvarPipeline()">
+        <mat-icon>save</mat-icon>
+        Salvar
       </button>
       <button class="btn-clear" (click)="limparSessao()">
         <mat-icon>delete_outline</mat-icon>

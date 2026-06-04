@@ -8,7 +8,7 @@ import { Subject, takeUntil } from 'rxjs';
 import tutor from '../../constants/tutor.json';
 import { ScriptGeneratorService } from '../../service/script-generator.service';
 import { PipelineService, PipelineState } from '../../service/pipeline.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 @Component({
@@ -49,7 +49,8 @@ export class ExecucoesComponent implements OnInit {
     public dialog: MatDialog,
     private scriptGenerator: ScriptGeneratorService,
     private pipelineService: PipelineService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -517,6 +518,22 @@ export class ExecucoesComponent implements OnInit {
       // Feedback visual
       console.log('Pipeline salvo com sucesso');
     });
+  }
+
+  navegarParaProjetos(): void {
+    this.router.navigate(['/view-aluno/projetos']);
+  }
+
+  navegarParaGaleria(): void {
+    this.router.navigate(['/view-aluno/galeria']);
+  }
+
+  navegarParaAdmin(): void {
+    this.router.navigate(['/view-admin']);
+  }
+
+  navegarParaUsuarios(): void {
+    this.router.navigate(['/view-admin/usuarios']);
   }
 
   atualizarTutorContexto(): void {
