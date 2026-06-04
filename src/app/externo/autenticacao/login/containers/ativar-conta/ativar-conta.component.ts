@@ -53,7 +53,7 @@ export class AtivarContaComponent implements OnInit {
   }
 
   verificarToken(): void {
-    this.http.get<any>(`${environment.apiUrl}usuario/convite/${this.token}`).subscribe({
+    this.http.get<any>(`${environment.apiUrl}convite/${this.token}`).subscribe({
       next: (response: any) => {
         this.tokenValido = true;
         this.carregando = false;
@@ -82,8 +82,12 @@ export class AtivarContaComponent implements OnInit {
 
     this.ativandoConta = true;
     const senha = this.formSenha.get('senha')?.value;
+    const confirmarSenha = this.formSenha.get('confirmarSenha')?.value;
 
-    this.http.post<any>(`${environment.apiUrl}usuario/convite/${this.token}/ativar`, { senha }).subscribe({
+    this.http.post<any>(`${environment.apiUrl}convite/${this.token}/ativar`, { 
+      senha: senha,
+      confirmar_senha: confirmarSenha 
+    }).subscribe({
       next: (response: any) => {
         this.ativandoConta = false;
         this.snackBar.open('Conta ativada com sucesso! Faça login para continuar.', 'Fechar', {
