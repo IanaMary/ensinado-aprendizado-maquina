@@ -5,10 +5,16 @@
       <h2>Área de Trabalho</h2>
       <p>Arraste os itens do pipeline ou clique para executar</p>
     </div>
-    <button class="btn-clear" (click)="limparSessao()">
-      <mat-icon>delete_outline</mat-icon>
-      Limpar
-    </button>
+    <div class="header-actions">
+      <button class="btn-download" (click)="baixarPipeline()" [disabled]="!modeloSelecionado">
+        <mat-icon>download</mat-icon>
+        Baixar Pipeline
+      </button>
+      <button class="btn-clear" (click)="limparSessao()">
+        <mat-icon>delete_outline</mat-icon>
+        Limpar
+      </button>
+    </div>
   </div>
 
   <!-- Columns -->

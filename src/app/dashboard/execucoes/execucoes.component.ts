@@ -6,6 +6,7 @@ import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.c
 import { TutorContexto } from '../tutor/tutor.component';
 import { Subject, takeUntil } from 'rxjs';
 import tutor from '../../constants/tutor.json';
+import { ScriptGeneratorService } from '../../service/script-generator.service';
 
 
 @Component({
@@ -43,7 +44,8 @@ export class ExecucoesComponent implements OnInit {
 
   constructor(
     private dashboardService: DashboardService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private scriptGenerator: ScriptGeneratorService
   ) { }
 
   ngOnInit(): void {
@@ -463,6 +465,16 @@ export class ExecucoesComponent implements OnInit {
     this.tutorTheme = 'default';
     this.tutorThemeClass = 'theme-default';
     this.dashboardService.limparItensExecucao();
+  }
+
+  async baixarPipeline(): Promise<void> {
+    await this.scriptGenerator.generatePipelineBundle(
+      this.resultadoColetaDado,
+      this.modeloSelecionado,
+      this.metricasSelecionadas,
+      {},
+      this.preProcessamentoConfig
+    );
   }
 
   atualizarTutorContexto(): void {

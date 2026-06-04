@@ -46,6 +46,42 @@ $metrica-cor-escuro: #E65100;
     }
   }
 
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-download {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba($sucesso, 0.08);
+    color: $sucesso;
+    border: 1px solid rgba($sucesso, 0.2);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover:not(:disabled) {
+      background: rgba($sucesso, 0.15);
+      border-color: rgba($sucesso, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
   .btn-clear {
     display: flex;
     align-items: center;
