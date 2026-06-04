@@ -16,8 +16,7 @@ export class ScriptGeneratorService {
     preProcessamentoConfig?: any
   ): Promise<void> {
     const zip = new JSZip();
-    const folderName = 'pipeline_iana';
-    const folder = zip.folder(folderName)!;
+    const folder = zip.folder('pipeline_iana')!;
 
     // Generate the Python script
     const script = this.generatePythonScript(
@@ -60,7 +59,6 @@ export class ScriptGeneratorService {
     const rows = dados.map(row => 
       headers.map(header => {
         const value = row[header];
-        // Escape commas and quotes in CSV
         if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
           return `"${value.replace(/"/g, '""')}"`;
         }
@@ -139,74 +137,44 @@ export class ScriptGeneratorService {
     lines.push('"""');
     lines.push('');
 
-    // Collect all imports needed
+    // Imports
     const imports = this.collectImports(modeloSelecionado, metricasSelecionadas, preProcessamentoConfig);
     lines.push(imports.join('\n'));
     lines.push('');
 
-    // Data loading
-    lines.push('# ============================================');
-    lines.push('# 1. Carregamento dos Dados');
-    lines.push('# ============================================');
+    // Functions for each pipeline stage
+    lines.push(this.generateDataLoadingFunction());
     lines.push('');
-    lines.push(this.getDataLoading(resultadoColetaDado));
+    lines.push(this.generateFeatureSelectionFunction(resultadoColetaDado));
     lines.push('');
-
-    // Feature selection
-    lines.push('# ============================================');
-    lines.push('# 2. Seleção de Atributos e Target');
-    lines.push('# ============================================');
+    lines.push(this.generatePreprocessingFunction(preProcessamentoConfig));
     lines.push('');
-    lines.push(this.getFeatureSelection(resultadoColetaDado));
+    lines.push(this.generateModelTrainingFunction(modeloSelecionado, hiperparametros));
+    lines.push('');
+    lines.push(this.generateEvaluationFunction(metricasSelecionadas));
     lines.push('');
 
-    // Train/test split
+    // Main execution
     lines.push('# ============================================');
-    lines.push('# 3. Divisão Treino/Teste');
-    lines.push('# ============================================');
-    lines.push('');
-    lines.push(this.getTrainTestSplit(resultadoColetaDado));
-    lines.push('');
-
-    // Preprocessing
-    let stepNum = 4;
-    if (preProcessamentoConfig?.itens?.length > 0) {
-      lines.push('# ============================================');
-      lines.push(`# ${stepNum}. Pré-processamento`);
-      lines.push('# ============================================');
-      lines.push('');
-      lines.push(this.getPreprocessingCode(preProcessamentoConfig.itens));
-      lines.push('');
-      stepNum++;
-    }
-
-    // Model training
-    lines.push('# ============================================');
-    lines.push(`# ${stepNum}. Treinamento do Modelo`);
+    lines.push('# Execução Principal do Pipeline');
     lines.push('# ============================================');
     lines.push('');
-    lines.push(this.getModelTraining(modeloSelecionado, hiperparametros));
+    lines.push('if __name__ == "__main__":');
+    lines.push('    # 1. Carregar dados');
+    lines.push('    train_df, test_df = carregar_dados()');
     lines.push('');
-    stepNum++;
-
-    // Predictions
-    lines.push('# ============================================');
-    lines.push(`# ${stepNum}. Previsões`);
-    lines.push('# ============================================');
+    lines.push('    # 2. Selecionar features e target');
+    lines.push('    X_train, y_train, X_test, y_test = selecionar_features(train_df, test_df)');
     lines.push('');
-    lines.push('y_pred = modelo.predict(X_test)');
+    lines.push('    # 3. Pré-processamento');
+    lines.push('    X_train, X_test = aplicar_preprocessamento(X_train, X_test)');
     lines.push('');
-    stepNum++;
-
-    // Metrics
-    if (metricasSelecionadas.length > 0) {
-      lines.push('# ============================================');
-      lines.push(`# ${stepNum}. Avaliação do Modelo`);
-      lines.push('# ============================================');
-      lines.push('');
-      lines.push(this.getMetricsEvaluation(metricasSelecionadas));
-      lines.push('');
-    }
+    lines.push('    # 4. Treinar modelo');
+    lines.push('    modelo = treinar_modelo(X_train, y_train)');
+    lines.push('');
+    lines.push('    # 5. Avaliar modelo');
+    lines.push('    resultados = avaliar_modelo(modelo, X_test, y_test)');
+    lines.push('');
 
     return lines.join('\n');
   }
@@ -223,32 +191,12 @@ export class ScriptGeneratorService {
 
     // Preprocessing imports
     if (preProcessamentoConfig?.itens?.length > 0) {
-      const preprocessingImports = new Set<string>();
-      for (const item of preProcessamentoConfig.itens) {
-        switch (item.valor) {
-          case 'standard_scaler':
-          case 'min_max_scaler':
-          case 'robust_scaler':
-            preprocessingImports.add('StandardScaler, MinMaxScaler, RobustScaler');
-            break;
-          case 'label_encoder':
-          case 'one_hot_encoder':
-            preprocessingImports.add('LabelEncoder, OneHotEncoder');
-            break;
-          case 'simple_imputer':
-            preprocessingImports.add('SimpleImputer');
-            break;
-        }
-      }
-      for (const imp of preprocessingImports) {
-        if (imp.includes('SimpleImputer')) {
-          imports.push('from sklearn.impute import SimpleImputer');
-        } else if (imp.includes('LabelEncoder')) {
-          imports.push('from sklearn.preprocessing import LabelEncoder, OneHotEncoder');
-        } else {
-          imports.push(`from sklearn.preprocessing import ${imp}`);
-        }
-      }
+      imports.push('from sklearn.preprocessing import (');
+      imports.push('    StandardScaler, MinMaxScaler, RobustScaler, Normalizer,');
+      imports.push('    LabelEncoder, OneHotEncoder, OrdinalEncoder,');
+      imports.push('    PolynomialFeatures, PowerTransformer');
+      imports.push(')');
+      imports.push('from sklearn.impute import SimpleImputer');
     }
 
     // Model import
@@ -303,35 +251,45 @@ export class ScriptGeneratorService {
     return imports[modeloValor] || `# TODO: Import para ${modeloValor}`;
   }
 
-  private getDataLoading(resultado: ResultadoColetaDado | undefined): string {
+  private generateDataLoadingFunction(): string {
     return [
-      '# Carregamento dos dados de treino e teste',
-      'train_df = pd.read_csv("data/treino.csv")',
-      'test_df = pd.read_csv("data/teste.csv")',
-      '',
-      '# Visualizar as primeiras linhas',
-      'print("Dados de treino:")',
-      'print(train_df.head())',
-      'print(f"\\nShape: {train_df.shape}")',
-      '',
-      'print("\\nDados de teste:")',
-      'print(test_df.head())',
-      'print(f"\\nShape: {test_df.shape}")'
+      '# ============================================',
+      '# Função: Carregamento dos Dados',
+      '# ============================================',
+      'def carregar_dados():',
+      '    """Carrega os dados de treino e teste dos arquivos CSV."""',
+      '    train_df = pd.read_csv("data/treino.csv")',
+      '    test_df = pd.read_csv("data/teste.csv")',
+      '    ',
+      '    print("Dados de treino:")',
+      '    print(train_df.head())',
+      '    print(f"Shape: {train_df.shape}")',
+      '    ',
+      '    print("\\nDados de teste:")',
+      '    print(test_df.head())',
+      '    print(f"Shape: {test_df.shape}")',
+      '    ',
+      '    return train_df, test_df'
     ].join('\n');
   }
 
-  private getFeatureSelection(resultado: ResultadoColetaDado | undefined): string {
+  private generateFeatureSelectionFunction(resultado: ResultadoColetaDado | undefined): string {
     if (!resultado?.atributos) {
       return [
-        '# Defina os atributos (features) e o target',
-        'target = "target"  # Substitua pelo nome da coluna alvo',
-        'atributos = [col for col in train_df.columns if col != target]',
-        '',
-        'X_train = train_df[atributos]',
-        'y_train = train_df[target]',
-        '',
-        'X_test = test_df[atributos]',
-        'y_test = test_df[target]'
+        '# ============================================',
+        '# Função: Seleção de Features e Target',
+        '# ============================================',
+        'def selecionar_features(train_df, test_df, target="target"):',
+        '    """Separa features e target dos dados."""',
+        '    atributos = [col for col in train_df.columns if col != target]',
+        '    ',
+        '    X_train = train_df[atributos]',
+        '    y_train = train_df[target]',
+        '    ',
+        '    X_test = test_df[atributos]',
+        '    y_test = test_df[target]',
+        '    ',
+        '    return X_train, y_train, X_test, y_test'
       ].join('\n');
     }
 
@@ -339,131 +297,274 @@ export class ScriptGeneratorService {
     const target = resultado.target;
 
     return [
-      '# Atributos selecionados',
-      `atributos = ${JSON.stringify(atributos)}`,
-      `target = "${target}"`,
-      '',
-      '# Separar features e target',
-      'X_train = train_df[atributos]',
-      'y_train = train_df[target]',
-      '',
-      'X_test = test_df[atributos]',
-      'y_test = test_df[target]'
+      '# ============================================',
+      '# Função: Seleção de Features e Target',
+      '# ============================================',
+      'def selecionar_features(train_df, test_df):',
+      '    """Separa features e target dos dados."""',
+      `    atributos = ${JSON.stringify(atributos)}`,
+      `    target = "${target}"`,
+      '    ',
+      '    X_train = train_df[atributos]',
+      '    y_train = train_df[target]',
+      '    ',
+      '    X_test = test_df[atributos]',
+      '    y_test = test_df[target]',
+      '    ',
+      '    return X_train, y_train, X_test, y_test'
     ].join('\n');
   }
 
-  private getTrainTestSplit(resultado: ResultadoColetaDado | undefined): string {
-    return [
-      '# Os dados já estão divididos em treino e teste nos arquivos CSV',
-      'print(f"Dados de treino: {X_train.shape[0]} amostras")',
-      'print(f"Dados de teste: {X_test.shape[0]} amostras")'
-    ].join('\n');
-  }
-
-  private getPreprocessingCode(itens: any[]): string {
+  private generatePreprocessingFunction(preProcessamentoConfig?: any): string {
     const lines: string[] = [];
-    
-    for (const item of itens) {
+    lines.push('# ============================================');
+    lines.push('# Função: Pré-processamento');
+    lines.push('# ============================================');
+    lines.push('def aplicar_preprocessamento(X_train, X_test):');
+    lines.push('    """Aplica as transformações de pré-processamento nos dados."""');
+
+    if (!preProcessamentoConfig?.itens || preProcessamentoConfig.itens.length === 0) {
+      lines.push('    # Nenhum pré-processamento configurado');
+      lines.push('    return X_train, X_test');
+      return lines.join('\n');
+    }
+
+    lines.push('    ');
+    lines.push('    # Criar cópias para não modificar os originais');
+    lines.push('    X_train = X_train.copy()');
+    lines.push('    X_test = X_test.copy()');
+
+    for (const item of preProcessamentoConfig.itens) {
       const colunas = item.colunas || [];
       const colsArray = colunas.length > 0 
         ? `[${colunas.map((c: string) => `"${c}"`).join(', ')}]` 
         : null;
 
+      lines.push('    ');
+
       switch (item.valor) {
         case 'standard_scaler':
-          lines.push(`# StandardScaler${colunas.length > 0 ? ' nas colunas: ' + colunas.join(', ') : ''}`);
-          lines.push('scaler = StandardScaler()');
+          lines.push(`    # ${item.label}: Remove média e escala para variância unitária`);
+          lines.push('    scaler = StandardScaler()');
           if (colsArray) {
-            lines.push(`X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
-            lines.push(`X_test${colsArray} = scaler.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
+            lines.push(`    X_test${colsArray} = scaler.transform(X_test${colsArray})`);
           } else {
-            lines.push('X_train = scaler.fit_transform(X_train)');
-            lines.push('X_test = scaler.transform(X_test)');
+            lines.push('    X_train = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
+            lines.push('    X_test = pd.DataFrame(scaler.transform(X_test), columns=X_test.columns, index=X_test.index)');
           }
           break;
 
-        case 'min_max_scaler':
-          lines.push(`# MinMaxScaler${colunas.length > 0 ? ' nas colunas: ' + colunas.join(', ') : ''}`);
-          lines.push('scaler = MinMaxScaler()');
+        case 'minmax_scaler':
+          lines.push(`    # ${item.label}: Escala dados para intervalo [0, 1]`);
+          lines.push('    scaler = MinMaxScaler()');
           if (colsArray) {
-            lines.push(`X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
-            lines.push(`X_test${colsArray} = scaler.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
+            lines.push(`    X_test${colsArray} = scaler.transform(X_test${colsArray})`);
           } else {
-            lines.push('X_train = scaler.fit_transform(X_train)');
-            lines.push('X_test = scaler.transform(X_test)');
+            lines.push('    X_train = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
+            lines.push('    X_test = pd.DataFrame(scaler.transform(X_test), columns=X_test.columns, index=X_test.index)');
           }
           break;
 
         case 'robust_scaler':
-          lines.push(`# RobustScaler${colunas.length > 0 ? ' nas colunas: ' + colunas.join(', ') : ''}`);
-          lines.push('scaler = RobustScaler()');
+          lines.push(`    # ${item.label}: Escala usando estatísticas robustas a outliers`);
+          lines.push('    scaler = RobustScaler()');
           if (colsArray) {
-            lines.push(`X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
-            lines.push(`X_test${colsArray} = scaler.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
+            lines.push(`    X_test${colsArray} = scaler.transform(X_test${colsArray})`);
           } else {
-            lines.push('X_train = scaler.fit_transform(X_train)');
-            lines.push('X_test = scaler.transform(X_test)');
+            lines.push('    X_train = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
+            lines.push('    X_test = pd.DataFrame(scaler.transform(X_test), columns=X_test.columns, index=X_test.index)');
+          }
+          break;
+
+        case 'normalizer':
+          lines.push(`    # ${item.label}: Normaliza amostras para norma unitária`);
+          lines.push('    normalizer = Normalizer(norm="l2")');
+          if (colsArray) {
+            lines.push(`    X_train${colsArray} = normalizer.fit_transform(X_train${colsArray})`);
+            lines.push(`    X_test${colsArray} = normalizer.transform(X_test${colsArray})`);
+          } else {
+            lines.push('    X_train = pd.DataFrame(normalizer.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
+            lines.push('    X_test = pd.DataFrame(normalizer.transform(X_test), columns=X_test.columns, index=X_test.index)');
+          }
+          break;
+
+        case 'onehot_encoder':
+          lines.push(`    # ${item.label}: Codifica features categóricas como one-hot`);
+          if (colunas.length > 0) {
+            lines.push(`    X_train = pd.get_dummies(X_train, columns=${JSON.stringify(colunas)})`);
+            lines.push(`    X_test = pd.get_dummies(X_test, columns=${JSON.stringify(colunas)})`);
+            lines.push('    # Alinhar colunas entre treino e teste');
+            lines.push('    X_test = X_test.reindex(columns=X_train.columns, fill_value=0)');
+          }
+          break;
+
+        case 'ordinal_encoder':
+          lines.push(`    # ${item.label}: Codifica features categóricas como inteiros ordinais`);
+          lines.push('    encoder = OrdinalEncoder()');
+          if (colsArray) {
+            lines.push(`    X_train${colsArray} = encoder.fit_transform(X_train${colsArray})`);
+            lines.push(`    X_test${colsArray} = encoder.transform(X_test${colsArray})`);
           }
           break;
 
         case 'label_encoder':
-          lines.push(`# Label Encoder${colunas.length > 0 ? ' nas colunas: ' + colunas.join(', ') : ''}`);
-          lines.push('le = LabelEncoder()');
+          lines.push(`    # ${item.label}: Codifica rótulos de target`);
+          lines.push('    le = LabelEncoder()');
           for (const col of colunas) {
-            lines.push(`X_train["${col}"] = le.fit_transform(X_train["${col}"])`);
-            lines.push(`X_test["${col}"] = le.transform(X_test["${col}"])`);
-          }
-          break;
-
-        case 'one_hot_encoder':
-          lines.push(`# One-Hot Encoder${colunas.length > 0 ? ' nas colunas: ' + colunas.join(', ') : ''}`);
-          if (colunas.length > 0) {
-            lines.push(`X_train = pd.get_dummies(X_train, columns=${JSON.stringify(colunas)})`);
-            lines.push(`X_test = pd.get_dummies(X_test, columns=${JSON.stringify(colunas)})`);
+            lines.push(`    X_train["${col}"] = le.fit_transform(X_train["${col}"])`);
+            lines.push(`    X_test["${col}"] = le.transform(X_test["${col}"])`);
           }
           break;
 
         case 'simple_imputer':
-          lines.push(`# Simple Imputer (preencher valores ausentes com a média)${colunas.length > 0 ? ' nas colunas: ' + colunas.join(', ') : ''}`);
-          lines.push("imputer = SimpleImputer(strategy='mean')");
+          lines.push(`    # ${item.label}: Preenche valores ausentes com a média`);
+          lines.push("    imputer = SimpleImputer(strategy='mean')");
           if (colsArray) {
-            lines.push(`X_train${colsArray} = imputer.fit_transform(X_train${colsArray})`);
-            lines.push(`X_test${colsArray} = imputer.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsArray} = imputer.fit_transform(X_train${colsArray})`);
+            lines.push(`    X_test${colsArray} = imputer.transform(X_test${colsArray})`);
           } else {
-            lines.push('X_train = imputer.fit_transform(X_train)');
-            lines.push('X_test = imputer.transform(X_test)');
+            lines.push('    X_train = pd.DataFrame(imputer.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
+            lines.push('    X_test = pd.DataFrame(imputer.transform(X_test), columns=X_test.columns, index=X_test.index)');
+          }
+          break;
+
+        case 'polynomial_features':
+          lines.push(`    # ${item.label}: Gera features polinomiais`);
+          lines.push('    poly = PolynomialFeatures(degree=2, include_bias=False)');
+          if (colsArray) {
+            lines.push(`    X_train_poly = poly.fit_transform(X_train${colsArray})`);
+            lines.push(`    X_test_poly = poly.transform(X_test${colsArray})`);
+            lines.push(`    poly_cols = poly.get_feature_names_out(${colsArray})`);
+            lines.push('    X_train_poly = pd.DataFrame(X_train_poly, columns=poly_cols, index=X_train.index)');
+            lines.push('    X_test_poly = pd.DataFrame(X_test_poly, columns=poly_cols, index=X_test.index)');
+            lines.push(`    X_train = pd.concat([X_train.drop(columns=${colsArray}), X_train_poly], axis=1)`);
+            lines.push(`    X_test = pd.concat([X_test.drop(columns=${colsArray}), X_test_poly], axis=1)`);
+          }
+          break;
+
+        case 'power_transformer':
+          lines.push(`    # ${item.label}: Transformação para dados mais Gaussianos`);
+          lines.push('    pt = PowerTransformer(method="yeo-johnson")');
+          if (colsArray) {
+            lines.push(`    X_train${colsArray} = pt.fit_transform(X_train${colsArray})`);
+            lines.push(`    X_test${colsArray} = pt.transform(X_test${colsArray})`);
+          } else {
+            lines.push('    X_train = pd.DataFrame(pt.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
+            lines.push('    X_test = pd.DataFrame(pt.transform(X_test), columns=X_test.columns, index=X_test.index)');
           }
           break;
 
         default:
-          lines.push(`# ${item.label || item.valor} - não implementado automaticamente`);
-          break;
+          lines.push(`    # ${item.label}: Transformação não implementada automaticamente`);
       }
-      lines.push('');
     }
+
+    lines.push('    ');
+    lines.push('    return X_train, X_test');
 
     return lines.join('\n');
   }
 
-  private getModelTraining(modelo: ItemPipeline | undefined, hiperparametros: any): string {
+  private generateModelTrainingFunction(modelo: ItemPipeline | undefined, hiperparametros: any): string {
+    const lines: string[] = [];
+    lines.push('# ============================================');
+    lines.push('# Função: Treinamento do Modelo');
+    lines.push('# ============================================');
+    lines.push('def treinar_modelo(X_train, y_train):');
+    lines.push('    """Configura e treina o modelo de machine learning."""');
+
     if (!modelo) {
-      return [
-        '# Configure e treine o modelo',
-        'modelo = ...  # Defina o modelo aqui',
-        'modelo.fit(X_train, y_train)'
-      ].join('\n');
+      lines.push('    # Configure e treine o modelo');
+      lines.push('    modelo = ...  # Defina o modelo aqui');
+      lines.push('    modelo.fit(X_train, y_train)');
+      lines.push('    return modelo');
+      return lines.join('\n');
     }
 
     const modelClass = this.getModelClass(modelo.valor);
     const params = this.formatHyperparameters(hiperparametros);
 
-    return [
-      '# Configuração e treinamento do modelo',
-      `modelo = ${modelClass}(${params})`,
-      'modelo.fit(X_train, y_train)',
-      '',
-      'print("Modelo treinado com sucesso!")'
-    ].join('\n');
+    lines.push('    ');
+    lines.push('    # Configuração do modelo');
+    lines.push(`    modelo = ${modelClass}(${params})`);
+    lines.push('    ');
+    lines.push('    # Treinamento');
+    lines.push('    modelo.fit(X_train, y_train)');
+    lines.push('    ');
+    lines.push('    print("Modelo treinado com sucesso!")');
+    lines.push('    return modelo');
+
+    return lines.join('\n');
+  }
+
+  private generateEvaluationFunction(metricas: ItemPipeline[]): string {
+    const lines: string[] = [];
+    lines.push('# ============================================');
+    lines.push('# Função: Avaliação do Modelo');
+    lines.push('# ============================================');
+    lines.push('def avaliar_modelo(modelo, X_test, y_test):');
+    lines.push('    """Avalia o modelo usando as métricas configuradas."""');
+    lines.push('    ');
+    lines.push('    y_pred = modelo.predict(X_test)');
+    lines.push('    ');
+    lines.push('    resultados = {}');
+    lines.push('    ');
+    lines.push('    print("\\n" + "=" * 50)');
+    lines.push('    print("MÉTRICAS DE AVALIAÇÃO")');
+    lines.push('    print("=" * 50)');
+
+    for (const metrica of metricas) {
+      switch (metrica.valor) {
+        case 'accuracy_score':
+          lines.push('    ');
+          lines.push('    # Acurácia');
+          lines.push('    acuracia = accuracy_score(y_test, y_pred)');
+          lines.push('    resultados["acuracia"] = acuracia');
+          lines.push('    print(f"Acurácia: {acuracia:.4f}")');
+          break;
+
+        case 'f1_score':
+          lines.push('    ');
+          lines.push('    # F1-Score');
+          lines.push('    f1 = f1_score(y_test, y_pred, average="weighted")');
+          lines.push('    resultados["f1_score"] = f1');
+          lines.push('    print(f"F1-Score: {f1:.4f}")');
+          break;
+
+        case 'confusion_matrix':
+          lines.push('    ');
+          lines.push('    # Matriz de Confusão');
+          lines.push('    matriz = confusion_matrix(y_test, y_pred)');
+          lines.push('    resultados["matriz_confusao"] = matriz');
+          lines.push('    print("\\nMatriz de Confusão:")');
+          lines.push('    print(matriz)');
+          break;
+
+        case 'precision_score':
+          lines.push('    ');
+          lines.push('    # Precisão');
+          lines.push('    precisao = precision_score(y_test, y_pred, average="weighted")');
+          lines.push('    resultados["precisao"] = precisao');
+          lines.push('    print(f"Precisão: {precisao:.4f}")');
+          break;
+
+        case 'recall_score':
+          lines.push('    ');
+          lines.push('    # Recall');
+          lines.push('    recall = recall_score(y_test, y_pred, average="weighted")');
+          lines.push('    resultados["recall"] = recall');
+          lines.push('    print(f"Recall: {recall:.4f}")');
+          break;
+      }
+    }
+
+    lines.push('    ');
+    lines.push('    return resultados');
+
+    return lines.join('\n');
   }
 
   private getModelClass(modeloValor: string): string {
@@ -501,55 +602,6 @@ export class ScriptGeneratorService {
     }
 
     return params.join(', ');
-  }
-
-  private getMetricsEvaluation(metricas: ItemPipeline[]): string {
-    const lines: string[] = [];
-    lines.push('print("\\n" + "=" * 50)');
-    lines.push('print("MÉTRICAS DE AVALIAÇÃO")');
-    lines.push('print("=" * 50)');
-
-    for (const metrica of metricas) {
-      switch (metrica.valor) {
-        case 'accuracy_score':
-          lines.push('');
-          lines.push('# Acurácia');
-          lines.push('acuracia = accuracy_score(y_test, y_pred)');
-          lines.push('print(f"Acurácia: {acuracia:.4f}")');
-          break;
-
-        case 'f1_score':
-          lines.push('');
-          lines.push('# F1-Score');
-          lines.push('f1 = f1_score(y_test, y_pred, average="weighted")');
-          lines.push('print(f"F1-Score: {f1:.4f}")');
-          break;
-
-        case 'confusion_matrix':
-          lines.push('');
-          lines.push('# Matriz de Confusão');
-          lines.push('matriz = confusion_matrix(y_test, y_pred)');
-          lines.push('print("\\nMatriz de Confusão:")');
-          lines.push('print(matriz)');
-          break;
-
-        case 'precision_score':
-          lines.push('');
-          lines.push('# Precisão');
-          lines.push('precisao = precision_score(y_test, y_pred, average="weighted")');
-          lines.push('print(f"Precisão: {precisao:.4f}")');
-          break;
-
-        case 'recall_score':
-          lines.push('');
-          lines.push('# Recall');
-          lines.push('recall = recall_score(y_test, y_pred, average="weighted")');
-          lines.push('print(f"Recall: {recall:.4f}")');
-          break;
-      }
-    }
-
-    return lines.join('\n');
   }
 
   downloadScript(script: string, filename: string): void {
