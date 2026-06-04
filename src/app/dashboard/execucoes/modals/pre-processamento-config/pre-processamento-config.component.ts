@@ -46,6 +46,13 @@ export class PreProcessamentoConfigComponent implements OnInit {
   carregarItensPreProcessamento() {
     this.dashboardService.getItensPreProcessamento().subscribe(itens => {
       this.itensDisponiveis = [...itens];
+      // Remover itens ja selecionados da lista de disponiveis
+      if (this.preProcessamentoConfig?.itens) {
+        const valoresSelecionados = this.preProcessamentoConfig.itens.map(i => i.valor);
+        this.itensDisponiveis = this.itensDisponiveis.filter(
+          i => !valoresSelecionados.includes(i.valor)
+        );
+      }
     });
   }
 
