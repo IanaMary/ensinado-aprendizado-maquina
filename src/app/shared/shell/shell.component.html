@@ -27,10 +27,10 @@
 
     <div class="sidebar-footer">
       <div class="user-info" *ngIf="!sidebarCollapsed">
-        <div class="user-avatar">{{ userName.charAt(0).toUpperCase() }}</div>
+        <div class="user-avatar">{{ userInitials }}</div>
         <div class="user-details">
           <span class="user-name">{{ userName }}</span>
-          <span class="user-role">{{ userRole }}</span>
+          <span class="user-role">{{ roleLabel }}</span>
         </div>
       </div>
       <button class="logout-btn" (click)="logout()" matTooltip="Sair" matTooltipPosition="right">
@@ -51,14 +51,51 @@
         <app-breadcrumb></app-breadcrumb>
       </div>
       <div class="topbar-right">
-        <button class="manual-btn" (click)="abrirManual()" matTooltip="Manual">
-          <mat-icon>help_outline</mat-icon>
-          <span>Manual</span>
-        </button>
-        <span class="user-name-mobile">{{ userName }}</span>
-        <button class="icon-btn" (click)="logout()">
-          <mat-icon>logout</mat-icon>
-        </button>
+        <!-- User Menu -->
+        <div class="user-menu-container">
+          <button class="user-menu-btn" (click)="toggleUserMenu($event)">
+            <div class="user-avatar-small">{{ userInitials }}</div>
+            <div class="user-info-topbar">
+              <span class="user-name">{{ userName }}</span>
+              <span class="user-role">{{ roleLabel }}</span>
+            </div>
+            <mat-icon class="menu-arrow" [class.open]="userMenuOpen">expand_more</mat-icon>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div class="user-dropdown" *ngIf="userMenuOpen">
+            <div class="dropdown-header">
+              <div class="user-avatar-large">{{ userInitials }}</div>
+              <div class="user-details-dropdown">
+                <span class="user-name">{{ userName }}</span>
+                <span class="user-email">{{ userEmail }}</span>
+                <span class="user-role-badge">{{ roleLabel }}</span>
+              </div>
+            </div>
+            
+            <mat-divider></mat-divider>
+            
+            <div class="dropdown-items">
+              <ng-container *ngFor="let item of filteredMenuItems">
+                <div *ngIf="item.divider" class="dropdown-divider"></div>
+                <button *ngIf="!item.divider && item.route" 
+                        class="dropdown-item" 
+                        (click)="navigate(item.route!)"
+                        [class.active]="isActive(item.route!)">
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                  <span>{{ item.label }}</span>
+                </button>
+                <button *ngIf="!item.divider && item.action" 
+                        class="dropdown-item"
+                        [class.logout]="item.action === 'logout'"
+                        (click)="executeAction(item.action!)">
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                  <span>{{ item.label }}</span>
+                </button>
+              </ng-container>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
