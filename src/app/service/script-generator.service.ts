@@ -14,6 +14,9 @@ export class ScriptGeneratorService {
     hiperparametros: any,
     preProcessamentoConfig?: any
   ): string {
+    console.log('generatePythonScript - preProcessamentoConfig:', preProcessamentoConfig);
+    console.log('generatePythonScript - preProcessamentoConfig?.itens:', preProcessamentoConfig?.itens);
+    
     const lines: string[] = [];
 
     // Header
@@ -33,6 +36,7 @@ export class ScriptGeneratorService {
 
     // Preprocessing imports
     if (preProcessamentoConfig?.itens?.length > 0) {
+      console.log('Adicionando imports de pre-processamento');
       lines.push(this.getPreprocessingImports(preProcessamentoConfig.itens));
     }
 
