@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DashboardService } from '../../../dashboard/services/dashboard.service';
 
 interface Usuario {
   id: string;
@@ -33,7 +34,8 @@ export class GerenciarUsuariosComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -50,45 +52,27 @@ export class GerenciarUsuariosComponent implements OnInit {
   }
 
   carregarUsuarios(): void {
-    // TODO: Carregar do backend
-    // Por enquanto, dados mockados
-    this.usuarios = [
-      {
-        id: '1',
-        nome: 'Maria Silva',
-        email: 'maria.silva@email.com',
-        tipo: 'professor',
-        status: 'ativo',
-        dataAtivacao: new Date('2024-01-15'),
-        ultimoAcesso: new Date('2024-06-01')
+    this.carregando = true;
+    this.dashboardService.listarUsuarios().subscribe({
+      next: (usuarios) => {
+        this.usuarios = usuarios.map(u => ({
+          id: u.id,
+          nome: u.nome,
+          email: u.email,
+          tipo: u.tipo,
+          status: u.status,
+          dataConvite: u.data_convite ? new Date(u.data_convite) : undefined,
+          dataAtivacao: u.data_ativacao ? new Date(u.data_ativacao) : undefined,
+          ultimoAcesso: u.ultimo_acesso ? new Date(u.ultimo_acesso) : undefined
+        }));
+        this.carregando = false;
       },
-      {
-        id: '2',
-        nome: 'João Santos',
-        email: 'joao.santos@email.com',
-        tipo: 'aluno',
-        status: 'ativo',
-        dataAtivacao: new Date('2024-02-20'),
-        ultimoAcesso: new Date('2024-05-28')
-      },
-      {
-        id: '3',
-        nome: 'Ana Costa',
-        email: 'ana.costa@email.com',
-        tipo: 'aluno',
-        status: 'pendente',
-        dataConvite: new Date('2024-05-25')
-      },
-      {
-        id: '4',
-        nome: 'Pedro Oliveira',
-        email: 'pedro.oliveira@email.com',
-        tipo: 'professor',
-        status: 'inativo',
-        dataAtivacao: new Date('2024-01-10')
+      error: (err) => {
+        console.error('Erro ao carregar usuários:', err);
+        this.snackBar.open('Erro ao carregar usuários', 'Fechar', { duration: 3000 });
+        this.carregando = false;
       }
-    ];
-    this.carregando = false;
+    });
   }
 
   get usuariosFiltrados(): Usuario[] {
@@ -132,50 +116,98 @@ export class GerenciarUsuariosComponent implements OnInit {
     this.enviandoConvite = true;
     const dados = this.formUsuario.value;
 
-    // TODO: Enviar para o backend
-    // Simular envio
-    setTimeout(() => {
-      const novoUsuario: Usuario = {
-        id: Date.now().toString(),
-        nome: dados.nome,
-        email: dados.email,
-        tipo: dados.tipo,
-        status: 'pendente',
-        dataConvite: new Date()
-      };
+    this.dashboardService.criarConvite({
+      nome: dados.nome,
+      email: dados.email,
+      tipo: dados.tipo
+    }).subscribe({
+      next: (response) => {
+        const novoUsuario: Usuario = {
+          id: response.id,
+          nome: response.nome,
+          email: response.email,
+          tipo: response.tipo,
+          status: response.status,
+          dataConvite: response.data_convite ? new Date(response.data_convite) : new Date()
+        };
 
-      this.usuarios.unshift(novoUsuario);
-      this.fecharFormulario();
-      this.enviandoConvite = false;
+        this.usuarios.unshift(novoUsuario);
+        this.fecharFormulario();
+        this.enviandoConvite = false;
 
-      this.snackBar.open(`Convite enviado para ${dados.email}`, 'Fechar', {
-        duration: 5000,
-        panelClass: 'snackbar-success'
-      });
-    }, 1500);
+        if (response.email_enviado) {
+          this.snackBar.open(`Convite enviado para ${dados.email}`, 'Fechar', {
+            duration: 5000,
+            panelClass: 'snackbar-success'
+          });
+        } else if (response.link_convite) {
+          // Copiar link para clipboard
+          navigator.clipboard.writeText(response.link_convite).then(() => {
+            this.snackBar.open(
+              `Email não configurado. Link copiado para a área de transferência!`,
+              'Fechar',
+              { duration: 8000, panelClass: 'snackbar-warning' }
+            );
+          }).catch(() => {
+            this.snackBar.open(
+              `Link do convite: ${response.link_convite}`,
+              'Fechar',
+              { duration: 15000, panelClass: 'snackbar-warning' }
+            );
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao criar convite:', err);
+        this.enviandoConvite = false;
+        const msg = err.error?.detail || 'Erro ao enviar convite';
+        this.snackBar.open(msg, 'Fechar', { duration: 5000 });
+      }
+    });
   }
 
   reenviarConvite(usuario: Usuario): void {
-    // TODO: Enviar para o backend
-    this.snackBar.open(`Convite reenviado para ${usuario.email}`, 'Fechar', {
-      duration: 3000,
-      panelClass: 'snackbar-success'
+    this.dashboardService.reenviarConvite(usuario.id).subscribe({
+      next: (response) => {
+        const msg = response.email_enviado 
+          ? `Convite reenviado para ${usuario.email}` 
+          : `Convite recriado (email não configurado)`;
+        this.snackBar.open(msg, 'Fechar', { duration: 3000 });
+      },
+      error: (err) => {
+        console.error('Erro ao reenviar convite:', err);
+        this.snackBar.open('Erro ao reenviar convite', 'Fechar', { duration: 3000 });
+      }
     });
   }
 
   alterarStatus(usuario: Usuario, novoStatus: 'ativo' | 'inativo'): void {
-    // TODO: Enviar para o backend
-    usuario.status = novoStatus;
-    this.snackBar.open(`Status de ${usuario.nome} alterado para ${novoStatus}`, 'Fechar', {
-      duration: 3000
+    this.dashboardService.alterarStatusUsuario(usuario.id, novoStatus).subscribe({
+      next: () => {
+        usuario.status = novoStatus;
+        this.snackBar.open(`Status de ${usuario.nome} alterado para ${novoStatus}`, 'Fechar', {
+          duration: 3000
+        });
+      },
+      error: (err) => {
+        console.error('Erro ao alterar status:', err);
+        this.snackBar.open('Erro ao alterar status', 'Fechar', { duration: 3000 });
+      }
     });
   }
 
   excluirUsuario(usuario: Usuario): void {
-    // TODO: Enviar para o backend
-    this.usuarios = this.usuarios.filter(u => u.id !== usuario.id);
-    this.snackBar.open(`Usuário ${usuario.nome} removido`, 'Fechar', {
-      duration: 3000
+    this.dashboardService.excluirUsuario(usuario.id).subscribe({
+      next: () => {
+        this.usuarios = this.usuarios.filter(u => u.id !== usuario.id);
+        this.snackBar.open(`Usuário ${usuario.nome} removido`, 'Fechar', {
+          duration: 3000
+        });
+      },
+      error: (err) => {
+        console.error('Erro ao excluir usuário:', err);
+        this.snackBar.open('Erro ao excluir usuário', 'Fechar', { duration: 3000 });
+      }
     });
   }
 

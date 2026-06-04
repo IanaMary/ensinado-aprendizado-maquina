@@ -77,6 +77,35 @@ export class DashboardService {
 
   // SERVIÇOS COM LIGAÇÃO COM BANCO 
 
+  // USUÁRIOS
+  criarConvite(dados: { nome: string; email: string; tipo: string }) {
+    return this.http.post<any>(`${this.url}usuario/convite`, dados);
+  }
+
+  listarUsuarios() {
+    return this.http.get<any[]>(`${this.url}usuario/`);
+  }
+
+  alterarStatusUsuario(userId: string, status: string) {
+    return this.http.put<any>(`${this.url}usuario/${userId}/status`, { status });
+  }
+
+  reenviarConvite(userId: string) {
+    return this.http.post<any>(`${this.url}usuario/${userId}/reenviar-convite`, {});
+  }
+
+  excluirUsuario(userId: string) {
+    return this.http.delete<any>(`${this.url}usuario/${userId}`);
+  }
+
+  verificarConvite(token: string) {
+    return this.http.get<any>(`${this.url}usuario/convite/${token}`);
+  }
+
+  ativarConta(token: string, senha: string) {
+    return this.http.post<any>(`${this.url}usuario/convite/${token}/ativar`, { senha });
+  }
+
   getTutor(params: any) {
     return this.http.get(`${this.url}${this.endpointTutor}/?${params}`);
   }
