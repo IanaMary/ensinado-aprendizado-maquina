@@ -262,9 +262,11 @@ export class ScriptGeneratorService {
   }
 
   private getPreprocessingCode(itens: any[]): string {
+    console.log('getPreprocessingCode - itens:', itens);
     const lines: string[] = [];
     
     for (const item of itens) {
+      console.log('Processando item:', item);
       const colunas = item.colunas || [];
       const colsArray = colunas.length > 0 
         ? `[${colunas.map((c: string) => `"${c}"`).join(', ')}]` 
@@ -334,6 +336,10 @@ export class ScriptGeneratorService {
             lines.push('X_train = imputer.fit_transform(X_train)');
             lines.push('X_test = imputer.transform(X_test)');
           }
+          break;
+
+        default:
+          lines.push(`# ${item.label || item.valor} - não implementado automaticamente`);
           break;
       }
       lines.push('');
