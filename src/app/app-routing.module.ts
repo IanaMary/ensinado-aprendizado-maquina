@@ -9,7 +9,7 @@ const routes: Routes = [
   },
   {
     path: 'ativar-conta',
-    loadChildren: () => import('./externo/autenticacao/login/login.module').then(m => m.LoginModule)
+    loadChildren: () => import('./externo/autenticacao/login/containers/ativar-conta/ativar-conta.module').then(m => m.AtivarContaModule)
   },
   {
     path: 'manual',
