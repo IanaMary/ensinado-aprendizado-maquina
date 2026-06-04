@@ -60,11 +60,18 @@ export class LoginComponent implements OnInit {
         }
       },
       error: (error: any) => {
+        console.error('Erro no login:', error);
         let messageErr: string;
 
         switch (error.status) {
           case 401:
             messageErr = 'Usuário e/ou senha incorretos.';
+            break;
+          case 429:
+            messageErr = 'Muitas tentativas. Aguarde 1 minuto.';
+            break;
+          case 0:
+            messageErr = 'Sem conexão com o servidor.';
             break;
           default:
             messageErr = 'Algo de errado aconteceu, tente novamente mais tarde.';

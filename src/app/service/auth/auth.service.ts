@@ -41,7 +41,7 @@ export class AuthService {
     return new Promise((resolve) => {
       sessionStorage.setItem('id', usuario?.usuario?._id);
       sessionStorage.setItem('token', usuario.access_token);
-      sessionStorage.setItem('name', usuario?.usuario?.name);
+      sessionStorage.setItem('name', usuario?.usuario?.nome_usuario || usuario?.usuario?.name);
       sessionStorage.setItem('role', usuario?.usuario?.role);
       resolve(true);
     });

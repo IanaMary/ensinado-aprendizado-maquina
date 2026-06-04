@@ -23,10 +23,14 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(req).pipe(
       catchError(err => {
-        if (err.status === 401) {
+        // Não redirecionar para login em endpoints públicos
+        const isPublicEndpoint = req.url.includes('/convite/') || 
+                                  req.url.includes('/login') ||
+                                  req.url.includes('/ativar-conta');
+        
+        if (err.status === 401 && !isPublicEndpoint) {
           this.authService.logout();
         } else if (err.status === 403) {
-          // Opcional: mostrar notificação de acesso negado
           console.warn('Acesso negado (403)');
         }
         return throwError(() => err);

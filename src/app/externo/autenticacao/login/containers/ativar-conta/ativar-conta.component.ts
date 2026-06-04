@@ -61,6 +61,7 @@ export class AtivarContaComponent implements OnInit {
         this.emailUsuario = response.email;
       },
       error: (err: any) => {
+        console.error('Erro ao verificar convite:', err);
         this.carregando = false;
         this.tokenValido = false;
         if (err.status === 404) {
@@ -68,8 +69,9 @@ export class AtivarContaComponent implements OnInit {
         } else if (err.status === 400) {
           this.erroToken = 'Convite expirado. Solicite um novo convite.';
         } else {
-          this.erroToken = 'Erro ao verificar convite.';
+          this.erroToken = `Erro ao verificar convite: ${err.message || err.status}`;
         }
+        // NÃO redirecionar para login - ficar na página para debugar
       }
     });
   }
