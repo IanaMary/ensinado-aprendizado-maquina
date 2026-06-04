@@ -17,6 +17,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
   @Input() modeloSelecionado: ItemPipeline | undefined;
   @Input() hiperparametros: any = {};
+  @Input() preProcessamentoConfig: any = null;
 
   @Output() atualizarResultadoAvaliacoes = new EventEmitter<any>();
 
@@ -175,7 +176,8 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       this.resultadoColetaDado,
       this.modeloSelecionado,
       this.metricasSelecionadas,
-      this.hiperparametros
+      this.hiperparametros,
+      this.preProcessamentoConfig
     );
 
     const nomeModelo = this.modeloSelecionado?.label || 'modelo';

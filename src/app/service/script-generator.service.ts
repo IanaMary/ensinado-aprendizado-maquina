@@ -11,7 +11,8 @@ export class ScriptGeneratorService {
     resultadoColetaDado: ResultadoColetaDado | undefined,
     modeloSelecionado: ItemPipeline | undefined,
     metricasSelecionadas: ItemPipeline[],
-    hiperparametros: any
+    hiperparametros: any,
+    preProcessamentoConfig?: any
   ): string {
     const lines: string[] = [];
 
@@ -29,6 +30,11 @@ export class ScriptGeneratorService {
     lines.push('import pandas as pd');
     lines.push('import numpy as np');
     lines.push('from sklearn.model_selection import train_test_split');
+
+    // Preprocessing imports
+    if (preProcessamentoConfig?.itens?.length > 0) {
+      lines.push(this.getPreprocessingImports(preProcessamentoConfig.itens));
+    }
 
     // Model import
     if (modeloSelecionado) {
@@ -88,9 +94,19 @@ export class ScriptGeneratorService {
     lines.push(`print(f"Dados de teste: {X_test.shape[0]} amostras")`);
     lines.push('');
 
+    // Preprocessing
+    if (preProcessamentoConfig?.itens?.length > 0) {
+      lines.push('# ============================================');
+      lines.push('# 4. Pré-processamento');
+      lines.push('# ============================================');
+      lines.push('');
+      lines.push(this.getPreprocessingCode(preProcessamentoConfig.itens));
+    }
+
     // Model training
+    const stepNumber = preProcessamentoConfig?.itens?.length > 0 ? '5' : '4';
     lines.push('# ============================================');
-    lines.push('# 4. Treinamento do Modelo');
+    lines.push(`#${stepNumber}. Treinamento do Modelo`);
     lines.push('# ============================================');
     lines.push('');
 
@@ -146,6 +162,111 @@ export class ScriptGeneratorService {
       'pca': 'from sklearn.decomposition import PCA'
     };
     return imports[modeloValor] || `# Import para ${modeloValor}`;
+  }
+
+  private getPreprocessingImports(itens: any[]): string {
+    const imports: string[] = [];
+    for (const item of itens) {
+      switch (item.valor) {
+        case 'standard_scaler':
+        case 'min_max_scaler':
+        case 'robust_scaler':
+          if (!imports.includes('from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler')) {
+            imports.push('from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler');
+          }
+          break;
+        case 'label_encoder':
+        case 'one_hot_encoder':
+          if (!imports.includes('from sklearn.preprocessing import LabelEncoder, OneHotEncoder')) {
+            imports.push('from sklearn.preprocessing import LabelEncoder, OneHotEncoder');
+          }
+          break;
+        case 'simple_imputer':
+          if (!imports.includes('from sklearn.impute import SimpleImputer')) {
+            imports.push('from sklearn.impute import SimpleImputer');
+          }
+          break;
+        case 'pca':
+          if (!imports.includes('from sklearn.decomposition import PCA')) {
+            imports.push('from sklearn.decomposition import PCA');
+          }
+          break;
+      }
+    }
+    return imports.join('\n');
+  }
+
+  private getPreprocessingCode(itens: any[]): string {
+    const lines: string[] = [];
+    for (const item of itens) {
+      const cols = item.colunas && item.colunas.length > 0 
+        ? item.colunas.map((c: string) => `"${c}"`).join(', ') 
+        : 'todas as colunas numéricas';
+      
+      lines.push(`# ${item.label} nas colunas: ${cols}`);
+      switch (item.valor) {
+        case 'standard_scaler':
+          lines.push(`scaler = StandardScaler()`);
+          if (item.colunas && item.colunas.length > 0) {
+            lines.push(`X_train[${[item.colunas]}] = scaler.fit_transform(X_train[${[item.colunas]}])`);
+            lines.push(`X_test[${[item.colunas]}] = scaler.transform(X_test[${[item.colunas]}])`);
+          } else {
+            lines.push(`X_train = scaler.fit_transform(X_train)`);
+            lines.push(`X_test = scaler.transform(X_test)`);
+          }
+          break;
+        case 'min_max_scaler':
+          lines.push(`scaler = MinMaxScaler()`);
+          if (item.colunas && item.colunas.length > 0) {
+            lines.push(`X_train[${[item.colunas]}] = scaler.fit_transform(X_train[${[item.colunas]}])`);
+            lines.push(`X_test[${[item.colunas]}] = scaler.transform(X_test[${[item.colunas]}])`);
+          } else {
+            lines.push(`X_train = scaler.fit_transform(X_train)`);
+            lines.push(`X_test = scaler.transform(X_test)`);
+          }
+          break;
+        case 'robust_scaler':
+          lines.push(`scaler = RobustScaler()`);
+          if (item.colunas && item.colunas.length > 0) {
+            lines.push(`X_train[${[item.colunas]}] = scaler.fit_transform(X_train[${[item.colunas]}])`);
+            lines.push(`X_test[${[item.colunas]}] = scaler.transform(X_test[${[item.colunas]}])`);
+          } else {
+            lines.push(`X_train = scaler.fit_transform(X_train)`);
+            lines.push(`X_test = scaler.transform(X_test)`);
+          }
+          break;
+        case 'label_encoder':
+          lines.push(`le = LabelEncoder()`);
+          if (item.colunas && item.colunas.length > 0) {
+            for (const col of item.colunas) {
+              lines.push(`X_train["${col}"] = le.fit_transform(X_train["${col}"])`);
+              lines.push(`X_test["${col}"] = le.transform(X_test["${col}"])`);
+            }
+          }
+          break;
+        case 'one_hot_encoder':
+          lines.push(`# One-Hot Encoding`);
+          if (item.colunas && item.colunas.length > 0) {
+            lines.push(`X_train = pd.get_dummies(X_train, columns=${JSON.stringify(item.colunas)})`);
+            lines.push(`X_test = pd.get_dummies(X_test, columns=${JSON.stringify(item.colunas)})`);
+          }
+          break;
+        case 'simple_imputer':
+          lines.push(`imputer = SimpleImputer(strategy='mean')`);
+          if (item.colunas && item.colunas.length > 0) {
+            lines.push(`X_train[${[item.colunas]}] = imputer.fit_transform(X_train[${[item.colunas]}])`);
+            lines.push(`X_test[${[item.colunas]}] = imputer.transform(X_test[${[item.colunas]}])`);
+          } else {
+            lines.push(`X_train = imputer.fit_transform(X_train)`);
+            lines.push(`X_test = imputer.transform(X_test)`);
+          }
+          break;
+        default:
+          lines.push(`# ${item.label} - implementação manual necessária`);
+      }
+      lines.push('');
+    }
+    return lines.join('\n');
   }
 
   private getMetricsImports(metricas: ItemPipeline[]): string {
