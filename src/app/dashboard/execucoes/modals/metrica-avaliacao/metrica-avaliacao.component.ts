@@ -171,25 +171,19 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     return `Erro: ${valor} amostras de "${classeReal}" classificadas como "${classePredita}"`;
   }
 
-  baixarScript(): void {
+  async baixarScript(): Promise<void> {
     console.log('baixarScript - preProcessamentoConfig:', this.preProcessamentoConfig);
     console.log('baixarScript - resultadoColetaDado:', this.resultadoColetaDado);
     console.log('baixarScript - modeloSelecionado:', this.modeloSelecionado);
     console.log('baixarScript - metricasSelecionadas:', this.metricasSelecionadas);
     console.log('baixarScript - hiperparametros:', this.hiperparametros);
     
-    const script = this.scriptGenerator.generatePythonScript(
+    await this.scriptGenerator.generatePipelineBundle(
       this.resultadoColetaDado,
       this.modeloSelecionado,
       this.metricasSelecionadas,
       this.hiperparametros,
       this.preProcessamentoConfig
     );
-
-    console.log('Script gerado:', script);
-    
-    const nomeModelo = this.modeloSelecionado?.label || 'modelo';
-    const data = new Date().toISOString().slice(0, 10);
-    this.scriptGenerator.downloadScript(script, `pipeline_${nomeModelo}_${data}.py`);
   }
 }

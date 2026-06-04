@@ -1,10 +1,125 @@
 import { Injectable } from '@angular/core';
 import { ItemPipeline, ResultadoColetaDado } from '../models/item-coleta-dado.model';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScriptGeneratorService {
+
+  async generatePipelineBundle(
+    resultadoColetaDado: ResultadoColetaDado | undefined,
+    modeloSelecionado: ItemPipeline | undefined,
+    metricasSelecionadas: ItemPipeline[],
+    hiperparametros: any,
+    preProcessamentoConfig?: any
+  ): Promise<void> {
+    const zip = new JSZip();
+    const folderName = 'pipeline_iana';
+    const folder = zip.folder(folderName)!;
+
+    // Generate the Python script
+    const script = this.generatePythonScript(
+      resultadoColetaDado,
+      modeloSelecionado,
+      metricasSelecionadas,
+      hiperparametros,
+      preProcessamentoConfig
+    );
+
+    // Add script to the folder
+    folder.file('pipeline.py', script);
+
+    // Add datasets if available
+    if (resultadoColetaDado?.treino?.dados && resultadoColetaDado.treino.dados.length > 0) {
+      const trainCsv = this.convertToCsv(resultadoColetaDado.treino.dados);
+      folder.file('data/treino.csv', trainCsv);
+    }
+
+    if (resultadoColetaDado?.teste?.dados && resultadoColetaDado.teste.dados.length > 0) {
+      const testCsv = this.convertToCsv(resultadoColetaDado.teste.dados);
+      folder.file('data/teste.csv', testCsv);
+    }
+
+    // Add README
+    const readme = this.generateReadme(modeloSelecionado, resultadoColetaDado);
+    folder.file('README.md', readme);
+
+    // Generate and download the ZIP
+    const content = await zip.generateAsync({ type: 'blob' });
+    const nomeModelo = modeloSelecionado?.label || 'modelo';
+    const data = new Date().toISOString().slice(0, 10);
+    saveAs(content, `pipeline_${nomeModelo}_${data}.zip`);
+  }
+
+  private convertToCsv(dados: any[]): string {
+    if (!dados || dados.length === 0) return '';
+    
+    const headers = Object.keys(dados[0]);
+    const rows = dados.map(row => 
+      headers.map(header => {
+        const value = row[header];
+        // Escape commas and quotes in CSV
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      }).join(',')
+    );
+    
+    return [headers.join(','), ...rows].join('\n');
+  }
+
+  private generateReadme(modelo: ItemPipeline | undefined, resultado: ResultadoColetaDado | undefined): string {
+    const lines: string[] = [];
+    lines.push('# Pipeline de Machine Learning - Iana');
+    lines.push('');
+    lines.push('## Estrutura do Projeto');
+    lines.push('');
+    lines.push('```');
+    lines.push('pipeline_iana/');
+    lines.push('├── pipeline.py          # Script principal do pipeline');
+    lines.push('├── data/');
+    lines.push('│   ├── treino.csv       # Dados de treino');
+    lines.push('│   └── teste.csv        # Dados de teste');
+    lines.push('└── README.md            # Este arquivo');
+    lines.push('```');
+    lines.push('');
+    lines.push('## Como Executar');
+    lines.push('');
+    lines.push('1. Certifique-se de ter Python 3.7+ instalado');
+    lines.push('2. Instale as dependências:');
+    lines.push('   ```bash');
+    lines.push('   pip install pandas numpy scikit-learn');
+    lines.push('   ```');
+    lines.push('3. Execute o pipeline:');
+    lines.push('   ```bash');
+    lines.push('   python pipeline.py');
+    lines.push('   ```');
+    lines.push('');
+    
+    if (modelo) {
+      lines.push('## Modelo Utilizado');
+      lines.push('');
+      lines.push(`- **Modelo:** ${modelo.label || modelo.valor}`);
+      lines.push('');
+    }
+
+    if (resultado) {
+      lines.push('## Dados');
+      lines.push('');
+      lines.push(`- **Target:** ${resultado.target}`);
+      lines.push(`- **Atributos:** ${Object.keys(resultado.atributos || {}).filter(k => resultado.atributos?.[k]).join(', ')}`);
+      lines.push(`- **Divisão Treino/Teste:** ${resultado.porcentagemTreino || 70}/${100 - (resultado.porcentagemTreino || 70)}`);
+      lines.push('');
+    }
+
+    lines.push('---');
+    lines.push('*Gerado automaticamente pelo Iana - Plataforma de Ensino de Machine Learning*');
+    
+    return lines.join('\n');
+  }
 
   generatePythonScript(
     resultadoColetaDado: ResultadoColetaDado | undefined,
@@ -57,7 +172,7 @@ export class ScriptGeneratorService {
     let stepNum = 4;
     if (preProcessamentoConfig?.itens?.length > 0) {
       lines.push('# ============================================');
-      lines.push(`#${stepNum}. Pré-processamento`);
+      lines.push(`# ${stepNum}. Pré-processamento`);
       lines.push('# ============================================');
       lines.push('');
       lines.push(this.getPreprocessingCode(preProcessamentoConfig.itens));
@@ -67,7 +182,7 @@ export class ScriptGeneratorService {
 
     // Model training
     lines.push('# ============================================');
-    lines.push(`#${stepNum}. Treinamento do Modelo`);
+    lines.push(`# ${stepNum}. Treinamento do Modelo`);
     lines.push('# ============================================');
     lines.push('');
     lines.push(this.getModelTraining(modeloSelecionado, hiperparametros));
@@ -76,7 +191,7 @@ export class ScriptGeneratorService {
 
     // Predictions
     lines.push('# ============================================');
-    lines.push(`#${stepNum}. Previsões`);
+    lines.push(`# ${stepNum}. Previsões`);
     lines.push('# ============================================');
     lines.push('');
     lines.push('y_pred = modelo.predict(X_test)');
@@ -86,7 +201,7 @@ export class ScriptGeneratorService {
     // Metrics
     if (metricasSelecionadas.length > 0) {
       lines.push('# ============================================');
-      lines.push(`#${stepNum}. Avaliação do Modelo`);
+      lines.push(`# ${stepNum}. Avaliação do Modelo`);
       lines.push('# ============================================');
       lines.push('');
       lines.push(this.getMetricsEvaluation(metricasSelecionadas));
@@ -108,26 +223,30 @@ export class ScriptGeneratorService {
 
     // Preprocessing imports
     if (preProcessamentoConfig?.itens?.length > 0) {
+      const preprocessingImports = new Set<string>();
       for (const item of preProcessamentoConfig.itens) {
         switch (item.valor) {
           case 'standard_scaler':
           case 'min_max_scaler':
           case 'robust_scaler':
-            if (!imports.includes('from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler')) {
-              imports.push('from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler');
-            }
+            preprocessingImports.add('StandardScaler, MinMaxScaler, RobustScaler');
             break;
           case 'label_encoder':
           case 'one_hot_encoder':
-            if (!imports.includes('from sklearn.preprocessing import LabelEncoder, OneHotEncoder')) {
-              imports.push('from sklearn.preprocessing import LabelEncoder, OneHotEncoder');
-            }
+            preprocessingImports.add('LabelEncoder, OneHotEncoder');
             break;
           case 'simple_imputer':
-            if (!imports.includes('from sklearn.impute import SimpleImputer')) {
-              imports.push('from sklearn.impute import SimpleImputer');
-            }
+            preprocessingImports.add('SimpleImputer');
             break;
+        }
+      }
+      for (const imp of preprocessingImports) {
+        if (imp.includes('SimpleImputer')) {
+          imports.push('from sklearn.impute import SimpleImputer');
+        } else if (imp.includes('LabelEncoder')) {
+          imports.push('from sklearn.preprocessing import LabelEncoder, OneHotEncoder');
+        } else {
+          imports.push(`from sklearn.preprocessing import ${imp}`);
         }
       }
     }
@@ -185,42 +304,19 @@ export class ScriptGeneratorService {
   }
 
   private getDataLoading(resultado: ResultadoColetaDado | undefined): string {
-    if (!resultado?.treino?.nomeArquivo) {
-      return [
-        '# Carregue seus dados aqui',
-        'df = pd.read_csv("seu_arquivo.csv")  # Ajuste o caminho do arquivo',
-        '',
-        '# Visualizar as primeiras linhas',
-        'print("Primeiras linhas dos dados:")',
-        'print(df.head())',
-        '',
-        '# Informações sobre os dados',
-        'print("\\nInformações dos dados:")',
-        'print(df.info())'
-      ].join('\n');
-    }
-
-    const nomeArquivo = resultado.treino.nomeArquivo;
-    const extensao = nomeArquivo.split('.').pop()?.toLowerCase();
-    
-    if (extensao === 'xlsx' || extensao === 'xls') {
-      return [
-        '# Carregamento dos dados',
-        `df = pd.read_excel("${nomeArquivo}")`,
-        '',
-        '# Visualizar as primeiras linhas',
-        'print("Primeiras linhas dos dados:")',
-        'print(df.head())'
-      ].join('\n');
-    }
-
     return [
-      '# Carregamento dos dados',
-      `df = pd.read_csv("${nomeArquivo}")`,
+      '# Carregamento dos dados de treino e teste',
+      'train_df = pd.read_csv("data/treino.csv")',
+      'test_df = pd.read_csv("data/teste.csv")',
       '',
       '# Visualizar as primeiras linhas',
-      'print("Primeiras linhas dos dados:")',
-      'print(df.head())'
+      'print("Dados de treino:")',
+      'print(train_df.head())',
+      'print(f"\\nShape: {train_df.shape}")',
+      '',
+      'print("\\nDados de teste:")',
+      'print(test_df.head())',
+      'print(f"\\nShape: {test_df.shape}")'
     ].join('\n');
   }
 
@@ -228,8 +324,14 @@ export class ScriptGeneratorService {
     if (!resultado?.atributos) {
       return [
         '# Defina os atributos (features) e o target',
-        'X = df.drop(columns=["target"])  # Substitua "target" pelo nome da coluna alvo',
-        'y = df["target"]'
+        'target = "target"  # Substitua pelo nome da coluna alvo',
+        'atributos = [col for col in train_df.columns if col != target]',
+        '',
+        'X_train = train_df[atributos]',
+        'y_train = train_df[target]',
+        '',
+        'X_test = test_df[atributos]',
+        'y_test = test_df[target]'
       ].join('\n');
     }
 
@@ -239,34 +341,29 @@ export class ScriptGeneratorService {
     return [
       '# Atributos selecionados',
       `atributos = ${JSON.stringify(atributos)}`,
-      'X = df[atributos]',
+      `target = "${target}"`,
       '',
-      '# Target',
-      `y = df["${target}"]`
+      '# Separar features e target',
+      'X_train = train_df[atributos]',
+      'y_train = train_df[target]',
+      '',
+      'X_test = test_df[atributos]',
+      'y_test = test_df[target]'
     ].join('\n');
   }
 
   private getTrainTestSplit(resultado: ResultadoColetaDado | undefined): string {
-    const trainPercent = resultado?.porcentagemTreino || 70;
-    const testPercent = 100 - trainPercent;
-
     return [
-      `# Divisão ${trainPercent}/${testPercent}`,
-      'X_train, X_test, y_train, y_test = train_test_split(',
-      '    X, y, test_size=' + (testPercent / 100).toFixed(2) + ', random_state=42',
-      ')',
-      '',
+      '# Os dados já estão divididos em treino e teste nos arquivos CSV',
       'print(f"Dados de treino: {X_train.shape[0]} amostras")',
       'print(f"Dados de teste: {X_test.shape[0]} amostras")'
     ].join('\n');
   }
 
   private getPreprocessingCode(itens: any[]): string {
-    console.log('getPreprocessingCode - itens:', itens);
     const lines: string[] = [];
     
     for (const item of itens) {
-      console.log('Processando item:', item);
       const colunas = item.colunas || [];
       const colsArray = colunas.length > 0 
         ? `[${colunas.map((c: string) => `"${c}"`).join(', ')}]` 
