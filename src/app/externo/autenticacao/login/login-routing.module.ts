@@ -8,16 +8,16 @@ import { AtivarContaComponent } from './containers/ativar-conta/ativar-conta.com
 
 const routes: Routes = [
   {
-    path: '',
-    component: LoginComponent
+    path: 'ativar-conta',
+    component: AtivarContaComponent
   },
   {
     path: 'cadastro-usuario',
     component: CadastroUsuarioComponent
   },
   {
-    path: 'ativar-conta',
-    component: AtivarContaComponent
+    path: '',
+    component: LoginComponent
   }
 ];
 

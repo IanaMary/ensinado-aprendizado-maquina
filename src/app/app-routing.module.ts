@@ -8,6 +8,10 @@ const routes: Routes = [
     loadChildren: () => import('./externo/externo.module').then(m => m.ExternoModule)
   },
   {
+    path: 'ativar-conta',
+    loadChildren: () => import('./externo/autenticacao/login/login.module').then(m => m.LoginModule)
+  },
+  {
     path: 'manual',
     loadChildren: () => import('./shared/manual/manual.module').then(m => m.ManualModule)
   },
