@@ -1,0 +1,101 @@
+<div class="meus-projetos-container">
+  <!-- Header -->
+  <div class="projetos-header">
+    <div class="header-left">
+      <button class="btn-voltar" (click)="voltar()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-info">
+        <h1>Meus Projetos</h1>
+        <p>Gerencie seus pipelines de machine learning</p>
+      </div>
+    </div>
+    <button class="btn-novo" (click)="criarNovoProjeto()">
+      <mat-icon>add</mat-icon>
+      Novo Pipeline
+    </button>
+  </div>
+
+  <!-- Filtros e Busca -->
+  <div class="filtros-container">
+    <div class="busca">
+      <mat-icon>search</mat-icon>
+      <input type="text" 
+             [(ngModel)]="termoBusca" 
+             placeholder="Buscar projetos...">
+    </div>
+    <div class="filtros-status">
+      <button *ngFor="let status of ['todos', 'rascunho', 'em_progresso', 'concluido']"
+              [class.active]="filtroStatus === status"
+              (click)="filtroStatus = status">
+        {{ status === 'todos' ? 'Todos' : getStatusLabel(status) }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="carregando">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Carregando projetos...</span>
+  </div>
+
+  <!-- Lista de Projetos -->
+  <div class="projetos-grid" *ngIf="!carregando">
+    <div class="projeto-card" 
+         *ngFor="let projeto of projetosFiltrados"
+         (click)="abrirProjeto(projeto)">
+      <div class="card-header">
+        <div class="card-icon">
+          <mat-icon>account_tree</mat-icon>
+        </div>
+        <div class="card-status" [ngClass]="getStatusClass(projeto.status)">
+          <mat-icon>{{ getStatusIcon(projeto.status) }}</mat-icon>
+          <span>{{ getStatusLabel(projeto.status) }}</span>
+        </div>
+      </div>
+      
+      <div class="card-content">
+        <h3>{{ projeto.nome }}</h3>
+        <p>{{ projeto.descricao }}</p>
+        
+        <div class="card-meta" *ngIf="projeto.modelo || projeto.dataset">
+          <span *ngIf="projeto.modelo" class="meta-item">
+            <mat-icon>smart_toy</mat-icon>
+            {{ projeto.modelo }}
+          </span>
+          <span *ngIf="projeto.dataset" class="meta-item">
+            <mat-icon>table_chart</mat-icon>
+            {{ projeto.dataset }}
+          </span>
+        </div>
+      </div>
+      
+      <div class="card-footer">
+        <span class="data">
+          <mat-icon>schedule</mat-icon>
+          {{ getDataFormatada(projeto.dataModificacao) }}
+        </span>
+        <button class="btn-excluir" (click)="excluirProjeto(projeto, $event)" matTooltip="Excluir projeto">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Card para criar novo -->
+    <div class="projeto-card novo-projeto" (click)="criarNovoProjeto()">
+      <div class="novo-icon">
+        <mat-icon>add_circle_outline</mat-icon>
+      </div>
+      <span>Criar Novo Pipeline</span>
+    </div>
+  </div>
+
+  <!-- Estado vazio -->
+  <div class="estado-vazio" *ngIf="!carregando && projetosFiltrados.length === 0">
+    <mat-icon>folder_open</mat-icon>
+    <h3>Nenhum projeto encontrado</h3>
+    <p *ngIf="termoBusca">Tente buscar com outros termos</p>
+    <p *ngIf="!termoBusca && filtroStatus !== 'todos'">Nenhum projeto com status "{{ getStatusLabel(filtroStatus) }}"</p>
+    <p *ngIf="!termoBusca && filtroStatus === 'todos'">Crie seu primeiro pipeline clicando no botão acima</p>
+  </div>
+</div>

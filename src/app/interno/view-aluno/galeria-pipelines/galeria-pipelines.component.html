@@ -1,0 +1,113 @@
+<div class="galeria-container">
+  <!-- Header -->
+  <div class="galeria-header">
+    <div class="header-left">
+      <button class="btn-voltar" (click)="voltar()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-info">
+        <h1>Galeria de Pipelines</h1>
+        <p>Explore pipelines criados por professores e colegas</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros e Busca -->
+  <div class="filtros-container">
+    <div class="busca">
+      <mat-icon>search</mat-icon>
+      <input type="text" 
+             [(ngModel)]="termoBusca" 
+             placeholder="Buscar por nome, professor, tags...">
+    </div>
+    
+    <div class="filtros-grupo">
+      <div class="filtro-tipo">
+        <button [class.active]="filtroTipo === 'publicos'" (click)="filtroTipo = 'publicos'">
+          <mat-icon>public</mat-icon>
+          Públicos
+        </button>
+        <button [class.active]="filtroTipo === 'turma'" (click)="filtroTipo = 'turma'">
+          <mat-icon>group</mat-icon>
+          Minha Turma
+        </button>
+        <button [class.active]="filtroTipo === 'todos'" (click)="filtroTipo = 'todos'">
+          <mat-icon>apps</mat-icon>
+          Todos
+        </button>
+      </div>
+      
+      <div class="filtro-dificuldade">
+        <button *ngFor="let dificuldade of ['todos', 'iniciante', 'intermediario', 'avancado']"
+                [class.active]="filtroDificuldade === dificuldade"
+                (click)="filtroDificuldade = dificuldade">
+          {{ dificuldade === 'todos' ? 'Todas' : getDificuldadeLabel(dificuldade) }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="carregando">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Carregando pipelines...</span>
+  </div>
+
+  <!-- Grid de Pipelines -->
+  <div class="pipelines-grid" *ngIf="!carregando">
+    <div class="pipeline-card" 
+         *ngFor="let pipeline of pipelinesFiltrados"
+         (click)="abrirPipeline(pipeline)">
+      <div class="card-header">
+        <div class="card-badge" [ngClass]="getDificuldadeClass(pipeline.dificuldade)">
+          {{ getDificuldadeLabel(pipeline.dificuldade) }}
+        </div>
+        <div class="card-tipo" *ngIf="!pipeline.publico">
+          <mat-icon>lock</mat-icon>
+          <span>{{ pipeline.turma }}</span>
+        </div>
+      </div>
+      
+      <div class="card-content">
+        <h3>{{ pipeline.nome }}</h3>
+        <p class="descricao">{{ pipeline.descricao }}</p>
+        
+        <div class="card-professor">
+          <mat-icon>person</mat-icon>
+          <span>{{ pipeline.professor }}</span>
+          <span class="disciplina" *ngIf="pipeline.disciplina">• {{ pipeline.disciplina }}</span>
+        </div>
+        
+        <div class="card-tags">
+          <span *ngFor="let tag of pipeline.tags" class="tag">{{ tag }}</span>
+        </div>
+      </div>
+      
+      <div class="card-footer">
+        <div class="card-stats">
+          <span class="stat">
+            <mat-icon>content_copy</mat-icon>
+            {{ pipeline.totalCopias }} cópias
+          </span>
+          <span class="stat">
+            <mat-icon>star</mat-icon>
+            {{ pipeline.avaliacao }}
+          </span>
+        </div>
+        
+        <button class="btn-copiar" (click)="copiarPipeline(pipeline, $event)" matTooltip="Copiar para meus projetos">
+          <mat-icon>content_copy</mat-icon>
+          Copiar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado vazio -->
+  <div class="estado-vazio" *ngIf="!carregando && pipelinesFiltrados.length === 0">
+    <mat-icon>explore</mat-icon>
+    <h3>Nenhum pipeline encontrado</h3>
+    <p *ngIf="termoBusca">Tente buscar com outros termos</p>
+    <p *ngIf="!termoBusca">Não há pipelines disponíveis com os filtros selecionados</p>
+  </div>
+</div>

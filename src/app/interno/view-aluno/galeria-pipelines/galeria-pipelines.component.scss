@@ -1,0 +1,357 @@
+@use '../../../../styles/styles.scss' as *;
+
+.galeria-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Header
+.galeria-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .btn-voltar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba($roxo-medio, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    mat-icon {
+      color: $roxo-medio;
+    }
+
+    &:hover {
+      background: rgba($roxo-medio, 0.2);
+    }
+  }
+
+  .header-info {
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: $roxo-escuro;
+    }
+
+    p {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: $cinza-medio;
+    }
+  }
+}
+
+// Filtros
+.filtros-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .busca {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: white;
+    border: 1px solid $cinza-claro;
+    border-radius: 10px;
+
+    mat-icon {
+      color: $cinza-medio;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    input {
+      border: none;
+      outline: none;
+      font-size: 14px;
+      width: 100%;
+      color: $cinza-escuro;
+
+      &::placeholder {
+        color: $cinza-medio;
+      }
+    }
+  }
+
+  .filtros-grupo {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    .filtro-tipo,
+    .filtro-dificuldade {
+      display: flex;
+      gap: 8px;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        background: white;
+        border: 1px solid $cinza-claro;
+        border-radius: 8px;
+        font-size: 13px;
+        color: $cinza-medio;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        mat-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+        }
+
+        &:hover {
+          border-color: $roxo-claro;
+          color: $roxo-medio;
+        }
+
+        &.active {
+          background: $roxo-medio;
+          border-color: $roxo-medio;
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+// Loading
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px;
+
+  span {
+    font-size: 14px;
+    color: $cinza-medio;
+  }
+}
+
+// Grid de pipelines
+.pipelines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+// Card do pipeline
+.pipeline-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid $cinza-claro;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba($roxo-escuro, 0.1);
+    border-color: $roxo-claro;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .card-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+
+      &.dificuldade-iniciante {
+        background: rgba($sucesso, 0.1);
+        color: darken($sucesso, 10%);
+      }
+
+      &.dificuldade-intermediario {
+        background: rgba($aviso, 0.1);
+        color: darken($aviso, 10%);
+      }
+
+      &.dificuldade-avancado {
+        background: rgba($erro, 0.1);
+        color: darken($erro, 10%);
+      }
+    }
+
+    .card-tipo {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: $cinza-medio;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  .card-content {
+    margin-bottom: 16px;
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: $cinza-escuro;
+    }
+
+    .descricao {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: $cinza-medio;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-professor {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: $cinza-medio;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+
+      .disciplina {
+        color: $roxo-medio;
+      }
+    }
+
+    .card-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+
+      .tag {
+        padding: 3px 8px;
+        background: rgba($roxo-medio, 0.08);
+        border-radius: 4px;
+        font-size: 11px;
+        color: $roxo-medio;
+      }
+    }
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid $cinza-claro;
+
+    .card-stats {
+      display: flex;
+      gap: 12px;
+
+      .stat {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        color: $cinza-medio;
+
+        mat-icon {
+          font-size: 14px;
+          width: 14px;
+          height: 14px;
+        }
+      }
+    }
+
+    .btn-copiar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: rgba($roxo-medio, 0.1);
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: $roxo-medio;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+
+      &:hover {
+        background: $roxo-medio;
+        color: white;
+      }
+    }
+  }
+}
+
+// Estado vazio
+.estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: $cinza-medio;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: $cinza-escuro;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: $cinza-medio;
+  }
+}

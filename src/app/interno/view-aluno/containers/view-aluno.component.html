@@ -1,1 +1,23 @@
-<app-dashboard></app-dashboard>
+<div class="view-aluno-container">
+  <!-- Navigation Bar -->
+  <nav class="aluno-nav">
+    <div class="nav-left">
+      <button class="nav-btn" (click)="navegarParaProjetos()" matTooltip="Meus Projetos">
+        <mat-icon>folder</mat-icon>
+        <span>Meus Projetos</span>
+      </button>
+      <button class="nav-btn" (click)="navegarParaGaleria()" matTooltip="Galeria de Pipelines">
+        <mat-icon>explore</mat-icon>
+        <span>Galeria</span>
+      </button>
+    </div>
+    <div class="nav-right">
+      <span class="nav-title">Pipeline Atual</span>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="aluno-content">
+    <app-dashboard></app-dashboard>
+  </main>
+</div>
