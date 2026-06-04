@@ -232,3 +232,90 @@ h4 {
     color: darken($sucesso, 10%);
   }
 }
+
+// Estilos para itens desabilitados
+.item-option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: $cinza-claro;
+
+  &:hover {
+    border-color: $cinza-medio;
+    background: $cinza-claro;
+  }
+
+  mat-icon {
+    color: $cinza-medio;
+  }
+}
+
+.item-tipo {
+  font-size: 11px;
+  color: $cinza-medio;
+  font-style: italic;
+}
+
+// Estilos para tipo de coluna
+.coluna-tipo {
+  font-size: 10px;
+  color: $cinza-medio;
+  margin-left: 4px;
+  font-style: italic;
+}
+
+.colunas-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba($aviso, 0.1);
+  border-radius: 8px;
+  margin-top: 8px;
+
+  mat-icon {
+    color: $aviso;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  span {
+    font-size: 12px;
+    color: darken($aviso, 10%);
+  }
+}
+
+// Estilos para informação de tipos
+.tipos-info {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba($info, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba($info, 0.1);
+
+  h4 {
+    margin: 0 0 8px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: $roxo-escuro;
+  }
+
+  .tipo-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      color: $cinza-medio;
+    }
+
+    span {
+      font-size: 11px;
+      color: $cinza-escuro;
+    }
+  }
+}

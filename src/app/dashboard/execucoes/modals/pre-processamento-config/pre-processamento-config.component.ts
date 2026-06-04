@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { ItemPipeline, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
+import { ItemPipeline, ResultadoColetaDado, TipoDado } from '../../../../models/item-coleta-dado.model';
 import { DashboardService } from '../../../services/dashboard.service';
 
 export interface PreProcessamentoConfig {
@@ -20,6 +20,9 @@ export class PreProcessamentoConfigComponent implements OnInit {
   itensDisponiveis: any[] = [];
   itensSelecionados: any[] = [];
   colunas: string[] = [];
+  colunasNumericas: string[] = [];
+  colunasCategoricas: string[] = [];
+  tiposColunas: Record<string, TipoDado> = {};
 
   constructor(private dashboardService: DashboardService) {}
 
@@ -41,12 +44,33 @@ export class PreProcessamentoConfigComponent implements OnInit {
         c => c !== this.resultadoColetaDado?.target
       );
     }
+    
+    // Separar colunas por tipo
+    if (this.resultadoColetaDado?.tipos) {
+      this.tiposColunas = this.resultadoColetaDado.tipos;
+      this.colunasNumericas = this.colunas.filter(c => 
+        this.tiposColunas[c] === 'Número'
+      );
+      this.colunasCategoricas = this.colunas.filter(c => 
+        this.tiposColunas[c] === 'Texto' || this.tiposColunas[c] === 'Booleano'
+      );
+    } else {
+      // Se não tiver informação de tipo, assume todas como numéricas
+      this.colunasNumericas = [...this.colunas];
+      this.colunasCategoricas = [];
+    }
   }
 
   carregarItensPreProcessamento() {
     this.dashboardService.getItensPreProcessamento().subscribe(itens => {
-      this.itensDisponiveis = [...itens];
-      // Remover itens ja selecionados da lista de disponiveis
+      // Filtrar itens inadequados:
+      // - LabelEncoder não deve estar disponível para features (é para target)
+      // - OneHotEncoder e OrdinalEncoder devem ter pelo menos uma coluna categórica
+      this.itensDisponiveis = itens.filter(item => 
+        item.valor !== 'label_encoder'
+      );
+      
+      // Remover itens já selecionados da lista de disponíveis
       if (this.preProcessamentoConfig?.itens) {
         const valoresSelecionados = this.preProcessamentoConfig.itens.map(i => i.valor);
         this.itensDisponiveis = this.itensDisponiveis.filter(
@@ -56,12 +80,49 @@ export class PreProcessamentoConfigComponent implements OnInit {
     });
   }
 
+  // Retorna as colunas disponíveis para um determinado tipo de pré-processamento
+  getColunasDisponiveis(item: any): string[] {
+    switch (item.valor) {
+      case 'onehot_encoder':
+      case 'ordinal_encoder':
+        // Encoders só podem ser aplicados a colunas categóricas (texto ou booleano)
+        return this.colunasCategoricas;
+      case 'standard_scaler':
+      case 'minmax_scaler':
+      case 'robust_scaler':
+      case 'normalizer':
+      case 'polynomial_features':
+      case 'power_transformer':
+        // Scalers e transformadores só podem ser aplicados a colunas numéricas
+        return this.colunasNumericas;
+      case 'simple_imputer':
+        // Imputer pode ser aplicado a qualquer coluna
+        return this.colunas;
+      default:
+        return this.colunas;
+    }
+  }
+
+  // Verifica se um item pode ser adicionado (tem colunas disponíveis)
+  podeAdicionar(item: any): boolean {
+    const colunasDisponiveis = this.getColunasDisponiveis(item);
+    return colunasDisponiveis.length > 0;
+  }
+
   adicionarItem(item: any) {
-    // Adicionar com todas as colunas por padrão
+    // Obter colunas disponíveis para este tipo de pré-processamento
+    const colunasDisponiveis = this.getColunasDisponiveis(item);
+    
+    // Se não houver colunas disponíveis, não adicionar
+    if (colunasDisponiveis.length === 0) {
+      return;
+    }
+
+    // Adicionar com as colunas disponíveis por padrão
     this.itensSelecionados.push({
       valor: item.valor,
       label: item.label,
-      colunas: [...this.colunas]
+      colunas: [...colunasDisponiveis]
     });
 
     // Remover da lista de disponíveis
@@ -91,6 +152,30 @@ export class PreProcessamentoConfigComponent implements OnInit {
 
   isColunaSelecionada(item: any, coluna: string): boolean {
     return item.colunas?.includes(coluna);
+  }
+
+  // Verifica se uma coluna está disponível para um item específico
+  isColunaDisponivelParaItem(item: any, coluna: string): boolean {
+    const colunasDisponiveis = this.getColunasDisponiveis(item);
+    return colunasDisponiveis.includes(coluna);
+  }
+
+  // Retorna uma mensagem explicando por que um item não pode ser adicionado
+  getMensagemIndisponivel(item: any): string {
+    switch (item.valor) {
+      case 'onehot_encoder':
+      case 'ordinal_encoder':
+        return 'Requer colunas categóricas (texto ou booleano)';
+      case 'standard_scaler':
+      case 'minmax_scaler':
+      case 'robust_scaler':
+      case 'normalizer':
+      case 'polynomial_features':
+      case 'power_transformer':
+        return 'Requer colunas numéricas';
+      default:
+        return 'Nenhuma coluna disponível';
+    }
   }
 
   private emitirConfig() {

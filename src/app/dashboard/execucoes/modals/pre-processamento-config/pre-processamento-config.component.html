@@ -26,13 +26,18 @@
       <!-- Colunas configuráveis -->
       <div class="item-colunas" *ngIf="item.expanded">
         <div class="colunas-grid">
-          <div *ngFor="let col of colunas"
+          <div *ngFor="let col of getColunasDisponiveis(item)"
                class="coluna-chip"
                [class.selected]="isColunaSelecionada(item, col)"
                (click)="toggleColuna(idx, col)">
             <mat-icon>{{ isColunaSelecionada(item, col) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
             <span>{{ col }}</span>
+            <span class="coluna-tipo">{{ tiposColunas[col] || 'N/A' }}</span>
           </div>
+        </div>
+        <div class="colunas-info" *ngIf="getColunasDisponiveis(item).length === 0">
+          <mat-icon>info</mat-icon>
+          <span>Nenhuma coluna disponível para este transformador</span>
         </div>
       </div>
     </div>
@@ -44,9 +49,12 @@
     <div class="itens-grid">
       <div *ngFor="let item of itensDisponiveis"
            class="item-option"
-           (click)="adicionarItem(item)">
-        <mat-icon>add_circle_outline</mat-icon>
+           [class.disabled]="!podeAdicionar(item)"
+           [matTooltip]="!podeAdicionar(item) ? getMensagemIndisponivel(item) : ''"
+           (click)="podeAdicionar(item) && adicionarItem(item)">
+        <mat-icon>{{ podeAdicionar(item) ? 'add_circle_outline' : 'block' }}</mat-icon>
         <span>{{ item.label }}</span>
+        <span class="item-tipo" *ngIf="!podeAdicionar(item)">(indisponível)</span>
       </div>
     </div>
   </div>
@@ -55,5 +63,18 @@
   <div class="all-added" *ngIf="itensDisponiveis.length === 0 && itensSelecionados.length > 0">
     <mat-icon>check_circle</mat-icon>
     <span>Todas as transformações foram adicionadas</span>
+  </div>
+
+  <!-- Informação sobre tipos de colunas -->
+  <div class="tipos-info" *ngIf="colunasNumericas.length > 0 || colunasCategoricas.length > 0">
+    <h4>Tipos de colunas detectados</h4>
+    <div class="tipo-item" *ngIf="colunasNumericas.length > 0">
+      <mat-icon>numbers</mat-icon>
+      <span><strong>Numéricas:</strong> {{ colunasNumericas.join(', ') }}</span>
+    </div>
+    <div class="tipo-item" *ngIf="colunasCategoricas.length > 0">
+      <mat-icon>text_fields</mat-icon>
+      <span><strong>Categóricas:</strong> {{ colunasCategoricas.join(', ') }}</span>
+    </div>
   </div>
 </div>
