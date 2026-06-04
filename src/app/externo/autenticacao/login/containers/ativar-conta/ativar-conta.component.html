@@ -1,0 +1,93 @@
+<div class="ativar-conta-page">
+  <!-- Left side - Branding -->
+  <div class="branding-section">
+    <div class="branding-content">
+      <div class="logo-container">
+        <div class="logo-icon">IA</div>
+        <h1 class="logo-text">Iana</h1>
+      </div>
+      <p class="branding-subtitle">Plataforma de Ensino de Machine Learning</p>
+      <div class="branding-features">
+        <div class="feature-item">
+          <mat-icon>school</mat-icon>
+          <span>Aprenda na prática com pipelines interativos</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>psychology</mat-icon>
+          <span>Tutor contextual para cada etapa</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>analytics</mat-icon>
+          <span>Métricas e visualizações em tempo real</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right side - Form -->
+  <div class="form-section">
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="carregando">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Verificando convite...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-container" *ngIf="!carregando && !tokenValido">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <h2>Convite Inválido</h2>
+      <p>{{ erroToken }}</p>
+      <button class="btn-primary" (click)="irParaLogin()">Ir para Login</button>
+    </div>
+
+    <!-- Activate Form -->
+    <div class="form-container" *ngIf="!carregando && tokenValido">
+      <div class="form-header">
+        <mat-icon class="header-icon">person_add</mat-icon>
+        <h2>Criar sua Senha</h2>
+        <p>Olá, <strong>{{ nomeUsuario }}</strong>! Defina sua senha para acessar a plataforma.</p>
+        <p class="email-info">Email: {{ emailUsuario }}</p>
+      </div>
+
+      <form [formGroup]="formSenha" (ngSubmit)="ativarConta()" class="senha-form">
+        <div class="field-group">
+          <label class="field-label">Nova Senha</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">lock</mat-icon>
+            <input 
+              type="password" 
+              formControlName="senha" 
+              placeholder="Mínimo 6 caracteres"
+              class="form-input"
+              [class.error]="formSenha.get('senha')?.touched && formSenha.get('senha')?.invalid">
+          </div>
+          <span class="field-error" *ngIf="formSenha.get('senha')?.touched && formSenha.get('senha')?.invalid">
+            {{ getErroCampo('senha') }}
+          </span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Confirmar Senha</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">lock</mat-icon>
+            <input 
+              type="password" 
+              formControlName="confirmarSenha" 
+              placeholder="Repita a senha"
+              class="form-input"
+              [class.error]="formSenha.get('confirmarSenha')?.touched && formSenha.get('confirmarSenha')?.invalid">
+          </div>
+          <span class="field-error" *ngIf="formSenha.hasError('senhasNaoIguais') && formSenha.get('confirmarSenha')?.touched">
+            As senhas não coincidem
+          </span>
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="ativandoConta || formSenha.invalid">
+          <mat-spinner *ngIf="ativandoConta" diameter="20"></mat-spinner>
+          <span *ngIf="!ativandoConta">Ativar Conta</span>
+          <span *ngIf="ativandoConta">Ativando...</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
