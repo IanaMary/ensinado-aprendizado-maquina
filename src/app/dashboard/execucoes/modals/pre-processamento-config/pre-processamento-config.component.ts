@@ -81,6 +81,26 @@ export class PreProcessamentoConfigComponent implements OnInit {
     });
   }
 
+  // Retorna o tipo de uma coluna ('Número' | 'Texto' | 'Booleano')
+  // Usa 'tipos' como fonte primária e 'colunasDetalhes' como fallback
+  private getTipoColuna(coluna: string): string {
+    const tipoDireto = this.tiposColunas[coluna];
+    if (tipoDireto) return tipoDireto;
+
+    const detalhes = this.resultadoColetaDado?.colunasDetalhes as any[] | undefined;
+    if (detalhes?.length) {
+      const det = detalhes.find((d: any) => d.nome_coluna === coluna);
+      if (det?.tipo_coluna) {
+        const t = (det.tipo_coluna || '').toLowerCase();
+        if (t === 'numero' || t === 'número') return 'Número';
+        if (t === 'booleano' || t === 'boolean') return 'Booleano';
+        if (t === 'texto' || t === 'string') return 'Texto';
+        return det.tipo_coluna;
+      }
+    }
+    return '';
+  }
+
   // Retorna as colunas disponíveis para um determinado tipo de pré-processamento
   getColunasDisponiveis(item: any): string[] {
     switch (item.valor) {
@@ -97,10 +117,11 @@ export class PreProcessamentoConfigComponent implements OnInit {
         // Scalers e transformadores só podem ser aplicados a colunas numéricas (Número)
         return this.colunasNumericas;
       case 'label_encoder':
-        // LabelEncoder é destinado ao target (coluna Texto categórica) — inclui o target se for Texto
+        // LabelEncoder é destinado ao target (coluna Texto categórica)
+        // Disponibilizado quando o target é Texto, para permitir treinar
+        // modelos que não aceitam texto como target.
         const target = this.resultadoColetaDado?.target;
-        const tipos = this.resultadoColetaDado?.tipos || {};
-        if (target && (tipos[target] || '').toLowerCase() === 'texto') {
+        if (target && this.getTipoColuna(target).toLowerCase() === 'texto') {
           return [target];
         }
         return [];
@@ -182,8 +203,8 @@ export class PreProcessamentoConfigComponent implements OnInit {
       case 'polynomial_features':
       case 'power_transformer':
         return 'Requer colunas Número';
-      case 'label_encoder':
-        return 'Requer target do tipo Texto';
+        case 'label_encoder':
+          return 'Disponível apenas quando o target (rótulo) é Texto';
       default:
         return 'Nenhuma coluna disponível';
     }

@@ -329,6 +329,21 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     this.resultColetaDadoL.colunasDetalhes = res.colunas_detalhes;
 
+    const tipos: Record<string, TipoDado> = {};
+    if (res.colunas_detalhes?.length) {
+      for (const det of res.colunas_detalhes) {
+        const t = (det.tipo_coluna || '').toLowerCase();
+        tipos[det.nome_coluna] = t === 'numero' || t === 'número' ? 'Número'
+          : t === 'texto' || t === 'string' ? 'Texto'
+          : t === 'booleano' || t === 'boolean' ? 'Booleano'
+          : 'Texto';
+      }
+    } else if (res.preview_treino?.length) {
+      const detected = this.detectarTipos(res.preview_treino);
+      Object.assign(tipos, detected);
+    }
+    this.resultColetaDadoL.tipos = tipos;
+
     this.treino.dados = res.preview_treino;
     this.treino.totalDados = res.num_linhas_treino;
     this.treino.nomeArquivo = res.arquivo_nome_treino;
