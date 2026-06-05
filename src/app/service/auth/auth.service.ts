@@ -39,11 +39,13 @@ export class AuthService {
 
   salvarUsuarioSessionStorage(usuario: any): Promise<any> {
     return new Promise((resolve) => {
-      sessionStorage.setItem('id', usuario?.usuario?._id);
-      sessionStorage.setItem('token', usuario.access_token);
-      sessionStorage.setItem('name', usuario?.usuario?.nome_usuario || usuario?.usuario?.name);
-      sessionStorage.setItem('role', usuario?.usuario?.role);
-      resolve(true);
+      setTimeout(() => {
+        sessionStorage.setItem('id', usuario?.usuario?._id);
+        sessionStorage.setItem('token', usuario.access_token);
+        sessionStorage.setItem('name', usuario?.usuario?.nome_usuario || usuario?.usuario?.name);
+        sessionStorage.setItem('role', usuario?.usuario?.role);
+        resolve(true);
+      }, 0);
     });
   }
 
@@ -74,6 +76,6 @@ export class AuthService {
 
   logout(): void {
     sessionStorage.clear();
-    this.router.navigate(['/autenticacao/login', { queryParams: { expirado: 1 } }]);
+    this.router.navigate(['/autenticacao/login'], { queryParams: { expirado: 1 } });
   }
 }

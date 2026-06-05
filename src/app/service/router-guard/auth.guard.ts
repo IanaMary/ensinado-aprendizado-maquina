@@ -23,6 +23,7 @@ export class AuthGuard implements CanLoad {
     const requiredRole = roleMap[firstSegment];
 
     if (requiredRole && role !== requiredRole) {
+      console.warn(`Acesso negado: role '${role}' não tem permissão para '${firstSegment}'`);
       this.router.navigate(['/autenticacao/login']);
       return false;
     }
@@ -30,3 +31,4 @@ export class AuthGuard implements CanLoad {
     return true;
   }
 }
+

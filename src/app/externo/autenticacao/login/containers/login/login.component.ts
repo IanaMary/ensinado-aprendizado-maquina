@@ -18,8 +18,6 @@ export class LoginComponent implements OnInit {
 
   loginForm: FormGroup;
   hide = true;
-  email: any;
-  senha: any;
 
   constructor(private readonly loginService: LoginService,
     private readonly formBuilder: FormBuilder,
@@ -48,18 +46,23 @@ export class LoginComponent implements OnInit {
   }
 
   entrar() {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
 
-    this.loginService.login(this.email, this.senha).subscribe({
-      next: async (usuario: any) => {
+    const { email, senha } = this.loginForm.value;
+    console.log('Tentando login com:', { email, senha });
+
+    this.loginService.login(email, senha).subscribe({
+      next: (usuario: any) => {
         console.log('Login response:', usuario);
-        const validar = await this.auth.salvarUsuarioSessionStorage(usuario);
-        if (validar) {
-
-          const role = usuario?.usuario?.role
+        this.auth.salvarUsuarioSessionStorage(usuario).then(() => {
+          const role = usuario?.usuario?.role;
           console.log('Role:', role, 'Rota:', roleMap[role]);
           const rota = roleMap[role] || '/autenticacao/login';
-          await this.router.navigate([rota]);
-        }
+          this.router.navigate([rota]);
+        });
       },
       error: (error: any) => {
         console.error('Erro no login:', error);

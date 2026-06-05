@@ -37,10 +37,9 @@
           <label class="field-label">Email</label>
           <div class="input-wrapper">
             <mat-icon class="input-icon">email</mat-icon>
-            <input 
-              [(ngModel)]="email" 
-              formControlName="email" 
-              matInput 
+            <input
+              formControlName="email"
+              matInput
               placeholder="seu@email.com"
               class="form-input">
           </div>
@@ -50,10 +49,9 @@
           <label class="field-label">Senha</label>
           <div class="input-wrapper">
             <mat-icon class="input-icon">lock</mat-icon>
-            <input 
-              [(ngModel)]="senha" 
-              formControlName="senha" 
-              matInput 
+            <input
+              formControlName="senha"
+              matInput
               [type]="hide ? 'password' : 'text'"
               placeholder="Sua senha"
               class="form-input">
