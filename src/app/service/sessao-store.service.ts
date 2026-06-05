@@ -13,16 +13,16 @@ export class SessionService {
     return localStorage.getItem(this.STORAGE_KEY) || '';
   }
 
-  getColetaId(): string {
-    return sessionStorage.getItem('idColeta') || '';
+  getColetaId(): string | null {
+    return sessionStorage.getItem('idColeta');
   }
 
   setColetaId(idColeta: string) {
     sessionStorage.setItem('idColeta', idColeta);
   }
 
-  getConfigurcaoTreinamento(): string {
-    return sessionStorage.getItem('configurcaoTreinamento') || '';
+  getConfigurcaoTreinamento(): string | null {
+    return sessionStorage.getItem('configurcaoTreinamento');
   }
 
   setConfigurcaoTreinamento(configurcaoTreinamento: string) {

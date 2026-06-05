@@ -41,11 +41,28 @@ export class ClasificadorComponent implements OnChanges {
   async enviarParaClassificador(classificador: string) {
     this.treinando = true
     const tipoClassficador = classificador ?? '';
+    const arquivoId = this.sessionService.getColetaId();
+    const configuracaoId = this.sessionService.getConfigurcaoTreinamento();
+    const modeloId = this.modeloSelecionado?.id;
+
+    if (!arquivoId || !configuracaoId || !modeloId) {
+      this.treinando = false;
+      this.resultadoTreinamento = {
+        ...this.resultadoTreinamento,
+        [(modeloId ?? classificador ?? 'modelo')]: {
+          erro: true,
+          status: 'IDs ausentes: faça upload de dados e selecione o modelo antes de treinar.'
+        }
+      };
+      this.atualizarResultadoTreinamento.emit(this.resultadoTreinamento);
+      return;
+    }
+
     const body = {
       tipo_arquivo: 'xlsx',
-      arquivo_id: this.sessionService.getColetaId(),
-      configuracao_id: this.sessionService.getConfigurcaoTreinamento(),
-      modelo_id: this.modeloSelecionado?.id
+      arquivo_id: arquivoId,
+      configuracao_id: configuracaoId,
+      modelo_id: modeloId
     }
 
     this.dashboardService.classificadorTreino(tipoClassficador, body).subscribe({

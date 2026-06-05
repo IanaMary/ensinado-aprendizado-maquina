@@ -95,8 +95,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   ngOnChanges(changes: SimpleChanges) {
 
-    this.idColeta = this.sessionService.getColetaId();
-    this.idConfigurcacaoTreinamento = this.sessionService.getConfigurcaoTreinamento();
+    this.idColeta = this.sessionService.getColetaId() ?? '';
+    this.idConfigurcacaoTreinamento = this.sessionService.getConfigurcaoTreinamento() ?? '';
     if (this.idConfigurcacaoTreinamento && !this.resultadoColetaDado) {
       this.getColetaInfo();
     }
