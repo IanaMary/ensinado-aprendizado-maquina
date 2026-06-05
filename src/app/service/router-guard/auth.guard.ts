@@ -11,8 +11,10 @@ export class AuthGuard implements CanLoad {
 
   async canLoad(route: Route, segments: UrlSegment[]): Promise<boolean> {
     const autenticado: boolean = await this.authService.autenticado();
+    console.log('[AuthGuard] canLoad chamado. segments:', segments, 'autenticado:', autenticado);
 
     if (!autenticado) {
+      console.warn('[AuthGuard] Não autenticado, redirecionando para login');
       this.router.navigate(['/autenticacao/login']);
       return false;
     }
@@ -23,11 +25,12 @@ export class AuthGuard implements CanLoad {
     const requiredRole = roleMap[firstSegment];
 
     if (requiredRole && role !== requiredRole) {
-      console.warn(`Acesso negado: role '${role}' não tem permissão para '${firstSegment}'`);
+      console.warn(`[AuthGuard] Acesso negado: role '${role}' não tem permissão para '${firstSegment}'`);
       this.router.navigate(['/autenticacao/login']);
       return false;
     }
 
+    console.log('[AuthGuard] Acesso permitido. role:', role, 'rota:', firstSegment);
     return true;
   }
 }

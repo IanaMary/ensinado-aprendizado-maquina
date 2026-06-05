@@ -46,26 +46,33 @@ export class LoginComponent implements OnInit {
   }
 
   entrar() {
+    console.log('[Login] entrar() chamado. Form valid:', this.loginForm.valid, 'Form value:', this.loginForm.value);
+
     if (this.loginForm.invalid) {
+      console.warn('[Login] Form inválido:', this.loginForm.errors);
       this.loginForm.markAllAsTouched();
       return;
     }
 
     const { email, senha } = this.loginForm.value;
-    console.log('Tentando login com:', { email, senha });
+    console.log('[Login] Tentando login com:', { email, senha });
 
     this.loginService.login(email, senha).subscribe({
       next: (usuario: any) => {
-        console.log('Login response:', usuario);
+        console.log('[Login] Resposta do servidor:', usuario);
         this.auth.salvarUsuarioSessionStorage(usuario).then(() => {
           const role = usuario?.usuario?.role;
-          console.log('Role:', role, 'Rota:', roleMap[role]);
           const rota = roleMap[role] || '/autenticacao/login';
-          this.router.navigate([rota]);
+          console.log('[Login] Role:', role, 'Navegando para:', rota);
+          this.router.navigate([rota]).then(success => {
+            console.log('[Login] Navegação resultado:', success);
+          }).catch(err => {
+            console.error('[Login] Erro na navegação:', err);
+          });
         });
       },
       error: (error: any) => {
-        console.error('Erro no login:', error);
+        console.error('[Login] Erro no login:', error);
         let messageErr: string;
 
         switch (error.status) {

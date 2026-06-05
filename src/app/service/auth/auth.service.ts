@@ -38,15 +38,12 @@ export class AuthService {
   }
 
   salvarUsuarioSessionStorage(usuario: any): Promise<any> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        sessionStorage.setItem('id', usuario?.usuario?._id);
-        sessionStorage.setItem('token', usuario.access_token);
-        sessionStorage.setItem('name', usuario?.usuario?.nome_usuario || usuario?.usuario?.name);
-        sessionStorage.setItem('role', usuario?.usuario?.role);
-        resolve(true);
-      }, 0);
-    });
+    sessionStorage.setItem('id', usuario?.usuario?._id);
+    sessionStorage.setItem('token', usuario.access_token);
+    sessionStorage.setItem('name', usuario?.usuario?.nome_usuario || usuario?.usuario?.name);
+    sessionStorage.setItem('role', usuario?.usuario?.role);
+    console.log('[Auth] Token salvo no sessionStorage. Role:', usuario?.usuario?.role);
+    return Promise.resolve(true);
   }
 
   limparSessionStorage(): Promise<any> {
