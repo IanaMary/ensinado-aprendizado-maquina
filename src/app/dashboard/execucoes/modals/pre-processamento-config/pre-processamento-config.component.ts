@@ -48,12 +48,27 @@ export class PreProcessamentoConfigComponent implements OnInit {
     // Separar colunas por tipo
     if (this.resultadoColetaDado?.tipos) {
       this.tiposColunas = this.resultadoColetaDado.tipos;
-      this.colunasNumericas = this.colunas.filter(c => 
-        this.tiposColunas[c] === 'Número'
-      );
-      this.colunasCategoricas = this.colunas.filter(c => 
-        this.tiposColunas[c] === 'Texto' || this.tiposColunas[c] === 'Booleano'
-      );
+      this.colunasNumericas = this.colunas.filter(c => {
+        const t = (this.tiposColunas[c] || '').toLowerCase();
+        return t === 'número' || t === 'numero' || t === 'number';
+      });
+      this.colunasCategoricas = this.colunas.filter(c => {
+        const t = (this.tiposColunas[c] || '').toLowerCase();
+        return t === 'texto' || t === 'string' || t === 'booleano' || t === 'boolean';
+      });
+    } else if (this.resultadoColetaDado?.colunasDetalhes) {
+      this.colunasNumericas = this.resultadoColetaDado.colunasDetalhes
+        .filter((d: any) => {
+          const t = (d.tipo_coluna || '').toLowerCase();
+          return t === 'numero' || t === 'número' || t === 'number';
+        })
+        .map((d: any) => d.nome_coluna);
+      this.colunasCategoricas = this.resultadoColetaDado.colunasDetalhes
+        .filter((d: any) => {
+          const t = (d.tipo_coluna || '').toLowerCase();
+          return t === 'texto' || t === 'string' || t === 'booleano' || t === 'boolean';
+        })
+        .map((d: any) => d.nome_coluna);
     } else {
       // Se não tiver informação de tipo, assume todas como numéricas
       this.colunasNumericas = [...this.colunas];
