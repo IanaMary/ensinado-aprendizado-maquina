@@ -147,7 +147,7 @@ export class ScriptGeneratorService {
     lines.push('');
     lines.push(this.generateFeatureSelectionFunction(resultadoColetaDado));
     lines.push('');
-    lines.push(this.generatePreprocessingFunction(preProcessamentoConfig));
+    lines.push(this.generatePreprocessingFunction(resultadoColetaDado, preProcessamentoConfig));
     lines.push('');
     lines.push(this.generateModelTrainingFunction(modeloSelecionado, hiperparametros));
     lines.push('');
@@ -315,7 +315,7 @@ export class ScriptGeneratorService {
     ].join('\n');
   }
 
-  private generatePreprocessingFunction(preProcessamentoConfig?: any): string {
+  private generatePreprocessingFunction(resultadoColetaDado: ResultadoColetaDado | undefined, preProcessamentoConfig?: any): string {
     const lines: string[] = [];
     lines.push('# ============================================');
     lines.push('# Função: Pré-processamento');
