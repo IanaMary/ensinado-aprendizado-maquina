@@ -180,7 +180,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     // Marcar todos os atributos exceto target
     this.att = {};
-    const tipos: Record<string, string> = {};
+    const tipos: Record<string, TipoDado> = {};
     for (const det of resultado.colunas_detalhes) {
       const t = (det.tipo_coluna || '').toLowerCase();
       tipos[det.nome_coluna] = t === 'numero' || t === 'número' ? 'Número'
