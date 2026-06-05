@@ -378,9 +378,12 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     if (this.tipoPredicao === 'exploratorio') return false;
     if (!this.resultColetaDadoL.dadosRotulados) return false;
 
-    const tipo = item.tipo_coluna;
-    if (this.tipoPredicao === 'classificacao') return tipo === 'string';
-    if (this.tipoPredicao === 'regressao') return tipo === 'number';
+    const tipo = (item.tipo_coluna || '').toLowerCase();
+    const isTexto = tipo === 'texto' || tipo === 'string';
+    const isNumero = tipo === 'numerico' || tipo === 'number';
+
+    if (this.tipoPredicao === 'classificacao') return isTexto;
+    if (this.tipoPredicao === 'regressao') return isNumero;
     return false;
   }
 
@@ -388,9 +391,12 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     if (this.tipoPredicao === 'exploratorio') return 'Selecione um tipo de predição';
     if (!this.resultColetaDadoL.dadosRotulados) return 'Marque "Dados possuem rótulo"';
 
-    const tipo = item.tipo_coluna;
-    if (this.tipoPredicao === 'classificacao' && tipo === 'number') return 'Classificação requer coluna texto';
-    if (this.tipoPredicao === 'regressao' && tipo === 'string') return 'Regressão requer coluna numérica';
+    const tipo = (item.tipo_coluna || '').toLowerCase();
+    const isTexto = tipo === 'texto' || tipo === 'string';
+    const isNumero = tipo === 'numerico' || tipo === 'number';
+
+    if (this.tipoPredicao === 'classificacao' && !isTexto) return 'Classificação requer coluna texto';
+    if (this.tipoPredicao === 'regressao' && !isNumero) return 'Regressão requer coluna numérica';
     return '';
   }
 
