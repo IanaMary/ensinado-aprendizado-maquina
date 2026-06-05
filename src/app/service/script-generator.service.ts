@@ -334,10 +334,12 @@ export class ScriptGeneratorService {
     lines.push('    X_train = X_train.copy()');
     lines.push('    X_test = X_test.copy()');
 
+    const targetCol = resultadoColetaDado?.target;
+
     for (const item of preProcessamentoConfig.itens) {
       const colunas = item.colunas || [];
-      const colsArray = colunas.length > 0 
-        ? `[${colunas.map((c: string) => `"${c}"`).join(', ')}]` 
+      const colsArray = colunas.length > 0
+        ? `[${colunas.map((c: string) => `"${c}"`).join(', ')}]`
         : null;
 
       lines.push('    ');
@@ -413,7 +415,6 @@ export class ScriptGeneratorService {
         case 'label_encoder':
           lines.push(`    # ${item.label}: Codifica rótulos categóricos (target)`);
           lines.push('    le = LabelEncoder()');
-          const targetCol = resultadoColetaDado?.target;
           for (const col of colunas) {
             if (col === targetCol) {
               lines.push(`    y_train = le.fit_transform(y_train)`);
