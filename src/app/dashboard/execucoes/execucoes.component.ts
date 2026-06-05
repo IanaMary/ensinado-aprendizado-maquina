@@ -473,6 +473,7 @@ export class ExecucoesComponent implements OnInit {
     this.resultadoTreinamento = undefined;
     this.metricasSelecionadas = [];
     this.resultadosDasAvaliacoes = {};
+    this.preProcessamentoConfig = null;
     this.tutorPipelineInfo = null;
     this.tutorItemInfo = null;
     this.tutorTheme = 'default';

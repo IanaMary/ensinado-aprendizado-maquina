@@ -257,6 +257,36 @@ export class DashboardService {
 
   limparItensExecucao() {
     this.itemsEmExecucao.next([]);
+
+    // Reseta o status dos widgets das colunas para o estado original
+    // (movido=false, habilitado no estado default) para que o usuário
+    // possa mover/selecionar novamente após limpar.
+    const resetColeta = this.itensColetasDados.value.map(i => ({
+      ...i,
+      movido: false,
+      habilitado: true,
+    }));
+    this.itensColetasDados.next(resetColeta);
+
+    const resetPre = this.itensPreProcessamento.value.map(i => ({
+      ...i,
+      movido: false,
+    }));
+    this.itensPreProcessamento.next(resetPre);
+
+    const resetModelos = this.itensModelos.value.map(i => ({
+      ...i,
+      movido: false,
+      habilitado: false,
+    }));
+    this.itensModelos.next(resetModelos);
+
+    const resetMetricas = this.itensMetricas.value.map(i => ({
+      ...i,
+      movido: false,
+      habilitado: false,
+    }));
+    this.itensMetricas.next(resetMetricas);
   }
 
 
