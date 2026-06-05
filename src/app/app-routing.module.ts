@@ -17,7 +17,6 @@ const routes: Routes = [
   },
   {
     path: '',
-    pathMatch: 'full',
     loadChildren: () => import('./interno/interno.module').then(m => m.InternoModule),
     canLoad: [AuthGuard]
   },
