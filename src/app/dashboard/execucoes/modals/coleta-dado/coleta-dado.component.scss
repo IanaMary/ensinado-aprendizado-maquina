@@ -431,3 +431,178 @@ input[type="file"] {
     min-width: 200px;
   }
 }
+
+// === Seção de Toy Datasets ===
+.secao-datasets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: $cinza-claro;
+  border-radius: 10px;
+}
+
+.datasets-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .datasets-filtro {
+    flex: 1;
+    min-width: 180px;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  .btn-voltar-arquivo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid $cinza-medio;
+    background: $branco;
+    color: $roxo-escuro;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      background: $roxo-escuro;
+      color: $branco;
+      border-color: $roxo-escuro;
+    }
+  }
+}
+
+.datasets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.dataset-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: $branco;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  &:hover {
+    border-color: $roxo-medio;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &.selecionado {
+    border-color: $roxo-escuro;
+    background: rgba($roxo-escuro, 0.04);
+  }
+
+  .dataset-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      color: $roxo-escuro;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .dataset-nome {
+      font-weight: 600;
+      font-size: 14px;
+      color: $preto;
+    }
+  }
+
+  .dataset-descricao {
+    font-size: 12px;
+    color: $cinza-medio;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .dataset-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+
+    .badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+
+      &.badge-classificacao {
+        background: rgba($roxo-escuro, 0.12);
+        color: $roxo-escuro;
+      }
+
+      &.badge-regressao {
+        background: rgba(#1976d2, 0.12);
+        color: #1976d2;
+      }
+
+      &.badge-agrupamento {
+        background: rgba(#388e3c, 0.12);
+        color: #388e3c;
+      }
+
+      &.badge-fonte {
+        background: $cinza-medio;
+        color: $branco;
+      }
+    }
+
+    .dataset-amostras {
+      font-size: 11px;
+      color: $cinza-medio;
+      margin-left: auto;
+    }
+  }
+}
+
+.datasets-loading,
+.datasets-vazio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px;
+  color: $cinza-medio;
+  font-size: 14px;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}

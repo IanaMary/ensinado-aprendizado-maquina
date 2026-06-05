@@ -1,7 +1,29 @@
 <nav class="modal-coleta">
 
+    <!-- Toggle: Arquivo vs Dataset -->
+    <nav class="fonte-dados">
+      <nav class="fonte-tabs">
+        <button
+          type="button"
+          class="fonte-tab"
+          [class.active]="fonteDados === 'arquivo'"
+          (click)="fonteDados = 'arquivo'">
+          <mat-icon>upload_file</mat-icon>
+          <span>Enviar Arquivo</span>
+        </button>
+        <button
+          type="button"
+          class="fonte-tab"
+          [class.active]="fonteDados === 'dataset'"
+          (click)="trocarFonteDados('dataset')">
+          <mat-icon>dataset</mat-icon>
+          <span>Toy Datasets</span>
+        </button>
+      </nav>
+    </nav>
+
     <!-- Upload de arquivo -->
-    <nav class="secao-arquivos">
+    <nav class="secao-arquivos" *ngIf="fonteDados === 'arquivo'">
       <div class="arquivo-item">
         <label for="arquivo-treino">Planilha de Treino (obrigatória)</label>
         <input id="arquivo-treino" type="file" (change)="postArquivo($event, 'treino')" [accept]="aceitarArquivos" />
@@ -21,6 +43,59 @@
           <span>{{ teste.nomeArquivo }}</span>
         </div>
       </div>
+    </nav>
+
+    <!-- Lista de Toy Datasets -->
+    <nav class="secao-datasets" *ngIf="fonteDados === 'dataset'">
+      <nav class="datasets-header">
+        <nav class="datasets-filtro">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Filtrar por tipo</mat-label>
+            <mat-select [(ngModel)]="filtroTipoDataset">
+              <mat-option [value]="">Todos</mat-option>
+              <mat-option value="classificacao">Classificação</mat-option>
+              <mat-option value="regressao">Regressão</mat-option>
+              <mat-option value="agrupamento">Agrupamento</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </nav>
+        <button
+          type="button"
+          class="btn-voltar-arquivo"
+          (click)="fonteDados = 'arquivo'">
+          <mat-icon>arrow_back</mat-icon>
+          Voltar para upload
+        </button>
+      </nav>
+
+      <nav class="datasets-grid" *ngIf="!carregandoDataset && datasets.length > 0">
+        <nav
+          *ngFor="let ds of datasetsFiltrados"
+          class="dataset-card"
+          [class.selecionado]="datasetSelecionado === ds.id"
+          (click)="selecionarDataset(ds)">
+          <nav class="dataset-card-header">
+            <mat-icon>science</mat-icon>
+            <span class="dataset-nome">{{ ds.nome }}</span>
+          </nav>
+          <nav class="dataset-descricao">{{ ds.descricao }}</nav>
+          <nav class="dataset-meta">
+            <span class="badge" [ngClass]="'badge-' + ds.tipo">{{ ds.tipo }}</span>
+            <span class="badge badge-fonte">{{ ds.fonte }}</span>
+            <span class="dataset-amostras" *ngIf="ds.n_amostras">{{ ds.n_amostras }} amostras</span>
+          </nav>
+        </nav>
+      </nav>
+
+      <nav class="datasets-loading" *ngIf="carregandoDataset">
+        <mat-spinner diameter="32"></mat-spinner>
+        <span>Carregando dataset...</span>
+      </nav>
+
+      <nav class="datasets-vazio" *ngIf="!carregandoDataset && datasets.length === 0">
+        <mat-icon>inbox</mat-icon>
+        <span>Nenhum dataset disponível</span>
+      </nav>
     </nav>
 
     <!-- Seção de configuração do dataset -->

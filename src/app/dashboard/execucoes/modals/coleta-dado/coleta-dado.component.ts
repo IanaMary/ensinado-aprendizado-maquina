@@ -118,7 +118,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
   carregarDatasets() {
     if (this.datasets.length > 0) return;
-    
+
     this.dashboardService.getToyDatasets().subscribe({
       next: (datasets: any[]) => {
         this.datasets = datasets;
@@ -127,6 +127,13 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
         console.error('Erro ao carregar datasets:', err);
       }
     });
+  }
+
+  trocarFonteDados(fonte: 'arquivo' | 'dataset') {
+    this.fonteDados = fonte;
+    if (fonte === 'dataset') {
+      this.carregarDatasets();
+    }
   }
 
   selecionarDataset(ds: any) {
