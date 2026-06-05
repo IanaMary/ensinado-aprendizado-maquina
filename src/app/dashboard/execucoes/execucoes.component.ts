@@ -9,6 +9,7 @@ import tutor from '../../constants/tutor.json';
 import { ScriptGeneratorService } from '../../service/script-generator.service';
 import { PipelineService, PipelineState } from '../../service/pipeline.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NomearPipelineDialogComponent } from './modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
 
 
 @Component({
@@ -504,19 +505,31 @@ export class ExecucoesComponent implements OnInit {
   }
 
   salvarPipeline(): void {
-    const state: PipelineState = {
-      nome: 'Meu Pipeline',
-      resultadoColetaDado: this.resultadoColetaDado,
-      modeloSelecionado: this.modeloSelecionado,
-      metricasSelecionadas: this.metricasSelecionadas,
-      preProcessamentoConfig: this.preProcessamentoConfig,
-      resultadoTreinamento: this.resultadoTreinamento,
-      resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
-    };
+    const dialogRef = this.dialog.open<NomearPipelineDialogComponent, any, string | null>(
+      NomearPipelineDialogComponent,
+      {
+        width: '440px',
+        disableClose: false,
+        autoFocus: 'first-tabbable',
+      }
+    );
 
-    this.pipelineService.salvarPipeline(state).subscribe(() => {
-      // Feedback visual
-      console.log('Pipeline salvo com sucesso');
+    dialogRef.afterClosed().subscribe(nome => {
+      if (!nome) return;
+
+      const state: PipelineState = {
+        nome,
+        resultadoColetaDado: this.resultadoColetaDado,
+        modeloSelecionado: this.modeloSelecionado,
+        metricasSelecionadas: this.metricasSelecionadas,
+        preProcessamentoConfig: this.preProcessamentoConfig,
+        resultadoTreinamento: this.resultadoTreinamento,
+        resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
+      };
+
+      this.pipelineService.salvarPipeline(state).subscribe(() => {
+        console.log('Pipeline salvo com sucesso:', nome);
+      });
     });
   }
 

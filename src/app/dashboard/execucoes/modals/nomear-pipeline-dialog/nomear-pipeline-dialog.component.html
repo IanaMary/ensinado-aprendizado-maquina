@@ -1,0 +1,44 @@
+<div class="nomear-pipeline-dialog">
+  <div class="dialog-header">
+    <mat-icon>edit_note</mat-icon>
+    <h2 mat-dialog-title>
+      {{ data?.isEdicao ? 'Renomear pipeline' : 'Salvar pipeline' }}
+    </h2>
+  </div>
+
+  <mat-dialog-content>
+    <p class="dialog-desc">
+      Dê um nome para identificar este pipeline na sua galeria de projetos.
+    </p>
+
+    <mat-form-field appearance="outline" class="nome-field">
+      <mat-label>Nome do pipeline</mat-label>
+      <input
+        matInput
+        type="text"
+        [(ngModel)]="nome"
+        (keyup.enter)="confirmar()"
+        maxlength="100"
+        placeholder="Ex: Classificação Iris com KNN"
+        autocomplete="off">
+      <mat-icon matSuffix>label</mat-icon>
+      <mat-hint align="end">{{ nome.length }} / 100</mat-hint>
+    </mat-form-field>
+
+    <div class="erro" *ngIf="erro">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ erro }}</span>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button class="btn-cancelar" (click)="cancelar()">
+      <mat-icon>close</mat-icon>
+      Cancelar
+    </button>
+    <button mat-flat-button color="primary" class="btn-confirmar" (click)="confirmar()">
+      <mat-icon>check</mat-icon>
+      {{ data?.isEdicao ? 'Renomear' : 'Salvar' }}
+    </button>
+  </mat-dialog-actions>
+</div>
