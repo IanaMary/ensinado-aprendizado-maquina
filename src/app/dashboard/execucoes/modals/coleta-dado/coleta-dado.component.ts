@@ -180,10 +180,19 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     // Marcar todos os atributos exceto target
     this.att = {};
+    const tipos: Record<string, string> = {};
+    for (const det of resultado.colunas_detalhes) {
+      const t = (det.tipo_coluna || '').toLowerCase();
+      tipos[det.nome_coluna] = t === 'numero' || t === 'número' ? 'Número'
+        : t === 'texto' || t === 'string' ? 'Texto'
+        : t === 'booleano' || t === 'boolean' ? 'Booleano'
+        : 'Texto';
+    }
     for (const col of resultado.colunas) {
       this.att[col] = col !== resultado.target;
     }
     this.resultColetaDadoL.atributos = this.att;
+    this.resultColetaDadoL.tipos = tipos;
 
     // Atualizar opções de filtro
     this.opcoesNome = resultado.colunas;
