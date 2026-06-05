@@ -87,7 +87,7 @@ export class DashboardService {
   }
 
   alterarStatusUsuario(userId: string, status: string) {
-    return this.http.put<any>(`${this.url}usuario/${userId}/status`, { status });
+    return this.http.put<any>(`${this.url}usuario/${userId}/status?novo_status=${status}`, {});
   }
 
   reenviarConvite(userId: string) {
@@ -99,11 +99,11 @@ export class DashboardService {
   }
 
   verificarConvite(token: string) {
-    return this.http.get<any>(`${this.url}usuario/convite/${token}`);
+    return this.http.get<any>(`${this.url}convite/${token}`);
   }
 
-  ativarConta(token: string, senha: string) {
-    return this.http.post<any>(`${this.url}usuario/convite/${token}/ativar`, { senha });
+  ativarConta(token: string, senha: string, confirmarSenha: string) {
+    return this.http.post<any>(`${this.url}convite/${token}/ativar`, { senha, confirmar_senha: confirmarSenha });
   }
 
   getTutor(params: any) {

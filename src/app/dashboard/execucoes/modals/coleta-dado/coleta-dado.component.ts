@@ -137,11 +137,11 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   }
 
   selecionarDataset(ds: any) {
-    this.datasetSelecionado = ds.valor;
+    this.datasetSelecionado = ds.id;
     this.datasetSelecionadoNome = ds.nome;
     this.carregandoDataset = true;
 
-    this.dashboardService.carregarToyDataset(ds.valor).subscribe({
+    this.dashboardService.carregarToyDataset(ds.id).subscribe({
       next: (resultado: any) => {
         this.processarResultadoDataset(resultado);
         this.carregandoDataset = false;

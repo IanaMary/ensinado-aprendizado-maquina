@@ -8,6 +8,7 @@ import { Subject, takeUntil } from 'rxjs';
 import tutor from '../../constants/tutor.json';
 import { ScriptGeneratorService } from '../../service/script-generator.service';
 import { PipelineService, PipelineState } from '../../service/pipeline.service';
+import { SessionService } from '../../service/sessao-store.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NomearPipelineDialogComponent } from './modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
 
@@ -50,6 +51,7 @@ export class ExecucoesComponent implements OnInit {
     public dialog: MatDialog,
     private scriptGenerator: ScriptGeneratorService,
     private pipelineService: PipelineService,
+    private sessionService: SessionService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
@@ -653,6 +655,16 @@ export class ExecucoesComponent implements OnInit {
 
     // Adicionar item a coluna de coleta
     this.dashboardService.movendoItemExecucao(datasetItem);
+
+    // Salvar IDs no sessionStorage para uso posterior pelo treinamento
+    const idColeta = resultado.id_coleta;
+    const idConfig = resultado.id_configuracoes_treinamento;
+    if (idColeta) {
+      this.sessionService.setColetaId(idColeta);
+    }
+    if (idConfig) {
+      this.sessionService.setConfigurcaoTreinamento(idConfig);
+    }
 
     // Abrir modal com dados pre-configurados
     setTimeout(() => {
