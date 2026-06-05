@@ -159,6 +159,16 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.treino.totalDados = resultado.total_dados;
     this.treino.nomeArquivo = resultado.nome_dataset;
 
+    // Persistir IDs retornados pelo backend (toy datasets agora salvam no MongoDB)
+    if (resultado.id_coleta) {
+      this.idColeta = resultado.id_coleta;
+      this.sessionService.setColetaId(this.idColeta);
+    }
+    if (resultado.id_configuracoes_treinamento) {
+      this.idConfigurcacaoTreinamento = resultado.id_configuracoes_treinamento;
+      this.sessionService.setConfigurcaoTreinamento(this.idConfigurcacaoTreinamento);
+    }
+
     // Configurar colunas
     this.resultColetaDadoL.colunas = resultado.colunas;
     this.resultColetaDadoL.colunasDetalhes = resultado.colunas_detalhes;
@@ -199,6 +209,14 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.opcoesTipo = [...new Set(resultado.colunas_detalhes.map((c: any) => c.tipo_coluna))] as string[];
 
     this.todosMarcados = true;
+
+    // Persistir configuração inicial no backend (target, atributos, tipo_predicao)
+    // Garante que o config do MongoDB esteja sincronizado com o estado local
+    // mesmo que o usuário não interaja antes de treinar.
+    if (this.idConfigurcacaoTreinamento) {
+      this.putConfiguracaoTreino();
+    }
+
     this.resultadoColetaDadoModificado.emit(this.resultColetaDadoL);
   }
 
@@ -425,6 +443,11 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   }
 
   putConfiguracaoTreino() {
+    if (!this.idConfigurcacaoTreinamento) {
+      // Sem ID de configuração não há o que atualizar; ignora silenciosamente
+      return;
+    }
+
     const dadoss_rotulados = this.resultColetaDadoL.dadosRotulados ?? false;
     const prever_categoria = this.resultColetaDadoL.preverCategoria ?? false;
     const body = {
