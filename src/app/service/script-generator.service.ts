@@ -30,15 +30,17 @@ export class ScriptGeneratorService {
     // Add script to the folder
     folder.file('pipeline.py', script);
 
-    // Add datasets if available
-    if (resultadoColetaDado?.treino?.dados && resultadoColetaDado.treino.dados.length > 0) {
-      const trainCsv = this.convertToCsv(resultadoColetaDado.treino.dados);
-      folder.file('data/treino.csv', trainCsv);
-    }
+    // Add datasets if available (apenas para fonte de arquivo; toy datasets usam sklearn)
+    if (resultadoColetaDado?.fonteDados !== 'dataset') {
+      if (resultadoColetaDado?.treino?.dados && resultadoColetaDado.treino.dados.length > 0) {
+        const trainCsv = this.convertToCsv(resultadoColetaDado.treino.dados);
+        folder.file('data/treino.csv', trainCsv);
+      }
 
-    if (resultadoColetaDado?.teste?.dados && resultadoColetaDado.teste.dados.length > 0) {
-      const testCsv = this.convertToCsv(resultadoColetaDado.teste.dados);
-      folder.file('data/teste.csv', testCsv);
+      if (resultadoColetaDado?.teste?.dados && resultadoColetaDado.teste.dados.length > 0) {
+        const testCsv = this.convertToCsv(resultadoColetaDado.teste.dados);
+        folder.file('data/teste.csv', testCsv);
+      }
     }
 
     // Add README
@@ -77,10 +79,14 @@ export class ScriptGeneratorService {
     lines.push('');
     lines.push('```');
     lines.push('pipeline_iana/');
-    lines.push('├── pipeline.py          # Script principal do pipeline');
-    lines.push('├── data/');
-    lines.push('│   ├── treino.csv       # Dados de treino');
-    lines.push('│   └── teste.csv        # Dados de teste');
+    if (resultado?.fonteDados === 'dataset') {
+      lines.push('├── pipeline.py          # Script principal do pipeline');
+    } else {
+      lines.push('├── pipeline.py          # Script principal do pipeline');
+      lines.push('├── data/');
+      lines.push('│   ├── treino.csv       # Dados de treino');
+      lines.push('│   └── teste.csv        # Dados de teste');
+    }
     lines.push('└── README.md            # Este arquivo');
     lines.push('```');
     lines.push('');
@@ -96,7 +102,7 @@ export class ScriptGeneratorService {
     lines.push('   python pipeline.py');
     lines.push('   ```');
     lines.push('');
-    
+
     if (modelo) {
       lines.push('## Modelo Utilizado');
       lines.push('');
@@ -107,6 +113,9 @@ export class ScriptGeneratorService {
     if (resultado) {
       lines.push('## Dados');
       lines.push('');
+      if (resultado.fonteDados === 'dataset') {
+        lines.push(`- **Origem:** Toy dataset '${resultado.nomeDataset}' do scikit-learn (carregado via as_frame=True)`);
+      }
       lines.push(`- **Target:** ${resultado.target}`);
       lines.push(`- **Atributos:** ${Object.keys(resultado.atributos || {}).filter(k => resultado.atributos?.[k]).join(', ')}`);
       lines.push(`- **Divisão Treino/Teste:** ${resultado.porcentagemTreino || 70}/${100 - (resultado.porcentagemTreino || 70)}`);
@@ -115,7 +124,7 @@ export class ScriptGeneratorService {
 
     lines.push('---');
     lines.push('*Gerado automaticamente pelo Iana - Plataforma de Ensino de Machine Learning*');
-    
+
     return lines.join('\n');
   }
 
@@ -138,12 +147,12 @@ export class ScriptGeneratorService {
     lines.push('');
 
     // Imports
-    const imports = this.collectImports(modeloSelecionado, metricasSelecionadas, preProcessamentoConfig);
+    const imports = this.collectImports(modeloSelecionado, metricasSelecionadas, preProcessamentoConfig, resultadoColetaDado);
     lines.push(imports.join('\n'));
     lines.push('');
 
     // Functions for each pipeline stage
-    lines.push(this.generateDataLoadingFunction());
+    lines.push(this.generateDataLoadingFunction(resultadoColetaDado));
     lines.push('');
     lines.push(this.generateFeatureSelectionFunction(resultadoColetaDado));
     lines.push('');
@@ -160,12 +169,23 @@ export class ScriptGeneratorService {
     lines.push('# ============================================');
     lines.push('');
     lines.push('if __name__ == "__main__":');
-    lines.push('    # 1. Carregar dados');
-    lines.push('    train_df, test_df = carregar_dados()');
-    lines.push('');
-    lines.push('    # 2. Selecionar features e target');
-    lines.push('    X_train, y_train, X_test, y_test = selecionar_features(train_df, test_df)');
-    lines.push('');
+    if (resultadoColetaDado?.fonteDados === 'dataset' && resultadoColetaDado.nomeDataset) {
+      const splitPct = resultadoColetaDado.porcentagemTreino || 70;
+      const testPct = 100 - splitPct;
+      lines.push('    # 1. Carregar dados (toy dataset do scikit-learn)');
+      lines.push('    X, y = carregar_dados()');
+      lines.push('');
+      lines.push('    # 2. Selecionar features e target (e dividir em treino/teste)');
+      lines.push('    X_train, X_test, y_train, y_test = selecionar_features(X, y)');
+      lines.push('');
+    } else {
+      lines.push('    # 1. Carregar dados');
+      lines.push('    train_df, test_df = carregar_dados()');
+      lines.push('');
+      lines.push('    # 2. Selecionar features e target');
+      lines.push('    X_train, y_train, X_test, y_test = selecionar_features(train_df, test_df)');
+      lines.push('');
+    }
     lines.push('    # 3. Pré-processamento');
     lines.push('    X_train, X_test = aplicar_preprocessamento(X_train, X_test)');
     lines.push('');
@@ -182,12 +202,23 @@ export class ScriptGeneratorService {
   private collectImports(
     modelo: ItemPipeline | undefined,
     metricas: ItemPipeline[],
-    preProcessamentoConfig?: any
+    preProcessamentoConfig?: any,
+    resultadoColetaDado?: ResultadoColetaDado
   ): string[] {
     const imports: string[] = [];
     imports.push('import pandas as pd');
     imports.push('import numpy as np');
     imports.push('from sklearn.model_selection import train_test_split');
+
+    // Toy dataset imports (sklearn loaders)
+    if (resultadoColetaDado?.fonteDados === 'dataset' && resultadoColetaDado.nomeDataset) {
+      const ds = this.getToyDatasetLoader(resultadoColetaDado.nomeDataset);
+      if (ds) {
+        const functionName = ds.importLine.split('(')[0];
+        const module = functionName.startsWith('fetch_') ? 'datasets' : 'datasets';
+        imports.push(`from sklearn.${module} import ${functionName}`);
+      }
+    }
 
     // Preprocessing imports
     if (preProcessamentoConfig?.itens?.length > 0) {
@@ -251,7 +282,29 @@ export class ScriptGeneratorService {
     return imports[modeloValor] || `# TODO: Import para ${modeloValor}`;
   }
 
-  private generateDataLoadingFunction(): string {
+  private generateDataLoadingFunction(resultado?: ResultadoColetaDado): string {
+    if (resultado?.fonteDados === 'dataset' && resultado.nomeDataset) {
+      const ds = this.getToyDatasetLoader(resultado.nomeDataset);
+      if (ds) {
+        return [
+          '# ============================================',
+          '# Função: Carregamento dos Dados',
+          '# ============================================',
+          'def carregar_dados():',
+          `    """Carrega o dataset '${resultado.nomeDataset}' do scikit-learn."""`,
+          `    dados = ${ds.importLine}`,
+          '    X = dados.data',
+          '    y = dados.target',
+          '    ',
+          '    print("Primeiras amostras (X):")',
+          '    print(X.head())',
+          '    print(f"Shape de X: {X.shape}")',
+          '    print(f"Shape de y: {y.shape}")',
+          '    ',
+          '    return X, y'
+        ].join('\n');
+      }
+    }
     return [
       '# ============================================',
       '# Função: Carregamento dos Dados',
@@ -273,7 +326,39 @@ export class ScriptGeneratorService {
     ].join('\n');
   }
 
+  private getToyDatasetLoader(nome: string): { importLine: string } | null {
+    const map: Record<string, { importLine: string }> = {
+      'iris': { importLine: 'load_iris(as_frame=True)' },
+      'wine': { importLine: 'load_wine(as_frame=True)' },
+      'breast_cancer': { importLine: 'load_breast_cancer(as_frame=True)' },
+      'digits': { importLine: 'load_digits(as_frame=True)' },
+      'diabetes': { importLine: 'load_diabetes(as_frame=True)' },
+      'california_housing': { importLine: 'fetch_california_housing(as_frame=True)' },
+    };
+    return map[nome] ?? null;
+  }
+
   private generateFeatureSelectionFunction(resultado: ResultadoColetaDado | undefined): string {
+    if (resultado?.fonteDados === 'dataset' && resultado.nomeDataset) {
+      const splitPct = resultado.porcentagemTreino || 70;
+      const testPct = 100 - splitPct;
+      return [
+        '# ============================================',
+        '# Função: Seleção de Features e Target',
+        '# ============================================',
+        'def selecionar_features(X, y):',
+        '    """Divide o dataset em treino e teste, mantendo a coluna target separada."""',
+        `    X_train, X_test, y_train, y_test = train_test_split(`,
+        `        X, y, test_size=${(testPct / 100).toFixed(2)}, random_state=42, stratify=y`,
+        '    )',
+        '    ',
+        '    print("\\nDivisão treino/teste:")',
+        `    print(f"Treino: {X_train.shape[0]} amostras ({splitPct}%)")`,
+        `    print(f"Teste:  {X_test.shape[0]} amostras (${testPct}%)")`,
+        '    ',
+        '    return X_train, X_test, y_train, y_test'
+      ].join('\n');
+    }
     if (!resultado?.atributos) {
       return [
         '# ============================================',

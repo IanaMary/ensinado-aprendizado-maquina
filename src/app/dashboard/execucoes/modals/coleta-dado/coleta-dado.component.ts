@@ -172,6 +172,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     // Configurar colunas
     this.resultColetaDadoL.colunas = resultado.colunas;
     this.resultColetaDadoL.colunasDetalhes = resultado.colunas_detalhes;
+    this.resultColetaDadoL.fonteDados = 'dataset';
+    this.resultColetaDadoL.nomeDataset = resultado.nome_dataset;
 
     // Configurar target
     this.resultColetaDadoL.target = resultado.target;

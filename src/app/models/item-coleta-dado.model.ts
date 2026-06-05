@@ -75,6 +75,8 @@ export interface ResultadoColetaDado {
   tipos: Record<string, TipoDado>;
   treino: InformacoesDados;
   teste: InformacoesDados;
+  fonteDados?: 'arquivo' | 'dataset';
+  nomeDataset?: string;
 }
 
 export interface InformacoesDados {
