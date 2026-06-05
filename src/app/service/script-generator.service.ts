@@ -413,7 +413,7 @@ export class ScriptGeneratorService {
         case 'label_encoder':
           lines.push(`    # ${item.label}: Codifica rótulos categóricos (target)`);
           lines.push('    le = LabelEncoder()');
-          const targetCol = this.resultadoColetaDado?.target;
+          const targetCol = resultadoColetaDado?.target;
           for (const col of colunas) {
             if (col === targetCol) {
               lines.push(`    y_train = le.fit_transform(y_train)`);
