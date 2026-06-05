@@ -411,11 +411,17 @@ export class ScriptGeneratorService {
           break;
 
         case 'label_encoder':
-          lines.push(`    # ${item.label}: Codifica rótulos de target`);
+          lines.push(`    # ${item.label}: Codifica rótulos categóricos (target)`);
           lines.push('    le = LabelEncoder()');
+          const targetCol = this.resultadoColetaDado?.target;
           for (const col of colunas) {
-            lines.push(`    X_train["${col}"] = le.fit_transform(X_train["${col}"])`);
-            lines.push(`    X_test["${col}"] = le.transform(X_test["${col}"])`);
+            if (col === targetCol) {
+              lines.push(`    y_train = le.fit_transform(y_train)`);
+              lines.push(`    y_test = le.transform(y_test)`);
+            } else {
+              lines.push(`    X_train["${col}"] = le.fit_transform(X_train["${col}"])`);
+              lines.push(`    X_test["${col}"] = le.transform(X_test["${col}"])`);
+            }
           }
           break;
 

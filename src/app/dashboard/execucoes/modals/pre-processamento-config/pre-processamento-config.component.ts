@@ -45,29 +45,20 @@ export class PreProcessamentoConfigComponent implements OnInit {
       );
     }
     
-    // Separar colunas por tipo
+    // Separar colunas por tipo (canonical: 'Número' / 'Texto' / 'Booleano')
+    const isNumero = (t: string) => t === 'número' || t === 'numero';
+    const isCategorica = (t: string) => t === 'texto' || t === 'booleano';
+
     if (this.resultadoColetaDado?.tipos && Object.keys(this.resultadoColetaDado.tipos).length > 0) {
       this.tiposColunas = this.resultadoColetaDado.tipos;
-      this.colunasNumericas = this.colunas.filter(c => {
-        const t = (this.tiposColunas[c] || '').toLowerCase();
-        return t === 'número' || t === 'numero' || t === 'number';
-      });
-      this.colunasCategoricas = this.colunas.filter(c => {
-        const t = (this.tiposColunas[c] || '').toLowerCase();
-        return t === 'texto' || t === 'string' || t === 'booleano' || t === 'boolean';
-      });
+      this.colunasNumericas = this.colunas.filter(c => isNumero((this.tiposColunas[c] || '').toLowerCase()));
+      this.colunasCategoricas = this.colunas.filter(c => isCategorica((this.tiposColunas[c] || '').toLowerCase()));
     } else if (this.resultadoColetaDado?.colunasDetalhes?.length) {
       this.colunasNumericas = this.resultadoColetaDado.colunasDetalhes
-        .filter((d: any) => {
-          const t = (d.tipo_coluna || '').toLowerCase();
-          return t === 'numero' || t === 'número' || t === 'number';
-        })
+        .filter((d: any) => isNumero((d.tipo_coluna || '').toLowerCase()))
         .map((d: any) => d.nome_coluna);
       this.colunasCategoricas = this.resultadoColetaDado.colunasDetalhes
-        .filter((d: any) => {
-          const t = (d.tipo_coluna || '').toLowerCase();
-          return t === 'texto' || t === 'string' || t === 'booleano' || t === 'boolean';
-        })
+        .filter((d: any) => isCategorica((d.tipo_coluna || '').toLowerCase()))
         .map((d: any) => d.nome_coluna);
     } else {
       // Se não tiver informação de tipo, assume todas como numéricas
@@ -78,13 +69,8 @@ export class PreProcessamentoConfigComponent implements OnInit {
 
   carregarItensPreProcessamento() {
     this.dashboardService.getItensPreProcessamento().subscribe(itens => {
-      // Filtrar itens inadequados:
-      // - LabelEncoder não deve estar disponível para features (é para target)
-      // - OneHotEncoder e OrdinalEncoder devem ter pelo menos uma coluna categórica
-      this.itensDisponiveis = itens.filter(item => 
-        item.valor !== 'label_encoder'
-      );
-      
+      this.itensDisponiveis = [...itens];
+
       // Remover itens já selecionados da lista de disponíveis
       if (this.preProcessamentoConfig?.itens) {
         const valoresSelecionados = this.preProcessamentoConfig.itens.map(i => i.valor);
@@ -100,7 +86,7 @@ export class PreProcessamentoConfigComponent implements OnInit {
     switch (item.valor) {
       case 'onehot_encoder':
       case 'ordinal_encoder':
-        // Encoders só podem ser aplicados a colunas categóricas (texto ou booleano)
+        // Encoders só podem ser aplicados a colunas categóricas (Texto ou Booleano)
         return this.colunasCategoricas;
       case 'standard_scaler':
       case 'minmax_scaler':
@@ -108,8 +94,16 @@ export class PreProcessamentoConfigComponent implements OnInit {
       case 'normalizer':
       case 'polynomial_features':
       case 'power_transformer':
-        // Scalers e transformadores só podem ser aplicados a colunas numéricas
+        // Scalers e transformadores só podem ser aplicados a colunas numéricas (Número)
         return this.colunasNumericas;
+      case 'label_encoder':
+        // LabelEncoder é destinado ao target (coluna Texto categórica) — inclui o target se for Texto
+        const target = this.resultadoColetaDado?.target;
+        const tipos = this.resultadoColetaDado?.tipos || {};
+        if (target && (tipos[target] || '').toLowerCase() === 'texto') {
+          return [target];
+        }
+        return [];
       case 'simple_imputer':
         // Imputer pode ser aplicado a qualquer coluna
         return this.colunas;
@@ -180,14 +174,16 @@ export class PreProcessamentoConfigComponent implements OnInit {
     switch (item.valor) {
       case 'onehot_encoder':
       case 'ordinal_encoder':
-        return 'Requer colunas categóricas (texto ou booleano)';
+        return 'Requer colunas categóricas (Texto ou Booleano)';
       case 'standard_scaler':
       case 'minmax_scaler':
       case 'robust_scaler':
       case 'normalizer':
       case 'polynomial_features':
       case 'power_transformer':
-        return 'Requer colunas numéricas';
+        return 'Requer colunas Número';
+      case 'label_encoder':
+        return 'Requer target do tipo Texto';
       default:
         return 'Nenhuma coluna disponível';
     }

@@ -1,7 +1,6 @@
 // Tipos e constantes
 export type TipoItem = 'coleta-dado' | 'pre-processamento' | 'treino-validacao-teste' | 'metrica';
-// export type TipoTarget = 'number' | 'string' | 'boolean' | null;
-export type TipoTarget = 'number' | 'string' | 'boolean' | null;
+export type TipoTarget = 'Número' | 'Texto' | 'Booleano' | null;
 export type TipoDado = 'Texto' | 'Número' | 'Booleano';
 
 
@@ -28,22 +27,16 @@ export const roleMap: Record<string, string> = {
 };
 
 
-export const labelParaTipoTargetMap: Record<string, string> = {
-  'Número': 'number',
-  'Texto': 'string',
-  'Booleano': 'boolean'
+export const labelParaTipoTargetMap: Record<string, TipoTarget> = {
+  'Número': 'Número',
+  'Texto': 'Texto',
+  'Booleano': 'Booleano'
 };
 
-// export const labelParaTipoTargetMap: Record<string, TipoTarget> = {
-//   'number': 'Número',
-//   'string': 'Texto',
-//   'boolean': 'Booleano'
-// };
-
 export const tipoLabels: Record<string, string> = {
-  number: 'Número',
-  string: 'Texto',
-  boolean: 'Booleano'
+  Número: 'Número',
+  Texto: 'Texto',
+  Booleano: 'Booleano'
 };
 
 export interface Modelo {

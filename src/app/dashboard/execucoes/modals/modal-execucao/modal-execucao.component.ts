@@ -185,8 +185,8 @@ export class ModalExecucaoComponent implements OnInit {
 
     const tipoTarget = this.resultadoColetaDado?.tipoTarget;
 
-    this.tutorModeloTarget = tipoTarget === 'string' ? tutor.resumos['modelo-classificacao'] :
-      tipoTarget === 'number' ? tutor.resumos['modelo-regressao'] :
+    this.tutorModeloTarget = tipoTarget === 'Texto' ? tutor.resumos['modelo-classificacao'] :
+      tipoTarget === 'Número' ? tutor.resumos['modelo-regressao'] :
         tutor.resumos['modelo-exploratorio'];
 
     this.validarProximaEtapa();

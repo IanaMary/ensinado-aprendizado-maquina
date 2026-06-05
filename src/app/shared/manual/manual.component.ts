@@ -116,12 +116,13 @@ export class ManualComponent implements OnInit {
             <h3>Passo 2: Pré-processamento</h3>
             <p>Configure transformações nos seus dados:</p>
             <ul>
-              <li><strong>Scalers:</strong> StandardScaler, MinMaxScaler, RobustScaler, Normalizer</li>
-              <li><strong>Encoders:</strong> OneHotEncoder, OrdinalEncoder (para dados categóricos)</li>
+              <li><strong>Scalers:</strong> StandardScaler, MinMaxScaler, RobustScaler, Normalizer (para colunas Número)</li>
+              <li><strong>Encoders:</strong> OneHotEncoder, OrdinalEncoder (para colunas Texto ou Booleano)</li>
+              <li><strong>LabelEncoder:</strong> aplicado ao target quando ele é Texto categórico</li>
               <li><strong>Imputers:</strong> SimpleImputer (para valores ausentes)</li>
               <li><strong>Transformers:</strong> PolynomialFeatures, PowerTransformer</li>
             </ul>
-            <p><strong>Nota:</strong> Encoders só podem ser aplicados a colunas categóricas (texto ou booleano).</p>
+            <p><strong>Nota:</strong> Encoders categóricos só podem ser aplicados a colunas Texto ou Booleano. Scalers só podem ser aplicados a colunas Número.</p>
             
             <h3>Passo 3: Seleção do Modelo</h3>
             <p>Escolha o algoritmo de ML:</p>
