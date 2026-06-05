@@ -51,10 +51,12 @@ export class LoginComponent implements OnInit {
 
     this.loginService.login(this.email, this.senha).subscribe({
       next: async (usuario: any) => {
+        console.log('Login response:', usuario);
         const validar = await this.auth.salvarUsuarioSessionStorage(usuario);
         if (validar) {
 
           const role = usuario?.usuario?.role
+          console.log('Role:', role, 'Rota:', roleMap[role]);
           const rota = roleMap[role] || '/autenticacao/login';
           await this.router.navigate([rota]);
         }
