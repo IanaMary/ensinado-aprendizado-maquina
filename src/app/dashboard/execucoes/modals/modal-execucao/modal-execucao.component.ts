@@ -97,13 +97,12 @@ export class ModalExecucaoComponent implements OnInit {
 
   irParaEtapa(idx: number): void {
     const indiceAtual = this.etapas[this.etapaAtual].indice;
+    if (idx === indiceAtual) return;
 
-    // So permite voltar para etapas anteriores
-    if (idx < indiceAtual) {
-      this.etapaAtual = this.ordemEtapas[idx];
-      this.validarProximaEtapa();
-      this.atualizarTutorContexto();
-    }
+    this.etapaAtual = this.ordemEtapas[idx];
+    this.validarProximaEtapa();
+    this.atualizarTutorContexto();
+    this.autoGerarMetricas();
   }
 
   autoGerarMetricas(): void {

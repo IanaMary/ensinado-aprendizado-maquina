@@ -13,7 +13,7 @@
       <div class="breadcrumb-trail">
         <ng-container *ngFor="let key of etapaKeys; let idx = index; let last = last">
           <div class="step" [ngClass]="getClasseLinhaPipe(idx)"
-            [class.clickable]="idx < etapas[etapaAtual].indice"
+            [class.clickable]="idx <= etapas[etapaAtual].indice"
             (click)="irParaEtapa(idx)">
             <div class="step-circle">
               <mat-icon *ngIf="idx < etapas[etapaAtual].indice">check</mat-icon>
