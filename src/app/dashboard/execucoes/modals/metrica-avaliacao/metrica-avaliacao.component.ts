@@ -36,6 +36,9 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   cont = 0;
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['resultadosDasAvaliacoes']) {
+      this.atualizarVariaveis();
+    }
   }
 
   ngOnInit(): void {
