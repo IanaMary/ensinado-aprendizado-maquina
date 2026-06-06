@@ -5,6 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MeusProjetosComponent } from './meus-projetos.component';
 
 const routes: Routes = [
@@ -25,7 +26,8 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     MatIconModule,
     MatTooltipModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatSnackBarModule
   ]
 })
 export class MeusProjetosModule { }

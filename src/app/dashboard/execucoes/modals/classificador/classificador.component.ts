@@ -30,7 +30,7 @@ export class ClasificadorComponent implements OnChanges {
     if (changes['resultadoColetaDado'] || changes['modeloSelecionado']) {
       const valor = this.modeloSelecionado?.valor;
       const jaTreinado = this.resultadoTreinamento && valor ? this.resultadoTreinamento.hasOwnProperty(valor) : false;
-      if (valor && !jaTreinado) {
+      if (valor && !jaTreinado && !this.treinando) {
         this.enviarParaClassificador(valor);
       }
     }
@@ -40,7 +40,10 @@ export class ClasificadorComponent implements OnChanges {
 
   async enviarParaClassificador(classificador: string) {
     this.treinando = true
-    const tipoClassficador = classificador ?? '';
+    const tipoClassficador = (classificador ?? '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '_')
+      .toLowerCase();
     const arquivoId = this.sessionService.getColetaId();
     const configuracaoId = this.sessionService.getConfigurcaoTreinamento();
     const modeloId = this.modeloSelecionado?.id;
