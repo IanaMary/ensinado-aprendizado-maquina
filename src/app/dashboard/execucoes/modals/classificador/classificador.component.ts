@@ -19,6 +19,7 @@ export class ClasificadorComponent implements OnChanges {
   @Output() atualizarResultadoTreinamento = new EventEmitter<any>();
 
   treinando = false;
+  modelosJaTreinados = new Set<string>();
 
   constructor(
     private dashboardService: DashboardService,
@@ -30,7 +31,9 @@ export class ClasificadorComponent implements OnChanges {
     if (changes['resultadoColetaDado'] || changes['modeloSelecionado']) {
       const valor = this.modeloSelecionado?.valor;
       const jaTreinado = this.resultadoTreinamento && valor ? this.resultadoTreinamento.hasOwnProperty(valor) : false;
-      if (valor && !jaTreinado && !this.treinando) {
+      const jaProcessando = this.modelosJaTreinados.has(valor || '');
+      if (valor && !jaTreinado && !jaProcessando) {
+        this.modelosJaTreinados.add(valor);
         this.enviarParaClassificador(valor);
       }
     }
@@ -40,10 +43,9 @@ export class ClasificadorComponent implements OnChanges {
 
   async enviarParaClassificador(classificador: string) {
     this.treinando = true
-    const tipoClassficador = (classificador ?? '')
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/\s+/g, '_')
-      .toLowerCase();
+    // Use the modeloSelecionado.valor directly (already correct in JSON: 'arvore_decisao', 'knn', etc.)
+    // instead of normalizing the label which adds unwanted "de"
+    const tipoClassficador = this.modeloSelecionado?.valor ?? classificador;
     const arquivoId = this.sessionService.getColetaId();
     const configuracaoId = this.sessionService.getConfigurcaoTreinamento();
     const modeloId = this.modeloSelecionado?.id;
