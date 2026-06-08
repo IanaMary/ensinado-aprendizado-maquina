@@ -286,7 +286,7 @@ export class ModalExecucaoComponent implements OnInit {
         todosExistem = true;
         this.atualizarMetricasSelecionadas(data.metricasSelecionadas);
       }
-      if (data.resultadosDasAvaliacoes.length) {
+      if (Object.keys(data.resultadosDasAvaliacoes).length) {
         todosExistem = true;
         this.funcResultadoAvaliacoes(data.resultadosDasAvaliacoes)
       }
