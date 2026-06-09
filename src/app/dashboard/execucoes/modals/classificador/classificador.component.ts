@@ -30,10 +30,19 @@ export class ClasificadorComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['resultadoColetaDado'] || changes['modeloSelecionado']) {
       const valor = this.modeloSelecionado?.valor;
-      const jaTreinado = this.resultadoTreinamento && valor ? this.resultadoTreinamento.hasOwnProperty(valor) : false;
-      const jaProcessando = this.modelosJaTreinados.has(valor || '');
+      // Use the backend's returned key format (with accents) for checking
+      // The backend returns modelo as "árvore_de_decisão" (with accents)
+      const chaveBackend = this.modeloSelecionado?.valor
+        ?.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '_')
+        .toLowerCase();
+      const jaTreinado = this.resultadoTreinamento && valor 
+        ? (this.resultadoTreinamento.hasOwnProperty(valor) || this.resultadoTreinamento.hasOwnProperty(chaveBackend || ''))
+        : false;
+      const jaProcessando = this.modelosJaTreinados.has(valor || '') || this.modelosJaTreinados.has(chaveBackend || '');
       if (valor && !jaTreinado && !jaProcessando) {
         this.modelosJaTreinados.add(valor);
+        this.modelosJaTreinados.add(chaveBackend || '');
         this.enviarParaClassificador(valor);
       }
     }
