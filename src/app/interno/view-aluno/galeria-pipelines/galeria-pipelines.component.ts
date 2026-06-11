@@ -1,22 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
-interface PipelineProfessor {
-  id: string;
-  nome: string;
-  descricao: string;
-  professor: string;
-  disciplina?: string;
-  turma?: string;
-  publico: boolean;
-  dataCriacao: Date;
-  modelo: string;
-  dataset: string;
-  dificuldade: 'iniciante' | 'intermediario' | 'avancado';
-  tags: string[];
-  totalCopias: number;
-  avaliacao: number;
-}
+import { PipelineService, PipelineProfessor, PipelineState } from '../../../service/pipeline.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-galeria-pipelines',
@@ -31,80 +16,41 @@ export class GaleriaPipelinesComponent implements OnInit {
   filtroTipo: string = 'publicos';
   termoBusca: string = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private pipelineService: PipelineService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.carregarPipelines();
   }
 
   carregarPipelines(): void {
-    // TODO: Carregar do backend
-    // Por enquanto, dados mockados para demonstração
-    this.pipelines = [
-      {
-        id: '1',
-        nome: 'Introdução ao KNN',
-        descricao: 'Pipeline didático para aprender como o algoritmo K-Nearest Neighbors funciona com dados de frutas',
-        professor: 'Prof. Maria Silva',
-        disciplina: 'Machine Learning Básico',
-        turma: 'Turma 2024.1',
-        publico: true,
-        dataCriacao: new Date('2024-01-10'),
-        modelo: 'KNN',
-        dataset: 'Fruits Dataset',
-        dificuldade: 'iniciante',
-        tags: ['classificação', 'knn', 'frutas'],
-        totalCopias: 45,
-        avaliacao: 4.8
+    this.carregando = true;
+    this.pipelineService.listarPipelinesProfessores().subscribe({
+      next: (data: any[]) => {
+        this.pipelines = data.map(p => ({
+          id: p.id,
+          nome: p.nome,
+          descricao: p.descricao || '',
+          professor: p.professor_id || 'Professor Iana',
+          publico: p.is_public,
+          dataCriacao: p.dataCriacao,
+          modelo: p.modeloSelecionado?.label || 'Não definido',
+          dataset: p.resultadoColetaDado?.dataset_nome || 'Não definido',
+          dificuldade: p.dificuldade || 'iniciante',
+          tags: p.tags || [],
+          totalCopias: 0, // Placeholder
+          avaliacao: 5.0, // Placeholder
+        }));
+        this.carregando = false;
       },
-      {
-        id: '2',
-        nome: 'Árvore de Decisão na Prática',
-        descricao: 'Explore como árvores de decisão tomam decisões usando dados de aprovação de empréstimos',
-        professor: 'Prof. João Santos',
-        disciplina: 'Ciência de Dados',
-        publico: true,
-        dataCriacao: new Date('2024-02-05'),
-        modelo: 'Decision Tree',
-        dataset: 'Loan Approval',
-        dificuldade: 'iniciante',
-        tags: ['classificação', 'árvore', 'interpretabilidade'],
-        totalCopias: 32,
-        avaliacao: 4.6
-      },
-      {
-        id: '3',
-        nome: 'SVM para Classificação de Texto',
-        descricao: 'Use Support Vector Machines para classificar sentimentos em reviews de filmes',
-        professor: 'Prof. Ana Costa',
-        disciplina: 'NLP',
-        publico: true,
-        dataCriacao: new Date('2024-03-15'),
-        modelo: 'SVM',
-        dataset: 'Movie Reviews',
-        dificuldade: 'intermediario',
-        tags: ['nlp', 'svm', 'sentimentos'],
-        totalCopias: 18,
-        avaliacao: 4.4
-      },
-      {
-        id: '4',
-        nome: 'Random Forest Avançado',
-        descricao: 'Pipeline completo com feature engineering e otimização de hiperparâmetros para Random Forest',
-        professor: 'Prof. Maria Silva',
-        disciplina: 'Machine Learning Avançado',
-        turma: 'Turma 2024.2',
-        publico: false,
-        dataCriacao: new Date('2024-04-01'),
-        modelo: 'Random Forest',
-        dataset: 'Titanic',
-        dificuldade: 'avancado',
-        tags: ['ensemble', 'feature engineering', 'otimização'],
-        totalCopias: 8,
-        avaliacao: 4.9
+      error: () => {
+        this.carregando = false;
+        this.snackBar.open('Erro ao carregar galeria', 'Fechar', { duration: 3000 });
       }
-    ];
-    this.carregando = false;
+    });
   }
 
   get pipelinesFiltrados(): PipelineProfessor[] {
@@ -114,7 +60,9 @@ export class GaleriaPipelinesComponent implements OnInit {
     if (this.filtroTipo === 'publicos') {
       filtrados = filtrados.filter(p => p.publico);
     } else if (this.filtroTipo === 'turma') {
-      filtrados = filtrados.filter(p => !p.publico && p.turma);
+      // Por enquanto, filtros de turma são baseados em is_public=false se houver contexto de turma
+      // Como não temos turmas implementadas no backend ainda, mantemos simples
+      filtrados = filtrados.filter(p => !p.publico);
     }
     
     // Filtrar por dificuldade
@@ -137,17 +85,27 @@ export class GaleriaPipelinesComponent implements OnInit {
   }
 
   abrirPipeline(pipeline: PipelineProfessor): void {
-    // Navegar para o playground com o pipeline selecionado
-    this.router.navigate(['/interno/view-aluno/playground'], { 
-      queryParams: { pipeline: pipeline.id } 
+    // Navegar para o playground com o pipeline selecionado (modo visualização)
+    this.router.navigate(['/interno/view-aluno'], { 
+      queryParams: { pipeline: pipeline.id, viewOnly: true } 
     });
   }
 
   copiarPipeline(pipeline: PipelineProfessor, event: Event): void {
     event.stopPropagation();
-    // TODO: Copiar pipeline para o usuário atual no backend
-    console.log('Copiando pipeline:', pipeline.nome);
-    // Mostrar feedback visual
+    this.pipelineService.copiarPipeline(pipeline.id).subscribe({
+      next: (copia: PipelineState) => {
+        this.snackBar.open('Projeto copiado para sua lista!', 'Abrir', { duration: 5000 })
+          .onAction().subscribe(() => {
+            this.router.navigate(['/interno/view-aluno'], { 
+              queryParams: { pipeline: copia.id } 
+            });
+          });
+      },
+      error: () => {
+        this.snackBar.open('Erro ao copiar pipeline', 'Fechar', { duration: 3000 });
+      }
+    });
   }
 
   getDificuldadeLabel(dificuldade: string): string {
@@ -163,8 +121,9 @@ export class GaleriaPipelinesComponent implements OnInit {
     return `dificuldade-${dificuldade}`;
   }
 
-  getDataFormatada(data: Date): string {
-    return data.toLocaleDateString('pt-BR', {
+  getDataFormatada(data: string): string {
+    if (!data) return '';
+    return new Date(data).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'

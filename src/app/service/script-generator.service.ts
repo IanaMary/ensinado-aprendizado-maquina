@@ -273,9 +273,11 @@ export class ScriptGeneratorService {
       'regressao_linear': 'from sklearn.linear_model import LinearRegression',
       'random_forest': 'from sklearn.ensemble import RandomForestClassifier',
       'adaboost': 'from sklearn.ensemble import AdaBoostClassifier',
+      'gradient_boosting': 'from sklearn.ensemble import GradientBoostingClassifier',
       'naive_bayes': 'from sklearn.naive_bayes import GaussianNB',
       'mlp': 'from sklearn.neural_network import MLPClassifier',
       'qda': 'from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis',
+      'lda': 'from sklearn.discriminant_analysis import LinearDiscriminantAnalysis',
       'k_means': 'from sklearn.cluster import KMeans',
       'pca': 'from sklearn.decomposition import PCA'
     };
@@ -669,9 +671,11 @@ export class ScriptGeneratorService {
       'regressao_linear': 'LinearRegression',
       'random_forest': 'RandomForestClassifier',
       'adaboost': 'AdaBoostClassifier',
+      'gradient_boosting': 'GradientBoostingClassifier',
       'naive_bayes': 'GaussianNB',
       'mlp': 'MLPClassifier',
       'qda': 'QuadraticDiscriminantAnalysis',
+      'lda': 'LinearDiscriminantAnalysis',
       'k_means': 'KMeans',
       'pca': 'PCA'
     };

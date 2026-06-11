@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ScriptGeneratorService } from '../../../../service/script-generator.service';
 import { ItemPipeline, nomeMetricas, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
@@ -31,7 +33,8 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
 
   constructor(
     private dashboardService: DashboardService,
-    private scriptGenerator: ScriptGeneratorService
+    private scriptGenerator: ScriptGeneratorService,
+    private snackBar: MatSnackBar
   ) { }
   cont = 0;
 
@@ -47,14 +50,23 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
 
 
   async postAvaliacao() {
+    if (!this.resultadoTreinamento || Object.keys(this.resultadoTreinamento).length === 0) {
+      console.warn('[WARN] Tentativa de avaliar sem modelos treinados.');
+      this.snackBar.open('Nenhum modelo treinado encontrado. Volte para a etapa de Treinamento.', 'Fechar', { duration: 5000 });
+      return;
+    }
 
     const body = {
       modelos: Object.values(this.resultadoTreinamento).map((e: any) => ({ id: e.id, label: e.nome_modelo })),
       metricas: this.metricasSelecionadas.map((e: any) => ({ valor: e.valor, label: e.label }))
     };
 
+    console.log('[DEBUG] Enviando para avaliar_modelos:', body);
+    console.log('[DEBUG] resultadoTreinamento atual:', this.resultadoTreinamento);
+
     this.dashboardService.postMetricas(body).subscribe({
       next: (res) => {
+        console.log('[DEBUG] Resposta de avaliar_modelos:', res);
         this.resultadosDasAvaliacoes = res;
         this.atualizarVariaveis()
         this.atualizarResultadoAvaliacoes.emit(this.resultadosDasAvaliacoes);
@@ -77,7 +89,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   }
 
   isConfusionMatrix(value: any): boolean {
-    return value && typeof value === 'object' && 'matriz' in value && 'classes' in value;
+    return value && typeof value === 'object' && ('matriz' in value || Array.isArray(value)) && 'classes' in value;
   }
 
   getClasseLabel(value: any, idx: number): string {

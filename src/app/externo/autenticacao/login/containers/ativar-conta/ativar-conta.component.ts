@@ -71,7 +71,6 @@ export class AtivarContaComponent implements OnInit {
         } else {
           this.erroToken = `Erro ao verificar convite: ${err.message || err.status}`;
         }
-        // NÃO redirecionar para login - ficar na página para debugar
       }
     });
   }

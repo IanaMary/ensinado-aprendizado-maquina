@@ -75,20 +75,8 @@ export class PipelineService {
     );
   }
 
-  copiarPipeline(pipelineProfessor: PipelineProfessor): Observable<PipelineState> {
-    const novoPipeline: PipelineState = {
-      nome: `${pipelineProfessor.nome} (Cópia)`,
-      descricao: `Cópia do pipeline de ${pipelineProfessor.professor}: ${pipelineProfessor.descricao}`,
-      resultadoColetaDado: pipelineProfessor.estado?.resultadoColetaDado,
-      modeloSelecionado: pipelineProfessor.estado?.modeloSelecionado,
-      metricasSelecionadas: pipelineProfessor.estado?.metricasSelecionadas,
-      preProcessamentoConfig: pipelineProfessor.estado?.preProcessamentoConfig,
-      resultadoTreinamento: pipelineProfessor.estado?.resultadoTreinamento,
-      resultadosDasAvaliacoes: pipelineProfessor.estado?.resultadosDasAvaliacoes,
-      status: 'rascunho'
-    };
-
-    return this.salvarPipeline(novoPipeline);
+  copiarPipeline(id: string): Observable<PipelineState> {
+    return this.http.post<PipelineState>(`${this.endpoint}/${id}/copiar`, {});
   }
 
   listarPipelinesProfessores(): Observable<PipelineProfessor[]> {
