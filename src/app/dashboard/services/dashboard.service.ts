@@ -25,6 +25,7 @@ export class DashboardService {
   private itensPreProcessamento = new BehaviorSubject<ItemPipeline[]>([]);
   private itensModelos = new BehaviorSubject<ItemPipeline[]>([]);
   private itensMetricas = new BehaviorSubject<ItemPipeline[]>([]);
+  private datasetEmExecucao: ItemPipeline | null = null;
 
   get url(): string { return environment.apiUrl; }
   private readonly endpointTutor: string = 'tutor';
@@ -279,6 +280,7 @@ export class DashboardService {
 
   limparItensExecucao() {
     this.itemsEmExecucao.next([]);
+    this.datasetEmExecucao = null;
 
     // Reseta o status dos widgets das colunas para o estado original
     // (movido=false, habilitado no estado default) para que o usuário
@@ -340,6 +342,12 @@ export class DashboardService {
   // }
 
   movendoItemExecucao(item: ItemPipeline) {
+    if (item.tipoItem === 'coleta-dado' && item.valor === 'dataset') {
+      this.datasetEmExecucao = item;
+    } else if (item.tipoItem === 'coleta-dado') {
+      this.datasetEmExecucao = null;
+    }
+
     this.itemsEmExecucao.next([
       ...this.itemsEmExecucao.value,
       item
@@ -369,6 +377,7 @@ export class DashboardService {
 
     const itensMovidos = [
       ...this.itensColetasDados.value.filter(item => item.movido),
+      ...(this.datasetEmExecucao ? [this.datasetEmExecucao] : []),
       ...this.itensPreProcessamento.value.filter(item => item.movido),
       ...this.itensModelos.value.filter(item => item.movido),
       ...this.itensMetricas.value.filter(item => item.movido)

@@ -43,6 +43,25 @@
           <span>{{ teste.nomeArquivo }}</span>
         </div>
       </div>
+
+      <div class="configuracao-generica opcoes-divisao opcoes-divisao-upload" *ngIf="treino.dados.length === 0">
+        <mat-checkbox
+          [(ngModel)]="resultColetaDadoL.embaralharDados"
+          [disabled]="!!teste.nomeArquivo">
+          Embaralhar dados antes da divisão
+        </mat-checkbox>
+        <mat-checkbox
+          [(ngModel)]="resultColetaDadoL.estratificarDados"
+          [disabled]="true">
+          Separar treino/teste com estratificação
+        </mat-checkbox>
+        <mat-hint class="divisao-hint" *ngIf="!teste.nomeArquivo">
+          A estratificação será habilitada após escolher uma coluna alvo de classificação.
+        </mat-hint>
+        <mat-hint class="divisao-hint" *ngIf="teste.nomeArquivo">
+          A divisão automática fica desativada quando uma planilha de teste é enviada.
+        </mat-hint>
+      </div>
     </nav>
 
     <!-- Lista de Toy Datasets -->

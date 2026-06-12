@@ -104,4 +104,29 @@ describe('DashboardService', () => {
       service.sincronizarPreProcessamentosSelecionados([{ valor: 'minmax_scaler' }]);
     });
   });
+
+  describe('moverItensEmExecucao', () => {
+    it('should preserve selected toy dataset item when rebuilding execution items', (done) => {
+      const datasetItem = {
+        label: 'Iris',
+        valor: 'dataset',
+        preverCategoria: true,
+        dadosRotulados: true,
+        movido: true,
+        habilitado: true,
+        icon: 'coleta-dado',
+        tipoItem: 'coleta-dado' as const,
+        id: 'dataset-iris'
+      };
+
+      service.movendoItemExecucao(datasetItem);
+
+      service.getItemsEmExecucao().pipe(skip(1)).subscribe(items => {
+        expect(items.map(item => item.label)).toEqual(['Iris']);
+        done();
+      });
+
+      service.moverItensEmExecucao();
+    });
+  });
 });
