@@ -271,6 +271,7 @@ export class ModalExecucaoComponent implements OnInit {
 
   atualizarPreProcessamento(event: any) {
     this.preProcessamentoConfig = event;
+    this.dashboardService.sincronizarPreProcessamentosSelecionados(event?.itens || []);
     console.log('Pre-processamento configurado:', event);
   }
 

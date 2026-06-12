@@ -508,6 +508,7 @@ export class ExecucoesComponent implements OnInit {
           average: metrica.average ?? this.mediaMetricas
         }));
         this.preProcessamentoConfig = pipeline.preProcessamentoConfig;
+        this.dashboardService.sincronizarPreProcessamentosSelecionados(this.preProcessamentoConfig?.itens || []);
         this.resultadoTreinamento = pipeline.resultadoTreinamento;
         this.resultadosDasAvaliacoes = pipeline.resultadosDasAvaliacoes;
         this.atualizarTutorContexto();

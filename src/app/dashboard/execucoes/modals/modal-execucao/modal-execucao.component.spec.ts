@@ -3,6 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { ModalExecucaoComponent } from './modal-execucao.component';
+import { DashboardService } from '../../../services/dashboard.service';
 
 describe('ModalExecucaoComponent', () => {
   let component: ModalExecucaoComponent;
@@ -27,5 +28,16 @@ describe('ModalExecucaoComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should sync preprocessing items when preprocessing config changes', () => {
+    const dashboardService = TestBed.inject(DashboardService);
+    const spy = spyOn(dashboardService, 'sincronizarPreProcessamentosSelecionados');
+    const itens = [{ valor: 'standard_scaler', label: 'StandardScaler', colunas: ['mass'] }];
+
+    component.atualizarPreProcessamento({ itens });
+
+    expect(component.preProcessamentoConfig).toEqual({ itens });
+    expect(spy).toHaveBeenCalledOnceWith(itens);
   });
 });
