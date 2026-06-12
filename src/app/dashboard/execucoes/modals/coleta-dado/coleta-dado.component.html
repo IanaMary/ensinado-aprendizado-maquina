@@ -160,19 +160,6 @@
                 </nav>
               </mat-form-field>
             </div>
-            <div class="configuracao-generica opcoes-divisao">
-              <mat-checkbox
-                [(ngModel)]="resultColetaDadoL.embaralharDados"
-                (change)="onDivisaoDadosChange()">
-                Embaralhar dados antes da divisão
-              </mat-checkbox>
-              <mat-checkbox
-                [(ngModel)]="resultColetaDadoL.estratificarDados"
-                [disabled]="!resultColetaDadoL.embaralharDados || tipoPredicao !== 'classificacao' || !resultColetaDadoL.target"
-                (change)="onDivisaoDadosChange()">
-                Separar treino/teste com estratificação
-              </mat-checkbox>
-            </div>
             <div class="configuracao-generica">
               <mat-hint>
                 Total disponível: {{ treino.totalDados + teste.totalDados }} |
@@ -182,6 +169,24 @@
               </mat-hint>
             </div>
           </ng-container>
+
+          <div class="configuracao-generica opcoes-divisao">
+            <mat-checkbox
+              [(ngModel)]="resultColetaDadoL.embaralharDados"
+              [disabled]="!!teste.nomeArquivo"
+              (change)="onDivisaoDadosChange()">
+              Embaralhar dados antes da divisão
+            </mat-checkbox>
+            <mat-checkbox
+              [(ngModel)]="resultColetaDadoL.estratificarDados"
+              [disabled]="!!teste.nomeArquivo || !resultColetaDadoL.embaralharDados || tipoPredicao !== 'classificacao' || !resultColetaDadoL.target"
+              (change)="onDivisaoDadosChange()">
+              Separar treino/teste com estratificação
+            </mat-checkbox>
+            <mat-hint *ngIf="teste.nomeArquivo" class="divisao-hint">
+              A divisão automática fica desativada quando uma planilha de teste é enviada.
+            </mat-hint>
+          </div>
         </nav>
 
         <!-- Tabela de configuração das colunas -->
