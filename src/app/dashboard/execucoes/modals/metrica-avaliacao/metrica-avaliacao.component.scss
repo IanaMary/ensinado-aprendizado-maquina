@@ -267,10 +267,18 @@
   }
 
   figcaption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
     margin-bottom: 8px;
     color: $roxo-escuro;
     font-size: 12px;
     font-weight: 700;
+
+    span {
+      min-width: 0;
+    }
   }
 
   img {
@@ -294,6 +302,80 @@
     color: $roxo-escuro;
     font-size: 16px;
     box-shadow: 0 1px 5px rgba($preto, 0.18);
+  }
+}
+
+.yellowbrick-info-button {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  color: $roxo-medio;
+  cursor: help;
+
+  .btn-info {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+
+  &:hover {
+    background: rgba($roxo-medio, 0.1);
+    color: $roxo-escuro;
+  }
+}
+
+.yellowbrick-info-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba($preto, 0.45);
+}
+
+.yellowbrick-info-dialog {
+  width: min(520px, 92vw);
+  border-radius: 8px;
+  background: $branco;
+  box-shadow: 0 18px 54px rgba($preto, 0.26);
+  overflow: hidden;
+
+  p {
+    margin: 0;
+    padding: 16px;
+    color: $cinza-escuro;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+}
+
+.yellowbrick-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid $roxo-claro;
+  background: $roxo-fundo;
+  color: $roxo-escuro;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  strong {
+    font-size: 14px;
+  }
+
+  span {
+    color: $cinza-escuro;
+    font-size: 12px;
   }
 }
 

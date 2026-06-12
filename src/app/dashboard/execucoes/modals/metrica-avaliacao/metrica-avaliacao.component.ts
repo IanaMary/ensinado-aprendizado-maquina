@@ -29,6 +29,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   metricsAvaliadas: string[] = [];
   visualizacoesYellowbrick: Record<string, { titulo: string; mime: string; base64: string }[]> = {};
   visualizacaoAmpliada: { titulo: string; mime: string; base64: string; modelo: string } | null = null;
+  dicaVisualizacao: { titulo: string; modelo: string; descricao: string } | null = null;
 
   tooltipInfo: { linha: number; coluna: number; valor: number; tipo: string; classeReal: string; classePredita: string } | null = null;
 
@@ -108,6 +109,41 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
 
   fecharZoomVisualizacao(): void {
     this.visualizacaoAmpliada = null;
+  }
+
+  abrirDicaVisualizacao(event: Event, visualizacao: { titulo: string }, modelo: string): void {
+    event.stopPropagation();
+    this.dicaVisualizacao = {
+      titulo: visualizacao.titulo,
+      modelo,
+      descricao: this.getDescricaoVisualizacao(visualizacao.titulo)
+    };
+  }
+
+  fecharDicaVisualizacao(): void {
+    this.dicaVisualizacao = null;
+  }
+
+  getDescricaoVisualizacao(titulo: string): string {
+    const chave = titulo.toLowerCase();
+
+    if (chave.includes('matriz de confusão')) {
+      return 'Mostra quantas respostas o modelo acertou e onde ele confundiu as classes. A diagonal principal indica acertos. Os valores fora da diagonal mostram erros, ou seja, exemplos de uma classe real que foram previstos como outra classe.';
+    }
+
+    if (chave.includes('relatório de classificação')) {
+      return 'Resume precision, recall, F1-score e suporte por classe. Use para comparar se o modelo trata todas as classes bem ou se ele está indo melhor em algumas classes do que em outras.';
+    }
+
+    if (chave.includes('erros de predição')) {
+      return 'Mostra, para cada classe real, como as previsões se distribuíram. É útil para descobrir quais classes são mais confundidas pelo modelo e discutir possíveis causas nos atributos do dataset.';
+    }
+
+    if (chave.includes('balanceamento')) {
+      return 'Mostra a quantidade de exemplos em cada classe. Quando uma classe tem muito mais exemplos do que outra, o modelo pode aprender a favorecer a classe maior.';
+    }
+
+    return 'Visualização de avaliação do Yellowbrick. Observe padrões, diferenças entre classes e sinais de erro para discutir o comportamento do modelo.';
   }
 
   isNumber(value: any): boolean {

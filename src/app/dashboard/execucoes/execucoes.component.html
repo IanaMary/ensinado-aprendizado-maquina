@@ -99,7 +99,18 @@
             <div class="item-icon">
               <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
             </div>
-            <span>{{ item.label }}</span>
+            <div class="item-texto">
+              <span>{{ getTituloColeta(item) }}</span>
+              <div class="coleta-resumo" *ngIf="resultadoColetaDado">
+                <small>{{ getResumoFonteColeta() }}</small>
+                <div class="coleta-tags">
+                  <span>{{ getResumoDivisaoColeta() }}</span>
+                  <span>Shuffle: {{ resultadoColetaDado.embaralharDados === false ? 'Não' : 'Sim' }}</span>
+                  <span>Estratificação: {{ resultadoColetaDado.estratificarDados ? 'Sim' : 'Não' }}</span>
+                  <span *ngIf="resultadoColetaDado.target">Target: {{ resultadoColetaDado.target }}</span>
+                </div>
+              </div>
+            </div>
           </div>
           <mat-icon class="btn-info" (click)="mostrarInfoItem(item, $event)">info_outline</mat-icon>
         </div>

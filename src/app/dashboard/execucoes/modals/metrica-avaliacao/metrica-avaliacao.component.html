@@ -110,13 +110,37 @@
           (click)="abrirZoomVisualizacao(visualizacao, modelo)"
           [matTooltip]="'Ampliar ' + visualizacao.titulo"
           matTooltipPosition="above">
-          <figcaption>{{ visualizacao.titulo }}</figcaption>
+          <figcaption>
+            <span>{{ visualizacao.titulo }}</span>
+            <button mat-icon-button class="yellowbrick-info-button"
+              [attr.aria-label]="'Ler dica sobre ' + visualizacao.titulo"
+              [matTooltip]="'Ler dica sobre ' + visualizacao.titulo"
+              matTooltipPosition="above"
+              (click)="abrirDicaVisualizacao($event, visualizacao, modelo)">
+              <mat-icon class="btn-info">info_outline</mat-icon>
+            </button>
+          </figcaption>
           <mat-icon class="zoom-icon">zoom_in</mat-icon>
           <img [src]="getImagemVisualizacao(visualizacao)" [alt]="visualizacao.titulo + ' - ' + modelo" />
         </figure>
       </div>
     </div>
   </section>
+
+  <div class="yellowbrick-info-backdrop" *ngIf="dicaVisualizacao" (click)="fecharDicaVisualizacao()">
+    <div class="yellowbrick-info-dialog" (click)="$event.stopPropagation()">
+      <div class="yellowbrick-info-header">
+        <div>
+          <strong>{{ dicaVisualizacao.titulo }}</strong>
+          <span>{{ dicaVisualizacao.modelo }}</span>
+        </div>
+        <button mat-icon-button aria-label="Fechar dica" (click)="fecharDicaVisualizacao()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <p>{{ dicaVisualizacao.descricao }}</p>
+    </div>
+  </div>
 
   <div class="yellowbrick-zoom-backdrop" *ngIf="visualizacaoAmpliada" (click)="fecharZoomVisualizacao()">
     <div class="yellowbrick-zoom-dialog" (click)="$event.stopPropagation()">

@@ -78,4 +78,20 @@ describe('MetricaAvaliacaoComponent', () => {
 
     expect(component.visualizacaoAmpliada).toBeNull();
   });
+
+  it('should open and close yellowbrick visualization tips without triggering parent click', () => {
+    const event = jasmine.createSpyObj<Event>('event', ['stopPropagation']);
+    const visualizacao = { titulo: 'Relatório de classificação' };
+
+    component.abrirDicaVisualizacao(event, visualizacao, 'KNN');
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(component.dicaVisualizacao?.titulo).toBe('Relatório de classificação');
+    expect(component.dicaVisualizacao?.modelo).toBe('KNN');
+    expect(component.dicaVisualizacao?.descricao).toContain('precision');
+
+    component.fecharDicaVisualizacao();
+
+    expect(component.dicaVisualizacao).toBeNull();
+  });
 });

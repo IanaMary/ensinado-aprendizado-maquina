@@ -426,6 +426,14 @@ $metrica-cor-escuro: #E65100;
     }
   }
 
+  .item-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+  }
+
   span {
     font-size: 12px;
     font-weight: 500;
@@ -433,6 +441,40 @@ $metrica-cor-escuro: #E65100;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .coleta-resumo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+
+    small {
+      color: $cinza-medio;
+      font-size: 10px;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .coleta-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+
+    span {
+      max-width: 100%;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: rgba($coleta-cor-claro, 0.85);
+      color: $coleta-cor-escuro;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-transform: none;
+    }
   }
 
   .btn-info {

@@ -137,6 +137,39 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     return this.roleUsuario === 'admin';
   }
 
+  getTituloColeta(item: ItemPipeline): string {
+    if (!this.resultadoColetaDado) {
+      return item.label;
+    }
+    return this.resultadoColetaDado.nomeDataset
+      || this.resultadoColetaDado.treino?.nomeArquivo
+      || item.label;
+  }
+
+  getResumoFonteColeta(): string {
+    const resultado = this.resultadoColetaDado;
+    if (!resultado) return '';
+
+    const fonte = resultado.fonteDados === 'dataset' ? 'Toy dataset' : 'Arquivo';
+    const treino = resultado.treino?.totalDados || 0;
+    const teste = resultado.teste?.totalDados || 0;
+    const total = treino + teste;
+
+    return `${fonte} | ${total || treino} exemplos`;
+  }
+
+  getResumoDivisaoColeta(): string {
+    const resultado = this.resultadoColetaDado;
+    if (!resultado) return '';
+
+    if (resultado.teste?.nomeArquivo) {
+      return `Treino: ${resultado.treino?.totalDados || 0} | Teste enviado: ${resultado.teste.totalDados || 0}`;
+    }
+
+    const treino = resultado.porcentagemTreino || 70;
+    return `Treino/Teste: ${treino}%/${100 - treino}%`;
+  }
+
 
   abrirModalExecucao(item: ItemPipeline): void {
     if (this.modalAberto) return;
@@ -712,11 +745,15 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       colunas: colunas,
       colunasDetalhes: colunasDetalhes,
       porcentagemTreino: 70,
+      embaralharDados: true,
+      estratificarDados: false,
       tipoTarget: tipoTarget,
       atributos: att,
       tipos: {},
       treino: treino,
-      teste: { dados: [], totalDados: 0, nomeArquivo: '' }
+      teste: { dados: [], totalDados: 0, nomeArquivo: '' },
+      fonteDados: 'dataset',
+      nomeDataset: datasetNome
     };
 
     // Criar item para a coluna de coleta
