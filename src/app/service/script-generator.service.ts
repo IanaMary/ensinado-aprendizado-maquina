@@ -611,6 +611,7 @@ export class ScriptGeneratorService {
     lines.push('    print("=" * 50)');
 
     for (const metrica of metricas) {
+      const average = metrica.average || 'weighted';
       switch (metrica.valor) {
         case 'accuracy_score':
           lines.push('    ');
@@ -622,8 +623,8 @@ export class ScriptGeneratorService {
 
         case 'f1_score':
           lines.push('    ');
-          lines.push('    # F1-Score');
-          lines.push('    f1 = f1_score(y_test, y_pred, average="weighted")');
+          lines.push(`    # F1-Score (${average})`);
+          lines.push(`    f1 = f1_score(y_test, y_pred, average="${average}", zero_division=0)`);
           lines.push('    resultados["f1_score"] = f1');
           lines.push('    print(f"F1-Score: {f1:.4f}")');
           break;
@@ -639,16 +640,16 @@ export class ScriptGeneratorService {
 
         case 'precision_score':
           lines.push('    ');
-          lines.push('    # Precisão');
-          lines.push('    precisao = precision_score(y_test, y_pred, average="weighted")');
+          lines.push(`    # Precisão (${average})`);
+          lines.push(`    precisao = precision_score(y_test, y_pred, average="${average}", zero_division=0)`);
           lines.push('    resultados["precisao"] = precisao');
           lines.push('    print(f"Precisão: {precisao:.4f}")');
           break;
 
         case 'recall_score':
           lines.push('    ');
-          lines.push('    # Recall');
-          lines.push('    recall = recall_score(y_test, y_pred, average="weighted")');
+          lines.push(`    # Recall (${average})`);
+          lines.push(`    recall = recall_score(y_test, y_pred, average="${average}", zero_division=0)`);
           lines.push('    resultados["recall"] = recall');
           lines.push('    print(f"Recall: {recall:.4f}")');
           break;

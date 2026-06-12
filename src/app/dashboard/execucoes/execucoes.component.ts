@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
-import { ItemPipeline, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
+import { ItemPipeline, MediaMetrica, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
 import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.component';
 import { TutorContexto } from '../tutor/tutor.component';
 import { Subject, takeUntil } from 'rxjs';
@@ -43,6 +43,7 @@ export class ExecucoesComponent implements OnInit {
   modeloSelecionado?: ItemPipeline;
   resultadoTreinamento?: any;
   metricasSelecionadas: ItemPipeline[] = [];
+  mediaMetricas: MediaMetrica = 'weighted';
   resultadosDasAvaliacoes: any = {};
   preProcessamentoConfig: any = null;
 
@@ -113,6 +114,7 @@ export class ExecucoesComponent implements OnInit {
         modeloSelecionado: item.tipoItem === 'treino-validacao-teste' ? item : this.modeloSelecionado,
         resultadoTreinamento: this.resultadoTreinamento,
         metricasSelecionadas: this.metricasSelecionadas,
+        mediaMetricas: this.mediaMetricas,
         resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
         preProcessamentoConfig: this.preProcessamentoConfig
       }
@@ -127,6 +129,7 @@ export class ExecucoesComponent implements OnInit {
         this.modeloSelecionado = resultado.modeloSelecionado
         this.resultadoTreinamento = resultado.resultadoTreinamento;
         this.metricasSelecionadas = resultado.metricasSelecionadas;
+        this.mediaMetricas = resultado.mediaMetricas || this.mediaMetricas;
         this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
         this.preProcessamentoConfig = resultado.preProcessamentoConfig;
 
@@ -474,6 +477,7 @@ export class ExecucoesComponent implements OnInit {
     this.modeloSelecionado = undefined;
     this.resultadoTreinamento = undefined;
     this.metricasSelecionadas = [];
+    this.mediaMetricas = 'weighted';
     this.resultadosDasAvaliacoes = {};
     this.preProcessamentoConfig = null;
     this.tutorPipelineInfo = null;
@@ -498,7 +502,11 @@ export class ExecucoesComponent implements OnInit {
       if (pipeline) {
         this.resultadoColetaDado = pipeline.resultadoColetaDado;
         this.modeloSelecionado = pipeline.modeloSelecionado;
-        this.metricasSelecionadas = pipeline.metricasSelecionadas || [];
+        this.mediaMetricas = pipeline.mediaMetricas || 'weighted';
+        this.metricasSelecionadas = (pipeline.metricasSelecionadas || []).map((metrica: ItemPipeline) => ({
+          ...metrica,
+          average: metrica.average ?? this.mediaMetricas
+        }));
         this.preProcessamentoConfig = pipeline.preProcessamentoConfig;
         this.resultadoTreinamento = pipeline.resultadoTreinamento;
         this.resultadosDasAvaliacoes = pipeline.resultadosDasAvaliacoes;
@@ -525,6 +533,7 @@ export class ExecucoesComponent implements OnInit {
         resultadoColetaDado: this.resultadoColetaDado,
         modeloSelecionado: this.modeloSelecionado,
         metricasSelecionadas: this.metricasSelecionadas,
+        mediaMetricas: this.mediaMetricas,
         preProcessamentoConfig: this.preProcessamentoConfig,
         resultadoTreinamento: this.resultadoTreinamento,
         resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
@@ -688,6 +697,7 @@ export class ExecucoesComponent implements OnInit {
         modeloSelecionado: this.modeloSelecionado,
         resultadoTreinamento: this.resultadoTreinamento,
         metricasSelecionadas: this.metricasSelecionadas,
+        mediaMetricas: this.mediaMetricas,
         resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
       }
     });
@@ -699,6 +709,7 @@ export class ExecucoesComponent implements OnInit {
         this.modeloSelecionado = resultado.modeloSelecionado;
         this.resultadoTreinamento = resultado.resultadoTreinamento;
         this.metricasSelecionadas = resultado.metricasSelecionadas;
+        this.mediaMetricas = resultado.mediaMetricas || this.mediaMetricas;
         this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
         this.dashboardService.moverItensEmExecucao();
         this.atualizarTutorContexto();

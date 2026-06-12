@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, tap, map } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { MediaMetrica } from '../models/item-coleta-dado.model';
 
 export interface PipelineState {
   id?: string;
@@ -10,6 +11,7 @@ export interface PipelineState {
   resultadoColetaDado?: any;
   modeloSelecionado?: any;
   metricasSelecionadas?: any[];
+  mediaMetricas?: MediaMetrica;
   preProcessamentoConfig?: any;
   resultadoTreinamento?: any;
   resultadosDasAvaliacoes?: any;

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { ItemPipeline } from '../../../../models/item-coleta-dado.model';
+import { ItemPipeline, MediaMetrica } from '../../../../models/item-coleta-dado.model';
 import { DashboardService } from '../../../services/dashboard.service';
 
 @Component({
@@ -11,10 +11,28 @@ import { DashboardService } from '../../../services/dashboard.service';
 export class SelecaoMetricasComponent implements OnChanges {
 
   @Input() metricasDisponiveis: ItemPipeline[] = [];
-  @Output() selecaoMetricas = new EventEmitter<ItemPipeline[]>();
+  @Input() mediaMetricas: MediaMetrica = 'weighted';
+  @Output() selecaoMetricas = new EventEmitter<{ metricas: ItemPipeline[]; media: MediaMetrica }>();
 
   metricasSelecionadas: ItemPipeline[] = [];
   todasMarcadas: boolean = false;
+  medias: Array<{ valor: MediaMetrica; label: string; descricao: string }> = [
+    {
+      valor: 'weighted',
+      label: 'Weighted',
+      descricao: 'Pondera cada classe pela quantidade de exemplos. É a escolha mais estável quando as classes estão desbalanceadas.'
+    },
+    {
+      valor: 'macro',
+      label: 'Macro',
+      descricao: 'Calcula a métrica por classe e tira uma média simples. Dá o mesmo peso para classes raras e frequentes.'
+    },
+    {
+      valor: 'micro',
+      label: 'Micro',
+      descricao: 'Soma acertos e erros de todas as classes antes de calcular a métrica. Favorece a visão global do desempenho.'
+    }
+  ];
 
   constructor(private dashboardService: DashboardService) { }
 
@@ -31,8 +49,15 @@ export class SelecaoMetricasComponent implements OnChanges {
     this.emitSelecaoMetricas();
   }
 
+  atualizarMedia(media: MediaMetrica) {
+    this.mediaMetricas = media;
+    this.emitSelecaoMetricas();
+  }
+
   emitSelecaoMetricas() {
-    this.metricasSelecionadas = this.metricasDisponiveis.filter(e => e.movido);
-    this.selecaoMetricas.emit(this.metricasSelecionadas);
+    this.metricasSelecionadas = this.metricasDisponiveis
+      .filter(e => e.movido)
+      .map(e => ({ ...e, average: this.mediaMetricas }));
+    this.selecaoMetricas.emit({ metricas: this.metricasSelecionadas, media: this.mediaMetricas });
   }
 }

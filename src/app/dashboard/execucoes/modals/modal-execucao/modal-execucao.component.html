@@ -61,6 +61,7 @@
 
         <ng-container *ngSwitchCase="4">
           <app-selecao-metricas [metricasDisponiveis]="metricasDisponiveis"
+            [mediaMetricas]="mediaMetricas"
             (selecaoMetricas)="atualizarMetricasSelecionadas($event)">
           </app-selecao-metricas>
         </ng-container>
@@ -70,6 +71,7 @@
             [metricasSelecionadas]="metricasSelecionadas" [resultadoTreinamento]="resultadoTreinamento"
             [resultadoColetaDado]="resultadoColetaDado" [modeloSelecionado]="modeloSelecionado"
             [hiperparametros]="hiperparametrosAtuais" [preProcessamentoConfig]="preProcessamentoConfig"
+            [mediaMetricas]="mediaMetricas"
             (atualizarResultadoAvaliacoes)="funcResultadoAvaliacoes($event)">
           </app-metrica-avaliacao>
         </ng-container>
@@ -103,8 +105,8 @@
 
     <!-- Tutor com contexto -->
     <app-tutor
-      [explicacao]="explicacaoAtual"
       [contexto]="tutorContexto"
+      [explicacao]="explicacaoAgregacaoMetricas"
       [modeloSelecionado]="modeloSelecionado"
       [metricaSelecionada]="metricasSelecionadas[0]">
     </app-tutor>

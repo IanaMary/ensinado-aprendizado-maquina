@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { BodyTutor, ItemPipeline, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
+import { BodyTutor, ItemPipeline, MediaMetrica, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import { TutorContexto } from '../../../tutor/tutor.component';
@@ -54,6 +54,7 @@ export class ModalExecucaoComponent implements OnInit {
 
   metricasDisponiveis: ItemPipeline[] = [];
   metricasSelecionadas: ItemPipeline[] = [];
+  mediaMetricas: MediaMetrica = 'weighted';
   resultadosDasAvaliacoes: any = {};
   hiperparametrosAtuais: any = {};
 
@@ -118,7 +119,8 @@ export class ModalExecucaoComponent implements OnInit {
         })),
         metricas: this.metricasSelecionadas.map((e: any) => ({
           valor: e.valor,
-          label: e.label
+          label: e.label,
+          average: this.mediaMetricas
         }))
       };
 
@@ -250,8 +252,21 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   atualizarMetricasSelecionadas(event: any) {
-    this.metricasSelecionadas = event;
+    if (Array.isArray(event)) {
+      this.metricasSelecionadas = event.map((metrica: ItemPipeline) => ({
+        ...metrica,
+        average: metrica.average ?? this.mediaMetricas
+      }));
+    } else {
+      this.mediaMetricas = event.media ?? this.mediaMetricas;
+      this.metricasSelecionadas = (event.metricas ?? []).map((metrica: ItemPipeline) => ({
+        ...metrica,
+        average: this.mediaMetricas
+      }));
+    }
+    this.resultadosDasAvaliacoes = {};
     this.validarProximaEtapa();
+    this.atualizarTutorContexto();
   }
 
   atualizarPreProcessamento(event: any) {
@@ -286,6 +301,10 @@ export class ModalExecucaoComponent implements OnInit {
         todosExistem = true;
         this.atualizarMetricasSelecionadas(data.metricasSelecionadas);
       }
+      if (data.mediaMetricas) {
+        this.mediaMetricas = data.mediaMetricas;
+        this.atualizarMetricasSelecionadas(this.metricasSelecionadas);
+      }
       if (Object.keys(data.resultadosDasAvaliacoes).length) {
         todosExistem = true;
         this.funcResultadoAvaliacoes(data.resultadosDasAvaliacoes)
@@ -306,6 +325,7 @@ export class ModalExecucaoComponent implements OnInit {
       modeloSelecionado: this.modeloSelecionado,
       resultadoTreinamento: this.resultadoTreinamento,
       metricasSelecionadas: this.metricasSelecionadas,
+      mediaMetricas: this.mediaMetricas,
       resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
       preProcessamentoConfig: this.preProcessamentoConfig,
       etapa: this.etapaAtual
@@ -368,7 +388,7 @@ export class ModalExecucaoComponent implements OnInit {
       chaves = ['texto_pipe', 'explicacao'];
     } else if (this.etapaAtual === SELECAO_METRICAS) {
       const caminhos = this.metricasSelecionadas.map(item => `tipos[valor=${item.valor}].explicacao`);
-      chaves = ['texto_pipe', 'explicacao'].concat(caminhos);
+      chaves = ['texto_pipe', 'explicacao'].concat(caminhos, ['agregacao_metricas']);
     }
 
     this.emitTutor(chaves);
@@ -389,5 +409,15 @@ export class ModalExecucaoComponent implements OnInit {
         metrica: metricaInfo
       };
     }
+  }
+
+  get explicacaoAgregacaoMetricas(): string[] {
+    if (this.etapaAtual !== SELECAO_METRICAS && this.etapaAtual !== AVALIACAO) return [];
+    return [
+      'A agregação define como métricas calculadas por classe são resumidas em um único número.',
+      'Micro soma os acertos e erros de todas as classes antes do cálculo; é uma visão global do desempenho.',
+      'Macro calcula a métrica em cada classe e tira uma média simples; classes pequenas têm o mesmo peso das grandes.',
+      'Weighted calcula por classe e pondera pela quantidade de exemplos; costuma ser a escolha mais equilibrada em bases desbalanceadas.'
+    ];
   }
 }

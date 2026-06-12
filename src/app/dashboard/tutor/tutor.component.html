@@ -290,8 +290,8 @@
       </div>
     </ng-container>
 
-    <!-- Explicacao (fallback) -->
-    <div *ngIf="explicacao.length && !contexto && !tutorItemInfo" class="section">
+    <!-- Explicacao complementar -->
+    <div *ngIf="explicacao.length && !tutorItemInfo" class="section">
       <p *ngFor="let item of explicacao" class="desc-text">{{ item }}</p>
     </div>
   </div>

@@ -15,4 +15,21 @@
       </mat-checkbox>
     </div>
   </ng-container>
+
+  <section class="media-config">
+    <div class="media-header">
+      <span class="label">Agregação para métricas multiclasse</span>
+    </div>
+
+    <mat-radio-group class="media-options" [ngModel]="mediaMetricas" (ngModelChange)="atualizarMedia($event)">
+      <mat-radio-button *ngFor="let media of medias" [value]="media.valor">
+        {{ media.label }}
+      </mat-radio-button>
+    </mat-radio-group>
+
+    <div class="media-descricao" *ngFor="let media of medias" [class.ativa]="media.valor === mediaMetricas">
+      <strong>{{ media.label }}</strong>
+      <span>{{ media.descricao }}</span>
+    </div>
+  </section>
 </nav>

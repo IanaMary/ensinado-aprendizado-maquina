@@ -2,6 +2,7 @@
 export type TipoItem = 'coleta-dado' | 'pre-processamento' | 'treino-validacao-teste' | 'metrica';
 export type TipoTarget = 'Número' | 'Texto' | 'Booleano' | null;
 export type TipoDado = 'Texto' | 'Número' | 'Booleano';
+export type MediaMetrica = 'micro' | 'macro' | 'weighted';
 
 
 export const nomeMetricas: Record<string, string> = {
@@ -61,6 +62,7 @@ export interface ItemPipeline {
   tipo?: TipoTarget;
   hiperparametros?: any[];
   metricas?: any[];
+  average?: MediaMetrica;
 }
 
 export interface ResultadoColetaDado {
@@ -104,7 +106,6 @@ export function formatarValor(valor: unknown): string {
   }
   return String(valor ?? '');
 }
-
 
 
 

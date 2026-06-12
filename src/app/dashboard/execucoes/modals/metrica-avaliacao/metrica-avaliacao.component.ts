@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ScriptGeneratorService } from '../../../../service/script-generator.service';
-import { ItemPipeline, nomeMetricas, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
+import { ItemPipeline, MediaMetrica, nomeMetricas, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
 
 @Component({
   selector: 'app-metrica-avaliacao',
@@ -20,6 +20,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   @Input() modeloSelecionado: ItemPipeline | undefined;
   @Input() hiperparametros: any = {};
   @Input() preProcessamentoConfig: any = null;
+  @Input() mediaMetricas: MediaMetrica = 'weighted';
 
   @Output() atualizarResultadoAvaliacoes = new EventEmitter<any>();
 
@@ -58,7 +59,11 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
 
     const body = {
       modelos: Object.values(this.resultadoTreinamento).map((e: any) => ({ id: e.id, label: e.nome_modelo })),
-      metricas: this.metricasSelecionadas.map((e: any) => ({ valor: e.valor, label: e.label }))
+      metricas: this.metricasSelecionadas.map((e: any) => ({
+        valor: e.valor,
+        label: e.label,
+        average: e.average ?? this.mediaMetricas
+      }))
     };
 
     console.log('[DEBUG] Enviando para avaliar_modelos:', body);
