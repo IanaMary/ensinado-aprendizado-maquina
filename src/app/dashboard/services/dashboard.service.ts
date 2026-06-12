@@ -220,6 +220,24 @@ export class DashboardService {
     this.itensPreProcessamento.next(itens);
   }
 
+  sincronizarPreProcessamentosSelecionados(itensSelecionados: Pick<ItemPipeline, 'valor'>[]) {
+    const valoresSelecionados = new Set(itensSelecionados.map(item => item.valor));
+    const valoresVistos = new Set<string>();
+    const itensAtualizados = this.itensPreProcessamento.value
+      .filter(item => {
+        if (valoresVistos.has(item.valor)) return false;
+        valoresVistos.add(item.valor);
+        return true;
+      })
+      .map(item => ({
+        ...item,
+        movido: valoresSelecionados.has(item.valor)
+      }));
+
+    this.itensPreProcessamento.next(itensAtualizados);
+    this.moverItensEmExecucao();
+  }
+
   carregarItensModelos() {
     this.fetchItensModelos()
       .subscribe({

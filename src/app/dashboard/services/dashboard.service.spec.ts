@@ -88,4 +88,20 @@ describe('DashboardService', () => {
       service.limparItensExecucao();
     });
   });
+
+  describe('sincronizarPreProcessamentosSelecionados', () => {
+    it('should replace selected preprocessing items without duplicates', (done) => {
+      const standardScaler = { label: 'StandardScaler', valor: 'standard_scaler', preverCategoria: false, dadosRotulados: false, movido: false, habilitado: true, icon: '', tipoItem: 'pre-processamento' as const, id: '1' };
+      const minMaxScaler = { label: 'MinMaxScaler', valor: 'minmax_scaler', preverCategoria: false, dadosRotulados: false, movido: false, habilitado: true, icon: '', tipoItem: 'pre-processamento' as const, id: '2' };
+      const minMaxDuplicado = { ...minMaxScaler, id: '3' };
+      (service as any).itensPreProcessamento.next([standardScaler, minMaxScaler, minMaxDuplicado]);
+
+      service.getItemsEmExecucao().pipe(skip(1)).subscribe(items => {
+        expect(items.map(item => item.valor)).toEqual(['minmax_scaler']);
+        done();
+      });
+
+      service.sincronizarPreProcessamentosSelecionados([{ valor: 'minmax_scaler' }]);
+    });
+  });
 });

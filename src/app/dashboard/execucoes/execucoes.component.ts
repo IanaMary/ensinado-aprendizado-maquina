@@ -719,37 +719,7 @@ export class ExecucoesComponent implements OnInit {
 
   processarItensPreProcessamento(itens: any[]): void {
     console.log('processarItensPreProcessamento chamado com:', itens);
-    // Criar itens de pre-processamento para a coluna
-    for (const item of itens) {
-      const itemPipeline: ItemPipeline = {
-        label: item.label,
-        movido: true,
-        tipoItem: 'pre-processamento',
-        habilitado: true,
-        preverCategoria: false,
-        dadosRotulados: false,
-        valor: item.valor,
-        icon: 'pre-processamento',
-        id: 'preproc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9)
-      };
-      console.log('Criando item pipeline:', itemPipeline);
-      this.dashboardService.movendoItemExecucao(itemPipeline);
-    }
-
-    // Atualizar itens de pre-processamento no servico
-    const itensAtuais = this.dashboardService.getItensPreProcessamentoSync();
-    console.log('Itens atuais pre-processamento:', itensAtuais);
-    const novosItens = itens.map(item => ({
-      ...item,
-      movido: true,
-      tipoItem: 'pre-processamento' as const,
-      habilitado: true,
-      preverCategoria: false,
-      dadosRotulados: false,
-      icon: 'pre-processamento'
-    }));
-    console.log('Novos itens pre-processamento:', novosItens);
-    this.dashboardService.atualizarItensPreProcessamento([...itensAtuais, ...novosItens]);
+    this.dashboardService.sincronizarPreProcessamentosSelecionados(itens);
   }
 
   ngOnDestroy() {
