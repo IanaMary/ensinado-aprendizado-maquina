@@ -29,6 +29,45 @@
   }
 }
 
+.recomendacoes {
+  padding: 12px 14px;
+  border: 1px solid rgba($sucesso, 0.35);
+  border-radius: 10px;
+  background: rgba($sucesso, 0.08);
+
+  .recomendacoes-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: darken($sucesso, 10%);
+    font-size: 13px;
+    font-weight: 700;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  li {
+    margin-bottom: 5px;
+    color: $cinza-escuro;
+    font-size: 12px;
+    line-height: 1.45;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
 h4 {
   font-size: 13px;
   font-weight: 600;

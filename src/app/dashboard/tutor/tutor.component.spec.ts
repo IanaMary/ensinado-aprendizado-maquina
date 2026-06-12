@@ -23,4 +23,15 @@ describe('TutorComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should simplify technical terms in basic mode', () => {
+    component.contexto = {
+      titulo: 'Teste',
+      descricao: 'O target usa features para evitar overfitting.',
+    };
+
+    expect(component.getExplicacaoBasica()).toBe(
+      'o que queremos prever usa pistas para evitar quando o modelo decora os exemplos.'
+    );
+  });
 });

@@ -26,6 +26,37 @@
   }
 }
 
+.tutor-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba($roxo-claro, 0.7);
+  border-radius: 8px;
+  background: $roxo-fundo;
+
+  button {
+    border: none;
+    border-radius: 6px;
+    padding: 7px 8px;
+    background: transparent;
+    color: $roxo-escuro;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &.active {
+      background: $branco;
+      box-shadow: 0 1px 4px rgba($roxo-escuro, 0.15);
+    }
+  }
+}
+
+.basic-section {
+  background: #F3FAF4;
+  border-color: #BFE7C4;
+}
+
 // Tooltip
 .wrapper {
   position: relative;

@@ -97,7 +97,27 @@
     </ng-container>
   </ng-container>
 
+  <section class="yellowbrick-section" *ngIf="getModelosComVisualizacoes().length">
+    <div class="yellowbrick-header">
+      <mat-icon>insert_chart</mat-icon>
+      <span>Visualizações Yellowbrick</span>
+    </div>
+
+    <div class="yellowbrick-model" *ngFor="let modelo of getModelosComVisualizacoes()">
+      <h4>{{ modelo }}</h4>
+      <div class="yellowbrick-grid">
+        <figure class="yellowbrick-card" *ngFor="let visualizacao of visualizacoesYellowbrick[modelo]">
+          <figcaption>{{ visualizacao.titulo }}</figcaption>
+          <img [src]="getImagemVisualizacao(visualizacao)" [alt]="visualizacao.titulo + ' - ' + modelo" />
+        </figure>
+      </div>
+    </div>
+  </section>
+
   <section class="acoes">
+    <button mat-raised-button (click)="baixarRelatorioAluno()" [disabled]="!metricsAvaliadas.length">
+      Baixar relatório
+    </button>
     <button mat-raised-button color="primary" (click)="postAvaliacao()">
       Gerar avaliações
     </button>

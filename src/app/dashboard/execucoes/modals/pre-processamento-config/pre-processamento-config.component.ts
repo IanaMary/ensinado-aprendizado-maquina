@@ -184,6 +184,33 @@ export class PreProcessamentoConfigComponent implements OnInit {
     return item.colunas?.includes(coluna);
   }
 
+  getRecomendacoes(): string[] {
+    const recomendacoes: string[] = [];
+
+    if (this.colunasCategoricas.length > 0) {
+      recomendacoes.push('Há colunas de texto ou booleanas. Use OneHotEncoder para transformar categorias em números.');
+    }
+    if (this.colunasNumericas.length > 1) {
+      recomendacoes.push('Há várias colunas numéricas. Use StandardScaler ou MinMaxScaler quando os valores tiverem escalas diferentes.');
+    }
+    if (this.temValoresFaltantes()) {
+      recomendacoes.push('Há valores vazios no preview. Use SimpleImputer para preencher esses espaços antes do treino.');
+    }
+    const target = this.resultadoColetaDado?.target;
+    if (target && this.getTipoColuna(target).toLowerCase() === 'texto') {
+      recomendacoes.push('O que queremos prever é uma categoria. LabelEncoder pode transformar os rótulos em números para alguns modelos.');
+    }
+
+    return recomendacoes;
+  }
+
+  private temValoresFaltantes(): boolean {
+    const linhas = this.resultadoColetaDado?.treino?.dados || [];
+    return linhas.some((linha: any) =>
+      this.colunas.some(coluna => linha?.[coluna] === null || linha?.[coluna] === undefined || linha?.[coluna] === '')
+    );
+  }
+
   // Verifica se uma coluna está disponível para um item específico
   isColunaDisponivelParaItem(item: any, coluna: string): boolean {
     const colunasDisponiveis = this.getColunasDisponiveis(item);

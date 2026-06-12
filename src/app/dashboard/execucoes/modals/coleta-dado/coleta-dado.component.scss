@@ -557,6 +557,23 @@ input[type="file"] {
     overflow: hidden;
   }
 
+  .dataset-missao {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba($roxo-escuro, 0.05);
+    color: $cinza-escuro;
+    font-size: 11px;
+    line-height: 1.35;
+
+    strong {
+      color: $roxo-escuro;
+      font-size: 12px;
+    }
+  }
+
   .dataset-meta {
     display: flex;
     align-items: center;

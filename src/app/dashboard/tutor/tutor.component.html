@@ -11,6 +11,22 @@
 
   <!-- Painel principal -->
   <div class="tutor-painel">
+    <div class="tutor-mode">
+      <button type="button" [class.active]="modoTutor === 'basico'" (click)="modoTutor = 'basico'">
+        Básico
+      </button>
+      <button type="button" [class.active]="modoTutor === 'avancado'" (click)="modoTutor = 'avancado'">
+        Avançado
+      </button>
+    </div>
+
+    <div *ngIf="getExplicacaoBasica() && !modoAvancado" class="section basic-section">
+      <div class="section-header">
+        <mat-icon>lightbulb</mat-icon>
+        <span>{{ getTituloBasico() }}</span>
+      </div>
+      <p class="desc-text">{{ getExplicacaoBasica() }}</p>
+    </div>
 
     <!-- ITEM INFO (quando clica no botao info) -->
     <ng-container *ngIf="tutorItemInfo">
@@ -48,7 +64,7 @@
       </div>
 
       <!-- Formula (para metricas) -->
-      <div class="section formula-card" *ngIf="tutorItemInfo.formula">
+      <div class="section formula-card" *ngIf="tutorItemInfo.formula && modoAvancado">
         <span class="formula-label">Formula</span>
         <code class="formula-value">{{ tutorItemInfo.formula }}</code>
       </div>
@@ -76,7 +92,7 @@
       </div>
 
       <!-- Hiperparametros (para modelos) -->
-      <div class="section" *ngIf="tutorItemInfo.hiperparametros && objectKeys(tutorItemInfo.hiperparametros).length">
+      <div class="section" *ngIf="tutorItemInfo.hiperparametros && objectKeys(tutorItemInfo.hiperparametros).length && modoAvancado">
         <div class="section-header">
           <mat-icon>tune</mat-icon>
           <span>Hiperparametros</span>
@@ -139,7 +155,7 @@
       <div class="section model-header">
         <div class="model-badge">{{ contexto?.modelo?.tipo || 'Classificador' }}</div>
         <h3>{{ contexto?.titulo }}</h3>
-        <code class="sklearn-path">{{ contexto?.modelo?.sklearn }}</code>
+        <code class="sklearn-path" *ngIf="modoAvancado">{{ contexto?.modelo?.sklearn }}</code>
       </div>
 
       <div class="section">
@@ -187,7 +203,7 @@
         </div>
       </div>
 
-      <div class="section" *ngIf="contexto?.modelo?.hiperparametros && objectKeys(contexto?.modelo?.hiperparametros || {}).length">
+      <div class="section" *ngIf="contexto?.modelo?.hiperparametros && objectKeys(contexto?.modelo?.hiperparametros || {}).length && modoAvancado">
         <div class="section-header">
           <mat-icon>tune</mat-icon>
           <span>Hiperparametros</span>
@@ -236,14 +252,14 @@
     <ng-container *ngIf="contexto?.metrica && !tutorItemInfo">
       <div class="section metric-header">
         <h3>{{ contexto?.titulo }}</h3>
-        <code class="sklearn-path">{{ contexto?.metrica?.sklearn }}</code>
+        <code class="sklearn-path" *ngIf="modoAvancado">{{ contexto?.metrica?.sklearn }}</code>
       </div>
 
       <div class="section">
         <p class="desc-text">{{ contexto?.descricao }}</p>
       </div>
 
-      <div class="section formula-card" *ngIf="contexto?.metrica?.formula">
+      <div class="section formula-card" *ngIf="contexto?.metrica?.formula && modoAvancado">
         <span class="formula-label">Formula</span>
         <code class="formula-value">{{ contexto?.metrica?.formula }}</code>
       </div>

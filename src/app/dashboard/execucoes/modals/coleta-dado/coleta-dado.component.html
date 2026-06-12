@@ -98,6 +98,11 @@
             <span class="dataset-nome">{{ ds.nome }}</span>
           </nav>
           <nav class="dataset-descricao">{{ ds.descricao }}</nav>
+          <nav class="dataset-missao" *ngIf="ds.missao">
+            <strong>{{ ds.missao.pergunta }}</strong>
+            <span>Modelo: {{ ds.missao.modelo_recomendado }}</span>
+            <span>Visualização: {{ ds.missao.visualizacao_recomendada }}</span>
+          </nav>
           <nav class="dataset-meta">
             <span class="badge" [ngClass]="'badge-' + ds.tipo">{{ ds.tipo }}</span>
             <span class="badge badge-fonte">{{ ds.fonte }}</span>

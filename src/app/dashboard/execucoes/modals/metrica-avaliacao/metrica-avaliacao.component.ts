@@ -27,6 +27,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   itensMetricas: ItemPipeline[] = [];
   modelosAvaliados: string[] = [];
   metricsAvaliadas: string[] = [];
+  visualizacoesYellowbrick: Record<string, { titulo: string; mime: string; base64: string }[]> = {};
 
   tooltipInfo: { linha: number; coluna: number; valor: number; tipo: string; classeReal: string; classePredita: string } | null = null;
 
@@ -83,10 +84,21 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   }
 
   atualizarVariaveis() {
-    this.metricsAvaliadas = Object.keys(this.resultadosDasAvaliacoes);
+    this.visualizacoesYellowbrick = this.resultadosDasAvaliacoes?._visualizacoes || {};
+    this.metricsAvaliadas = Object.keys(this.resultadosDasAvaliacoes || {})
+      .filter(chave => chave !== '_visualizacoes');
     this.modelosAvaliados = this.metricsAvaliadas.length > 0
       ? Object.keys(this.resultadosDasAvaliacoes[this.metricsAvaliadas[0]])
       : [];
+  }
+
+  getModelosComVisualizacoes(): string[] {
+    return Object.keys(this.visualizacoesYellowbrick)
+      .filter(modelo => (this.visualizacoesYellowbrick[modelo] || []).length > 0);
+  }
+
+  getImagemVisualizacao(visualizacao: { mime: string; base64: string }): string {
+    return `data:${visualizacao.mime};base64,${visualizacao.base64}`;
   }
 
   isNumber(value: any): boolean {
@@ -205,5 +217,51 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       this.hiperparametros,
       this.preProcessamentoConfig
     );
+  }
+
+  gerarRelatorioAluno(): string {
+    const dataset = this.resultadoColetaDado?.nomeDataset || this.resultadoColetaDado?.treino?.nomeArquivo || 'Dataset';
+    const pergunta = (this.resultadoColetaDado as any)?.missao?.pergunta || 'Que padrão o modelo conseguiu aprender com os dados?';
+    const modelo = this.modeloSelecionado?.label || 'Modelo treinado';
+    const linhasMetricas = this.metricsAvaliadas
+      .filter(metrica => !this.isConfusionMatrix(this.resultadosDasAvaliacoes[metrica]?.[this.modelosAvaliados[0]]))
+      .map(metrica => {
+        const valores = this.modelosAvaliados
+          .map(modeloNome => `${modeloNome}: ${this.resultadosDasAvaliacoes[metrica]?.[modeloNome]}`)
+          .join('; ');
+        return `- ${metrica}: ${valores}`;
+      });
+
+    return [
+      '# Relatório do experimento',
+      '',
+      `## Pergunta`,
+      pergunta,
+      '',
+      `## Dados`,
+      `Dataset usado: ${dataset}`,
+      '',
+      `## Modelo`,
+      `Modelo escolhido: ${modelo}`,
+      '',
+      `## Resultados`,
+      ...(linhasMetricas.length ? linhasMetricas : ['- Gere as avaliações para preencher esta seção.']),
+      '',
+      `## O que observar`,
+      '- O modelo acertou bem todas as classes ou errou mais em alguma?',
+      '- Alguma pista dos dados parece ter ajudado mais?',
+      '- O que você mudaria para tentar melhorar o resultado?',
+      '',
+    ].join('\n');
+  }
+
+  baixarRelatorioAluno(): void {
+    const blob = new Blob([this.gerarRelatorioAluno()], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'relatorio-experimento-ml.md';
+    link.click();
+    URL.revokeObjectURL(url);
   }
 }
