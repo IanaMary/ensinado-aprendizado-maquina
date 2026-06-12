@@ -106,13 +106,32 @@
     <div class="yellowbrick-model" *ngFor="let modelo of getModelosComVisualizacoes()">
       <h4>{{ modelo }}</h4>
       <div class="yellowbrick-grid">
-        <figure class="yellowbrick-card" *ngFor="let visualizacao of visualizacoesYellowbrick[modelo]">
+        <figure class="yellowbrick-card" *ngFor="let visualizacao of visualizacoesYellowbrick[modelo]"
+          (click)="abrirZoomVisualizacao(visualizacao, modelo)"
+          [matTooltip]="'Ampliar ' + visualizacao.titulo"
+          matTooltipPosition="above">
           <figcaption>{{ visualizacao.titulo }}</figcaption>
+          <mat-icon class="zoom-icon">zoom_in</mat-icon>
           <img [src]="getImagemVisualizacao(visualizacao)" [alt]="visualizacao.titulo + ' - ' + modelo" />
         </figure>
       </div>
     </div>
   </section>
+
+  <div class="yellowbrick-zoom-backdrop" *ngIf="visualizacaoAmpliada" (click)="fecharZoomVisualizacao()">
+    <div class="yellowbrick-zoom-dialog" (click)="$event.stopPropagation()">
+      <div class="yellowbrick-zoom-header">
+        <div>
+          <strong>{{ visualizacaoAmpliada.titulo }}</strong>
+          <span>{{ visualizacaoAmpliada.modelo }}</span>
+        </div>
+        <button mat-icon-button aria-label="Fechar zoom" (click)="fecharZoomVisualizacao()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <img [src]="getImagemVisualizacao(visualizacaoAmpliada)" [alt]="visualizacaoAmpliada.titulo + ' ampliada'" />
+    </div>
+  </div>
 
   <section class="acoes">
     <button mat-raised-button (click)="baixarRelatorioAluno()" [disabled]="!metricsAvaliadas.length">

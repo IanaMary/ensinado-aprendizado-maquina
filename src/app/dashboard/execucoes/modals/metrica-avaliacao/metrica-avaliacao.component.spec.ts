@@ -66,4 +66,16 @@ describe('MetricaAvaliacaoComponent', () => {
     expect(relatorio).toContain('Árvore de Decisão');
     expect(relatorio).toContain('Acurácia');
   });
+
+  it('should open and close yellowbrick visualization zoom', () => {
+    const visualizacao = { titulo: 'Matriz de confusão', mime: 'image/png', base64: 'abc123' };
+
+    component.abrirZoomVisualizacao(visualizacao, 'KNN');
+
+    expect(component.visualizacaoAmpliada).toEqual({ ...visualizacao, modelo: 'KNN' });
+
+    component.fecharZoomVisualizacao();
+
+    expect(component.visualizacaoAmpliada).toBeNull();
+  });
 });

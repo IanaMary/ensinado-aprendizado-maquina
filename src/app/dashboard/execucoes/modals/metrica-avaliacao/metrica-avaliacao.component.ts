@@ -28,6 +28,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   modelosAvaliados: string[] = [];
   metricsAvaliadas: string[] = [];
   visualizacoesYellowbrick: Record<string, { titulo: string; mime: string; base64: string }[]> = {};
+  visualizacaoAmpliada: { titulo: string; mime: string; base64: string; modelo: string } | null = null;
 
   tooltipInfo: { linha: number; coluna: number; valor: number; tipo: string; classeReal: string; classePredita: string } | null = null;
 
@@ -99,6 +100,14 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
 
   getImagemVisualizacao(visualizacao: { mime: string; base64: string }): string {
     return `data:${visualizacao.mime};base64,${visualizacao.base64}`;
+  }
+
+  abrirZoomVisualizacao(visualizacao: { titulo: string; mime: string; base64: string }, modelo: string): void {
+    this.visualizacaoAmpliada = { ...visualizacao, modelo };
+  }
+
+  fecharZoomVisualizacao(): void {
+    this.visualizacaoAmpliada = null;
   }
 
   isNumber(value: any): boolean {
