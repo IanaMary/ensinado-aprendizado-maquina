@@ -192,9 +192,29 @@
 // Seção de arquivos
 .secao-arquivos {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   padding: 10px 0;
   border-bottom: 1px solid $roxo-claro;
+
+  .formatos-aceitos {
+    flex-basis: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba($info, 0.08);
+    color: $cinza-escuro;
+    font-size: 12px;
+
+    mat-icon {
+      color: $info;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
 
   .arquivo-item {
     flex: 1;
@@ -225,6 +245,14 @@
       width: 16px;
       height: 16px;
       color: $roxo-medio;
+    }
+
+    small {
+      margin-left: auto;
+      color: $cinza-medio;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
     }
   }
 }

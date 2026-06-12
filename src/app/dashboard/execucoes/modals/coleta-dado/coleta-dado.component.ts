@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PlanilhaService } from '../../../../service/planilha.service';
-import { InformacoesDados, ResultadoColetaDado, TipoDado } from '../../../../models/item-coleta-dado.model';
+import { InformacoesDados, ResultadoColetaDado, TipoArquivoDados, TipoDado } from '../../../../models/item-coleta-dado.model';
 import tutor from '../../../../constants/tutor.json';
 import { DashboardService } from '../../../services/dashboard.service';
 import { SessionService } from '../../../../service/sessao-store.service';
@@ -25,7 +25,7 @@ import { CsvConfigComponent } from '../csv-config/csv-config.component';
 export class ColetaDadoComponent implements OnChanges, OnInit {
 
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
-  @Input() tipoArquivoSelecionado: 'xlxs' | 'csv' | 'json' = 'xlxs';
+  @Input() tipoArquivoSelecionado: TipoArquivoDados = 'csv';
   
   @Output() resultadoColetaDadoModificado = new EventEmitter<ResultadoColetaDado>();
 
@@ -87,13 +87,18 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   ) { }
 
   get aceitarArquivos(): string {
-    switch (this.tipoArquivoSelecionado) {
-      case 'csv': return '.csv';
-      case 'json': return '.json';
-      case 'xlxs':
-      default:
-        return '.xlsx,.xls';
-    }
+    return '.csv,.tsv,.json,.xls,.xlsx';
+  }
+
+  get tipoArquivoLabel(): string {
+    const labels: Record<TipoArquivoDados, string> = {
+      csv: 'CSV',
+      tsv: 'TSV',
+      json: 'JSON',
+      excel: 'Excel',
+      xlxs: 'Excel'
+    };
+    return labels[this.tipoArquivoSelecionado] || 'Arquivo';
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -233,8 +238,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     if (!input.files?.length) return;
 
     const file = input.files[0];
+    this.tipoArquivoSelecionado = this.detectarTipoArquivo(file.name);
 
-    if (this.tipoArquivoSelecionado === 'csv') {
+    if (this.tipoArquivoSelecionado === 'csv' || this.tipoArquivoSelecionado === 'tsv') {
       this.abrirConfigCSV(file, tipo);
     } else {
       const formData = this.criarBodyFromEvent(event, tipo);
@@ -250,7 +256,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       maxWidth: '950px',
       panelClass: 'csv-config-dialog',
       disableClose: true,
-      data: { file, tipo }
+      data: { file, tipo, formato: this.tipoArquivoSelecionado as 'csv' | 'tsv' }
     });
 
     dialogRef.afterClosed().subscribe((resultado: any) => {
@@ -296,6 +302,15 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
         this.msgErro(tipo, msg)
       }
     });
+  }
+
+  detectarTipoArquivo(nomeArquivo: string): TipoArquivoDados {
+    const nome = nomeArquivo.toLowerCase();
+    if (nome.endsWith('.tsv')) return 'tsv';
+    if (nome.endsWith('.csv')) return 'csv';
+    if (nome.endsWith('.json')) return 'json';
+    if (nome.endsWith('.xls') || nome.endsWith('.xlsx')) return 'excel';
+    return this.tipoArquivoSelecionado;
   }
 
   criarBodyFromEvent(event: Event, tipo: 'treino' | 'teste') {

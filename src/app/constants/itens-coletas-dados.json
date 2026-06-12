@@ -1,25 +1,12 @@
 {
   "itensColetasDados": [
     {
-      "label": "CSV",
+      "label": "Dados",
       "movido": false,
       "tipoItem": "coleta-dado",
       "habilitado": true,
-      "valor": "csv"
-    },
-    {
-      "label": "JSON",
-      "movido": false,
-      "tipoItem": "coleta-dado",
-      "habilitado": true,
-      "valor": "json"
-    },
-    {
-      "label": "Excel",
-      "movido": false,
-      "tipoItem": "coleta-dado",
-      "habilitado": true,
-      "valor": "xlxs"
+      "valor": "dados",
+      "resumo": "Carregue arquivos CSV, TSV, JSON, Excel (.xls/.xlsx) ou use toy datasets prontos."
     }
   ],
   "itensPreProcessamento": [

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
 import { ItemPipeline, MediaMetrica, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
@@ -11,7 +11,9 @@ import { PipelineService, PipelineState } from '../../service/pipeline.service';
 import { SessionService } from '../../service/sessao-store.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NomearPipelineDialogComponent } from './modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
+import { AuthService } from '../../service/auth/auth.service';
 
+const TIPOS_ARQUIVO_DADOS = ['csv', 'tsv', 'json', 'excel', 'xlxs'];
 
 @Component({
   selector: 'app-execucoes',
@@ -19,7 +21,7 @@ import { NomearPipelineDialogComponent } from './modals/nomear-pipeline-dialog/n
   styleUrls: ['./execucoes.component.scss'],
   standalone: false,
 })
-export class ExecucoesComponent implements OnInit {
+export class ExecucoesComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private modalAberto = false;
@@ -32,6 +34,10 @@ export class ExecucoesComponent implements OnInit {
   tutorThemeClass: string = 'theme-default';
   paramsTutor = '';
   etapaAtual = '';
+  usuarioMenuAberto = false;
+  nomeUsuario = 'Usuario';
+  emailUsuario = '';
+  roleUsuario = '';
 
   itens: ItemPipeline[] = [];
   colunaColeta: ItemPipeline[] = [];
@@ -54,10 +60,15 @@ export class ExecucoesComponent implements OnInit {
     private pipelineService: PipelineService,
     private sessionService: SessionService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
+    this.nomeUsuario = sessionStorage.getItem('name') || 'Usuario';
+    this.emailUsuario = sessionStorage.getItem('email') || '';
+    this.roleUsuario = this.authService.getUsuarioRole();
+
     this.getTutor('inicio');
     this.dashboardService.getItemsEmExecucao().subscribe(itens => {
       this.itens = [...itens];
@@ -97,6 +108,35 @@ export class ExecucoesComponent implements OnInit {
     });
   }
 
+  @HostListener('document:click', ['$event'])
+  fecharMenuAoClicarFora(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.usuario-menu')) {
+      this.usuarioMenuAberto = false;
+    }
+  }
+
+  get iniciaisUsuario(): string {
+    const partes = this.nomeUsuario.trim().split(/\s+/).filter(Boolean);
+    if (partes.length >= 2) {
+      return `${partes[0][0]}${partes[partes.length - 1][0]}`.toUpperCase();
+    }
+    return (partes[0]?.substring(0, 2) || 'A').toUpperCase();
+  }
+
+  get papelUsuario(): string {
+    const papeis: Record<string, string> = {
+      aluno: 'Aluno',
+      professor: 'Professor',
+      admin: 'Admin'
+    };
+    return papeis[this.roleUsuario] || this.roleUsuario || 'Aluno';
+  }
+
+  get usuarioAdmin(): boolean {
+    return this.roleUsuario === 'admin';
+  }
+
 
   abrirModalExecucao(item: ItemPipeline): void {
     if (this.modalAberto) return;
@@ -109,7 +149,7 @@ export class ExecucoesComponent implements OnInit {
       hasBackdrop: false,
       data: {
         etapa: item.tipoItem === 'metrica' ? 'avaliacao' : item.tipoItem === 'treino-validacao-teste' ? 'treinamento' : item.tipoItem === 'pre-processamento' ? 'pre-processamento' : item.tipoItem,
-        tipoArquivoSelecionado: item.tipoItem === 'coleta-dado' ? item.valor : undefined,
+        tipoArquivoSelecionado: item.tipoItem === 'coleta-dado' && TIPOS_ARQUIVO_DADOS.includes(item.valor) ? item.valor : undefined,
         resultadoColetaDado: this.resultadoColetaDado,
         modeloSelecionado: item.tipoItem === 'treino-validacao-teste' ? item : this.modeloSelecionado,
         resultadoTreinamento: this.resultadoTreinamento,
@@ -175,6 +215,21 @@ export class ExecucoesComponent implements OnInit {
     // Info para itens de coleta
     if (tipo === 'coleta-dado') {
       const coletaInfo: any = {
+        'dados': {
+          titulo: 'Entrada de Dados',
+          descricao: 'Use um unico widget para carregar arquivos CSV, TSV, JSON, Excel (.xls/.xlsx) ou escolher toy datasets prontos para experimentos.',
+          dicas: [
+            'Arquivos em tabela funcionam melhor quando a primeira linha tem nomes de colunas',
+            'CSV e TSV permitem configurar separador e encoding antes da importacao',
+            'Toy datasets ja vêm organizados para aulas e exemplos guiados',
+            'Depois de carregar, escolha o tipo de predicao, target e atributos'
+          ],
+          conceitos: [
+            { nome: 'Arquivo', desc: 'Dados enviados pelo aluno em CSV, TSV, JSON, XLS ou XLSX' },
+            { nome: 'Toy dataset', desc: 'Base pequena e conhecida, pronta para aprender e comparar modelos' },
+            { nome: 'Target', desc: 'Coluna que o modelo deve aprender a prever quando ha rotulos' }
+          ]
+        },
         'xlxs': {
           titulo: 'Arquivo Excel (.xlsx)',
           descricao: 'O formato XLSX e o padrao do Microsoft Excel. Suporta multiplas abas, formatacao de celulas e formulas. Ideal para dados organizados em tabelas com metadados.',
@@ -546,20 +601,34 @@ export class ExecucoesComponent implements OnInit {
     });
   }
 
+  alternarMenuUsuario(event: Event): void {
+    event.stopPropagation();
+    this.usuarioMenuAberto = !this.usuarioMenuAberto;
+  }
+
   navegarParaProjetos(): void {
+    this.usuarioMenuAberto = false;
     this.router.navigate(['/view-aluno/projetos']);
   }
 
   navegarParaGaleria(): void {
+    this.usuarioMenuAberto = false;
     this.router.navigate(['/view-aluno/galeria']);
   }
 
   navegarParaAdmin(): void {
+    this.usuarioMenuAberto = false;
     this.router.navigate(['/view-admin']);
   }
 
   navegarParaUsuarios(): void {
+    this.usuarioMenuAberto = false;
     this.router.navigate(['/view-admin/usuarios']);
+  }
+
+  sair(): void {
+    this.usuarioMenuAberto = false;
+    this.authService.logout();
   }
 
   atualizarTutorContexto(): void {

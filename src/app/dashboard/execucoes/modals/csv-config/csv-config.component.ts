@@ -39,12 +39,19 @@ export class CsvConfigComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<CsvConfigComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { file: File, tipo: string },
+    @Inject(MAT_DIALOG_DATA) public data: { file: File, tipo: string, formato?: 'csv' | 'tsv' },
     private dashboardService: DashboardService
   ) { }
 
   ngOnInit(): void {
+    if (this.data?.formato === 'tsv') {
+      this.separador = 'tab';
+    }
     this.fazerPreview();
+  }
+
+  get titulo(): string {
+    return this.data?.formato === 'tsv' ? 'Configurar Leitura TSV' : 'Configurar Leitura CSV';
   }
 
   get totalPaginas(): number {

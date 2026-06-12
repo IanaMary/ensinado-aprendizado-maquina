@@ -3,6 +3,7 @@ export type TipoItem = 'coleta-dado' | 'pre-processamento' | 'treino-validacao-t
 export type TipoTarget = 'Número' | 'Texto' | 'Booleano' | null;
 export type TipoDado = 'Texto' | 'Número' | 'Booleano';
 export type MediaMetrica = 'micro' | 'macro' | 'weighted';
+export type TipoArquivoDados = 'csv' | 'tsv' | 'json' | 'excel' | 'xlxs';
 
 
 export const nomeMetricas: Record<string, string> = {
@@ -108,5 +109,4 @@ export function formatarValor(valor: unknown): string {
   }
   return String(valor ?? '');
 }
-
 

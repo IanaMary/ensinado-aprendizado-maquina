@@ -1,9 +1,7 @@
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../../services/dashboard.service';
 import { ItemPipeline } from '../../../models/item-coleta-dado.model';
-import { ToyDatasetsDialogComponent } from './toy-datasets-dialog/toy-datasets-dialog.component';
 
 @Component({
   selector: 'app-coleta-de-dados',
@@ -16,8 +14,7 @@ export class ColetaDeDadosComponent implements OnInit {
   itens: ItemPipeline[] = [];
 
   constructor(
-    private dashboardService: DashboardService,
-    private dialog: MatDialog
+    private dashboardService: DashboardService
   ) { }
 
   ngOnInit() {
@@ -29,13 +26,6 @@ export class ColetaDeDadosComponent implements OnInit {
 
   onItemDropped(event: any) {
     const item = event.item.data;
-
-    // Se for um dataset, abrir dialog de escolha
-    if (item.valor === 'dataset') {
-      this.abrirDialogDatasets();
-      return;
-    }
-
     event.item.data.movido = true;
     this.dashboardService.movendoItemExecucao(item);
   }
@@ -44,19 +34,5 @@ export class ColetaDeDadosComponent implements OnInit {
     event.stopPropagation();
     event.preventDefault();
     this.dashboardService.emitInfoItemClicked(item);
-  }
-
-  abrirDialogDatasets() {
-    const dialogRef = this.dialog.open(ToyDatasetsDialogComponent, {
-      width: '750px',
-      maxWidth: '90vw',
-      panelClass: 'toy-datasets-dialog'
-    });
-
-    dialogRef.afterClosed().subscribe((resultado: any) => {
-      if (resultado) {
-        this.dashboardService.emitirResultadoDataset(resultado);
-      }
-    });
   }
 }

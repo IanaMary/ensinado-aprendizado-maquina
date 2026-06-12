@@ -9,7 +9,7 @@
           [class.active]="fonteDados === 'arquivo'"
           (click)="fonteDados = 'arquivo'">
           <mat-icon>upload_file</mat-icon>
-          <span>Enviar Arquivo</span>
+          <span>Arquivos</span>
         </button>
         <button
           type="button"
@@ -24,23 +24,29 @@
 
     <!-- Upload de arquivo -->
     <nav class="secao-arquivos" *ngIf="fonteDados === 'arquivo'">
+      <div class="formatos-aceitos">
+        <mat-icon>description</mat-icon>
+        <span>Formatos aceitos: CSV, TSV, JSON, Excel (.xls, .xlsx)</span>
+      </div>
       <div class="arquivo-item">
-        <label for="arquivo-treino">Planilha de Treino (obrigatória)</label>
+        <label for="arquivo-treino">Arquivo de treino (obrigatório)</label>
         <input id="arquivo-treino" type="file" (change)="postArquivo($event, 'treino')" [accept]="aceitarArquivos" />
         <nav *ngIf="treino.erro" class="erro">{{ treino.erro }}</nav>
         <div *ngIf="treino.nomeArquivo" class="arquivo-selecionado">
           <mat-icon>description</mat-icon>
           <span>{{ treino.nomeArquivo }}</span>
+          <small>{{ tipoArquivoLabel }}</small>
         </div>
       </div>
 
       <div class="arquivo-item">
-        <label for="arquivo-teste">Planilha de Teste (opcional)</label>
+        <label for="arquivo-teste">Arquivo de teste (opcional)</label>
         <input id="arquivo-teste" type="file" (change)="postArquivo($event, 'teste')" [accept]="aceitarArquivos" />
         <nav *ngIf="teste.erro" class="erro">{{ teste.erro }}</nav>
         <div *ngIf="teste.nomeArquivo" class="arquivo-selecionado">
           <mat-icon>description</mat-icon>
           <span>{{ teste.nomeArquivo }}</span>
+          <small>{{ tipoArquivoLabel }}</small>
         </div>
       </div>
 

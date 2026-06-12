@@ -48,34 +48,9 @@ $metrica-cor-escuro: #E65100;
 
   .header-actions {
     display: flex;
+    align-items: center;
     gap: 8px;
     flex-wrap: wrap;
-  }
-
-  .btn-nav {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    background: rgba($roxo-medio, 0.08);
-    color: $roxo-medio;
-    border: 1px solid rgba($roxo-medio, 0.15);
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-
-    &:hover {
-      background: rgba($roxo-medio, 0.15);
-      border-color: rgba($roxo-medio, 0.3);
-    }
   }
 
   .btn-salvar {
@@ -158,6 +133,174 @@ $metrica-cor-escuro: #E65100;
     &:hover {
       background: rgba($erro, 0.15);
       border-color: rgba($erro, 0.4);
+    }
+  }
+
+  .usuario-menu {
+    position: relative;
+  }
+
+  .usuario-avatar-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: $info;
+    color: $branco;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      background: #1976d2;
+      transform: translateY(-1px);
+    }
+  }
+
+  .usuario-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 288px;
+    background: $branco;
+    border: 1px solid rgba($cinza-medio, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 14px 34px rgba($preto, 0.16);
+    padding: 4px 0;
+    z-index: 100;
+  }
+
+  .usuario-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba($cinza-medio, 0.16);
+  }
+
+  .usuario-avatar-grande {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: $info;
+    color: $branco;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .usuario-identidade {
+    min-width: 0;
+  }
+
+  .usuario-nome {
+    color: $cinza-escuro;
+    font-size: 14px;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .usuario-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+    color: $cinza-medio;
+    font-size: 11px;
+    min-width: 0;
+
+    span:first-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .usuario-papel {
+    background: rgba($roxo-medio, 0.12);
+    color: $roxo-medio;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .usuario-opcoes {
+    padding: 4px 0;
+
+    & + .usuario-opcoes {
+      border-top: 1px solid rgba($cinza-medio, 0.16);
+    }
+  }
+
+  .usuario-opcao {
+    width: 100%;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 16px;
+    text-align: left;
+    color: $cinza-escuro;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: rgba($cinza-claro, 0.45);
+    }
+
+    mat-icon {
+      margin-top: 1px;
+      color: $cinza-medio;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    strong,
+    span {
+      display: block;
+    }
+
+    strong {
+      font-size: 13px;
+      font-weight: 700;
+      color: $cinza-escuro;
+      line-height: 1.25;
+    }
+
+    span {
+      margin-top: 2px;
+      font-size: 11px;
+      color: $cinza-medio;
+      line-height: 1.3;
+    }
+
+    &.sair {
+      color: $erro;
+
+      &:hover {
+        background: rgba($erro, 0.08);
+      }
+
+      mat-icon,
+      strong {
+        color: $erro;
+      }
     }
   }
 }

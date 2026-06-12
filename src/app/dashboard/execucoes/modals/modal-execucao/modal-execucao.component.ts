@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { BodyTutor, ItemPipeline, MediaMetrica, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
+import { BodyTutor, ItemPipeline, MediaMetrica, ResultadoColetaDado, TipoArquivoDados } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import { TutorContexto } from '../../../tutor/tutor.component';
@@ -50,7 +50,7 @@ export class ModalExecucaoComponent implements OnInit {
   tutorModeloTarget: any[] = [];
   preProcessamentoConfig: any = null;
 
-  tipoArquivoSelecionado: 'xlxs' | 'csv' | 'json' = 'xlxs';
+  tipoArquivoSelecionado: TipoArquivoDados = 'csv';
 
   metricasDisponiveis: ItemPipeline[] = [];
   metricasSelecionadas: ItemPipeline[] = [];

@@ -6,14 +6,6 @@
       <p>Arraste os itens do pipeline ou clique para executar</p>
     </div>
     <div class="header-actions">
-      <button class="btn-nav" (click)="navegarParaProjetos()" matTooltip="Meus Projetos">
-        <mat-icon>folder</mat-icon>
-        <span>Meus Projetos</span>
-      </button>
-      <button class="btn-nav" (click)="navegarParaGaleria()" matTooltip="Galeria de Pipelines">
-        <mat-icon>explore</mat-icon>
-        <span>Galeria</span>
-      </button>
       <button class="btn-download" (click)="baixarPipeline()" [disabled]="!modeloSelecionado">
         <mat-icon>download</mat-icon>
         Baixar Pipeline
@@ -26,6 +18,67 @@
         <mat-icon>delete_outline</mat-icon>
         Limpar
       </button>
+      <div class="usuario-menu">
+        <button class="usuario-avatar-btn" (click)="alternarMenuUsuario($event)" matTooltip="Menu do usuário">
+          <span>{{ iniciaisUsuario }}</span>
+        </button>
+
+        <div class="usuario-dropdown" *ngIf="usuarioMenuAberto">
+          <div class="usuario-header">
+            <div class="usuario-avatar-grande">{{ iniciaisUsuario }}</div>
+            <div class="usuario-identidade">
+              <div class="usuario-nome">{{ nomeUsuario }}</div>
+              <div class="usuario-meta">
+                <span *ngIf="emailUsuario">{{ emailUsuario }}</span>
+                <span class="usuario-papel">{{ papelUsuario }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="usuario-opcoes">
+            <button class="usuario-opcao" (click)="navegarParaProjetos()">
+              <mat-icon>folder</mat-icon>
+              <div>
+                <strong>Meus Projetos</strong>
+                <span>Pipelines salvos</span>
+              </div>
+            </button>
+            <button class="usuario-opcao" (click)="navegarParaGaleria()">
+              <mat-icon>explore</mat-icon>
+              <div>
+                <strong>Galeria</strong>
+                <span>Pipelines compartilhados</span>
+              </div>
+            </button>
+          </div>
+
+          <div class="usuario-opcoes" *ngIf="usuarioAdmin">
+            <button class="usuario-opcao" (click)="navegarParaAdmin()">
+              <mat-icon>admin_panel_settings</mat-icon>
+              <div>
+                <strong>Painel admin</strong>
+                <span>Gerenciar sistema</span>
+              </div>
+            </button>
+            <button class="usuario-opcao" (click)="navegarParaUsuarios()">
+              <mat-icon>people</mat-icon>
+              <div>
+                <strong>Usuários</strong>
+                <span>Gerenciar contas</span>
+              </div>
+            </button>
+          </div>
+
+          <div class="usuario-opcoes">
+            <button class="usuario-opcao sair" (click)="sair()">
+              <mat-icon>logout</mat-icon>
+              <div>
+                <strong>Sair</strong>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

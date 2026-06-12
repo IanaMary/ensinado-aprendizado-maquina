@@ -26,6 +26,18 @@ export class DashboardService {
   private itensModelos = new BehaviorSubject<ItemPipeline[]>([]);
   private itensMetricas = new BehaviorSubject<ItemPipeline[]>([]);
   private datasetEmExecucao: ItemPipeline | null = null;
+  private readonly itemDados: ItemPipeline = {
+    label: 'Dados',
+    movido: false,
+    tipoItem: 'coleta-dado',
+    habilitado: true,
+    valor: 'dados',
+    id: 'dados',
+    icon: 'coleta-dado',
+    preverCategoria: false,
+    dadosRotulados: false,
+    resumo: 'Carregue arquivos CSV, TSV, JSON, Excel (.xls/.xlsx) ou escolha um toy dataset.'
+  };
 
   get url(): string { return environment.apiUrl; }
   private readonly endpointTutor: string = 'tutor';
@@ -135,6 +147,10 @@ export class DashboardService {
   postColetaArquivo(tipo: string, body: any) {
     const endpoints: Record<string, string> = {
       csv: 'csv',
+      tsv: 'csv',
+      excel: 'salvar_xlxs',
+      xls: 'salvar_xlxs',
+      xlsx: 'salvar_xlxs',
       xlxs: 'salvar_xlxs',
       json: 'salvar_json'
     };
@@ -197,11 +213,25 @@ export class DashboardService {
   carregarItensColetasDados() {
     this.fetchItensColetasDados()
       .subscribe({
-        next: dados => this.itensColetasDados.next(dados),
+        next: dados => this.itensColetasDados.next(this.agruparItensColeta(dados)),
         error: err => {
           console.error('Erro ao carregar itens coleta dados:', err);
+          this.itensColetasDados.next(this.agruparItensColeta([]));
         }
       });
+  }
+
+  private agruparItensColeta(itens: ItemPipeline[]): ItemPipeline[] {
+    const itemExistente = itens.find(item => item.valor === 'dados');
+    return [{
+      ...this.itemDados,
+      ...(itemExistente || {}),
+      label: 'Dados',
+      valor: 'dados',
+      tipoItem: 'coleta-dado',
+      habilitado: itemExistente?.habilitado ?? true,
+      movido: itemExistente?.movido ?? false,
+    }];
   }
 
   getItensColetasDados(): Observable<ItemPipeline[]> {
