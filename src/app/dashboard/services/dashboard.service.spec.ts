@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { DashboardService } from './dashboard.service';
 import { environment } from '../../../environments/environment';
+import { skip } from 'rxjs';
 
 describe('DashboardService', () => {
   let service: DashboardService;
@@ -80,7 +81,7 @@ describe('DashboardService', () => {
 
   describe('limparItensExecucao', () => {
     it('should clear items', (done) => {
-      service.getItemsEmExecucao().subscribe(items => {
+      service.getItemsEmExecucao().pipe(skip(1)).subscribe(items => {
         expect(items).toEqual([]);
         done();
       });

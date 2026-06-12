@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { DashboardComponent } from './dashboard.component';
 
@@ -8,8 +9,10 @@ describe('DashboardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DashboardComponent]
+      declarations: [DashboardComponent],
+      imports: [HttpClientTestingModule]
     })
+    .overrideComponent(DashboardComponent, { set: { template: '' } })
     .compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);

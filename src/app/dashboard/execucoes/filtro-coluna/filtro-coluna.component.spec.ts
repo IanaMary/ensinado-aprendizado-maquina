@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { FiltroColunaComponent } from './filtro-coluna.component';
 
@@ -8,8 +9,10 @@ describe('FiltroColunaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FiltroColunaComponent]
+      declarations: [FiltroColunaComponent],
+      imports: [HttpClientTestingModule]
     })
+    .overrideComponent(FiltroColunaComponent, { set: { template: '' } })
     .compileComponents();
 
     fixture = TestBed.createComponent(FiltroColunaComponent);

@@ -42,7 +42,6 @@ export class AuthService {
     sessionStorage.setItem('token', usuario.access_token);
     sessionStorage.setItem('name', usuario?.usuario?.nome_usuario || usuario?.usuario?.name);
     sessionStorage.setItem('role', usuario?.usuario?.role);
-    console.log('[Auth] Token salvo no sessionStorage. Role:', usuario?.usuario?.role);
     return Promise.resolve(true);
   }
 

@@ -1,18 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-import { ModalClasificadorComponent } from './classificador.component';
+import { ClasificadorComponent } from './classificador.component';
+import { DashboardService } from '../../../services/dashboard.service';
+import { SessionService } from '../../../../service/sessao-store.service';
 
-describe('ModalClasificadorComponent', () => {
-  let component: ModalClasificadorComponent;
-  let fixture: ComponentFixture<ModalClasificadorComponent>;
+describe('ClasificadorComponent', () => {
+  let component: ClasificadorComponent;
+  let fixture: ComponentFixture<ClasificadorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModalClasificadorComponent]
+      declarations: [ClasificadorComponent],
+      providers: [
+        { provide: DashboardService, useValue: {} },
+        { provide: SessionService, useValue: {} },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ModalClasificadorComponent);
+    fixture = TestBed.createComponent(ClasificadorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

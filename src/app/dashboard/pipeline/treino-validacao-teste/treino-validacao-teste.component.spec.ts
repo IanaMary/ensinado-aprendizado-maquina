@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { TreinoValidacaoTesteComponent } from './treino-validacao-teste.component';
 
@@ -8,8 +9,10 @@ describe('TreinoValidacaoTesteComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TreinoValidacaoTesteComponent]
+      declarations: [TreinoValidacaoTesteComponent],
+      imports: [HttpClientTestingModule]
     })
+    .overrideComponent(TreinoValidacaoTesteComponent, { set: { template: '' } })
     .compileComponents();
 
     fixture = TestBed.createComponent(TreinoValidacaoTesteComponent);

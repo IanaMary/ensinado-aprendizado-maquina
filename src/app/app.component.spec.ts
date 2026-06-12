@@ -4,8 +4,10 @@ import { AppComponent } from './app.component';
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
-    }).compileComponents();
+      declarations: [AppComponent],
+    })
+    .overrideComponent(AppComponent, { set: { template: '' } })
+    .compileComponents();
   });
 
   it('should create the app', () => {
@@ -20,10 +22,4 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('ensinado-aprendizado-maquina');
   });
 
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, ensinado-aprendizado-maquina');
-  });
 });

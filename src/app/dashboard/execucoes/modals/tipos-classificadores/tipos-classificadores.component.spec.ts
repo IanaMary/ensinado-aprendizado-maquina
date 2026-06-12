@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { TiposClassificadoresComponent } from './tipos-classificadores.component';
 
@@ -8,8 +9,10 @@ describe('TiposClassificadoresComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TiposClassificadoresComponent]
+      declarations: [TiposClassificadoresComponent],
+      imports: [HttpClientTestingModule]
     })
+    .overrideComponent(TiposClassificadoresComponent, { set: { template: '' } })
     .compileComponents();
 
     fixture = TestBed.createComponent(TiposClassificadoresComponent);

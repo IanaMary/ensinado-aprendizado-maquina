@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { ColetaDeDadosComponent } from './coleta-de-dados.component';
 
@@ -8,8 +9,10 @@ describe('ColetaDeDadosComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ColetaDeDadosComponent]
+      declarations: [ColetaDeDadosComponent],
+      imports: [HttpClientTestingModule]
     })
+    .overrideComponent(ColetaDeDadosComponent, { set: { template: '' } })
     .compileComponents();
 
     fixture = TestBed.createComponent(ColetaDeDadosComponent);

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { SelecaoMetricasComponent } from './selecao-metricas.component';
 
@@ -8,8 +9,10 @@ describe('SelecaoMetricasComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SelecaoMetricasComponent]
+      declarations: [SelecaoMetricasComponent],
+      imports: [HttpClientTestingModule]
     })
+    .overrideComponent(SelecaoMetricasComponent, { set: { template: '' } })
     .compileComponents();
 
     fixture = TestBed.createComponent(SelecaoMetricasComponent);

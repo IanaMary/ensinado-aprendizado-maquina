@@ -99,7 +99,7 @@ describe('AuthService', () => {
       sessionStorage.setItem('token', 'test');
       service.logout();
       expect(sessionStorage.getItem('token')).toBeNull();
-      expect(router.navigate).toHaveBeenCalledWith(['/autenticacao/login', { queryParams: { expirado: 1 } }]);
+      expect(router.navigate).toHaveBeenCalledWith(['/autenticacao/login'], { queryParams: { expirado: 1 } });
     });
   });
 });
