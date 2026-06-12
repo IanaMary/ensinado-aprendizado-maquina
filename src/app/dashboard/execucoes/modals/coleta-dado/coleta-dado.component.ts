@@ -45,6 +45,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     colunas: [],
     colunasDetalhes: [],
     porcentagemTreino: 70,
+    embaralharDados: true,
+    estratificarDados: false,
     tipoTarget: null,
     atributos: this.att,
     tipos: {},
@@ -74,6 +76,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   datasetSelecionado: string = '';
   datasetSelecionadoNome: string = '';
   carregandoDataset: boolean = false;
+  redivisaoEmAndamento: boolean = false;
 
 
   constructor(private planilhaService: PlanilhaService,
@@ -158,6 +161,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.treino.dados = resultado.dados;
     this.treino.totalDados = resultado.total_dados;
     this.treino.nomeArquivo = resultado.nome_dataset;
+    this.resultColetaDadoL.porcentagemTreino = 70;
+    this.resultColetaDadoL.embaralharDados = true;
+    this.resultColetaDadoL.estratificarDados = false;
 
     // Persistir IDs retornados pelo backend (toy datasets agora salvam no MongoDB)
     if (resultado.id_coleta) {
@@ -258,6 +264,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
         if (tipo === 'treino') {
           const porcentagemTeste = (1 - this.resultColetaDadoL.porcentagemTreino / 100).toString();
           formData.append('test_size', porcentagemTeste);
+          this.adicionarConfiguracaoDivisao(formData);
           this.treinoArquivo = file;
         } else {
           this.testeArquivo = file;
@@ -303,6 +310,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       this.treinoArquivo = input.files[0];
       formData.append('file', this.treinoArquivo, this.treinoArquivo.name);
       formData.append('test_size', porcentagemTeste);
+      this.adicionarConfiguracaoDivisao(formData);
     } else if (tipo === 'teste') {
       this.testeArquivo = input.files[0];
       formData.append('file', this.testeArquivo, this.testeArquivo.name);
@@ -345,6 +353,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     this.resultColetaDadoL.tipoTarget = res.tipo_target;
     this.resultColetaDadoL.preverCategoria = res.prever_categoria;
     this.resultColetaDadoL.dadosRotulados = res.dados_rotulados || res.daods_rotulados;
+    this.resultColetaDadoL.embaralharDados = res.shuffle ?? this.resultColetaDadoL.embaralharDados ?? true;
+    this.resultColetaDadoL.estratificarDados = res.stratify ?? this.resultColetaDadoL.estratificarDados ?? false;
 
 
     this.resultColetaDadoL.colunasDetalhes = res.colunas_detalhes;
@@ -408,7 +418,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     }
 
     this.resultColetaDadoL.target = '';
+    this.resultColetaDadoL.estratificarDados = false;
     this.putConfiguracaoTreino();
+    this.redividirDados();
   }
 
   onDadosRotuladosChange() {
@@ -457,6 +469,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       atributos: this.resultColetaDadoL.atributos,
       prever_categoria: prever_categoria,
       dados_rotulados: dadoss_rotulados,
+      shuffle: this.resultColetaDadoL.embaralharDados ?? true,
+      stratify: this.resultColetaDadoL.estratificarDados ?? false,
     }
 
     this.dashboardService.putColetaConfig('xlxs', this.idConfigurcacaoTreinamento, body).subscribe({
@@ -489,6 +503,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     }
 
     this.putConfiguracaoTreino();
+    this.redividirDados();
   }
 
   selecionarTodosAtributos() {
@@ -559,9 +574,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   }
 
 
-  porcentagemTreino = 70; // valor inicial
   atualizarPocentagemTreino() {
-    this.resultColetaDadoL.porcentagemTreino = this.porcentagemTreino;
+    this.resultColetaDadoL.porcentagemTreino = Math.min(90, Math.max(50, this.resultColetaDadoL.porcentagemTreino || 70));
+    this.redividirDados();
   }
 
   get maxTarget(): number {
@@ -613,6 +628,58 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     } else {
       this.resultColetaDadoL.porcentagemTreino -= 5;
     }
+    this.atualizarPocentagemTreino();
+  }
+
+  onDivisaoDadosChange() {
+    if (!this.resultColetaDadoL.embaralharDados) {
+      this.resultColetaDadoL.estratificarDados = false;
+    }
+    this.putConfiguracaoTreino();
+    this.redividirDados();
+  }
+
+  adicionarConfiguracaoDivisao(formData: FormData) {
+    formData.append('shuffle', String(this.resultColetaDadoL.embaralharDados ?? true));
+    formData.append('stratify', String(this.resultColetaDadoL.estratificarDados ?? false));
+    if (this.resultColetaDadoL.target) {
+      formData.append('stratify_column', this.resultColetaDadoL.target);
+    }
+  }
+
+  redividirDados() {
+    if (!this.idConfigurcacaoTreinamento || this.teste.nomeArquivo) return;
+
+    const estadoAtual = {
+      atributos: { ...this.resultColetaDadoL.atributos },
+      target: this.resultColetaDadoL.target,
+      tipoTarget: this.resultColetaDadoL.tipoTarget,
+      preverCategoria: this.resultColetaDadoL.preverCategoria,
+      dadosRotulados: this.resultColetaDadoL.dadosRotulados
+    };
+    const body = {
+      test_size: 1 - (this.resultColetaDadoL.porcentagemTreino / 100),
+      shuffle: this.resultColetaDadoL.embaralharDados ?? true,
+      stratify: this.resultColetaDadoL.estratificarDados ?? false,
+      target: this.resultColetaDadoL.target || null
+    };
+
+    this.redivisaoEmAndamento = true;
+    this.dashboardService.redividirColeta(this.tipoArquivoSelecionado, this.idConfigurcacaoTreinamento, body).subscribe({
+      next: (res: any) => {
+        this.redivisaoEmAndamento = false;
+        res.atributos = estadoAtual.atributos;
+        res.target = estadoAtual.target;
+        res.tipo_target = estadoAtual.tipoTarget;
+        res.prever_categoria = estadoAtual.preverCategoria;
+        res.dados_rotulados = estadoAtual.dadosRotulados;
+        this.preencherDados(res);
+      },
+      error: (err) => {
+        this.redivisaoEmAndamento = false;
+        this.msgErro('treino', err?.error?.detail || 'Erro ao refazer a divisão treino/teste.');
+      }
+    });
   }
 
 

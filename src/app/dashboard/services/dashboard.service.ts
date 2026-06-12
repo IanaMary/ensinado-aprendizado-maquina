@@ -153,6 +153,10 @@ export class DashboardService {
     return this.http.put(`${this.url}${this.endpointConfiguraca}/${tipo}/${idColeta}`, body);
   }
 
+  redividirColeta(tipo: string, idConfigurcacaoTreinamento: string, body: any) {
+    return this.http.post(`${this.url}${this.endpointConfiguraca}/${tipo}/${idConfigurcacaoTreinamento}/redividir`, body);
+  }
+
   getColetaDadosTreino(idColeta: string, limite: number) {
     return this.http.get(`${this.url}${this.endpointColeta}/unique?id_coleta=${idColeta}&limit=${limite}`);
   }

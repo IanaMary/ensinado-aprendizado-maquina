@@ -119,6 +119,8 @@ export class ScriptGeneratorService {
       lines.push(`- **Target:** ${resultado.target}`);
       lines.push(`- **Atributos:** ${Object.keys(resultado.atributos || {}).filter(k => resultado.atributos?.[k]).join(', ')}`);
       lines.push(`- **Divisão Treino/Teste:** ${resultado.porcentagemTreino || 70}/${100 - (resultado.porcentagemTreino || 70)}`);
+      lines.push(`- **Embaralhar dados:** ${resultado.embaralharDados === false ? 'Não' : 'Sim'}`);
+      lines.push(`- **Estratificação:** ${resultado.estratificarDados ? 'Sim' : 'Não'}`);
       lines.push('');
     }
 
@@ -344,6 +346,8 @@ export class ScriptGeneratorService {
     if (resultado?.fonteDados === 'dataset' && resultado.nomeDataset) {
       const splitPct = resultado.porcentagemTreino || 70;
       const testPct = 100 - splitPct;
+      const shuffle = resultado.embaralharDados === false ? 'False' : 'True';
+      const stratify = resultado.estratificarDados && resultado.embaralharDados !== false ? 'y' : 'None';
       return [
         '# ============================================',
         '# Função: Seleção de Features e Target',
@@ -351,7 +355,8 @@ export class ScriptGeneratorService {
         'def selecionar_features(X, y):',
         '    """Divide o dataset em treino e teste, mantendo a coluna target separada."""',
         `    X_train, X_test, y_train, y_test = train_test_split(`,
-        `        X, y, test_size=${(testPct / 100).toFixed(2)}, random_state=42, stratify=y`,
+        `        X, y, test_size=${(testPct / 100).toFixed(2)}, random_state=42,`,
+        `        shuffle=${shuffle}, stratify=${stratify}`,
         '    )',
         '    ',
         '    print("\\nDivisão treino/teste:")',

@@ -160,11 +160,25 @@
                 </nav>
               </mat-form-field>
             </div>
+            <div class="configuracao-generica opcoes-divisao">
+              <mat-checkbox
+                [(ngModel)]="resultColetaDadoL.embaralharDados"
+                (change)="onDivisaoDadosChange()">
+                Embaralhar dados antes da divisão
+              </mat-checkbox>
+              <mat-checkbox
+                [(ngModel)]="resultColetaDadoL.estratificarDados"
+                [disabled]="!resultColetaDadoL.embaralharDados || tipoPredicao !== 'classificacao' || !resultColetaDadoL.target"
+                (change)="onDivisaoDadosChange()">
+                Separar treino/teste com estratificação
+              </mat-checkbox>
+            </div>
             <div class="configuracao-generica">
               <mat-hint>
                 Total disponível: {{ treino.totalDados + teste.totalDados }} |
                 Treino: {{ treino.totalDados }} ({{ resultColetaDadoL.porcentagemTreino }}%) |
                 Teste: {{ teste.totalDados }} ({{ 100 - resultColetaDadoL.porcentagemTreino }}%)
+                <span *ngIf="redivisaoEmAndamento"> | Atualizando divisão...</span>
               </mat-hint>
             </div>
           </ng-container>

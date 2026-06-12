@@ -8,6 +8,13 @@
   padding: 0 4px;
 }
 
+.opcoes-divisao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
 // Fonte de dados tabs
 .fonte-dados {
   margin-bottom: 8px;

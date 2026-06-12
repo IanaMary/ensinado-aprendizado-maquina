@@ -72,6 +72,8 @@ export interface ResultadoColetaDado {
   colunas: string[];
   colunasDetalhes: [];
   porcentagemTreino: number;
+  embaralharDados?: boolean;
+  estratificarDados?: boolean;
   tipoTarget: TipoTarget;
   atributos: Record<string, boolean>;
   tipos: Record<string, TipoDado>;
@@ -106,6 +108,5 @@ export function formatarValor(valor: unknown): string {
   }
   return String(valor ?? '');
 }
-
 
 
