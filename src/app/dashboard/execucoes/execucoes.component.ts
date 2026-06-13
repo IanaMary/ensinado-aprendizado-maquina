@@ -170,6 +170,18 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     return `Treino/Teste: ${treino}%/${100 - treino}%`;
   }
 
+  getResumoPreProcessamento(item: ItemPipeline): { colunas: string[] } | null {
+    if (!this.preProcessamentoConfig?.itens) return null;
+    
+    const configItem = this.preProcessamentoConfig.itens.find(
+      (i: any) => i.valor === item.valor
+    );
+    
+    if (!configItem || !configItem.colunas || configItem.colunas.length === 0) return null;
+    
+    return { colunas: configItem.colunas };
+  }
+
 
   abrirModalExecucao(item: ItemPipeline): void {
     if (this.modalAberto) return;

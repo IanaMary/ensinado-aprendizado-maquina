@@ -127,12 +127,20 @@
       </div>
       <div class="column-content" cdkDropList #preprocessamentoList="cdkDropList" [cdkDropListData]="colunaPreProcessamento"
         [cdkDropListConnectedTo]="['coletaList', 'treinoList', 'metricaList']">
-        <div *ngFor="let item of colunaPreProcessamento" cdkDrag class="item-card">
+        <div *ngFor="let item of colunaPreProcessamento; let idx = index" cdkDrag class="item-card">
           <div class="item-main" (click)="abrirModalExecucao(item)">
             <div class="item-icon">
+              <span class="item-numeral">{{ idx + 1 }}</span>
               <mat-icon>transform</mat-icon>
             </div>
-            <span>{{ item.label }}</span>
+            <div class="item-texto">
+              <span>{{ item.label }}</span>
+              <div class="preprocessamento-resumo" *ngIf="getResumoPreProcessamento(item) as resumo">
+                <div class="preprocessamento-tags">
+                  <span *ngFor="let coluna of resumo.colunas">{{ coluna }}</span>
+                </div>
+              </div>
+            </div>
           </div>
           <mat-icon class="btn-info" (click)="mostrarInfoItem(item, $event)">info_outline</mat-icon>
         </div>

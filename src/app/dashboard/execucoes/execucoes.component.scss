@@ -419,6 +419,7 @@ $metrica-cor-escuro: #E65100;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    position: relative;
 
     img {
       width: 16px;
@@ -475,6 +476,49 @@ $metrica-cor-escuro: #E65100;
       line-height: 1.2;
       text-transform: none;
     }
+  }
+
+  .preprocessamento-resumo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .preprocessamento-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+
+    span {
+      max-width: 100%;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: rgba($preprocessamento-cor-claro, 0.85);
+      color: $preprocessamento-cor-escuro;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-transform: none;
+    }
+  }
+
+  .item-numeral {
+    font-size: 10px;
+    font-weight: 700;
+    color: $preprocessamento-cor;
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    background: $branco;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid $preprocessamento-cor;
+    line-height: 1;
   }
 
   .btn-info {
