@@ -15,6 +15,10 @@ export const nomeMetricas: Record<string, string> = {
   silhouette_score: 'Silhouette Score',
   calinski_harabasz_score: 'Calinski-Harabasz',
   davies_bouldin_score: 'Davies-Bouldin',
+  r2_score: 'R² (Coef. de Determinação)',
+  mean_squared_error: 'Erro Quadrático Médio (MSE)',
+  root_mean_squared_error: 'Raiz do Erro Quadrático (RMSE)',
+  mean_absolute_error: 'Erro Absoluto Médio (MAE)',
 };
 
 export const nomeModelos: Record<string, string> = {

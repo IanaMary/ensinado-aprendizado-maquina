@@ -437,6 +437,12 @@ export class DashboardService {
     this.itensModelos.next(itensAtualizados);
   }
 
+  private determinarTipoModelo(modelo: ItemPipeline): string {
+    if (!modelo.dadosRotulados) return 'agrupamento';
+    if (modelo.preverCategoria) return 'classificacao';
+    return 'regressao';
+  }
+
   habilitadarMetricas(modelos: any[]) {
 
     const modelosSelecionados = this.itensModelos.getValue().filter(
@@ -446,11 +452,22 @@ export class DashboardService {
     let metricasComuns: string[] = [];
 
     if (modelosSelecionados.length > 0) {
-      metricasComuns = modelosSelecionados
-        .map(m => m.metricas ?? [])
-        .reduce((acc, metricas) => acc.filter(m => metricas.includes(m)));
-    }
+      const todosTemMetricas = modelosSelecionados.every(m => (m.metricas?.length ?? 0) > 0);
 
+      if (todosTemMetricas) {
+        metricasComuns = modelosSelecionados
+          .map(m => m.metricas ?? [])
+          .reduce((acc, metricas) => acc.filter(m => metricas.includes(m)));
+      } else {
+        const metricasPorTipo: Record<string, string[]> = {
+          classificacao: ['accuracy_score', 'precision_score', 'recall_score', 'f1_score', 'confusion_matrix'],
+          regressao: ['r2_score', 'mean_squared_error', 'root_mean_squared_error', 'mean_absolute_error'],
+          agrupamento: ['silhouette_score', 'calinski_harabasz_score', 'davies_bouldin_score'],
+        };
+        const tipo = this.determinarTipoModelo(modelosSelecionados[0]);
+        metricasComuns = metricasPorTipo[tipo] ?? [];
+      }
+    }
 
     const itensAtualizados = this.itensMetricas.value.map(item => ({
       ...item,

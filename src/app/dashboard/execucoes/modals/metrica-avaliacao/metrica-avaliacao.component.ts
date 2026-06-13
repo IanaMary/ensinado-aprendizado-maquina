@@ -155,6 +155,14 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       return 'Mostra como a inércia (soma das distâncias ao centroide) varia com o número de clusters (K). O "cotovelo" no gráfico — onde a curva para de cair rápido — indica o K ideal. Se não houver cotovelo claro, os dados podem não ter uma estrutura de clusters bem definida.';
     }
 
+    if (chave.includes('prediction error') || chave.includes('previsto vs. real')) {
+      return 'Mostra os valores reais no eixo X e os valores previstos no eixo Y. A linha tracejada representa a previsão perfeita (real = previsto). Quanto mais os pontos se alinharem sobre essa linha, melhor o modelo. Pontos distantes indicam erros grandes de previsão.';
+    }
+
+    if (chave.includes('residuals plot') || chave.includes('resíduos')) {
+      return 'Mostra os resíduos (diferença entre real e previsto) em função do valor previsto. O ideal é que os pontos fiquem espalhados aleatoriamente em torno do zero, sem padrões visíveis. Padrões nos resíduos indicam que o modelo não capturou algum padrão nos dados.';
+    }
+
     return 'Visualização de avaliação do Yellowbrick. Observe padrões, diferenças entre classes e sinais de erro para discutir o comportamento do modelo.';
   }
 
@@ -281,6 +289,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     const pergunta = (this.resultadoColetaDado as any)?.missao?.pergunta || 'Que padrão o modelo conseguiu aprender com os dados?';
     const modelo = this.modeloSelecionado?.label || 'Modelo treinado';
     const isClustering = this.modeloSelecionado?.dadosRotulados === false;
+    const isRegressao = !isClustering && this.modeloSelecionado?.preverCategoria === false;
     const linhasMetricas = this.metricsAvaliadas
       .filter(metrica => !this.isConfusionMatrix(this.resultadosDasAvaliacoes[metrica]?.[this.modelosAvaliados[0]]))
       .map(metrica => {
@@ -296,6 +305,12 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       '- O Silhouette Score está próximo de 1 (bom) ou de 0/negativo (clusters sobrepostos)?',
       '- O gráfico do cotovelo mostra um "K" claro? Se não, tente outros valores de K.',
       '- Os clusters encontrados revelam algum padrão interessante nos dados?',
+    ] : isRegressao ? [
+      '## O que observar',
+      '- O R² está próximo de 1? Quanto mais alto, melhor o modelo explica a variação dos dados.',
+      '- O RMSE e o MAE estão baixos em relação à faixa dos valores do target?',
+      '- O gráfico "Previsto vs. Real" mostra pontos próximos da linha diagonal?',
+      '- Os resíduos estão espalhados aleatoriamente ou mostram algum padrão?',
     ] : [
       '## O que observar',
       '- O modelo acertou bem todas as classes ou errou mais em alguma?',
