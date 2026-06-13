@@ -8,15 +8,31 @@
     <span class="label">Métricas disponíveis</span>
   </div>
 
-  <ng-container *ngIf="metricasDisponiveis.length">
-    <div *ngFor="let metrica of metricasDisponiveis" class="metrica-item">
-      <mat-checkbox (change)="toggleMetrica(metrica)" [(ngModel)]="metrica.movido">
-        {{ metrica?.label }}
-      </mat-checkbox>
+  <ng-container *ngIf="grupos.length">
+    <div *ngFor="let grupo of grupos" class="grupo-metricas">
+      <div class="grupo-header">
+        <mat-icon>{{ grupo.icone }}</mat-icon>
+        <span>{{ grupo.nome }}</span>
+        <button mat-icon-button class="btn-grupo-toggle"
+          [matTooltip]="'Selecionar todas do grupo'"
+          (click)="toggleGrupo(grupo)">
+          <mat-icon>select_all</mat-icon>
+        </button>
+      </div>
+
+      <div *ngFor="let metrica of grupo.itens" class="metrica-item">
+        <mat-checkbox (change)="toggleMetrica(metrica)" [(ngModel)]="metrica.movido">
+          <div class="metrica-conteudo">
+            <span class="metrica-label">{{ metrica?.label }}</span>
+            <span class="metrica-explicacao" *ngIf="metrica.explicacao">{{ metrica.explicacao }}</span>
+            <span class="metrica-explicacao" *ngIf="!metrica.explicacao && metrica.resumo">{{ metrica.resumo }}</span>
+          </div>
+        </mat-checkbox>
+      </div>
     </div>
   </ng-container>
 
-  <section class="media-config">
+  <section class="media-config" *ngIf="temClassificacao">
     <div class="media-header">
       <span class="label">Agregação para métricas multiclasse</span>
     </div>

@@ -65,6 +65,8 @@ export interface ItemPipeline {
   id: string;
   resumo?: string;
   tipo?: TipoTarget;
+  grupo?: string;
+  explicacao?: string;
   hiperparametros?: any[];
   metricas?: any[];
   average?: MediaMetrica;

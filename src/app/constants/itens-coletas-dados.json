@@ -269,7 +269,8 @@
       "tipo": null,
       "hiperparametros": [],
       "preverCategoria": true,
-      "dadosRotulados": false
+      "dadosRotulados": false,
+      "metricas": ["silhouette_score", "calinski_harabasz_score", "davies_bouldin_score"]
     },
     {
       "label": "PCA",
@@ -291,7 +292,9 @@
       "valor": "accuracy_score",
       "movido": false,
       "tipoItem": "metrica",
-      "habilitado": false
+      "habilitado": false,
+      "grupo": "classificacao",
+      "explicacao": "Das 100 amostras de teste, quantas o modelo acertou? É a métrica mais simples: acertos dividido pelo total."
     },
     {
       "label": "Precisão",
@@ -299,7 +302,9 @@
       "valor": "precision_score",
       "movido": false,
       "tipoItem": "metrica",
-      "habilitado": false
+      "habilitado": false,
+      "grupo": "classificacao",
+      "explicacao": "Se o modelo disse \"é positivo\" 10 vezes e 8 realmente eram, a precisão é 80%. Importante quando o custo de um falso positivo é alto."
     },
     {
       "label": "Recall",
@@ -307,7 +312,9 @@
       "valor": "recall_score",
       "movido": false,
       "tipoItem": "metrica",
-      "habilitado": false
+      "habilitado": false,
+      "grupo": "classificacao",
+      "explicacao": "Dos positivos reais, quantos o modelo detectou. Importante quando o custo de um falso negativo é alto."
     },
     {
       "label": "F1-Score",
@@ -315,7 +322,9 @@
       "valor": "f1_score",
       "movido": false,
       "tipoItem": "metrica",
-      "habilitado": false
+      "habilitado": false,
+      "grupo": "classificacao",
+      "explicacao": "Média harmônica entre precisão e recall. Se um dos dois for baixo, o F1 cai bastante. Útil com classes desbalanceadas."
     },
     {
       "label": "Matriz de Confusão",
@@ -323,7 +332,39 @@
       "valor": "confusion_matrix",
       "movido": false,
       "tipoItem": "metrica",
-      "habilitado": false
+      "habilitado": false,
+      "grupo": "classificacao",
+      "explicacao": "Tabela que mostra acertos (diagonal) e erros (fora da diagonal) por classe. Permite ver exatamente onde o modelo confunde."
+    },
+    {
+      "label": "Silhouette Score",
+      "resumo": "Quão bem definidos estão os clusters (-1 a 1)",
+      "valor": "silhouette_score",
+      "movido": false,
+      "tipoItem": "metrica",
+      "habilitado": false,
+      "grupo": "agrupamento",
+      "explicacao": "Mede o quão parecido cada ponto é com seu próprio cluster comparado aos outros. Próximo de 1 = clusters bem definidos; negativo = possivelmente no cluster errado."
+    },
+    {
+      "label": "Calinski-Harabasz",
+      "resumo": "Razão entre separação e coesão dos clusters",
+      "valor": "calinski_harabasz_score",
+      "movido": false,
+      "tipoItem": "metrica",
+      "habilitado": false,
+      "grupo": "agrupamento",
+      "explicacao": "Compara a dispersão entre os clusters com a dispersão dentro de cada cluster. Valores maiores indicam clusters mais definidos e separados."
+    },
+    {
+      "label": "Davies-Bouldin",
+      "resumo": "Similaridade média entre clusters (quanto menor, melhor)",
+      "valor": "davies_bouldin_score",
+      "movido": false,
+      "tipoItem": "metrica",
+      "habilitado": false,
+      "grupo": "agrupamento",
+      "explicacao": "Para cada cluster, calcula o quão parecido ele é com o mais próximo. Zero = clusters perfeitamente separados. Valores baixos = boa separação."
     }
   ]
 }

@@ -2,6 +2,12 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { ItemPipeline, MediaMetrica } from '../../../../models/item-coleta-dado.model';
 import { DashboardService } from '../../../services/dashboard.service';
 
+interface GrupoMetricas {
+  nome: string;
+  icone: string;
+  itens: ItemPipeline[];
+}
+
 @Component({
   selector: 'app-selecao-metricas',
   templateUrl: './selecao-metricas.component.html',
@@ -16,6 +22,15 @@ export class SelecaoMetricasComponent implements OnChanges {
 
   metricasSelecionadas: ItemPipeline[] = [];
   todasMarcadas: boolean = false;
+  grupos: GrupoMetricas[] = [];
+  temClassificacao: boolean = false;
+
+  private nomesGrupos: Record<string, { nome: string; icone: string }> = {
+    classificacao: { nome: 'Classificação', icone: 'category' },
+    regressao: { nome: 'Regressão', icone: 'trending_up' },
+    agrupamento: { nome: 'Agrupamento', icone: 'scatter_plot' },
+  };
+
   medias: Array<{ valor: MediaMetrica; label: string; descricao: string }> = [
     {
       valor: 'weighted',
@@ -36,7 +51,34 @@ export class SelecaoMetricasComponent implements OnChanges {
 
   constructor(private dashboardService: DashboardService) { }
 
-  ngOnChanges(changes: SimpleChanges): void { }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['metricasDisponiveis']) {
+      this.construirGrupos();
+    }
+  }
+
+  private construirGrupos(): void {
+    const mapa = new Map<string, ItemPipeline[]>();
+    for (const metrica of this.metricasDisponiveis) {
+      const grupo = metrica.grupo || 'outros';
+      if (!mapa.has(grupo)) {
+        mapa.set(grupo, []);
+      }
+      mapa.get(grupo)!.push(metrica);
+    }
+
+    const ordem = ['classificacao', 'regressao', 'agrupamento', 'outros'];
+    this.grupos = [];
+    for (const key of ordem) {
+      if (mapa.has(key)) {
+        const meta = this.nomesGrupos[key] || { nome: key, icone: 'help' };
+        this.grupos.push({ nome: meta.nome, icone: meta.icone, itens: mapa.get(key)! });
+      }
+    }
+
+    this.temClassificacao = mapa.has('classificacao');
+    this.todasMarcadas = this.metricasDisponiveis.length > 0 && this.metricasDisponiveis.every(m => m.movido);
+  }
 
   toggleMetrica(metrica: ItemPipeline) {
     this.todasMarcadas = this.metricasDisponiveis.every(m => m.movido);
@@ -46,6 +88,13 @@ export class SelecaoMetricasComponent implements OnChanges {
   toggleTodas() {
     this.todasMarcadas = !this.todasMarcadas;
     this.metricasDisponiveis.forEach(m => m.movido = this.todasMarcadas);
+    this.emitSelecaoMetricas();
+  }
+
+  toggleGrupo(grupo: GrupoMetricas) {
+    const todasDoGrupoMarcadas = grupo.itens.every(m => m.movido);
+    grupo.itens.forEach(m => m.movido = !todasDoGrupoMarcadas);
+    this.todasMarcadas = this.metricasDisponiveis.every(m => m.movido);
     this.emitSelecaoMetricas();
   }
 
