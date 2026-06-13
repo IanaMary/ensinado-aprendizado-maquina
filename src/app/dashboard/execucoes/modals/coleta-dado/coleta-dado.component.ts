@@ -197,6 +197,12 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     this.resultColetaDadoL.embaralharDados = true;
     this.resultColetaDadoL.estratificarDados = false;
 
+    // Limpar dados de teste (toy datasets não têm arquivo de teste separado)
+    this.teste.dados = [];
+    this.teste.totalDados = 0;
+    this.teste.nomeArquivo = '';
+    this.teste.erro = '';
+
     // Persistir IDs retornados pelo backend (toy datasets agora salvam no MongoDB)
     if (resultado.id_coleta) {
       this.idColeta = resultado.id_coleta;
