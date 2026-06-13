@@ -192,14 +192,9 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     if (!modeloInfo?.hiperparametros) return null;
     
     const hiperparametros = Object.entries(modeloInfo.hiperparametros)
-      .filter(([key, param]: [string, any]) => {
-        const valorAtual = this.hiperparametrosAtuais[key];
-        const valorPadrao = param.padrao;
-        return valorAtual !== undefined && valorAtual !== valorPadrao;
-      })
       .map(([key, param]: [string, any]) => ({
         nome: (param as any).nome || key,
-        valor: this.hiperparametrosAtuais[key]
+        valor: this.hiperparametrosAtuais[key] !== undefined ? this.hiperparametrosAtuais[key] : (param as any).padrao
       }));
     
     if (hiperparametros.length === 0) return null;
