@@ -4,11 +4,16 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthService } from '../service/auth/auth.service';
+import { NotificacaoService } from '../service/notificacao.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private notificacao: NotificacaoService
+  ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.getToken();
@@ -32,6 +37,7 @@ export class AuthInterceptor implements HttpInterceptor {
           this.authService.logout();
         } else if (err.status === 403) {
           console.warn('Acesso negado (403)');
+          this.notificacao.erro('Você não tem permissão para esta ação.');
         }
         return throwError(() => err);
       })

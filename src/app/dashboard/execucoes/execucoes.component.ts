@@ -70,7 +70,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     this.roleUsuario = this.authService.getUsuarioRole();
 
     this.getTutor('inicio');
-    this.dashboardService.getItemsEmExecucao().subscribe(itens => {
+    this.dashboardService.getItemsEmExecucao().pipe(takeUntil(this.destroy$)).subscribe(itens => {
       this.itens = [...itens];
       this.colunaColeta = itens.filter(i => i.tipoItem === 'coleta-dado');
       this.colunaPreProcessamento = itens.filter(i => i.tipoItem === 'pre-processamento');
@@ -101,7 +101,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       });
 
     // Verificar se ha um pipeline para carregar
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       if (params['pipeline']) {
         this.carregarPipeline(params['pipeline']);
       }
@@ -193,7 +193,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       }
     });
 
-    dialogRef.afterClosed().subscribe((resultado: any) => {
+    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((resultado: any) => {
       this.modalAberto = false;
       if (resultado) {
         console.log('Modal fechado com resultado:', resultado);
@@ -537,7 +537,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     if (params !== this.paramsTutor) {
       this.paramsTutor = params;
       this.etapaAtual = this.etapaAtual;
-      this.dashboardService.getTutor(this.paramsTutor).subscribe({
+      this.dashboardService.getTutor(this.paramsTutor).pipe(takeUntil(this.destroy$)).subscribe({
         next: async (res: any) => {
           if (res.descricao) {
             this.tutor = res.descricao.replace(/&nbsp;/g, ' ');
@@ -586,7 +586,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   }
 
   carregarPipeline(id: string): void {
-    this.pipelineService.carregarPipeline(id).subscribe(pipeline => {
+    this.pipelineService.carregarPipeline(id).pipe(takeUntil(this.destroy$)).subscribe(pipeline => {
       if (pipeline) {
         this.resultadoColetaDado = pipeline.resultadoColetaDado;
         this.modeloSelecionado = pipeline.modeloSelecionado;
@@ -614,7 +614,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       }
     );
 
-    dialogRef.afterClosed().subscribe(nome => {
+    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(nome => {
       if (!nome) return;
 
       const state: PipelineState = {
@@ -628,7 +628,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
       };
 
-      this.pipelineService.salvarPipeline(state).subscribe(() => {
+      this.pipelineService.salvarPipeline(state).pipe(takeUntil(this.destroy$)).subscribe(() => {
         console.log('Pipeline salvo com sucesso:', nome);
       });
     });
@@ -809,7 +809,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       }
     });
 
-    dialogRef.afterClosed().subscribe((resultado: any) => {
+    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((resultado: any) => {
       this.modalAberto = false;
       if (resultado) {
         this.resultadoColetaDado = resultado.resultadoColetaDado;

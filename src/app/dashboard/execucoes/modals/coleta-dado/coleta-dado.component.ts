@@ -6,14 +6,18 @@ import {
   OnChanges,
   SimpleChanges,
   OnInit,
+  OnDestroy,
   ChangeDetectorRef
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { EMPTY, Subject } from 'rxjs';
+import { catchError, debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { PlanilhaService } from '../../../../service/planilha.service';
 import { InformacoesDados, ResultadoColetaDado, TipoArquivoDados, TipoDado } from '../../../../models/item-coleta-dado.model';
 import tutor from '../../../../constants/tutor.json';
 import { DashboardService } from '../../../services/dashboard.service';
 import { SessionService } from '../../../../service/sessao-store.service';
+import { NotificacaoService } from '../../../../service/notificacao.service';
 import { CsvConfigComponent } from '../csv-config/csv-config.component';
 
 @Component({
@@ -22,7 +26,10 @@ import { CsvConfigComponent } from '../csv-config/csv-config.component';
   styleUrls: ['./coleta-dado.component.scss'],
   standalone: false
 })
-export class ColetaDadoComponent implements OnChanges, OnInit {
+export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
+
+  private destroy$ = new Subject<void>();
+  private redividir$ = new Subject<void>();
 
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
   @Input() tipoArquivoSelecionado: TipoArquivoDados = 'csv';
@@ -82,6 +89,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   constructor(private planilhaService: PlanilhaService,
     private dashboardService: DashboardService,
     private sessionService: SessionService,
+    private notificacao: NotificacaoService,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
   ) { }
@@ -117,6 +125,21 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       this.treino = this.resultColetaDadoL.treino;
       this.teste = this.resultColetaDadoL.teste;
     }
+
+    // Debounce + switchMap: mudanças rápidas no slider geram uma única requisição,
+    // e uma redivisão nova cancela a resposta da anterior (evita estado obsoleto).
+    this.redividir$
+      .pipe(
+        debounceTime(300),
+        switchMap(() => this.executarRedivisao()),
+        takeUntil(this.destroy$)
+      )
+      .subscribe();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get datasetsFiltrados(): any[] {
@@ -133,6 +156,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       },
       error: (err: any) => {
         console.error('Erro ao carregar datasets:', err);
+        this.notificacao.erro(err?.error?.detail || 'Não foi possível carregar a lista de datasets.');
       }
     });
   }
@@ -157,6 +181,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       error: (err: any) => {
         console.error('Erro ao carregar dataset:', err);
         this.carregandoDataset = false;
+        this.notificacao.erro(err?.error?.detail || 'Não foi possível carregar o dataset selecionado.');
       }
     });
   }
@@ -203,14 +228,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     // Marcar todos os atributos exceto target
     this.att = {};
-    const tipos: Record<string, TipoDado> = {};
-    for (const det of resultado.colunas_detalhes) {
-      const t = (det.tipo_coluna || '').toLowerCase();
-      tipos[det.nome_coluna] = t === 'numero' || t === 'número' ? 'Número'
-        : t === 'texto' || t === 'string' ? 'Texto'
-        : t === 'booleano' || t === 'boolean' ? 'Booleano'
-        : 'Texto';
-    }
+    const tipos = this.tiposPorColunaDetalhes(resultado.colunas_detalhes);
     for (const col of resultado.colunas) {
       this.att[col] = col !== resultado.target;
     }
@@ -350,7 +368,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
       next: (res: any) => {
         this.preencherDados(res);
       },
-      error: (err) => { }
+      error: (err) => {
+        this.notificacao.erro(err?.error?.detail || 'Não foi possível carregar os dados da coleta.');
+      }
     });
   }
 
@@ -374,18 +394,11 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
 
     this.resultColetaDadoL.colunasDetalhes = res.colunas_detalhes;
 
-    const tipos: Record<string, TipoDado> = {};
+    let tipos: Record<string, TipoDado> = {};
     if (res.colunas_detalhes?.length) {
-      for (const det of res.colunas_detalhes) {
-        const t = (det.tipo_coluna || '').toLowerCase();
-        tipos[det.nome_coluna] = t === 'numero' || t === 'número' ? 'Número'
-          : t === 'texto' || t === 'string' ? 'Texto'
-          : t === 'booleano' || t === 'boolean' ? 'Booleano'
-          : 'Texto';
-      }
+      tipos = this.tiposPorColunaDetalhes(res.colunas_detalhes);
     } else if (res.preview_treino?.length) {
-      const detected = this.detectarTipos(res.preview_treino);
-      Object.assign(tipos, detected);
+      tipos = this.detectarTipos(res.preview_treino);
     }
     this.resultColetaDadoL.tipos = tipos;
 
@@ -494,7 +507,9 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
         this.resultadoColetaDado = this.resultColetaDadoL;
         this.resultadoColetaDadoModificado.emit(this.resultadoColetaDado);
       },
-      error: (err) => { }
+      error: (err) => {
+        this.notificacao.erro(err?.error?.detail || 'Não foi possível salvar a configuração da coleta.');
+      }
     });
   }
 
@@ -588,6 +603,21 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     return tipos;
   }
 
+  private normalizarTipoColuna(tipoColuna: string): TipoDado {
+    const t = (tipoColuna || '').toLowerCase();
+    if (t === 'numero' || t === 'número') return 'Número';
+    if (t === 'booleano' || t === 'boolean') return 'Booleano';
+    return 'Texto';
+  }
+
+  private tiposPorColunaDetalhes(colunasDetalhes: any[]): Record<string, TipoDado> {
+    const tipos: Record<string, TipoDado> = {};
+    for (const det of colunasDetalhes || []) {
+      tipos[det.nome_coluna] = this.normalizarTipoColuna(det.tipo_coluna);
+    }
+    return tipos;
+  }
+
 
   atualizarPocentagemTreino() {
     this.resultColetaDadoL.porcentagemTreino = Math.min(90, Math.max(50, this.resultColetaDadoL.porcentagemTreino || 70));
@@ -663,7 +693,11 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
   }
 
   redividirDados() {
-    if (!this.idConfigurcacaoTreinamento || this.teste.nomeArquivo) return;
+    this.redividir$.next();
+  }
+
+  private executarRedivisao() {
+    if (!this.idConfigurcacaoTreinamento || this.teste.nomeArquivo) return EMPTY;
 
     const estadoAtual = {
       atributos: { ...this.resultColetaDadoL.atributos },
@@ -680,8 +714,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
     };
 
     this.redivisaoEmAndamento = true;
-    this.dashboardService.redividirColeta(this.tipoArquivoSelecionado, this.idConfigurcacaoTreinamento, body).subscribe({
-      next: (res: any) => {
+    return this.dashboardService.redividirColeta(this.tipoArquivoSelecionado, this.idConfigurcacaoTreinamento, body).pipe(
+      tap((res: any) => {
         this.redivisaoEmAndamento = false;
         res.atributos = estadoAtual.atributos;
         res.target = estadoAtual.target;
@@ -689,12 +723,13 @@ export class ColetaDadoComponent implements OnChanges, OnInit {
         res.prever_categoria = estadoAtual.preverCategoria;
         res.dados_rotulados = estadoAtual.dadosRotulados;
         this.preencherDados(res);
-      },
-      error: (err) => {
+      }),
+      catchError((err) => {
         this.redivisaoEmAndamento = false;
         this.msgErro('treino', err?.error?.detail || 'Erro ao refazer a divisão treino/teste.');
-      }
-    });
+        return EMPTY;
+      })
+    );
   }
 
 

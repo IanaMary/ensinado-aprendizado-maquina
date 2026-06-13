@@ -2,21 +2,37 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 import { ExecucoesComponent } from './execucoes.component';
 import { AuthService } from '../../service/auth/auth.service';
+import { DashboardService } from '../services/dashboard.service';
 
 describe('ExecucoesComponent', () => {
   let component: ExecucoesComponent;
   let fixture: ComponentFixture<ExecucoesComponent>;
   let authService: jasmine.SpyObj<AuthService>;
   let router: jasmine.SpyObj<Router>;
+  let itensSubject: Subject<any[]>;
+  let dashboardStub: any;
 
   beforeEach(async () => {
     authService = jasmine.createSpyObj('AuthService', ['getUsuarioRole', 'logout']);
     authService.getUsuarioRole.and.returnValue('admin');
     router = jasmine.createSpyObj('Router', ['navigate']);
+
+    itensSubject = new Subject<any[]>();
+    dashboardStub = {
+      getItemsEmExecucao: () => itensSubject.asObservable(),
+      proximaEtapaPipe$: new Subject<any>(),
+      infoItemClicked$: new Subject<any>(),
+      resultadoDataset$: new Subject<any>(),
+      getTutor: jasmine.createSpy('getTutor').and.returnValue(of({ descricao: 'ola' })),
+      moverItensEmExecucao: jasmine.createSpy('moverItensEmExecucao'),
+      sincronizarPreProcessamentosSelecionados: jasmine.createSpy('sincronizarPreProcessamentosSelecionados'),
+      movendoItemExecucao: jasmine.createSpy('movendoItemExecucao'),
+      limparItensExecucao: jasmine.createSpy('limparItensExecucao'),
+    };
 
     await TestBed.configureTestingModule({
       declarations: [ExecucoesComponent],
@@ -26,6 +42,7 @@ describe('ExecucoesComponent', () => {
         { provide: Router, useValue: router },
         { provide: MatDialog, useValue: { open: jasmine.createSpy('open'), closeAll: jasmine.createSpy('closeAll') } },
         { provide: AuthService, useValue: authService },
+        { provide: DashboardService, useValue: dashboardStub },
       ],
     })
     .overrideComponent(ExecucoesComponent, { set: { template: '' } })
@@ -38,6 +55,26 @@ describe('ExecucoesComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should update columns while alive', () => {
+    itensSubject.next([
+      { tipoItem: 'coleta-dado', movido: false },
+      { tipoItem: 'metrica', movido: true },
+    ] as any[]);
+
+    expect(component.itens.length).toBe(2);
+    expect(component.colunaColeta.length).toBe(1);
+    expect(component.metricasSelecionadas.length).toBe(1);
+  });
+
+  it('should unsubscribe from execution items on destroy', () => {
+    // Regressão: subscriptions sem takeUntil vazavam após a destruição do componente
+    component.ngOnDestroy();
+
+    itensSubject.next([{ tipoItem: 'coleta-dado', movido: false }] as any[]);
+
+    expect(component.itens.length).toBe(0);
   });
 
   it('should toggle user menu and close when navigating', () => {
