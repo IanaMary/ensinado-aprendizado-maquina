@@ -58,9 +58,17 @@ export class SelecaoMetricasComponent implements OnChanges {
     }
   }
 
+  // Apenas as métricas válidas para os modelos treinados (classificação, regressão
+  // ou agrupamento). Filtrar aqui mantém a lista organizada por tipo de projeto e
+  // faz a agregação (micro/macro/weighted) aparecer só quando há classificação.
+  private get metricasHabilitadas(): ItemPipeline[] {
+    return this.metricasDisponiveis.filter(m => m.habilitado);
+  }
+
   private construirGrupos(): void {
+    const habilitadas = this.metricasHabilitadas;
     const mapa = new Map<string, ItemPipeline[]>();
-    for (const metrica of this.metricasDisponiveis) {
+    for (const metrica of habilitadas) {
       const grupo = metrica.grupo || 'outros';
       if (!mapa.has(grupo)) {
         mapa.set(grupo, []);
@@ -78,11 +86,11 @@ export class SelecaoMetricasComponent implements OnChanges {
     }
 
     this.temClassificacao = mapa.has('classificacao');
-    this.todasMarcadas = this.metricasDisponiveis.length > 0 && this.metricasDisponiveis.every(m => m.movido);
+    this.todasMarcadas = habilitadas.length > 0 && habilitadas.every(m => m.movido);
   }
 
   toggleMetrica(metrica: ItemPipeline) {
-    this.todasMarcadas = this.metricasDisponiveis.every(m => m.movido);
+    this.todasMarcadas = this.metricasHabilitadas.every(m => m.movido);
     this.emitSelecaoMetricas();
   }
 
@@ -94,7 +102,7 @@ export class SelecaoMetricasComponent implements OnChanges {
 
   toggleTodas() {
     this.todasMarcadas = !this.todasMarcadas;
-    this.metricasDisponiveis.forEach(m => m.movido = this.todasMarcadas);
+    this.metricasHabilitadas.forEach(m => m.movido = this.todasMarcadas);
     this.emitSelecaoMetricas();
   }
 
@@ -111,7 +119,7 @@ export class SelecaoMetricasComponent implements OnChanges {
   }
 
   emitSelecaoMetricas() {
-    this.metricasSelecionadas = this.metricasDisponiveis
+    this.metricasSelecionadas = this.metricasHabilitadas
       .filter(e => e.movido)
       .map(e => ({ ...e, average: this.mediaMetricas }));
     this.selecaoMetricas.emit({ metricas: this.metricasSelecionadas, media: this.mediaMetricas });
