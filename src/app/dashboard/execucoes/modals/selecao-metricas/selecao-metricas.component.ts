@@ -24,6 +24,7 @@ export class SelecaoMetricasComponent implements OnChanges {
   todasMarcadas: boolean = false;
   grupos: GrupoMetricas[] = [];
   temClassificacao: boolean = false;
+  metricaExpandida: ItemPipeline | null = null;
 
   private nomesGrupos: Record<string, { nome: string; icone: string }> = {
     classificacao: { nome: 'Classificação', icone: 'category' },
@@ -83,6 +84,12 @@ export class SelecaoMetricasComponent implements OnChanges {
   toggleMetrica(metrica: ItemPipeline) {
     this.todasMarcadas = this.metricasDisponiveis.every(m => m.movido);
     this.emitSelecaoMetricas();
+  }
+
+  toggleExplicacao(event: Event, metrica: ItemPipeline) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.metricaExpandida = this.metricaExpandida === metrica ? null : metrica;
   }
 
   toggleTodas() {

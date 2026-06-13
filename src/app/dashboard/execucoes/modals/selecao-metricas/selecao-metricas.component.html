@@ -20,14 +20,22 @@
         </button>
       </div>
 
-      <div *ngFor="let metrica of grupo.itens" class="metrica-item">
-        <mat-checkbox (change)="toggleMetrica(metrica)" [(ngModel)]="metrica.movido">
-          <div class="metrica-conteudo">
+      <div *ngFor="let metrica of grupo.itens" class="metrica-item" [class.expandida]="metrica === metricaExpandida">
+        <div class="metrica-linha">
+          <mat-checkbox (change)="toggleMetrica(metrica)" [(ngModel)]="metrica.movido">
             <span class="metrica-label">{{ metrica?.label }}</span>
-            <span class="metrica-explicacao" *ngIf="metrica.explicacao">{{ metrica.explicacao }}</span>
-            <span class="metrica-explicacao" *ngIf="!metrica.explicacao && metrica.resumo">{{ metrica.resumo }}</span>
-          </div>
-        </mat-checkbox>
+          </mat-checkbox>
+          <button mat-icon-button class="btn-info-metrica"
+            *ngIf="metrica.explicacao"
+            [matTooltip]="'Ver explicação'"
+            (click)="toggleExplicacao($event, metrica)">
+            <mat-icon>info_outline</mat-icon>
+          </button>
+        </div>
+        <div class="metrica-explicacao" *ngIf="metrica === metricaExpandida">
+          <mat-icon class="explicacao-icon">lightbulb</mat-icon>
+          <span>{{ metrica.explicacao }}</span>
+        </div>
       </div>
     </div>
   </ng-container>
