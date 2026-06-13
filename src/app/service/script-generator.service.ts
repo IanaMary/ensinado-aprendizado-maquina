@@ -171,31 +171,52 @@ export class ScriptGeneratorService {
     lines.push('# ============================================');
     lines.push('');
     lines.push('if __name__ == "__main__":');
+    const isClustering = modeloSelecionado?.dadosRotulados === false;
     if (resultadoColetaDado?.fonteDados === 'dataset' && resultadoColetaDado.nomeDataset) {
       const splitPct = resultadoColetaDado.porcentagemTreino || 70;
       const testPct = 100 - splitPct;
       lines.push('    # 1. Carregar dados (toy dataset do scikit-learn)');
       lines.push('    X, y = carregar_dados()');
       lines.push('');
-      lines.push('    # 2. Selecionar features e target (e dividir em treino/teste)');
-      lines.push('    X_train, X_test, y_train, y_test = selecionar_features(X, y)');
-      lines.push('');
+      if (isClustering) {
+        lines.push('    # 2. Selecionar features (sem target para agrupamento)');
+        lines.push('    X_train, X_test = selecionar_features(X)');
+        lines.push('');
+      } else {
+        lines.push('    # 2. Selecionar features e target (e dividir em treino/teste)');
+        lines.push('    X_train, X_test, y_train, y_test = selecionar_features(X, y)');
+        lines.push('');
+      }
     } else {
       lines.push('    # 1. Carregar dados');
       lines.push('    train_df, test_df = carregar_dados()');
       lines.push('');
-      lines.push('    # 2. Selecionar features e target');
-      lines.push('    X_train, y_train, X_test, y_test = selecionar_features(train_df, test_df)');
-      lines.push('');
+      if (isClustering) {
+        lines.push('    # 2. Selecionar features (sem target para agrupamento)');
+        lines.push('    X_train, X_test = selecionar_features(train_df, test_df)');
+        lines.push('');
+      } else {
+        lines.push('    # 2. Selecionar features e target');
+        lines.push('    X_train, y_train, X_test, y_test = selecionar_features(train_df, test_df)');
+        lines.push('');
+      }
     }
     lines.push('    # 3. Pré-processamento');
     lines.push('    X_train, X_test = aplicar_preprocessamento(X_train, X_test)');
     lines.push('');
-    lines.push('    # 4. Treinar modelo');
-    lines.push('    modelo = treinar_modelo(X_train, y_train)');
-    lines.push('');
-    lines.push('    # 5. Avaliar modelo');
-    lines.push('    resultados = avaliar_modelo(modelo, X_test, y_test)');
+    if (isClustering) {
+      lines.push('    # 4. Treinar modelo');
+      lines.push('    modelo = treinar_modelo(X_train)');
+      lines.push('');
+      lines.push('    # 5. Avaliar modelo');
+      lines.push('    resultados = avaliar_modelo(modelo, X_test)');
+    } else {
+      lines.push('    # 4. Treinar modelo');
+      lines.push('    modelo = treinar_modelo(X_train, y_train)');
+      lines.push('');
+      lines.push('    # 5. Avaliar modelo');
+      lines.push('    resultados = avaliar_modelo(modelo, X_test, y_test)');
+    }
     lines.push('');
 
     return lines.join('\n');
@@ -255,6 +276,15 @@ export class ScriptGeneratorService {
           break;
         case 'confusion_matrix':
           if (!metricImports.includes('confusion_matrix')) metricImports.push('confusion_matrix');
+          break;
+        case 'silhouette_score':
+          if (!metricImports.includes('silhouette_score')) metricImports.push('silhouette_score');
+          break;
+        case 'calinski_harabasz_score':
+          if (!metricImports.includes('calinski_harabasz_score')) metricImports.push('calinski_harabasz_score');
+          break;
+        case 'davies_bouldin_score':
+          if (!metricImports.includes('davies_bouldin_score')) metricImports.push('davies_bouldin_score');
           break;
       }
     }
@@ -572,13 +602,22 @@ export class ScriptGeneratorService {
     lines.push('# ============================================');
     lines.push('# Função: Treinamento do Modelo');
     lines.push('# ============================================');
-    lines.push('def treinar_modelo(X_train, y_train):');
+    const isClustering = modelo?.dadosRotulados === false;
+    if (isClustering) {
+      lines.push('def treinar_modelo(X_train):');
+    } else {
+      lines.push('def treinar_modelo(X_train, y_train):');
+    }
     lines.push('    """Configura e treina o modelo de machine learning."""');
 
     if (!modelo) {
       lines.push('    # Configure e treine o modelo');
       lines.push('    modelo = ...  # Defina o modelo aqui');
-      lines.push('    modelo.fit(X_train, y_train)');
+      if (isClustering) {
+        lines.push('    modelo.fit(X_train)');
+      } else {
+        lines.push('    modelo.fit(X_train, y_train)');
+      }
       lines.push('    return modelo');
       return lines.join('\n');
     }
@@ -591,7 +630,11 @@ export class ScriptGeneratorService {
     lines.push(`    modelo = ${modelClass}(${params})`);
     lines.push('    ');
     lines.push('    # Treinamento');
-    lines.push('    modelo.fit(X_train, y_train)');
+    if (isClustering) {
+      lines.push('    modelo.fit(X_train)');
+    } else {
+      lines.push('    modelo.fit(X_train, y_train)');
+    }
     lines.push('    ');
     lines.push('    print("Modelo treinado com sucesso!")');
     lines.push('    return modelo');
@@ -600,64 +643,104 @@ export class ScriptGeneratorService {
   }
 
   private generateEvaluationFunction(metricas: ItemPipeline[]): string {
+    const isClustering = metricas.some(m =>
+      ['silhouette_score', 'calinski_harabasz_score', 'davies_bouldin_score'].includes(m.valor)
+    );
+
     const lines: string[] = [];
     lines.push('# ============================================');
     lines.push('# Função: Avaliação do Modelo');
     lines.push('# ============================================');
-    lines.push('def avaliar_modelo(modelo, X_test, y_test):');
-    lines.push('    """Avalia o modelo usando as métricas configuradas."""');
-    lines.push('    ');
-    lines.push('    y_pred = modelo.predict(X_test)');
-    lines.push('    ');
-    lines.push('    resultados = {}');
-    lines.push('    ');
-    lines.push('    print("\\n" + "=" * 50)');
-    lines.push('    print("MÉTRICAS DE AVALIAÇÃO")');
-    lines.push('    print("=" * 50)');
 
-    for (const metrica of metricas) {
-      const average = metrica.average || 'weighted';
-      switch (metrica.valor) {
-        case 'accuracy_score':
-          lines.push('    ');
-          lines.push('    # Acurácia');
-          lines.push('    acuracia = accuracy_score(y_test, y_pred)');
-          lines.push('    resultados["acuracia"] = acuracia');
-          lines.push('    print(f"Acurácia: {acuracia:.4f}")');
-          break;
+    if (isClustering) {
+      lines.push('def avaliar_modelo(modelo, X_test):');
+      lines.push('    """Avalia o modelo de agrupamento usando métricas internas."""');
+      lines.push('    ');
+      lines.push('    labels = modelo.predict(X_test)');
+      lines.push('    ');
+      lines.push('    resultados = {}');
+      lines.push('    ');
+      lines.push('    print("\\n" + "=" * 50)');
+      lines.push('    print("MÉTRICAS DE AVALIAÇÃO (AGRUPAMENTO)")');
+      lines.push('    print("=" * 50)');
 
-        case 'f1_score':
-          lines.push('    ');
-          lines.push(`    # F1-Score (${average})`);
-          lines.push(`    f1 = f1_score(y_test, y_pred, average="${average}", zero_division=0)`);
-          lines.push('    resultados["f1_score"] = f1');
-          lines.push('    print(f"F1-Score: {f1:.4f}")');
-          break;
+      for (const metrica of metricas) {
+        switch (metrica.valor) {
+          case 'silhouette_score':
+            lines.push('    ');
+            lines.push('    # Silhouette Score');
+            lines.push('    sil = silhouette_score(X_test, labels)');
+            lines.push('    resultados["silhouette_score"] = sil');
+            lines.push('    print(f"Silhouette Score: {sil:.4f}")');
+            break;
+          case 'calinski_harabasz_score':
+            lines.push('    ');
+            lines.push('    # Calinski-Harabasz');
+            lines.push('    ch = calinski_harabasz_score(X_test, labels)');
+            lines.push('    resultados["calinski_harabasz"] = ch');
+            lines.push('    print(f"Calinski-Harabasz: {ch:.4f}")');
+            break;
+          case 'davies_bouldin_score':
+            lines.push('    ');
+            lines.push('    # Davies-Bouldin');
+            lines.push('    db = davies_bouldin_score(X_test, labels)');
+            lines.push('    resultados["davies_bouldin"] = db');
+            lines.push('    print(f"Davies-Bouldin: {db:.4f}")');
+            break;
+        }
+      }
+    } else {
+      lines.push('def avaliar_modelo(modelo, X_test, y_test):');
+      lines.push('    """Avalia o modelo usando as métricas configuradas."""');
+      lines.push('    ');
+      lines.push('    y_pred = modelo.predict(X_test)');
+      lines.push('    ');
+      lines.push('    resultados = {}');
+      lines.push('    ');
+      lines.push('    print("\\n" + "=" * 50)');
+      lines.push('    print("MÉTRICAS DE AVALIAÇÃO")');
+      lines.push('    print("=" * 50)');
 
-        case 'confusion_matrix':
-          lines.push('    ');
-          lines.push('    # Matriz de Confusão');
-          lines.push('    matriz = confusion_matrix(y_test, y_pred)');
-          lines.push('    resultados["matriz_confusao"] = matriz');
-          lines.push('    print("\\nMatriz de Confusão:")');
-          lines.push('    print(matriz)');
-          break;
-
-        case 'precision_score':
-          lines.push('    ');
-          lines.push(`    # Precisão (${average})`);
-          lines.push(`    precisao = precision_score(y_test, y_pred, average="${average}", zero_division=0)`);
-          lines.push('    resultados["precisao"] = precisao');
-          lines.push('    print(f"Precisão: {precisao:.4f}")');
-          break;
-
-        case 'recall_score':
-          lines.push('    ');
-          lines.push(`    # Recall (${average})`);
-          lines.push(`    recall = recall_score(y_test, y_pred, average="${average}", zero_division=0)`);
-          lines.push('    resultados["recall"] = recall');
-          lines.push('    print(f"Recall: {recall:.4f}")');
-          break;
+      for (const metrica of metricas) {
+        const average = metrica.average || 'weighted';
+        switch (metrica.valor) {
+          case 'accuracy_score':
+            lines.push('    ');
+            lines.push('    # Acurácia');
+            lines.push('    acuracia = accuracy_score(y_test, y_pred)');
+            lines.push('    resultados["acuracia"] = acuracia');
+            lines.push('    print(f"Acurácia: {acuracia:.4f}")');
+            break;
+          case 'f1_score':
+            lines.push('    ');
+            lines.push(`    # F1-Score (${average})`);
+            lines.push(`    f1 = f1_score(y_test, y_pred, average="${average}", zero_division=0)`);
+            lines.push('    resultados["f1_score"] = f1');
+            lines.push('    print(f"F1-Score: {f1:.4f}")');
+            break;
+          case 'confusion_matrix':
+            lines.push('    ');
+            lines.push('    # Matriz de Confusão');
+            lines.push('    matriz = confusion_matrix(y_test, y_pred)');
+            lines.push('    resultados["matriz_confusao"] = matriz');
+            lines.push('    print("\\nMatriz de Confusão:")');
+            lines.push('    print(matriz)');
+            break;
+          case 'precision_score':
+            lines.push('    ');
+            lines.push(`    # Precisão (${average})`);
+            lines.push(`    precisao = precision_score(y_test, y_pred, average="${average}", zero_division=0)`);
+            lines.push('    resultados["precisao"] = precisao');
+            lines.push('    print(f"Precisão: {precisao:.4f}")');
+            break;
+          case 'recall_score':
+            lines.push('    ');
+            lines.push(`    # Recall (${average})`);
+            lines.push(`    recall = recall_score(y_test, y_pred, average="${average}", zero_division=0)`);
+            lines.push('    resultados["recall"] = recall');
+            lines.push('    print(f"Recall: {recall:.4f}")');
+            break;
+        }
       }
     }
 

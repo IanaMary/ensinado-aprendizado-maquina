@@ -143,6 +143,18 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       return 'Mostra a quantidade de exemplos em cada classe. Quando uma classe tem muito mais exemplos do que outra, o modelo pode aprender a favorecer a classe maior.';
     }
 
+    if (chave.includes('silhouette')) {
+      return 'Mostra o score de silhueta para cada cluster. Barras mais longas e uniformes indicam clusters bem definidos. Valores próximos de 1 significam que os pontos estão bem agrupados; valores negativos indicam pontos possivelmente no cluster errado.';
+    }
+
+    if (chave.includes('distância entre clusters') || chave.includes('intercluster')) {
+      return 'Visualiza a distância relativa e o tamanho de cada cluster. Quanto mais separados os círculos, mais distintos os clusters. Sobreposição indica que os clusters podem estar muito próximos ou se misturando.';
+    }
+
+    if (chave.includes('cotovelo') || chave.includes('elbow')) {
+      return 'Mostra como a inércia (soma das distâncias ao centroide) varia com o número de clusters (K). O "cotovelo" no gráfico — onde a curva para de cair rápido — indica o K ideal. Se não houver cotovelo claro, os dados podem não ter uma estrutura de clusters bem definida.';
+    }
+
     return 'Visualização de avaliação do Yellowbrick. Observe padrões, diferenças entre classes e sinais de erro para discutir o comportamento do modelo.';
   }
 
@@ -268,6 +280,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     const dataset = this.resultadoColetaDado?.nomeDataset || this.resultadoColetaDado?.treino?.nomeArquivo || 'Dataset';
     const pergunta = (this.resultadoColetaDado as any)?.missao?.pergunta || 'Que padrão o modelo conseguiu aprender com os dados?';
     const modelo = this.modeloSelecionado?.label || 'Modelo treinado';
+    const isClustering = this.modeloSelecionado?.dadosRotulados === false;
     const linhasMetricas = this.metricsAvaliadas
       .filter(metrica => !this.isConfusionMatrix(this.resultadosDasAvaliacoes[metrica]?.[this.modelosAvaliados[0]]))
       .map(metrica => {
@@ -277,25 +290,35 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
         return `- ${metrica}: ${valores}`;
       });
 
-    return [
-      '# Relatório do experimento',
-      '',
-      `## Pergunta`,
-      pergunta,
-      '',
-      `## Dados`,
-      `Dataset usado: ${dataset}`,
-      '',
-      `## Modelo`,
-      `Modelo escolhido: ${modelo}`,
-      '',
-      `## Resultados`,
-      ...(linhasMetricas.length ? linhasMetricas : ['- Gere as avaliações para preencher esta seção.']),
-      '',
-      `## O que observar`,
+    const observacoes = isClustering ? [
+      '## O que observar',
+      '- Os clusters fazem sentido com os dados? Você consegue nomear cada grupo?',
+      '- O Silhouette Score está próximo de 1 (bom) ou de 0/negativo (clusters sobrepostos)?',
+      '- O gráfico do cotovelo mostra um "K" claro? Se não, tente outros valores de K.',
+      '- Os clusters encontrados revelam algum padrão interessante nos dados?',
+    ] : [
+      '## O que observar',
       '- O modelo acertou bem todas as classes ou errou mais em alguma?',
       '- Alguma pista dos dados parece ter ajudado mais?',
       '- O que você mudaria para tentar melhorar o resultado?',
+    ];
+
+    return [
+      '# Relatório do experimento',
+      '',
+      '## Pergunta',
+      pergunta,
+      '',
+      '## Dados',
+      `Dataset usado: ${dataset}`,
+      '',
+      '## Modelo',
+      `Modelo escolhido: ${modelo}`,
+      '',
+      '## Resultados',
+      ...(linhasMetricas.length ? linhasMetricas : ['- Gere as avaliações para preencher esta seção.']),
+      '',
+      ...observacoes,
       '',
     ].join('\n');
   }

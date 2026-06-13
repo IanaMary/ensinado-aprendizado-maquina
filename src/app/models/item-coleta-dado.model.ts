@@ -12,6 +12,9 @@ export const nomeMetricas: Record<string, string> = {
   recall_score: 'Recall',
   f1_score: 'F1-Score',
   confusion_matrix: 'Matriz de Confusão',
+  silhouette_score: 'Silhouette Score',
+  calinski_harabasz_score: 'Calinski-Harabasz',
+  davies_bouldin_score: 'Davies-Bouldin',
 };
 
 export const nomeModelos: Record<string, string> = {
@@ -20,6 +23,7 @@ export const nomeModelos: Record<string, string> = {
   svm: 'SVM',
   regressao_logistica: 'Regressão Logística',
   regressao_linear: 'Regressão Linear',
+  k_means: 'K-Means',
 };
 
 export const roleMap: Record<string, string> = {
