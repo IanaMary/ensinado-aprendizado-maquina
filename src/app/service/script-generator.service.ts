@@ -235,7 +235,7 @@ export class ScriptGeneratorService {
 
     // Toy dataset imports (sklearn loaders)
     if (resultadoColetaDado?.fonteDados === 'dataset' && resultadoColetaDado.nomeDataset) {
-      const ds = this.getToyDatasetLoader(resultadoColetaDado.nomeDataset);
+      const ds = this.getToyDatasetLoader(resultadoColetaDado.datasetId ?? resultadoColetaDado.nomeDataset);
       if (ds) {
         const functionName = ds.importLine.split('(')[0];
         const module = functionName.startsWith('fetch_') ? 'datasets' : 'datasets';
@@ -318,7 +318,8 @@ export class ScriptGeneratorService {
 
   private generateDataLoadingFunction(resultado?: ResultadoColetaDado): string {
     if (resultado?.fonteDados === 'dataset' && resultado.nomeDataset) {
-      const ds = this.getToyDatasetLoader(resultado.nomeDataset);
+      const datasetKey = resultado.datasetId ?? resultado.nomeDataset;
+      const ds = this.getToyDatasetLoader(datasetKey);
       if (ds) {
         return [
           '# ============================================',
@@ -329,6 +330,29 @@ export class ScriptGeneratorService {
           `    dados = ${ds.importLine}`,
           '    X = dados.data',
           '    y = dados.target',
+          '    ',
+          '    print("Primeiras amostras (X):")',
+          '    print(X.head())',
+          '    print(f"Shape de X: {X.shape}")',
+          '    print(f"Shape de y: {y.shape}")',
+          '    ',
+          '    return X, y'
+        ].join('\n');
+      }
+
+      const uciId = this.getUciDatasetId(datasetKey);
+      if (uciId !== null) {
+        return [
+          '# ============================================',
+          '# Função: Carregamento dos Dados',
+          '# ============================================',
+          'def carregar_dados():',
+          `    """Carrega o dataset '${resultado.nomeDataset}' do UCI Machine Learning Repository."""`,
+          '    from ucimlrepo import fetch_ucirepo',
+          '    ',
+          `    dados = fetch_ucirepo(id=${uciId})`,
+          '    X = dados.data.features',
+          '    y = dados.data.targets.squeeze()',
           '    ',
           '    print("Primeiras amostras (X):")',
           '    print(X.head())',
@@ -368,6 +392,25 @@ export class ScriptGeneratorService {
       'digits': { importLine: 'load_digits(as_frame=True)' },
       'diabetes': { importLine: 'load_diabetes(as_frame=True)' },
       'california_housing': { importLine: 'fetch_california_housing(as_frame=True)' },
+    };
+    return map[nome] ?? null;
+  }
+
+  // Espelha o mapa uci_ids do backend (app/routers/toy_datasets.py::_carregar_uci).
+  private getUciDatasetId(nome: string): number | null {
+    const map: Record<string, number> = {
+      'adult': 2,
+      'wine_quality': 186,
+      'heart_disease': 45,
+      'titanic': 597,
+      'abalone': 1,
+      'housing': 601,
+      'car_evaluation': 19,
+      'mushroom': 73,
+      'wholesale_customers': 292,
+      'obesity_levels': 544,
+      'online_shoppers': 468,
+      'heart_failure': 519,
     };
     return map[nome] ?? null;
   }

@@ -126,6 +126,15 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
       this.teste = this.resultColetaDadoL.teste;
     }
 
+    // Widget novo (sem dados nem configuração salva): abrir direto na aba Toy Datasets.
+    // Reabrir um widget já configurado mantém a view de configuração ('arquivo').
+    const semDados = !this.resultColetaDadoL?.colunas?.length;
+    const semConfigSalva = !this.sessionService.getConfigurcaoTreinamento();
+    if (!this.resultadoColetaDado && semDados && semConfigSalva) {
+      this.fonteDados = 'dataset';
+      this.carregarDatasets();
+    }
+
     // Debounce + switchMap: mudanças rápidas no slider geram uma única requisição,
     // e uma redivisão nova cancela a resposta da anterior (evita estado obsoleto).
     this.redividir$
@@ -218,6 +227,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     this.resultColetaDadoL.colunasDetalhes = resultado.colunas_detalhes;
     this.resultColetaDadoL.fonteDados = 'dataset';
     this.resultColetaDadoL.nomeDataset = resultado.nome_dataset;
+    this.resultColetaDadoL.datasetId = resultado.id;
 
     // Configurar target
     this.resultColetaDadoL.target = resultado.target;

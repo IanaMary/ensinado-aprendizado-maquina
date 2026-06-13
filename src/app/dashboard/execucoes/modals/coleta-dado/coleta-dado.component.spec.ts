@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { Subject, throwError } from 'rxjs';
+import { Subject, throwError, of } from 'rxjs';
 
 import { ColetaDadoComponent } from './coleta-dado.component';
 import { DashboardService } from '../../../services/dashboard.service';
@@ -22,6 +22,8 @@ describe('ColetaDadoComponent', () => {
       'carregarToyDataset',
     ]);
     notificacao = jasmine.createSpyObj('NotificacaoService', ['sucesso', 'erro', 'aviso']);
+    // Widget novo abre na aba Toy Datasets e dispara carregarDatasets() no ngOnInit.
+    dashboardService.getToyDatasets.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
       declarations: [ColetaDadoComponent],

@@ -315,16 +315,21 @@ small {
 }
 
 .tabela-container {
-  display: flex;
   border: 1px solid $roxo-claro;
   border-radius: 8px;
   background-color: $branco;
-  overflow: hidden;
+  max-height: 40vh;
+  overflow: auto;
 }
 
 .mat-table {
   width: 100%;
   border-collapse: collapse;
+
+  th,
+  td {
+    white-space: nowrap;
+  }
 }
 
 .thead {

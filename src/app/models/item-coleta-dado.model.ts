@@ -88,6 +88,7 @@ export interface ResultadoColetaDado {
   teste: InformacoesDados;
   fonteDados?: 'arquivo' | 'dataset';
   nomeDataset?: string;
+  datasetId?: string;
 }
 
 export interface InformacoesDados {

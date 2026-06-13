@@ -786,7 +786,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       treino: treino,
       teste: { dados: [], totalDados: 0, nomeArquivo: '' },
       fonteDados: 'dataset',
-      nomeDataset: datasetNome
+      nomeDataset: datasetNome,
+      datasetId: resultado.id
     };
 
     // Criar item para a coluna de coleta
