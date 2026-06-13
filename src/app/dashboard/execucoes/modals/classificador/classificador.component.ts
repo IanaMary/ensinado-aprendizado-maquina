@@ -114,11 +114,16 @@ export class ClasificadorComponent implements OnChanges {
     return Object.keys(this.resultadoTreinamento);
   }
 
-  getHiperparametrosArray(hiperparametros: any): { nome: string; valor: any }[] {
+  getHiperparametrosArray(hiperparametros: any, hiperparametrosPadrao?: any): { nome: string; valor: any; isDefault: boolean }[] {
     if (!hiperparametros) return [];
-    return Object.entries(hiperparametros).map(([key, value]) => ({
-      nome: key,
-      valor: value
-    }));
+    return Object.entries(hiperparametros).map(([key, value]) => {
+      const valorPadrao = hiperparametrosPadrao?.[key];
+      const isDefault = valorPadrao !== undefined && valorPadrao === value;
+      return {
+        nome: key,
+        valor: value,
+        isDefault
+      };
+    });
   }
 }
