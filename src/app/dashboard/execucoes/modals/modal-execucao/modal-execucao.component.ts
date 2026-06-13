@@ -202,8 +202,9 @@ export class ModalExecucaoComponent implements OnInit {
     const dadosRotulados = this.resultadoColetaDado.dadosRotulados ?? false;
     this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(preverCategoria, dadosRotulados);
     this.modeloSelecionado = this.modelosDisponiveis[0];
-    this.funcBodyTutor();
-    this.atualizarTutorContexto();
+    if (this.modeloSelecionado) {
+      this.atualizarModelo(this.modeloSelecionado);
+    }
   }
 
 
