@@ -177,6 +177,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
       next: (resultado: any) => {
         this.processarResultadoDataset(resultado);
         this.carregandoDataset = false;
+        // Mudar para a visualização de configuração após selecionar o dataset
+        this.fonteDados = 'arquivo';
       },
       error: (err: any) => {
         console.error('Erro ao carregar dataset:', err);
