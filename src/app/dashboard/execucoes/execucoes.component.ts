@@ -52,6 +52,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   mediaMetricas: MediaMetrica = 'weighted';
   resultadosDasAvaliacoes: any = {};
   preProcessamentoConfig: any = null;
+  hiperparametrosAtuais: any = {};
 
   constructor(
     private dashboardService: DashboardService,
@@ -182,6 +183,30 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     return { colunas: configItem.colunas };
   }
 
+  getResumoTreinamento(item: ItemPipeline): { hiperparametros: { nome: string; valor: any }[] } | null {
+    if (!this.hiperparametrosAtuais || Object.keys(this.hiperparametrosAtuais).length === 0) return null;
+    
+    const modelos = this.tutorRef.modelos as any;
+    const modeloInfo = modelos?.[item.valor];
+    
+    if (!modeloInfo?.hiperparametros) return null;
+    
+    const hiperparametros = Object.entries(modeloInfo.hiperparametros)
+      .filter(([key, param]: [string, any]) => {
+        const valorAtual = this.hiperparametrosAtuais[key];
+        const valorPadrao = param.padrao;
+        return valorAtual !== undefined && valorAtual !== valorPadrao;
+      })
+      .map(([key, param]: [string, any]) => ({
+        nome: (param as any).nome || key,
+        valor: this.hiperparametrosAtuais[key]
+      }));
+    
+    if (hiperparametros.length === 0) return null;
+    
+    return { hiperparametros };
+  }
+
 
   abrirModalExecucao(item: ItemPipeline): void {
     if (this.modalAberto) return;
@@ -217,6 +242,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         this.mediaMetricas = resultado.mediaMetricas || this.mediaMetricas;
         this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
         this.preProcessamentoConfig = resultado.preProcessamentoConfig;
+        this.hiperparametrosAtuais = resultado.hiperparametrosAtuais || {};
 
         // Processar itens de pre-processamento
         if (resultado.preProcessamentoConfig?.itens) {

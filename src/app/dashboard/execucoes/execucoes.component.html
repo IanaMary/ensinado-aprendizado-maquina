@@ -162,7 +162,14 @@
             <div class="item-icon">
               <img [src]="'assets/icons/' + item.tipoItem + '.svg'" width="16" />
             </div>
-            <span>{{ item.label }}</span>
+            <div class="item-texto">
+              <span>{{ item.label }}</span>
+              <div class="treino-resumo" *ngIf="getResumoTreinamento(item) as resumo">
+                <div class="treino-tags">
+                  <span *ngFor="let param of resumo.hiperparametros">{{ param.nome }}: {{ param.valor }}</span>
+                </div>
+              </div>
+            </div>
           </div>
           <mat-icon class="btn-info" (click)="mostrarInfoItem(item, $event)">info_outline</mat-icon>
         </div>

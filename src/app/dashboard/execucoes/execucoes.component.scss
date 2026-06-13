@@ -503,6 +503,31 @@ $metrica-cor-escuro: #E65100;
     }
   }
 
+  .treino-resumo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .treino-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+
+    span {
+      max-width: 100%;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: rgba($treino-cor-claro, 0.85);
+      color: $treino-cor-escuro;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-transform: none;
+    }
+  }
+
   .item-numeral {
     font-size: 10px;
     font-weight: 700;

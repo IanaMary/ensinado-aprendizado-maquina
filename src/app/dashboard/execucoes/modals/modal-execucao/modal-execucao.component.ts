@@ -329,6 +329,7 @@ export class ModalExecucaoComponent implements OnInit {
       mediaMetricas: this.mediaMetricas,
       resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
       preProcessamentoConfig: this.preProcessamentoConfig,
+      hiperparametrosAtuais: this.hiperparametrosAtuais,
       etapa: this.etapaAtual
     });
   }
