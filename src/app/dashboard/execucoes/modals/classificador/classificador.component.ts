@@ -113,4 +113,12 @@ export class ClasificadorComponent implements OnChanges {
     }
     return Object.keys(this.resultadoTreinamento);
   }
+
+  getHiperparametrosArray(hiperparametros: any): { nome: string; valor: any }[] {
+    if (!hiperparametros) return [];
+    return Object.entries(hiperparametros).map(([key, value]) => ({
+      nome: key,
+      valor: value
+    }));
+  }
 }

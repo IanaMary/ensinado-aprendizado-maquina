@@ -37,6 +37,17 @@
       <p><strong>Total Amostras Treino:</strong> {{ resultadoTreinamento[modeloValor].total_amostras_treino }}</p>
       <p><strong>Total Amostras Teste:</strong> {{ resultadoTreinamento[modeloValor].total_amostras_teste }}</p>
 
+      <!-- Hiperparâmetros -->
+      <div class="hiperparametros-section" *ngIf="resultadoTreinamento[modeloValor].hiperparametros">
+        <h3>Hiperparâmetros</h3>
+        <div class="hiperparametros-grid">
+          <div *ngFor="let param of getHiperparametrosArray(resultadoTreinamento[modeloValor].hiperparametros)" class="param-item">
+            <span class="param-nome">{{ param.nome }}</span>
+            <span class="param-valor">{{ param.valor }}</span>
+          </div>
+        </div>
+      </div>
+
       <button *ngIf="!treinando" mat-raised-button (click)="enviarParaClassificador(modeloValor)">
         Treinar {{ resultadoTreinamento[modeloValor]?.nome_modelo }}
       </button>
