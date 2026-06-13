@@ -631,7 +631,28 @@
         "Muitos outliers nos dados",
         "Atributos altamente correlacionados entre si"
       ],
-      "hiperparametros": {},
+      "hiperparametros": {
+        "fit_intercept": {
+          "nome": "Calcular intercepto",
+          "sklearn": "fit_intercept",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [true, false],
+          "descricao": "Define se o modelo calcula o termo de intercepto, o ponto onde a reta cruza o eixo y.",
+          "implicacoes": "true: a reta pode cruzar o eixo y em qualquer ponto. false: força a reta a passar pela origem (0, 0).",
+          "dicaPratica": "Deixe como true na maioria dos casos. Use false apenas quando, com todos os atributos em zero, o alvo também deve ser zero."
+        },
+        "positive": {
+          "nome": "Forçar coeficientes positivos",
+          "sklearn": "positive",
+          "tipo": "bool",
+          "padrao": false,
+          "opcoes": [true, false],
+          "descricao": "Quando ativado, obriga todos os pesos (coeficientes) da reta a serem maiores ou iguais a zero.",
+          "implicacoes": "false: os pesos podem ser positivos ou negativos. true: todos os pesos ficam positivos.",
+          "dicaPratica": "Use true apenas quando, pelo contexto do problema, nenhum atributo pode ter efeito negativo sobre o alvo (por exemplo, prever preço a partir do tamanho)."
+        }
+      },
       "vantagens": [
         "Simples e altamente interpretável",
         "Rápido para treinar",
