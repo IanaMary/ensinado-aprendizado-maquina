@@ -57,6 +57,7 @@ export class ModalExecucaoComponent implements OnInit {
   mediaMetricas: MediaMetrica = 'weighted';
   resultadosDasAvaliacoes: any = {};
   hiperparametrosAtuais: any = {};
+  hiperparametrosEditados: Record<string, any> = {};
 
   // Contexto do tutor por etapa
   tutorContexto: TutorContexto | null = null;
@@ -234,6 +235,11 @@ export class ModalExecucaoComponent implements OnInit {
     }
 
     this.funcBodyTutor();
+  }
+
+  atualizarHiperparametros(hiperparametros: Record<string, any>) {
+    // Valores editados na seleção do modelo, enviados ao treino.
+    this.hiperparametrosEditados = hiperparametros;
   }
 
   async atualizarResultadoTreinamento(event: any) {

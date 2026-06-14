@@ -16,6 +16,7 @@ export class ClasificadorComponent implements OnChanges {
   @Input() resultadoTreinamento: Record<string, any> = {};
   @Input() modeloSelecionado: ItemPipeline | undefined;
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
+  @Input() hiperparametros: Record<string, any> = {};
   @Output() atualizarResultadoTreinamento = new EventEmitter<any>();
 
   treinando = false;
@@ -78,7 +79,8 @@ export class ClasificadorComponent implements OnChanges {
       tipo_arquivo: 'xlsx',
       arquivo_id: arquivoId,
       configuracao_id: configuracaoId,
-      modelo_id: modeloId
+      modelo_id: modeloId,
+      hiperparametros: this.hiperparametros || {}
     }
 
     console.log('[DEBUG] Enviando requisição de treinamento:', body);

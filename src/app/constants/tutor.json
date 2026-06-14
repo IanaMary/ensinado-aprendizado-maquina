@@ -909,6 +909,372 @@
         "Pode perder informação importante"
       ],
       "curiosidade": "O PCA é uma das técnicas mais fundamentais da estatística. Foi inventado por Karl Pearson em 1901 e é usado em praticamente todas as áreas da ciência — de genômica a processamento de imagens."
+    },
+    "svm_linear": {
+      "nome": "SVM Linear",
+      "sklearn": "sklearn.svm.SVC (kernel='linear')",
+      "tipo": "Modelo linear",
+      "complexidade": "O(n² a n³) no treino",
+      "descricao": "Versão do SVM que separa as classes com uma fronteira reta (kernel linear). É mais rápida e simples quando as classes podem ser divididas por uma linha ou plano.",
+      "intuicao": "Imagine separar dois grupos de pontos com uma régua reta. O SVM Linear procura a régua que deixa a maior folga possível dos dois lados.",
+      "comoFunciona": [
+        "Procura uma fronteira reta que separe as classes.",
+        "Escolhe a reta com a maior margem (folga) até os pontos mais próximos.",
+        "Classifica um novo ponto pelo lado da reta em que ele cai."
+      ],
+      "passoAPasso": [
+        "1. Considera apenas fronteiras retas (lineares)",
+        "2. Maximiza a margem entre as classes",
+        "3. Usa os vetores de suporte (pontos da borda) para definir a reta",
+        "4. Classifica novos pontos pelo lado da fronteira"
+      ],
+      "quandoUsar": [
+        "Dados com muitos atributos (texto, por exemplo)",
+        "Quando as classes são quase separáveis por uma reta",
+        "Quando você precisa de treino rápido"
+      ],
+      "naoUsarQuando": [
+        "Fronteiras claramente curvas entre as classes",
+        "Muito ruído e classes muito sobrepostas"
+      ],
+      "hiperparametros": {
+        "C": {
+          "nome": "Regularização (C)",
+          "sklearn": "C",
+          "tipo": "float",
+          "padrao": 1.0,
+          "descricao": "Controla o quanto o modelo tolera erros de classificação para manter uma margem mais larga.",
+          "implicacoes": "C baixo: margem larga, mais tolerante a erros (mais simples). C alto: tenta acertar tudo (mais complexo, risco de overfitting).",
+          "dicaPratica": "Teste valores como 0.1, 1 e 10. Normalize os atributos antes de treinar."
+        }
+      },
+      "vantagens": [
+        "Rápido e escalável",
+        "Bom com muitos atributos",
+        "Boa generalização pela margem máxima"
+      ],
+      "desvantagens": [
+        "Só fronteiras lineares",
+        "Sensível à escala (normalize antes)",
+        "Menos eficaz com classes muito sobrepostas"
+      ],
+      "curiosidade": "O SVM dominou a área antes do boom das redes neurais profundas e ainda é forte em problemas com poucos exemplos e muitos atributos."
+    },
+    "random_forest": {
+      "nome": "Random Forest",
+      "sklearn": "sklearn.ensemble.RandomForestClassifier",
+      "tipo": "Conjunto de árvores",
+      "complexidade": "O(n · log n · número de árvores)",
+      "descricao": "Treina muitas árvores de decisão diferentes e combina os votos delas. A floresta costuma errar menos do que uma árvore sozinha.",
+      "intuicao": "Em vez de confiar em um único especialista (uma árvore), você pergunta a centenas deles e segue a maioria. Os erros individuais tendem a se cancelar.",
+      "comoFunciona": [
+        "Cria muitas árvores, cada uma com uma amostra e atributos diferentes.",
+        "Cada árvore dá um palpite (voto) para a classe.",
+        "A classe com mais votos vence."
+      ],
+      "passoAPasso": [
+        "1. Sorteia várias amostras dos dados (com reposição)",
+        "2. Treina uma árvore para cada amostra, usando atributos aleatórios em cada divisão",
+        "3. Cada árvore classifica o novo exemplo",
+        "4. Combina os votos por maioria para a resposta final"
+      ],
+      "quandoUsar": [
+        "Quando quer boa precisão sem ajustar muito",
+        "Dados com muitos atributos e relações não-lineares",
+        "Quando uma árvore sozinha está overfitando"
+      ],
+      "naoUsarQuando": [
+        "Quando precisa de um modelo simples e interpretável",
+        "Recursos de memória ou tempo muito limitados"
+      ],
+      "hiperparametros": {
+        "n_estimators": {
+          "nome": "Número de árvores",
+          "sklearn": "n_estimators",
+          "tipo": "int",
+          "padrao": 100,
+          "descricao": "Quantidade de árvores na floresta.",
+          "implicacoes": "Mais árvores: previsões mais estáveis, porém treino mais lento.",
+          "dicaPratica": "100 a 300 costuma ser suficiente."
+        },
+        "max_depth": {
+          "nome": "Profundidade máxima",
+          "sklearn": "max_depth",
+          "tipo": "int",
+          "padrao": null,
+          "descricao": "Profundidade máxima de cada árvore. Vazio significa sem limite.",
+          "implicacoes": "Limitar a profundidade reduz overfitting; valores muito baixos causam underfitting.",
+          "dicaPratica": "Deixe vazio para começar; limite (ex.: 10) se houver overfitting."
+        },
+        "criterion": {
+          "nome": "Critério de divisão",
+          "sklearn": "criterion",
+          "tipo": "str",
+          "padrao": "gini",
+          "opcoes": ["gini", "entropy", "log_loss"],
+          "descricao": "Como medir a qualidade de uma divisão.",
+          "implicacoes": "gini e entropy costumam dar resultados parecidos."
+        },
+        "min_samples_split": {
+          "nome": "Mínimo para dividir",
+          "sklearn": "min_samples_split",
+          "tipo": "int",
+          "padrao": 2,
+          "descricao": "Número mínimo de exemplos para dividir um nó.",
+          "implicacoes": "Valores maiores deixam as árvores mais simples (menos overfitting)."
+        }
+      },
+      "vantagens": [
+        "Alta precisão e robustez",
+        "Reduz o overfitting de uma árvore",
+        "Lida bem com não-linearidades",
+        "Mostra a importância dos atributos"
+      ],
+      "desvantagens": [
+        "Menos interpretável que uma árvore",
+        "Mais lento e pesado",
+        "Modelo grande na memória"
+      ],
+      "curiosidade": "Random Forest foi proposto por Leo Breiman em 2001 e por muito tempo foi o 'modelo que você tenta primeiro' por funcionar bem com pouco ajuste."
+    },
+    "adaboost": {
+      "nome": "AdaBoost",
+      "sklearn": "sklearn.ensemble.AdaBoostClassifier",
+      "tipo": "Conjunto (boosting)",
+      "complexidade": "O(n · número de estimadores)",
+      "descricao": "Combina vários modelos fracos em sequência, dando mais atenção aos exemplos que foram classificados errado nas rodadas anteriores.",
+      "intuicao": "É como estudar para a prova focando justamente nas questões que você errou antes, até acertar a maioria.",
+      "comoFunciona": [
+        "Treina um modelo fraco e vê onde ele erra.",
+        "Dá mais peso aos exemplos errados para o próximo modelo focar neles.",
+        "Junta todos os modelos, dando mais voto aos que acertam mais."
+      ],
+      "passoAPasso": [
+        "1. Treina um classificador fraco",
+        "2. Aumenta o peso dos exemplos classificados errado",
+        "3. Treina o próximo classificador dando atenção a eles",
+        "4. Combina todos, ponderando pela precisão de cada um"
+      ],
+      "quandoUsar": [
+        "Quando modelos simples sozinhos têm desempenho fraco",
+        "Problemas de classificação com dados razoavelmente limpos"
+      ],
+      "naoUsarQuando": [
+        "Dados com muitos outliers ou ruído (ele foca nos erros e pode piorar)",
+        "Quando precisa de muita velocidade"
+      ],
+      "hiperparametros": {
+        "n_estimators": {
+          "nome": "Número de estimadores",
+          "sklearn": "n_estimators",
+          "tipo": "int",
+          "padrao": 50,
+          "descricao": "Quantos modelos fracos serão treinados em sequência.",
+          "implicacoes": "Mais estimadores podem melhorar a precisão, mas aumentam o risco de overfitting e o tempo de treino."
+        },
+        "learning_rate": {
+          "nome": "Taxa de aprendizado",
+          "sklearn": "learning_rate",
+          "tipo": "float",
+          "padrao": 1.0,
+          "descricao": "Peso dado a cada novo modelo fraco.",
+          "implicacoes": "Valores menores aprendem mais devagar e costumam generalizar melhor (use mais estimadores junto)."
+        }
+      },
+      "vantagens": [
+        "Costuma melhorar bastante modelos fracos",
+        "Poucos hiperparâmetros",
+        "Boa precisão"
+      ],
+      "desvantagens": [
+        "Sensível a ruído e outliers",
+        "Treino sequencial (mais lento)",
+        "Menos interpretável"
+      ],
+      "curiosidade": "AdaBoost (Adaptive Boosting) rendeu a Freund e Schapire o Prêmio Gödel em 2003 e popularizou a ideia de juntar vários modelos fracos."
+    },
+    "naive_bayes": {
+      "nome": "Naive Bayes",
+      "sklearn": "sklearn.naive_bayes.GaussianNB",
+      "tipo": "Modelo probabilístico",
+      "complexidade": "O(n · d) no treino",
+      "descricao": "Calcula a probabilidade de cada classe usando o Teorema de Bayes, supondo (de forma 'ingênua') que os atributos são independentes entre si.",
+      "intuicao": "Para decidir se um e-mail é spam, ele soma as pistas de cada palavra de forma independente e escolhe a classe mais provável.",
+      "comoFunciona": [
+        "Aprende, para cada classe, como cada atributo costuma se distribuir.",
+        "Para um novo exemplo, calcula a probabilidade de cada classe.",
+        "Escolhe a classe de maior probabilidade."
+      ],
+      "passoAPasso": [
+        "1. Estima a probabilidade de cada classe nos dados",
+        "2. Estima como cada atributo se distribui em cada classe",
+        "3. Para um novo exemplo, combina essas probabilidades (assumindo independência)",
+        "4. Escolhe a classe com maior probabilidade"
+      ],
+      "quandoUsar": [
+        "Classificação de texto (spam, sentimentos)",
+        "Quando precisa de treino muito rápido",
+        "Como um baseline simples"
+      ],
+      "naoUsarQuando": [
+        "Atributos fortemente dependentes entre si",
+        "Quando precisa de probabilidades bem calibradas"
+      ],
+      "hiperparametros": {
+        "var_smoothing": {
+          "nome": "Suavização da variância",
+          "sklearn": "var_smoothing",
+          "tipo": "float",
+          "padrao": 1e-9,
+          "descricao": "Pequeno valor somado à variância para dar estabilidade numérica.",
+          "implicacoes": "Aumentar deixa o modelo mais 'suave' e tolerante a dados com pouca variação.",
+          "dicaPratica": "Raramente precisa mudar; só ajuste se houver erros numéricos."
+        }
+      },
+      "vantagens": [
+        "Muito rápido",
+        "Funciona bem com poucos dados",
+        "Simples e eficaz em texto"
+      ],
+      "desvantagens": [
+        "A suposição de independência raramente é verdadeira",
+        "Probabilidades podem ser mal calibradas"
+      ],
+      "curiosidade": "Apesar da suposição 'ingênua' quase nunca ser verdadeira, o Naive Bayes funciona surpreendentemente bem, especialmente em filtros de spam."
+    },
+    "mlp": {
+      "nome": "Rede Neural (MLP)",
+      "sklearn": "sklearn.neural_network.MLPClassifier",
+      "tipo": "Rede neural",
+      "complexidade": "Alta (depende das camadas e iterações)",
+      "descricao": "Uma rede neural com camadas de neurônios que aprende padrões complexos ajustando os pesos das conexões.",
+      "intuicao": "Cada neurônio combina os sinais que recebe e decide se 'dispara'. Empilhando camadas, a rede aprende padrões cada vez mais abstratos.",
+      "comoFunciona": [
+        "Passa os dados por camadas de neurônios, cada um combinando entradas com pesos.",
+        "Compara a saída com a resposta certa e mede o erro.",
+        "Ajusta os pesos aos poucos para reduzir o erro (backpropagation)."
+      ],
+      "passoAPasso": [
+        "1. Inicializa os pesos das conexões",
+        "2. Faz a passagem para frente e gera uma previsão",
+        "3. Calcula o erro em relação ao valor correto",
+        "4. Ajusta os pesos de trás para frente (backpropagation)",
+        "5. Repete por várias épocas até o erro parar de cair"
+      ],
+      "quandoUsar": [
+        "Padrões complexos e não-lineares",
+        "Quando há bastante dado de treino",
+        "Dados ricos como imagens e sinais"
+      ],
+      "naoUsarQuando": [
+        "Poucos dados de treino",
+        "Quando precisa explicar a decisão (pouco interpretável)",
+        "Recursos de tempo ou CPU limitados"
+      ],
+      "hiperparametros": {
+        "hidden_layer_sizes": {
+          "nome": "Neurônios na camada oculta",
+          "sklearn": "hidden_layer_sizes",
+          "tipo": "int",
+          "padrao": 100,
+          "descricao": "Quantidade de neurônios na camada oculta da rede.",
+          "implicacoes": "Mais neurônios aprendem padrões mais complexos, mas aumentam o risco de overfitting e o tempo de treino."
+        },
+        "activation": {
+          "nome": "Função de ativação",
+          "sklearn": "activation",
+          "tipo": "str",
+          "padrao": "relu",
+          "opcoes": ["identity", "logistic", "tanh", "relu"],
+          "descricao": "Função que cada neurônio aplica ao seu sinal.",
+          "implicacoes": "relu costuma ser uma boa escolha padrão."
+        },
+        "solver": {
+          "nome": "Otimizador",
+          "sklearn": "solver",
+          "tipo": "str",
+          "padrao": "adam",
+          "opcoes": ["adam", "sgd", "lbfgs"],
+          "descricao": "Algoritmo que ajusta os pesos durante o treino.",
+          "implicacoes": "adam funciona bem na maioria dos casos; lbfgs pode ser melhor com poucos dados."
+        },
+        "alpha": {
+          "nome": "Regularização (alpha)",
+          "sklearn": "alpha",
+          "tipo": "float",
+          "padrao": 0.0001,
+          "descricao": "Penalidade que evita pesos muito grandes.",
+          "implicacoes": "Valores maiores deixam a rede mais simples (menos overfitting)."
+        },
+        "max_iter": {
+          "nome": "Máximo de iterações",
+          "sklearn": "max_iter",
+          "tipo": "int",
+          "padrao": 500,
+          "descricao": "Número máximo de épocas de treino.",
+          "implicacoes": "Poucas iterações podem não convergir; muitas aumentam o tempo de treino."
+        }
+      },
+      "vantagens": [
+        "Aprende padrões complexos e não-lineares",
+        "Flexível para vários tipos de problema",
+        "Melhora com mais dados"
+      ],
+      "desvantagens": [
+        "Precisa de mais dados e ajuste",
+        "Pouco interpretável (caixa-preta)",
+        "Treino mais lento"
+      ],
+      "curiosidade": "O Multi-Layer Perceptron é a base das redes neurais modernas. A ideia existe desde os anos 1980, mas só decolou com mais dados e mais poder de computação."
+    },
+    "qda": {
+      "nome": "QDA",
+      "sklearn": "sklearn.discriminant_analysis.QuadraticDiscriminantAnalysis",
+      "tipo": "Modelo probabilístico",
+      "complexidade": "O(n · d²)",
+      "descricao": "A Análise Discriminante Quadrática separa as classes com fronteiras curvas, assumindo que cada classe tem sua própria forma de espalhamento (covariância).",
+      "intuicao": "Imagine cada classe como uma 'nuvem' de pontos com formato próprio. O QDA desenha curvas que melhor separam essas nuvens de formatos diferentes.",
+      "comoFunciona": [
+        "Aprende o centro e o formato (covariância) de cada classe.",
+        "Para um novo ponto, mede quão bem ele se encaixa em cada classe.",
+        "Escolhe a classe mais provável, com fronteiras que podem ser curvas."
+      ],
+      "passoAPasso": [
+        "1. Estima a média e a covariância de cada classe separadamente",
+        "2. Calcula a probabilidade do ponto pertencer a cada classe",
+        "3. Define fronteiras quadráticas (curvas) entre as classes",
+        "4. Classifica o ponto na classe de maior probabilidade"
+      ],
+      "quandoUsar": [
+        "Quando as classes têm formatos (dispersão) bem diferentes",
+        "Quando a fronteira entre classes é curva"
+      ],
+      "naoUsarQuando": [
+        "Poucos exemplos por classe (a covariância fica instável)",
+        "Muitos atributos em relação ao número de exemplos"
+      ],
+      "hiperparametros": {
+        "reg_param": {
+          "nome": "Regularização",
+          "sklearn": "reg_param",
+          "tipo": "float",
+          "padrao": 0.0,
+          "descricao": "Suaviza a estimativa da covariância de cada classe.",
+          "implicacoes": "Valores maiores (ex.: 0.1) ajudam quando há poucos dados por classe.",
+          "dicaPratica": "Comece em 0.0 e aumente se o modelo ficar instável."
+        }
+      },
+      "vantagens": [
+        "Captura fronteiras curvas entre classes",
+        "Baseado em probabilidade",
+        "Funciona bem quando as classes têm formatos diferentes"
+      ],
+      "desvantagens": [
+        "Precisa de bastante dado por classe",
+        "Sofre com muitos atributos",
+        "Sensível a outliers"
+      ],
+      "curiosidade": "O QDA é 'primo' da Regressão Logística e do LDA. A diferença é que ele permite que cada classe tenha um formato próprio, gerando fronteiras curvas em vez de retas."
     }
   },
   "metricas": {

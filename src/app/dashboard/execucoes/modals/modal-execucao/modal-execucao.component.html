@@ -48,13 +48,14 @@
 
         <ng-container *ngSwitchCase="2">
           <app-tipos-classificadores [modelosDisponiveis]="modelosDisponiveis" [modeloSelecionado]="modeloSelecionado"
-            (selecaoModelo)="atualizarModelo($event)">
+            (selecaoModelo)="atualizarModelo($event)"
+            (hiperparametrosModificados)="atualizarHiperparametros($event)">
           </app-tipos-classificadores>
         </ng-container>
 
         <ng-container *ngSwitchCase="3">
           <app-classificador [resultadoTreinamento]="resultadoTreinamento" [resultadoColetaDado]="resultadoColetaDado"
-            [modeloSelecionado]="modeloSelecionado"
+            [modeloSelecionado]="modeloSelecionado" [hiperparametros]="hiperparametrosEditados"
             (atualizarResultadoTreinamento)="atualizarResultadoTreinamento($event)">
           </app-classificador>
         </ng-container>
