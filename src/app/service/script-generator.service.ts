@@ -446,7 +446,20 @@ export class ScriptGeneratorService {
       'qda': 'from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis',
       'lda': 'from sklearn.discriminant_analysis import LinearDiscriminantAnalysis',
       'k_means': 'from sklearn.cluster import KMeans',
-      'pca': 'from sklearn.decomposition import PCA'
+      'pca': 'from sklearn.decomposition import PCA',
+      // Classificadores novos
+      'sgd': 'from sklearn.linear_model import SGDClassifier',
+      'perceptron': 'from sklearn.linear_model import Perceptron',
+      // Regressores novos
+      'ridge': 'from sklearn.linear_model import Ridge',
+      'quantile': 'from sklearn.linear_model import QuantileRegressor',
+      'huber': 'from sklearn.linear_model import HuberRegressor',
+      'ransac': 'from sklearn.linear_model import RANSACRegressor',
+      'theilsen': 'from sklearn.linear_model import TheilSenRegressor',
+      'svr': 'from sklearn.svm import SVR',
+      'mlp_regressor': 'from sklearn.neural_network import MLPRegressor',
+      'knn_regressor': 'from sklearn.neighbors import KNeighborsRegressor',
+      'regressao_polinomial': 'from sklearn.preprocessing import PolynomialFeatures\nfrom sklearn.linear_model import LinearRegression\nfrom sklearn.pipeline import make_pipeline'
     };
     return imports[modeloValor] || '';
   }
@@ -800,12 +813,27 @@ export class ScriptGeneratorService {
       return lines.join('\n');
     }
 
-    const modelClass = this.getModelClass(modelo.valor);
     const params = this.formatHyperparameters(hiperparametros);
 
     lines.push('    ');
     lines.push('    # Configuração do modelo');
-    lines.push(`    modelo = ${modelClass}(${params})`);
+    if (modelo.valor === 'regressao_polinomial') {
+      // Pipeline PolynomialFeatures -> LinearRegression (espelha o backend).
+      const h = hiperparametros || {};
+      const py = (v: any) => v === true ? 'True' : v === false ? 'False' : v;
+      const grau = h.degree ?? 2;
+      const incBias = py(h.include_bias ?? true);
+      const interOnly = py(h.interaction_only ?? false);
+      const fitInt = py(h.fit_intercept ?? true);
+      const positive = py(h.positive ?? false);
+      lines.push(`    modelo = make_pipeline(`);
+      lines.push(`        PolynomialFeatures(degree=${grau}, include_bias=${incBias}, interaction_only=${interOnly}),`);
+      lines.push(`        LinearRegression(fit_intercept=${fitInt}, positive=${positive})`);
+      lines.push(`    )`);
+    } else {
+      const modelClass = this.getModelClass(modelo.valor);
+      lines.push(`    modelo = ${modelClass}(${params})`);
+    }
     lines.push('    ');
     lines.push('    # Treinamento');
     if (isClustering) {
@@ -944,7 +972,17 @@ export class ScriptGeneratorService {
       'qda': 'QuadraticDiscriminantAnalysis',
       'lda': 'LinearDiscriminantAnalysis',
       'k_means': 'KMeans',
-      'pca': 'PCA'
+      'pca': 'PCA',
+      'sgd': 'SGDClassifier',
+      'perceptron': 'Perceptron',
+      'ridge': 'Ridge',
+      'quantile': 'QuantileRegressor',
+      'huber': 'HuberRegressor',
+      'ransac': 'RANSACRegressor',
+      'theilsen': 'TheilSenRegressor',
+      'svr': 'SVR',
+      'mlp_regressor': 'MLPRegressor',
+      'knn_regressor': 'KNeighborsRegressor'
     };
     return classes[modeloValor] || 'Modelo';
   }
