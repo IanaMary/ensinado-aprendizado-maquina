@@ -77,7 +77,11 @@
           "sklearn": "weights",
           "padrao": "uniform",
           "tipo": "str ou callable",
-          "opcoes": ["uniform", "distance", "callable"],
+          "opcoes": [
+            "uniform",
+            "distance",
+            "callable"
+          ],
           "descricao": "Controla como os votos dos vizinhos são ponderados na predição.",
           "implicacoes": "'uniform': todos os vizinhos votam igualmente (1 voto cada). 'distance': vizinhos mais próximos têm peso maior (inverso da distância). Callable: função personalizada que recebe distâncias e retorna pesos.",
           "dicaPratica": "Use 'distance' quando há outliers ou quando a qualidade dos vizinhos varia muito. Reduz o impacto de pontos distantes."
@@ -87,7 +91,12 @@
           "sklearn": "algorithm",
           "padrao": "auto",
           "tipo": "str",
-          "opcoes": ["auto", "ball_tree", "kd_tree", "brute"],
+          "opcoes": [
+            "auto",
+            "ball_tree",
+            "kd_tree",
+            "brute"
+          ],
           "descricao": "Algoritmo usado para calcular os vizinhos mais próximos.",
           "implicacoes": "'auto': escolhe automaticamente o melhor algoritmo. 'ball_tree': eficiente para dados de média dimensionalidade. 'kd_tree': eficiente para baixa dimensionalidade. 'brute': força bruta, eficiente para poucos dados ou alta dimensionalidade.",
           "dicaPratica": "Use 'auto' (padrão). Só mude se tiver problemas de performance específicos."
@@ -117,7 +126,16 @@
           "sklearn": "metric",
           "padrao": "minkowski",
           "tipo": "str ou callable",
-          "opcoes": ["minkowski", "euclidean", "manhattan", "chebyshev", "wminkowski", "seuclidean", "mahalanobis", "precomputed"],
+          "opcoes": [
+            "minkowski",
+            "euclidean",
+            "manhattan",
+            "chebyshev",
+            "wminkowski",
+            "seuclidean",
+            "mahalanobis",
+            "precomputed"
+          ],
           "descricao": "Métrica usada para calcular a distância entre pontos. O padrão 'minkowski' com p=2 resulta em distância Euclidiana.",
           "implicacoes": "'euclidean': distância em linha reta. 'manhattan': soma das diferenças absolutas. 'chebyshev': maior diferença em qualquer dimensão. 'precomputed': assume que X já é uma matriz de distância.",
           "dicaPratica": "Use 'minkowski' (padrão) com p=2 para distância Euclidiana. Para dados esparsos, experimente 'manhattan'."
@@ -136,7 +154,11 @@
           "sklearn": "n_jobs",
           "padrao": null,
           "tipo": "int ou None",
-          "opcoes": ["null (1 job)", "-1 (todos os CPUs)", "1, 2, 4, ..."],
+          "opcoes": [
+            "null (1 job)",
+            "-1 (todos os CPUs)",
+            "1, 2, 4, ..."
+          ],
           "descricao": "Número de jobs paralelos para a busca de vizinhos. None significa 1 job. -1 usa todos os processadores.",
           "implicacoes": "Mais jobs = mais rápido em datasets grandes, mas usa mais memória. Não afeta o método fit(), apenas predict().",
           "dicaPratica": "Use n_jobs=-1 se tiver muitos CPUs disponíveis e o dataset for grande. Caso contrário, deixe o padrão."
@@ -154,7 +176,10 @@
         "Sofre com a maldição da dimensionalidade",
         "Não gera um modelo interpretável"
       ],
-      "curiosidade": "O KNN é chamado de 'lazy learner' (aprendedor preguiçoso) porque não faz nenhum trabalho durante o treinamento — todo o cálculo acontece na predição. Isso é o oposto de modelos como Árvore de Decisão, que fazem todo o trabalho no treinamento."
+      "curiosidade": "O KNN é chamado de 'lazy learner' (aprendedor preguiçoso) porque não faz nenhum trabalho durante o treinamento — todo o cálculo acontece na predição. Isso é o oposto de modelos como Árvore de Decisão, que fazem todo o trabalho no treinamento.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html"
+      }
     },
     "arvore_decisao": {
       "nome": "Árvore de Decisão",
@@ -193,7 +218,11 @@
           "sklearn": "criterion",
           "padrao": "gini",
           "tipo": "str",
-          "opcoes": ["gini", "entropy", "log_loss"],
+          "opcoes": [
+            "gini",
+            "entropy",
+            "log_loss"
+          ],
           "descricao": "Função para medir a qualidade de uma divisão. Gini mede a impureza de Gini. Entropy e log_loss medem o ganho de informação de Shannon.",
           "implicacoes": "Gini: mais rápido, mede probabilidade de classificação errada. Entropy: mede incerteza, tende a criar árvores mais balanceadas. log_loss: similar ao entropy. Na prática, a diferença é mínima.",
           "dicaPratica": "Use 'gini' (padrão) — é mais rápido e quase sempre dá o mesmo resultado."
@@ -203,7 +232,10 @@
           "sklearn": "splitter",
           "padrao": "best",
           "tipo": "str",
-          "opcoes": ["best", "random"],
+          "opcoes": [
+            "best",
+            "random"
+          ],
           "descricao": "Estratégia usada para escolher a divisão em cada nó.",
           "implicacoes": "'best': escolhe a melhor divisão (mais lento, mais preciso). 'random': escolhe a melhor divisão aleatória (mais rápido, mais variância).",
           "dicaPratica": "Use 'best' (padrão). 'random' é útil para ensemble methods como Random Forest."
@@ -253,7 +285,13 @@
           "sklearn": "max_features",
           "padrao": null,
           "tipo": "int, float, 'sqrt', 'log2' ou null",
-          "opcoes": ["null (todas)", "int (número fixo)", "float (fração)", "sqrt", "log2"],
+          "opcoes": [
+            "null (todas)",
+            "int (número fixo)",
+            "float (fração)",
+            "sqrt",
+            "log2"
+          ],
           "descricao": "Número de features consideradas para a melhor divisão em cada nó.",
           "implicacoes": "None: todas as features. 'sqrt': raiz do total (bom para Random Forest). 'log2': log2 do total. Menos features = mais aleatoriedade.",
           "dicaPratica": "Para árvore única, use None (todas). Para Random Forest, use 'sqrt'."
@@ -292,7 +330,11 @@
           "sklearn": "class_weight",
           "padrao": null,
           "tipo": "dict, 'balanced' ou null",
-          "opcoes": ["null (pesos iguais)", "dict ({classe: peso})", "balanced"],
+          "opcoes": [
+            "null (pesos iguais)",
+            "dict ({classe: peso})",
+            "balanced"
+          ],
           "descricao": "Pesos associados às classes. 'balanced' ajusta pesos inversamente proporcional à frequência das classes.",
           "implicacoes": "None: todas as classes têm peso 1. 'balanced': útil para classes desbalanceadas. Dict: controle manual dos pesos.",
           "dicaPratica": "Use 'balanced' se suas classes forem desbalanceadas."
@@ -321,7 +363,10 @@
         "Viés para atributos com mais níveis/categorias",
         "Fronteiras de decisão são sempre paralelas aos eixos"
       ],
-      "curiosidade": "Uma única Árvore de Decisão tem alta variância (instável). Por isso, na prática, usamos conjuntos como Random Forest (muitas árvores votando juntas), que reduz a variância e melhora muito a generalização."
+      "curiosidade": "Uma única Árvore de Decisão tem alta variância (instável). Por isso, na prática, usamos conjuntos como Random Forest (muitas árvores votando juntas), que reduz a variância e melhora muito a generalização.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html"
+      }
     },
     "svm": {
       "nome": "Support Vector Machine (SVM)",
@@ -369,7 +414,13 @@
           "sklearn": "kernel",
           "padrao": "rbf",
           "tipo": "str ou callable",
-          "opcoes": ["linear", "poly", "rbf", "sigmoid", "precomputed"],
+          "opcoes": [
+            "linear",
+            "poly",
+            "rbf",
+            "sigmoid",
+            "precomputed"
+          ],
           "descricao": "Define como os dados são transformados para o espaço de alta dimensionalidade. É o hiperparâmetro que mais impacta o desempenho do SVM.",
           "implicacoes": "'linear': separa com uma reta/plano. Rápido, ideal quando os dados já são linearmente separáveis. 'rbf' (gaussiano): o mais versátil, cria fronteiras suaves e não-lineares. 'poly': captura relações polinomiais, mas pode overfitar com graus altos. 'sigmoid': similar à regressão logística.",
           "dicaPratica": "Comece com 'rbf'. Se o dataset for grande e os dados linearmente separáveis, use 'linear' (muito mais rápido)."
@@ -389,7 +440,11 @@
           "sklearn": "gamma",
           "padrao": "scale",
           "tipo": "float ou str",
-          "opcoes": ["scale", "auto", "float"],
+          "opcoes": [
+            "scale",
+            "auto",
+            "float"
+          ],
           "descricao": "Coeficiente do kernel para 'rbf', 'poly' e 'sigmoid'. 'scale' usa 1/(n_features * X.var()). 'auto' usa 1/n_features.",
           "implicacoes": "Gamma baixo: cada ponto influencia uma grande região (fronteira suave, underfitting). Gamma alto: cada ponto influencia apenas sua vizinhança (fronteira complexa, overfitting).",
           "dicaPratica": "Use 'scale' (padrão). Se o modelo overfita, diminua gamma. Se underfita, aumente."
@@ -457,7 +512,10 @@
           "sklearn": "decision_function_shape",
           "padrao": "ovr",
           "tipo": "str",
-          "opcoes": ["ovo", "ovr"],
+          "opcoes": [
+            "ovo",
+            "ovr"
+          ],
           "descricao": "Se retorna formato one-vs-rest ('ovr') ou one-vs-one ('ovo') para classificação multiclasse.",
           "implicacoes": "'ovr': formato padrão, compatível com outros classificadores. 'ovo': formato original do libsvm.",
           "dicaPratica": "Use 'ovr' (padrão). Internamente, 'ovo' é sempre usado para treinar."
@@ -484,7 +542,10 @@
         "Muito sensível à escolha do kernel e parâmetros",
         "Difícil de interpretar"
       ],
-      "curiosidade": "O 'truque do kernel' é uma das ideias mais elegantes do ML. Em vez de realmente transformar os dados para alta dimensionalidade (que seria computacionalmente caro), o kernel calcula a similaridade entre pontos diretamente — o resultado é o mesmo, mas sem o custo da transformação explícita."
+      "curiosidade": "O 'truque do kernel' é uma das ideias mais elegantes do ML. Em vez de realmente transformar os dados para alta dimensionalidade (que seria computacionalmente caro), o kernel calcula a similaridade entre pontos diretamente — o resultado é o mesmo, mas sem o custo da transformação explícita.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html"
+      }
     },
     "regressao_logistica": {
       "nome": "Regressão Logística",
@@ -531,7 +592,14 @@
           "sklearn": "solver",
           "padrao": "lbfgs",
           "tipo": "str",
-          "opcoes": ["lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"],
+          "opcoes": [
+            "lbfgs",
+            "liblinear",
+            "newton-cg",
+            "newton-cholesky",
+            "sag",
+            "saga"
+          ],
           "descricao": "Algoritmo matemático usado para encontrar os melhores pesos.",
           "implicacoes": "'lbfgs': bom para datasets pequenos/médios, suporta multiclasse. 'liblinear': bom para datasets pequenos e classificação binária. 'saga': eficiente para datasets grandes e esparsos. 'newton-cholesky': bom para n_samples >> n_features.",
           "dicaPratica": "Use 'lbfgs' (padrão). Para datasets grandes (>100k), use 'saga'."
@@ -541,7 +609,12 @@
           "sklearn": "penalty",
           "padrao": "l2",
           "tipo": "str",
-          "opcoes": ["l1", "l2", "elasticnet", "none"],
+          "opcoes": [
+            "l1",
+            "l2",
+            "elasticnet",
+            "none"
+          ],
           "descricao": "Define como a regularização é aplicada aos pesos. Nota: este parâmetro está deprecated desde v1.8, use l1_ratio.",
           "implicacoes": "'l2' (Ridge): reduz todos os pesos proporcionalmente. 'l1' (Lasso): zera pesos irrelevantes (seleção de atributos). 'elasticnet': combina L1+L2.",
           "dicaPratica": "Use 'l2' (padrão). Se tiver muitos atributos irrelevantes, experimente 'l1'."
@@ -626,7 +699,10 @@
         "Sensível a atributos correlacionados (multicolinearidade)",
         "Sensível a outliers"
       ],
-      "curiosidade": "A Regressão Logística é o 'cavalo de batalha' do ML em produção. Empresas como Google e Facebook usam extensivamente para previsão de cliques em anúncios, detecção de spam e muito mais — porque é rápida, calibrada e escalável."
+      "curiosidade": "A Regressão Logística é o 'cavalo de batalha' do ML em produção. Empresas como Google e Facebook usam extensivamente para previsão de cliques em anúncios, detecção de spam e muito mais — porque é rápida, calibrada e escalável.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html"
+      }
     },
     "regressao_linear": {
       "nome": "Regressão Linear",
@@ -662,7 +738,10 @@
           "sklearn": "fit_intercept",
           "tipo": "bool",
           "padrao": true,
-          "opcoes": [true, false],
+          "opcoes": [
+            true,
+            false
+          ],
           "descricao": "Define se o modelo calcula o termo de intercepto, o ponto onde a reta cruza o eixo y.",
           "implicacoes": "true: a reta pode cruzar o eixo y em qualquer ponto. false: força a reta a passar pela origem (0, 0).",
           "dicaPratica": "Deixe como true na maioria dos casos. Use false apenas quando, com todos os atributos em zero, o alvo também deve ser zero."
@@ -672,10 +751,37 @@
           "sklearn": "positive",
           "tipo": "bool",
           "padrao": false,
-          "opcoes": [true, false],
+          "opcoes": [
+            true,
+            false
+          ],
           "descricao": "Quando ativado, obriga todos os pesos (coeficientes) da reta a serem maiores ou iguais a zero.",
           "implicacoes": "false: os pesos podem ser positivos ou negativos. true: todos os pesos ficam positivos.",
           "dicaPratica": "Use true apenas quando, pelo contexto do problema, nenhum atributo pode ter efeito negativo sobre o alvo (por exemplo, prever preço a partir do tamanho)."
+        },
+        "copy_X": {
+          "nome": "Copiar os dados",
+          "sklearn": "copy_X",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Se trabalha numa cópia de X.",
+          "implicacoes": "true preserva os dados originais.",
+          "dicaPratica": "Deixe true.",
+          "avancado": true
+        },
+        "n_jobs": {
+          "nome": "Núcleos de CPU",
+          "sklearn": "n_jobs",
+          "tipo": "int",
+          "padrao": null,
+          "descricao": "Quantos processadores usar.",
+          "implicacoes": "Vazio = 1; -1 = todos.",
+          "dicaPratica": "Deixe vazio.",
+          "avancado": true
         }
       },
       "vantagens": [
@@ -690,7 +796,10 @@
         "Multicolinearidade afeta a estabilidade dos coeficientes",
         "Underfitting em relações não-lineares"
       ],
-      "curiosidade": "A Regressão Linear existe desde 1805 (Legendre). É o ponto de partida de todo cientista de dados — se a Regressão Linear não resolve, o problema provavelmente precisa de um modelo mais complexo."
+      "curiosidade": "A Regressão Linear existe desde 1805 (Legendre). É o ponto de partida de todo cientista de dados — se a Regressão Linear não resolve, o problema provavelmente precisa de um modelo mais complexo.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html"
+      }
     },
     "k_means": {
       "nome": "K-Means",
@@ -737,7 +846,11 @@
           "sklearn": "init",
           "padrao": "k-means++",
           "tipo": "str ou array-like",
-          "opcoes": ["k-means++", "random", "array-like"],
+          "opcoes": [
+            "k-means++",
+            "random",
+            "array-like"
+          ],
           "descricao": "Define como os centroides iniciais são escolhidos. Pode ser um array com centroides iniciais.",
           "implicacoes": "'k-means++': escolhe centroides distantes uns dos outros — converge mais rápido e evita soluções ruins. 'random': escolhe aleatoriamente — mais rápido mas resultados piores.",
           "dicaPratica": "Sempre use 'k-means++' (padrão)."
@@ -777,7 +890,10 @@
           "sklearn": "algorithm",
           "padrao": "lloyd",
           "tipo": "str",
-          "opcoes": ["lloyd", "elkan"],
+          "opcoes": [
+            "lloyd",
+            "elkan"
+          ],
           "descricao": "Algoritmo para o K-Means. 'lloyd' é o algoritmo clássico. 'elkan' usa a desigualdade triangular para acelerar.",
           "implicacoes": "'lloyd': funciona para qualquer caso. 'elkan': mais rápido para clusters bem separados, não funciona com dados esparsos.",
           "dicaPratica": "Use 'lloyd' (padrão). 'elkan' pode ser mais rápido para clusters esféricos."
@@ -804,7 +920,10 @@
         "Assume clusters esféricos e de tamanho similar",
         "Sensível a outliers"
       ],
-      "curiosidade": "O K-Means é um dos algoritmos mais antigos do ML (1957). Apesar de suas limitações, continua sendo um dos mais usados na prática por sua simplicidade e eficiência."
+      "curiosidade": "O K-Means é um dos algoritmos mais antigos do ML (1957). Apesar de suas limitações, continua sendo um dos mais usados na prática por sua simplicidade e eficiência.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html"
+      }
     },
     "pca": {
       "nome": "Principal Component Analysis (PCA)",
@@ -842,7 +961,12 @@
           "sklearn": "n_components",
           "padrao": null,
           "tipo": "int, float ou str",
-          "opcoes": ["null (min(n, d))", "int (número fixo)", "float (0-1, proporção da variância)", "mle"],
+          "opcoes": [
+            "null (min(n, d))",
+            "int (número fixo)",
+            "float (0-1, proporção da variância)",
+            "mle"
+          ],
           "descricao": "Número de componentes principais a manter. Se None, mantém min(n, d). Se float entre 0 e 1, é a proporção da variância a manter. Se 'mle', usa estimativa de máxima verossimilhança.",
           "implicacoes": "Menos componentes = mais compressão, mas possível perda de informação. O ideal é manter componentes que explicam ~95% da variância.",
           "dicaPratica": "Use n_components=0.95 para manter 95% da variância. Ou plote a variância acumulada e escolha o 'cotovelo'."
@@ -861,7 +985,12 @@
           "sklearn": "svd_solver",
           "padrao": "auto",
           "tipo": "str",
-          "opcoes": ["auto", "full", "arpack", "randomized"],
+          "opcoes": [
+            "auto",
+            "full",
+            "arpack",
+            "randomized"
+          ],
           "descricao": "Algoritmo para calcular a decomposição SVD.",
           "implicacoes": "'auto': escolhe automaticamente. 'full': exato, mas lento para grandes datasets. 'arpack': eficiente para matrizes esparsas. 'randomized': aproximado, muito mais rápido para grandes datasets.",
           "dicaPratica": "Use 'auto' (padrão). Para datasets grandes (>1000 features), experimente 'randomized'."
@@ -908,7 +1037,10 @@
         "Sensível à escala dos dados (normalize antes)",
         "Pode perder informação importante"
       ],
-      "curiosidade": "O PCA é uma das técnicas mais fundamentais da estatística. Foi inventado por Karl Pearson em 1901 e é usado em praticamente todas as áreas da ciência — de genômica a processamento de imagens."
+      "curiosidade": "O PCA é uma das técnicas mais fundamentais da estatística. Foi inventado por Karl Pearson em 1901 e é usado em praticamente todas as áreas da ciência — de genômica a processamento de imagens.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html"
+      }
     },
     "svm_linear": {
       "nome": "SVM Linear",
@@ -958,7 +1090,10 @@
         "Sensível à escala (normalize antes)",
         "Menos eficaz com classes muito sobrepostas"
       ],
-      "curiosidade": "O SVM dominou a área antes do boom das redes neurais profundas e ainda é forte em problemas com poucos exemplos e muitos atributos."
+      "curiosidade": "O SVM dominou a área antes do boom das redes neurais profundas e ainda é forte em problemas com poucos exemplos e muitos atributos.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html"
+      }
     },
     "random_forest": {
       "nome": "Random Forest",
@@ -1011,7 +1146,11 @@
           "sklearn": "criterion",
           "tipo": "str",
           "padrao": "gini",
-          "opcoes": ["gini", "entropy", "log_loss"],
+          "opcoes": [
+            "gini",
+            "entropy",
+            "log_loss"
+          ],
           "descricao": "Como medir a qualidade de uma divisão.",
           "implicacoes": "gini e entropy costumam dar resultados parecidos."
         },
@@ -1035,7 +1174,10 @@
         "Mais lento e pesado",
         "Modelo grande na memória"
       ],
-      "curiosidade": "Random Forest foi proposto por Leo Breiman em 2001 e por muito tempo foi o 'modelo que você tenta primeiro' por funcionar bem com pouco ajuste."
+      "curiosidade": "Random Forest foi proposto por Leo Breiman em 2001 e por muito tempo foi o 'modelo que você tenta primeiro' por funcionar bem com pouco ajuste.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html"
+      }
     },
     "adaboost": {
       "nome": "AdaBoost",
@@ -1091,7 +1233,10 @@
         "Treino sequencial (mais lento)",
         "Menos interpretável"
       ],
-      "curiosidade": "AdaBoost (Adaptive Boosting) rendeu a Freund e Schapire o Prêmio Gödel em 2003 e popularizou a ideia de juntar vários modelos fracos."
+      "curiosidade": "AdaBoost (Adaptive Boosting) rendeu a Freund e Schapire o Prêmio Gödel em 2003 e popularizou a ideia de juntar vários modelos fracos.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostClassifier.html"
+      }
     },
     "naive_bayes": {
       "nome": "Naive Bayes",
@@ -1125,7 +1270,7 @@
           "nome": "Suavização da variância",
           "sklearn": "var_smoothing",
           "tipo": "float",
-          "padrao": 1e-9,
+          "padrao": 1e-09,
           "descricao": "Pequeno valor somado à variância para dar estabilidade numérica.",
           "implicacoes": "Aumentar deixa o modelo mais 'suave' e tolerante a dados com pouca variação.",
           "dicaPratica": "Raramente precisa mudar; só ajuste se houver erros numéricos."
@@ -1140,7 +1285,10 @@
         "A suposição de independência raramente é verdadeira",
         "Probabilidades podem ser mal calibradas"
       ],
-      "curiosidade": "Apesar da suposição 'ingênua' quase nunca ser verdadeira, o Naive Bayes funciona surpreendentemente bem, especialmente em filtros de spam."
+      "curiosidade": "Apesar da suposição 'ingênua' quase nunca ser verdadeira, o Naive Bayes funciona surpreendentemente bem, especialmente em filtros de spam.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html"
+      }
     },
     "mlp": {
       "nome": "Rede Neural (MLP)",
@@ -1185,7 +1333,12 @@
           "sklearn": "activation",
           "tipo": "str",
           "padrao": "relu",
-          "opcoes": ["identity", "logistic", "tanh", "relu"],
+          "opcoes": [
+            "identity",
+            "logistic",
+            "tanh",
+            "relu"
+          ],
           "descricao": "Função que cada neurônio aplica ao seu sinal.",
           "implicacoes": "relu costuma ser uma boa escolha padrão."
         },
@@ -1194,7 +1347,11 @@
           "sklearn": "solver",
           "tipo": "str",
           "padrao": "adam",
-          "opcoes": ["adam", "sgd", "lbfgs"],
+          "opcoes": [
+            "adam",
+            "sgd",
+            "lbfgs"
+          ],
           "descricao": "Algoritmo que ajusta os pesos durante o treino.",
           "implicacoes": "adam funciona bem na maioria dos casos; lbfgs pode ser melhor com poucos dados."
         },
@@ -1213,6 +1370,45 @@
           "padrao": 500,
           "descricao": "Número máximo de épocas de treino.",
           "implicacoes": "Poucas iterações podem não convergir; muitas aumentam o tempo de treino."
+        },
+        "learning_rate": {
+          "nome": "Taxa de aprendizado (modo)",
+          "sklearn": "learning_rate",
+          "tipo": "str",
+          "padrao": "constant",
+          "opcoes": [
+            "constant",
+            "invscaling",
+            "adaptive"
+          ],
+          "descricao": "Como a taxa de aprendizado evolui (solver='sgd').",
+          "implicacoes": "Afeta só o 'sgd'.",
+          "dicaPratica": "Deixe 'constant'.",
+          "avancado": true
+        },
+        "learning_rate_init": {
+          "nome": "Taxa de aprendizado inicial",
+          "sklearn": "learning_rate_init",
+          "tipo": "float",
+          "padrao": 0.001,
+          "descricao": "Tamanho do passo inicial de ajuste.",
+          "implicacoes": "Alto demais não converge; baixo demais é lento.",
+          "dicaPratica": "0.001 é um bom começo.",
+          "avancado": true
+        },
+        "early_stopping": {
+          "nome": "Parada antecipada",
+          "sklearn": "early_stopping",
+          "tipo": "bool",
+          "padrao": false,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Para o treino quando a validação para de melhorar.",
+          "implicacoes": "true ajuda contra overfitting.",
+          "dicaPratica": "Ative se o treino estiver demorando ou superajustando.",
+          "avancado": true
         }
       },
       "vantagens": [
@@ -1225,7 +1421,10 @@
         "Pouco interpretável (caixa-preta)",
         "Treino mais lento"
       ],
-      "curiosidade": "O Multi-Layer Perceptron é a base das redes neurais modernas. A ideia existe desde os anos 1980, mas só decolou com mais dados e mais poder de computação."
+      "curiosidade": "O Multi-Layer Perceptron é a base das redes neurais modernas. A ideia existe desde os anos 1980, mas só decolou com mais dados e mais poder de computação.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html"
+      }
     },
     "qda": {
       "nome": "QDA",
@@ -1274,7 +1473,1367 @@
         "Sofre com muitos atributos",
         "Sensível a outliers"
       ],
-      "curiosidade": "O QDA é 'primo' da Regressão Logística e do LDA. A diferença é que ele permite que cada classe tenha um formato próprio, gerando fronteiras curvas em vez de retas."
+      "curiosidade": "O QDA é 'primo' da Regressão Logística e do LDA. A diferença é que ele permite que cada classe tenha um formato próprio, gerando fronteiras curvas em vez de retas.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.discriminant_analysis.QuadraticDiscriminantAnalysis.html"
+      }
+    },
+    "ridge": {
+      "nome": "Ridge",
+      "sklearn": "sklearn.linear_model.Ridge",
+      "tipo": "Modelo linear regularizado (L2)",
+      "complexidade": "O(n · d²)",
+      "descricao": "A Ridge é uma Regressão Linear que adiciona uma penalidade L2 (soma dos quadrados dos pesos). Essa penalidade encolhe os coeficientes, reduzindo o overfitting quando há muitos atributos ou multicolinearidade.",
+      "intuicao": "É como uma Regressão Linear com um 'freio': ela evita que qualquer peso fique grande demais, deixando o modelo mais estável e menos sensível a ruído nos dados.",
+      "comoFunciona": [
+        "Minimiza o erro quadrático MAIS alpha vezes a soma dos quadrados dos pesos.",
+        "Quanto maior o alpha, mais os pesos são puxados para perto de zero.",
+        "Nunca zera um peso totalmente (diferente do Lasso)."
+      ],
+      "passoAPasso": [
+        "1. Mesmo objetivo da Regressão Linear, com um termo extra de penalidade.",
+        "2. O alpha controla a força do 'freio'.",
+        "3. Encontra os pesos que equilibram erro baixo e pesos pequenos."
+      ],
+      "quandoUsar": [
+        "Muitos atributos, alguns correlacionados entre si",
+        "Regressão Linear simples está dando overfitting",
+        "Quando você quer um modelo linear mais estável"
+      ],
+      "naoUsarQuando": [
+        "Relações fortemente não-lineares",
+        "Quando você precisa zerar atributos (use Lasso)"
+      ],
+      "vantagens": [
+        "Reduz overfitting",
+        "Lida bem com multicolinearidade",
+        "Solução estável e rápida"
+      ],
+      "desvantagens": [
+        "Não faz seleção de atributos (não zera pesos)",
+        "Precisa escolher o alpha",
+        "Ainda é um modelo linear"
+      ],
+      "curiosidade": "Ridge significa 'cordilheira': o nome vem do formato da superfície de erro com a penalidade adicionada.",
+      "exemplo": "Prever o preço de casas usando 30 atributos correlacionados (área, nº de quartos, nº de banheiros...): a Ridge mantém o modelo estável mesmo com atributos parecidos.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html"
+      },
+      "hiperparametros": {
+        "alpha": {
+          "nome": "Força da regularização",
+          "sklearn": "alpha",
+          "tipo": "float",
+          "padrao": 1.0,
+          "descricao": "Controla a intensidade da penalidade L2 sobre os pesos.",
+          "implicacoes": "alpha alto: pesos menores, modelo mais simples. alpha baixo: parecido com Regressão Linear comum.",
+          "dicaPratica": "Comece com 1.0 e experimente 0.1, 10, 100 para ver o efeito."
+        },
+        "fit_intercept": {
+          "nome": "Calcular intercepto",
+          "sklearn": "fit_intercept",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Se o modelo calcula o ponto onde a reta cruza o eixo y.",
+          "implicacoes": "true na maioria dos casos.",
+          "dicaPratica": "Deixe true salvo motivo específico."
+        },
+        "solver": {
+          "nome": "Algoritmo de solução",
+          "sklearn": "solver",
+          "tipo": "str",
+          "padrao": "auto",
+          "opcoes": [
+            "auto",
+            "svd",
+            "cholesky",
+            "lsqr",
+            "sparse_cg",
+            "sag",
+            "saga"
+          ],
+          "descricao": "Método numérico usado para resolver a regressão.",
+          "implicacoes": "'auto' escolhe sozinho o melhor método para seus dados.",
+          "dicaPratica": "Deixe 'auto'.",
+          "avancado": true
+        },
+        "max_iter": {
+          "nome": "Máximo de iterações",
+          "sklearn": "max_iter",
+          "tipo": "int",
+          "padrao": null,
+          "descricao": "Limite de iterações para os solvers iterativos.",
+          "implicacoes": "Só afeta alguns solvers.",
+          "dicaPratica": "Deixe vazio (automático).",
+          "avancado": true
+        },
+        "tol": {
+          "nome": "Tolerância",
+          "sklearn": "tol",
+          "tipo": "float",
+          "padrao": 0.0001,
+          "descricao": "Critério de parada do solver.",
+          "implicacoes": "Menor = mais preciso e mais lento.",
+          "dicaPratica": "Deixe o padrão.",
+          "avancado": true
+        },
+        "positive": {
+          "nome": "Forçar coeficientes positivos",
+          "sklearn": "positive",
+          "tipo": "bool",
+          "padrao": false,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Obriga todos os pesos a serem >= 0.",
+          "implicacoes": "Use só se nenhum atributo puder ter efeito negativo.",
+          "dicaPratica": "Geralmente false.",
+          "avancado": true
+        },
+        "copy_X": {
+          "nome": "Copiar os dados",
+          "sklearn": "copy_X",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Se trabalha numa cópia de X.",
+          "implicacoes": "true preserva os dados originais.",
+          "dicaPratica": "Deixe true.",
+          "avancado": true
+        }
+      }
+    },
+    "regressao_polinomial": {
+      "nome": "Regressão Polinomial",
+      "sklearn": "sklearn.preprocessing.PolynomialFeatures",
+      "tipo": "Modelo linear sobre atributos polinomiais",
+      "complexidade": "Cresce com o grau",
+      "descricao": "A Regressão Polinomial expande os atributos em potências (x, x², x³...) e ajusta uma Regressão Linear sobre eles. Assim consegue modelar curvas, não apenas retas.",
+      "intuicao": "Quando os pontos formam uma curva (e não uma reta), elevar o atributo ao quadrado ou ao cubo permite que a 'reta' se dobre e acompanhe a curva.",
+      "comoFunciona": [
+        "Cria novas colunas: x², x³, e combinações entre atributos.",
+        "Ajusta uma Regressão Linear nesses novos atributos.",
+        "O grau controla o quanto a curva pode se dobrar."
+      ],
+      "passoAPasso": [
+        "1. Escolhe o grau (degree).",
+        "2. Gera os termos polinomiais.",
+        "3. Treina uma Regressão Linear sobre eles."
+      ],
+      "quandoUsar": [
+        "A relação entre atributo e alvo é curva",
+        "Regressão Linear simples ficou 'fraca' (underfitting)"
+      ],
+      "naoUsarQuando": [
+        "Muitos atributos (explode o nº de termos)",
+        "Grau alto com poucos dados (overfitting forte)"
+      ],
+      "vantagens": [
+        "Captura relações não-lineares",
+        "Simples de entender",
+        "Reusa a Regressão Linear"
+      ],
+      "desvantagens": [
+        "Grau alto causa overfitting",
+        "Número de termos cresce rápido",
+        "Sensível à escala dos dados"
+      ],
+      "curiosidade": "Com grau suficiente, um polinômio passa exatamente por todos os pontos de treino — mas aí ele 'decora' em vez de aprender.",
+      "exemplo": "Prever a distância de frenagem de um carro pela velocidade: a relação é curva (quadrática), então grau 2 funciona melhor que uma reta.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PolynomialFeatures.html",
+        "extra": [
+          "https://scikit-learn.org/stable/modules/linear_model.html#polynomial-regression-extending-linear-models-with-basis-functions"
+        ]
+      },
+      "hiperparametros": {
+        "degree": {
+          "nome": "Grau do polinômio",
+          "sklearn": "degree",
+          "tipo": "int",
+          "padrao": 2,
+          "descricao": "Maior potência usada na expansão (2 = quadrático, 3 = cúbico...).",
+          "implicacoes": "Grau alto dobra mais a curva, mas arrisca overfitting.",
+          "dicaPratica": "Comece com 2 ou 3. Raramente passe de 4."
+        },
+        "include_bias": {
+          "nome": "Incluir termo de viés",
+          "sklearn": "include_bias",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Adiciona uma coluna de 1s (constante).",
+          "implicacoes": "Normalmente redundante com o intercepto.",
+          "dicaPratica": "Pode deixar true.",
+          "avancado": true
+        },
+        "interaction_only": {
+          "nome": "Apenas interações",
+          "sklearn": "interaction_only",
+          "tipo": "bool",
+          "padrao": false,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Se gera só produtos entre atributos diferentes (sem x²).",
+          "implicacoes": "true remove as potências puras.",
+          "dicaPratica": "Geralmente false.",
+          "avancado": true
+        },
+        "fit_intercept": {
+          "nome": "Calcular intercepto",
+          "sklearn": "fit_intercept",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Intercepto da Regressão Linear interna.",
+          "implicacoes": "true na maioria dos casos.",
+          "dicaPratica": "Deixe true.",
+          "avancado": true
+        },
+        "positive": {
+          "nome": "Forçar coeficientes positivos",
+          "sklearn": "positive",
+          "tipo": "bool",
+          "padrao": false,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Obriga os pesos a >= 0.",
+          "implicacoes": "Raro em polinomial.",
+          "dicaPratica": "Geralmente false.",
+          "avancado": true
+        }
+      }
+    },
+    "quantile": {
+      "nome": "Regressão Quantílica",
+      "sklearn": "sklearn.linear_model.QuantileRegressor",
+      "tipo": "Modelo linear robusto",
+      "complexidade": "Resolve um problema de otimização linear",
+      "descricao": "Em vez de prever a média (como a Regressão Linear), a Regressão Quantílica prevê um quantil, por exemplo a mediana (50%). É robusta a outliers e útil para estimar faixas.",
+      "intuicao": "A média é puxada por valores extremos; a mediana não. Prever a mediana dá uma estimativa mais 'típica' quando há outliers.",
+      "comoFunciona": [
+        "Escolhe um quantil (ex.: 0.5 para mediana).",
+        "Penaliza erros para cima e para baixo de forma assimétrica conforme o quantil.",
+        "Encontra a reta que melhor representa aquele quantil."
+      ],
+      "passoAPasso": [
+        "1. Define o quantil desejado.",
+        "2. Minimiza o erro absoluto ponderado.",
+        "3. Retorna a reta do quantil."
+      ],
+      "quandoUsar": [
+        "Dados com outliers",
+        "Quer prever faixas (ex.: 10%, 50%, 90%)",
+        "A mediana é mais informativa que a média"
+      ],
+      "naoUsarQuando": [
+        "Relações não-lineares",
+        "Quando a média é realmente o que importa"
+      ],
+      "vantagens": [
+        "Robusta a outliers",
+        "Permite estimar quantis (faixas)",
+        "Interpretação clara"
+      ],
+      "desvantagens": [
+        "Mais lenta que a Regressão Linear",
+        "Ainda é linear",
+        "Precisa escolher o quantil"
+      ],
+      "curiosidade": "Treinando vários quantis (10%, 50%, 90%) você obtém uma 'banda' de previsão em vez de um único número.",
+      "exemplo": "Prever o tempo de entrega: prever o quantil 90% diz 'em 90% dos casos chega até X minutos', ótimo para dar prazos seguros.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.QuantileRegressor.html",
+        "extra": [
+          "https://scikit-learn.org/stable/modules/linear_model.html#quantile-regression"
+        ]
+      },
+      "hiperparametros": {
+        "quantile": {
+          "nome": "Quantil",
+          "sklearn": "quantile",
+          "tipo": "float",
+          "padrao": 0.5,
+          "descricao": "Qual quantil prever (0.5 = mediana, 0.9 = percentil 90).",
+          "implicacoes": "Valores próximos de 0 ou 1 estimam as caudas.",
+          "dicaPratica": "Use 0.5 para a mediana."
+        },
+        "alpha": {
+          "nome": "Regularização",
+          "sklearn": "alpha",
+          "tipo": "float",
+          "padrao": 1.0,
+          "descricao": "Força da penalidade L1 sobre os pesos.",
+          "implicacoes": "Maior = pesos menores.",
+          "dicaPratica": "Comece com 1.0; use 0 para sem regularização."
+        },
+        "fit_intercept": {
+          "nome": "Calcular intercepto",
+          "sklearn": "fit_intercept",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Intercepto da reta.",
+          "implicacoes": "true na maioria dos casos.",
+          "dicaPratica": "Deixe true.",
+          "avancado": true
+        },
+        "solver": {
+          "nome": "Solver",
+          "sklearn": "solver",
+          "tipo": "str",
+          "padrao": "highs",
+          "opcoes": [
+            "highs",
+            "highs-ds",
+            "highs-ipm"
+          ],
+          "descricao": "Algoritmo de programação linear usado.",
+          "implicacoes": "'highs' é o recomendado nas versões atuais.",
+          "dicaPratica": "Deixe 'highs'.",
+          "avancado": true
+        }
+      }
+    },
+    "huber": {
+      "nome": "Regressão de Huber",
+      "sklearn": "sklearn.linear_model.HuberRegressor",
+      "tipo": "Modelo linear robusto",
+      "complexidade": "O(n · d²) iterativo",
+      "descricao": "A Regressão de Huber combina o erro quadrático (para erros pequenos) com o erro absoluto (para erros grandes). Assim sofre menos com outliers que a Regressão Linear comum.",
+      "intuicao": "Erros pequenos são tratados normalmente; erros enormes (outliers) recebem peso menor, para não distorcerem a reta.",
+      "comoFunciona": [
+        "Usa erro quadrático até um limite (epsilon).",
+        "Acima desse limite, usa erro absoluto (penaliza menos os outliers).",
+        "Encontra a reta que minimiza essa perda mista."
+      ],
+      "passoAPasso": [
+        "1. Define epsilon (fronteira entre 'normal' e 'outlier').",
+        "2. Minimiza a perda de Huber.",
+        "3. Retorna a reta robusta."
+      ],
+      "quandoUsar": [
+        "Há alguns outliers nos dados",
+        "Quer um meio-termo entre Regressão Linear e robusta"
+      ],
+      "naoUsarQuando": [
+        "Sem outliers (use Regressão Linear)",
+        "Relações não-lineares"
+      ],
+      "vantagens": [
+        "Robusta a outliers moderados",
+        "Mais estável que mínimos quadrados",
+        "Interpretação linear"
+      ],
+      "desvantagens": [
+        "Precisa ajustar epsilon",
+        "Iterativa (mais lenta)",
+        "Ainda é linear"
+      ],
+      "curiosidade": "O valor padrão epsilon=1.35 foi escolhido para manter ~95% da eficiência da Regressão Linear quando não há outliers.",
+      "exemplo": "Prever consumo de energia quando alguns sensores registraram picos errados: o Huber ignora parcialmente esses picos.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.HuberRegressor.html",
+        "extra": [
+          "https://scikit-learn.org/stable/modules/linear_model.html#robustness-regression-outliers-and-modeling-errors"
+        ]
+      },
+      "hiperparametros": {
+        "epsilon": {
+          "nome": "Epsilon",
+          "sklearn": "epsilon",
+          "tipo": "float",
+          "padrao": 1.35,
+          "descricao": "Fronteira entre erro 'normal' e 'outlier'.",
+          "implicacoes": "Menor = mais robusto a outliers.",
+          "dicaPratica": "1.35 é um bom padrão; 1.1 a 2.0 são comuns."
+        },
+        "alpha": {
+          "nome": "Regularização",
+          "sklearn": "alpha",
+          "tipo": "float",
+          "padrao": 0.0001,
+          "descricao": "Penalidade L2 sobre os pesos.",
+          "implicacoes": "Maior = pesos menores.",
+          "dicaPratica": "Deixe o padrão na maioria dos casos."
+        },
+        "max_iter": {
+          "nome": "Máximo de iterações",
+          "sklearn": "max_iter",
+          "tipo": "int",
+          "padrao": 100,
+          "descricao": "Limite de iterações do otimizador.",
+          "implicacoes": "Aumente se não convergir.",
+          "dicaPratica": "100 costuma bastar.",
+          "avancado": true
+        },
+        "fit_intercept": {
+          "nome": "Calcular intercepto",
+          "sklearn": "fit_intercept",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Intercepto da reta.",
+          "implicacoes": "true na maioria.",
+          "dicaPratica": "Deixe true.",
+          "avancado": true
+        },
+        "tol": {
+          "nome": "Tolerância",
+          "sklearn": "tol",
+          "tipo": "float",
+          "padrao": 1e-05,
+          "descricao": "Critério de parada.",
+          "implicacoes": "Menor = mais preciso.",
+          "dicaPratica": "Deixe o padrão.",
+          "avancado": true
+        },
+        "warm_start": {
+          "nome": "Reaproveitar solução",
+          "sklearn": "warm_start",
+          "tipo": "bool",
+          "padrao": false,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Reusa a solução anterior como ponto de partida.",
+          "implicacoes": "Útil em ajustes repetidos.",
+          "dicaPratica": "Geralmente false.",
+          "avancado": true
+        }
+      }
+    },
+    "ransac": {
+      "nome": "Regressão RANSAC",
+      "sklearn": "sklearn.linear_model.RANSACRegressor",
+      "tipo": "Modelo linear robusto (consenso)",
+      "complexidade": "Repete o ajuste várias vezes",
+      "descricao": "O RANSAC ajusta a reta usando apenas os pontos 'bons' (inliers), descartando automaticamente os outliers. Ele testa vários subconjuntos e fica com o que tem mais pontos em consenso.",
+      "intuicao": "Em vez de tentar agradar todos os pontos, ele encontra o maior grupo de pontos que concordam entre si e ignora o resto.",
+      "comoFunciona": [
+        "Sorteia um subconjunto pequeno e ajusta uma reta.",
+        "Conta quantos pontos ficam perto dessa reta (inliers).",
+        "Repete e fica com a reta que teve mais inliers."
+      ],
+      "passoAPasso": [
+        "1. Sorteia pontos.",
+        "2. Ajusta e mede inliers.",
+        "3. Repete e escolhe o melhor consenso."
+      ],
+      "quandoUsar": [
+        "Muitos outliers nos dados",
+        "Outliers 'grosseiros' (erros de medição)"
+      ],
+      "naoUsarQuando": [
+        "Poucos dados",
+        "Outliers são na verdade informação importante"
+      ],
+      "vantagens": [
+        "Muito robusto a outliers grosseiros",
+        "Separa inliers de outliers",
+        "Simples de entender"
+      ],
+      "desvantagens": [
+        "Resultado varia entre execuções (aleatório)",
+        "Precisa ajustar limiares",
+        "Mais lento"
+      ],
+      "curiosidade": "RANSAC vem de 'RANdom SAmple Consensus' e foi criado em 1981 para visão computacional.",
+      "exemplo": "Ajustar uma reta a pontos de um sensor onde 30% das leituras são lixo: o RANSAC encontra a reta dos 70% bons.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html",
+        "extra": [
+          "https://scikit-learn.org/stable/modules/linear_model.html#ransac-random-sample-consensus"
+        ]
+      },
+      "hiperparametros": {
+        "min_samples": {
+          "nome": "Amostras mínimas",
+          "sklearn": "min_samples",
+          "tipo": "int",
+          "padrao": null,
+          "descricao": "Quantos pontos sortear por tentativa.",
+          "implicacoes": "Vazio = automático.",
+          "dicaPratica": "Deixe vazio salvo necessidade."
+        },
+        "residual_threshold": {
+          "nome": "Limiar de resíduo",
+          "sklearn": "residual_threshold",
+          "tipo": "float",
+          "padrao": null,
+          "descricao": "Distância máxima para considerar um ponto inlier.",
+          "implicacoes": "Vazio = usa a mediana dos erros.",
+          "dicaPratica": "Deixe vazio para começar."
+        },
+        "max_trials": {
+          "nome": "Máximo de tentativas",
+          "sklearn": "max_trials",
+          "tipo": "int",
+          "padrao": 100,
+          "descricao": "Quantas vezes repetir o sorteio.",
+          "implicacoes": "Mais tentativas = mais chance de achar o melhor consenso.",
+          "dicaPratica": "100 costuma bastar."
+        },
+        "stop_probability": {
+          "nome": "Probabilidade de parada",
+          "sklearn": "stop_probability",
+          "tipo": "float",
+          "padrao": 0.99,
+          "descricao": "Confiança desejada de ter achado um bom modelo.",
+          "implicacoes": "Maior = mais tentativas.",
+          "dicaPratica": "Deixe 0.99.",
+          "avancado": true
+        },
+        "loss": {
+          "nome": "Função de perda",
+          "sklearn": "loss",
+          "tipo": "str",
+          "padrao": "absolute_error",
+          "opcoes": [
+            "absolute_error",
+            "squared_error"
+          ],
+          "descricao": "Como medir o erro de cada ponto.",
+          "implicacoes": "'absolute_error' é robusto.",
+          "dicaPratica": "Deixe o padrão.",
+          "avancado": true
+        }
+      }
+    },
+    "theilsen": {
+      "nome": "Regressão Theil-Sen",
+      "sklearn": "sklearn.linear_model.TheilSenRegressor",
+      "tipo": "Modelo linear robusto (medianas)",
+      "complexidade": "Custosa em muitos atributos",
+      "descricao": "A Theil-Sen estima a inclinação da reta pela mediana das inclinações entre pares de pontos. É muito robusta a outliers (resiste a até ~29% de pontos ruins).",
+      "intuicao": "Para cada par de pontos dá para calcular uma inclinação; pegar a mediana de todas elas dá uma reta que ignora os extremos.",
+      "comoFunciona": [
+        "Calcula inclinações entre pares (ou amostras) de pontos.",
+        "Toma a mediana dessas inclinações.",
+        "Ajusta o intercepto de forma robusta."
+      ],
+      "passoAPasso": [
+        "1. Amostra pares de pontos.",
+        "2. Calcula medianas das inclinações.",
+        "3. Monta a reta robusta."
+      ],
+      "quandoUsar": [
+        "Dados com outliers",
+        "Poucos atributos",
+        "Quer uma alternativa robusta simples"
+      ],
+      "naoUsarQuando": [
+        "Muitos atributos (fica lento)",
+        "Datasets muito grandes"
+      ],
+      "vantagens": [
+        "Muito robusta a outliers",
+        "Sem hiperparâmetros críticos",
+        "Resultado estável"
+      ],
+      "desvantagens": [
+        "Lenta com muitos atributos",
+        "Escala mal",
+        "Ainda é linear"
+      ],
+      "curiosidade": "É chamada de 'estimador não-paramétrico' porque quase não assume nada sobre a distribuição dos erros.",
+      "exemplo": "Estimar a tendência de uma série pequena de medições com alguns erros grosseiros.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html",
+        "extra": [
+          "https://scikit-learn.org/stable/modules/linear_model.html#theil-sen-estimator-generalized-median-based-estimator"
+        ]
+      },
+      "hiperparametros": {
+        "fit_intercept": {
+          "nome": "Calcular intercepto",
+          "sklearn": "fit_intercept",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Intercepto da reta.",
+          "implicacoes": "true na maioria.",
+          "dicaPratica": "Deixe true."
+        },
+        "max_subpopulation": {
+          "nome": "Subpopulação máxima",
+          "sklearn": "max_subpopulation",
+          "tipo": "int",
+          "padrao": 10000,
+          "descricao": "Limita quantas combinações de pontos considerar (para não explodir).",
+          "implicacoes": "Menor = mais rápido, menos preciso.",
+          "dicaPratica": "Deixe o padrão para datasets pequenos."
+        },
+        "n_subsamples": {
+          "nome": "Nº de subamostras",
+          "sklearn": "n_subsamples",
+          "tipo": "int",
+          "padrao": null,
+          "descricao": "Quantos pontos usar por amostra.",
+          "implicacoes": "Vazio = automático.",
+          "dicaPratica": "Deixe vazio.",
+          "avancado": true
+        },
+        "max_iter": {
+          "nome": "Máximo de iterações",
+          "sklearn": "max_iter",
+          "tipo": "int",
+          "padrao": 300,
+          "descricao": "Limite de iterações do cálculo do intercepto.",
+          "implicacoes": "Aumente se não convergir.",
+          "dicaPratica": "300 costuma bastar.",
+          "avancado": true
+        },
+        "tol": {
+          "nome": "Tolerância",
+          "sklearn": "tol",
+          "tipo": "float",
+          "padrao": 0.001,
+          "descricao": "Critério de parada.",
+          "implicacoes": "Menor = mais preciso.",
+          "dicaPratica": "Deixe o padrão.",
+          "avancado": true
+        },
+        "n_jobs": {
+          "nome": "Núcleos de CPU",
+          "sklearn": "n_jobs",
+          "tipo": "int",
+          "padrao": null,
+          "descricao": "Quantos processadores usar em paralelo.",
+          "implicacoes": "Vazio = 1; -1 = todos.",
+          "dicaPratica": "Deixe vazio.",
+          "avancado": true
+        }
+      }
+    },
+    "svr": {
+      "nome": "SVR (Regressão SVM)",
+      "sklearn": "sklearn.svm.SVR",
+      "tipo": "Máquina de vetores de suporte",
+      "complexidade": "Entre O(n²) e O(n³)",
+      "descricao": "O SVR é a versão de regressão das SVMs. Ele tenta manter as previsões dentro de uma 'margem de tolerância' (epsilon) e usa kernels para capturar relações não-lineares.",
+      "intuicao": "Imagine um 'tubo' em torno da curva: o SVR tenta colocar o máximo de pontos dentro do tubo e penaliza só os que ficam de fora.",
+      "comoFunciona": [
+        "Ignora erros menores que epsilon (dentro do tubo).",
+        "Penaliza pontos fora do tubo.",
+        "Usa kernels para curvar a função quando preciso."
+      ],
+      "passoAPasso": [
+        "1. Escolhe kernel e epsilon.",
+        "2. Ajusta a função dentro da margem.",
+        "3. Usa os vetores de suporte para prever."
+      ],
+      "quandoUsar": [
+        "Relações não-lineares",
+        "Datasets pequenos/médios",
+        "Quer robustez a alguns outliers"
+      ],
+      "naoUsarQuando": [
+        "Datasets muito grandes (fica lento)",
+        "Precisa de muita interpretabilidade"
+      ],
+      "vantagens": [
+        "Captura não-linearidade via kernel",
+        "Robusto dentro da margem",
+        "Bom em datasets pequenos"
+      ],
+      "desvantagens": [
+        "Lento em muitos dados",
+        "Sensível à escala (normalizar!)",
+        "Vários hiperparâmetros para ajustar"
+      ],
+      "curiosidade": "Só os pontos fora (ou na borda) do tubo viram 'vetores de suporte' — os de dentro não influenciam a previsão.",
+      "exemplo": "Prever a temperatura de um processo industrial a partir de sensores, onde a relação é curva.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html",
+        "extra": [
+          "https://scikit-learn.org/stable/modules/svm.html#svm-regression"
+        ]
+      },
+      "hiperparametros": {
+        "C": {
+          "nome": "Regularização (C)",
+          "sklearn": "C",
+          "tipo": "float",
+          "padrao": 1.0,
+          "descricao": "Quanto penalizar erros fora da margem.",
+          "implicacoes": "C alto: foca em acertar o treino (risco de overfitting). C baixo: modelo mais simples.",
+          "dicaPratica": "Comece com 1.0 e experimente 0.1 e 10."
+        },
+        "kernel": {
+          "nome": "Kernel",
+          "sklearn": "kernel",
+          "tipo": "str",
+          "padrao": "rbf",
+          "opcoes": [
+            "rbf",
+            "linear",
+            "poly",
+            "sigmoid"
+          ],
+          "descricao": "Função que mede a similaridade entre pontos.",
+          "implicacoes": "'rbf' captura curvas; 'linear' é uma reta.",
+          "dicaPratica": "Comece com 'rbf'."
+        },
+        "gamma": {
+          "nome": "Gamma",
+          "sklearn": "gamma",
+          "tipo": "str",
+          "padrao": "scale",
+          "opcoes": [
+            "scale",
+            "auto"
+          ],
+          "descricao": "Alcance da influência de cada ponto (kernels não-lineares).",
+          "implicacoes": "Alto: fronteiras mais 'apertadas'. 'scale' é um bom automático.",
+          "dicaPratica": "Deixe 'scale'."
+        },
+        "epsilon": {
+          "nome": "Epsilon (margem)",
+          "sklearn": "epsilon",
+          "tipo": "float",
+          "padrao": 0.1,
+          "descricao": "Largura do 'tubo' sem penalidade.",
+          "implicacoes": "Maior = mais tolerante a erros pequenos.",
+          "dicaPratica": "0.1 é um bom começo."
+        },
+        "degree": {
+          "nome": "Grau (kernel poly)",
+          "sklearn": "degree",
+          "tipo": "int",
+          "padrao": 3,
+          "descricao": "Grau do polinômio quando kernel='poly'.",
+          "implicacoes": "Só afeta o kernel 'poly'.",
+          "dicaPratica": "Deixe 3 salvo usar 'poly'.",
+          "avancado": true
+        },
+        "coef0": {
+          "nome": "Coef0",
+          "sklearn": "coef0",
+          "tipo": "float",
+          "padrao": 0.0,
+          "descricao": "Termo independente em 'poly'/'sigmoid'.",
+          "implicacoes": "Afeta só esses kernels.",
+          "dicaPratica": "Deixe 0.",
+          "avancado": true
+        },
+        "tol": {
+          "nome": "Tolerância",
+          "sklearn": "tol",
+          "tipo": "float",
+          "padrao": 0.001,
+          "descricao": "Critério de parada.",
+          "implicacoes": "Menor = mais preciso.",
+          "dicaPratica": "Deixe o padrão.",
+          "avancado": true
+        },
+        "shrinking": {
+          "nome": "Heurística de encolhimento",
+          "sklearn": "shrinking",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Otimização interna que acelera o treino.",
+          "implicacoes": "true costuma ser melhor.",
+          "dicaPratica": "Deixe true.",
+          "avancado": true
+        },
+        "max_iter": {
+          "nome": "Máximo de iterações",
+          "sklearn": "max_iter",
+          "tipo": "int",
+          "padrao": -1,
+          "descricao": "Limite de iterações (-1 = sem limite).",
+          "implicacoes": "-1 deixa rodar até convergir.",
+          "dicaPratica": "Deixe -1.",
+          "avancado": true
+        }
+      }
+    },
+    "mlp_regressor": {
+      "nome": "Rede Neural (MLP) Regressora",
+      "sklearn": "sklearn.neural_network.MLPRegressor",
+      "tipo": "Rede neural (perceptron multicamadas)",
+      "complexidade": "Depende do tamanho da rede",
+      "descricao": "O MLPRegressor é uma rede neural com camadas ocultas para prever valores contínuos. Aprende relações não-lineares complexas entre os atributos e o alvo.",
+      "intuicao": "Vários neurônios combinam os atributos de formas não-lineares, permitindo modelar curvas complicadas que uma reta não captura.",
+      "comoFunciona": [
+        "Passa os atributos por camadas de neurônios com ativação não-linear.",
+        "Compara a previsão com o valor real e ajusta os pesos (backpropagation).",
+        "Repete por várias épocas até convergir."
+      ],
+      "passoAPasso": [
+        "1. Define a arquitetura (neurônios).",
+        "2. Treina ajustando pesos.",
+        "3. Prediz valores contínuos."
+      ],
+      "quandoUsar": [
+        "Relações não-lineares complexas",
+        "Dados suficientes para treinar",
+        "Atributos normalizados"
+      ],
+      "naoUsarQuando": [
+        "Poucos dados",
+        "Precisa de interpretabilidade",
+        "Sem normalizar os atributos"
+      ],
+      "vantagens": [
+        "Modela relações muito complexas",
+        "Flexível",
+        "Bom com muitos atributos"
+      ],
+      "desvantagens": [
+        "Precisa de muitos dados",
+        "Sensível à escala",
+        "Caixa-preta (pouco interpretável)",
+        "Vários hiperparâmetros"
+      ],
+      "curiosidade": "É a mesma ideia das redes neurais profundas, só que com poucas camadas — um bom primeiro contato com deep learning.",
+      "exemplo": "Prever o preço de um imóvel a partir de muitos atributos com relações não-lineares.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html"
+      },
+      "hiperparametros": {
+        "hidden_layer_sizes": {
+          "nome": "Tamanho das camadas ocultas",
+          "sklearn": "hidden_layer_sizes",
+          "tipo": "int",
+          "padrao": 100,
+          "descricao": "Número de neurônios na camada oculta.",
+          "implicacoes": "Mais neurônios = mais capacidade (e risco de overfitting).",
+          "dicaPratica": "Comece com 100."
+        },
+        "activation": {
+          "nome": "Função de ativação",
+          "sklearn": "activation",
+          "tipo": "str",
+          "padrao": "relu",
+          "opcoes": [
+            "relu",
+            "tanh",
+            "logistic",
+            "identity"
+          ],
+          "descricao": "Função aplicada em cada neurônio.",
+          "implicacoes": "'relu' é a escolha padrão moderna.",
+          "dicaPratica": "Deixe 'relu'."
+        },
+        "solver": {
+          "nome": "Otimizador",
+          "sklearn": "solver",
+          "tipo": "str",
+          "padrao": "adam",
+          "opcoes": [
+            "adam",
+            "sgd",
+            "lbfgs"
+          ],
+          "descricao": "Algoritmo que ajusta os pesos.",
+          "implicacoes": "'adam' funciona bem na maioria; 'lbfgs' é bom em datasets pequenos.",
+          "dicaPratica": "Deixe 'adam'."
+        },
+        "alpha": {
+          "nome": "Regularização (alpha)",
+          "sklearn": "alpha",
+          "tipo": "float",
+          "padrao": 0.0001,
+          "descricao": "Penalidade L2 contra overfitting.",
+          "implicacoes": "Maior = rede mais simples.",
+          "dicaPratica": "Aumente se houver overfitting."
+        },
+        "learning_rate": {
+          "nome": "Taxa de aprendizado (modo)",
+          "sklearn": "learning_rate",
+          "tipo": "str",
+          "padrao": "constant",
+          "opcoes": [
+            "constant",
+            "invscaling",
+            "adaptive"
+          ],
+          "descricao": "Como a taxa de aprendizado evolui (solver='sgd').",
+          "implicacoes": "Afeta só o 'sgd'.",
+          "dicaPratica": "Deixe 'constant'.",
+          "avancado": true
+        },
+        "learning_rate_init": {
+          "nome": "Taxa de aprendizado inicial",
+          "sklearn": "learning_rate_init",
+          "tipo": "float",
+          "padrao": 0.001,
+          "descricao": "Tamanho do passo inicial de ajuste.",
+          "implicacoes": "Alto demais não converge; baixo demais é lento.",
+          "dicaPratica": "0.001 é um bom começo.",
+          "avancado": true
+        },
+        "max_iter": {
+          "nome": "Máximo de épocas",
+          "sklearn": "max_iter",
+          "tipo": "int",
+          "padrao": 500,
+          "descricao": "Quantas vezes percorrer os dados.",
+          "implicacoes": "Mais épocas = mais treino (até convergir).",
+          "dicaPratica": "500 costuma bastar."
+        },
+        "early_stopping": {
+          "nome": "Parada antecipada",
+          "sklearn": "early_stopping",
+          "tipo": "bool",
+          "padrao": false,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Para o treino quando a validação para de melhorar.",
+          "implicacoes": "true ajuda contra overfitting.",
+          "dicaPratica": "Ative se o treino estiver demorando ou superajustando.",
+          "avancado": true
+        }
+      }
+    },
+    "knn_regressor": {
+      "nome": "k-NN Regressor",
+      "sklearn": "sklearn.neighbors.KNeighborsRegressor",
+      "tipo": "Baseado em instâncias (lazy learner)",
+      "complexidade": "O(n · d) na predição",
+      "descricao": "O k-NN Regressor prevê o valor de um ponto fazendo a média (ou média ponderada) dos k vizinhos mais próximos no espaço dos atributos.",
+      "intuicao": "Para estimar o valor de algo novo, ele olha os exemplos mais parecidos que já viu e tira a média dos valores deles.",
+      "comoFunciona": [
+        "Mede a distância do ponto novo a todos os exemplos.",
+        "Pega os k mais próximos.",
+        "Retorna a média dos valores desses vizinhos."
+      ],
+      "passoAPasso": [
+        "1. Escolhe k.",
+        "2. Encontra os k vizinhos.",
+        "3. Calcula a média (ou média ponderada)."
+      ],
+      "quandoUsar": [
+        "Relações locais (pontos próximos têm valores parecidos)",
+        "Datasets pequenos/médios",
+        "Como baseline"
+      ],
+      "naoUsarQuando": [
+        "Muitos atributos (maldição da dimensionalidade)",
+        "Datasets enormes (predição lenta)",
+        "Sem normalizar"
+      ],
+      "vantagens": [
+        "Simples e intuitivo",
+        "Sem suposições sobre os dados",
+        "Captura padrões locais"
+      ],
+      "desvantagens": [
+        "Predição lenta em dados grandes",
+        "Sensível à escala",
+        "Ruim em muitas dimensões"
+      ],
+      "curiosidade": "É 'preguiçoso': não treina de fato — guarda os dados e só calcula na hora de prever.",
+      "exemplo": "Prever o preço de uma casa pela média dos preços das 5 casas mais parecidas (tamanho, localização...).",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsRegressor.html"
+      },
+      "hiperparametros": {
+        "n_neighbors": {
+          "nome": "Número de vizinhos (k)",
+          "sklearn": "n_neighbors",
+          "tipo": "int",
+          "padrao": 5,
+          "descricao": "Quantos vizinhos considerar na média.",
+          "implicacoes": "k pequeno: sensível a ruído. k grande: previsão mais suave.",
+          "dicaPratica": "Comece com 5; teste valores ímpares."
+        },
+        "weights": {
+          "nome": "Pesos",
+          "sklearn": "weights",
+          "tipo": "str",
+          "padrao": "uniform",
+          "opcoes": [
+            "uniform",
+            "distance"
+          ],
+          "descricao": "Como ponderar os vizinhos.",
+          "implicacoes": "'uniform': todos iguais. 'distance': mais perto pesa mais.",
+          "dicaPratica": "Teste 'distance' se houver ruído."
+        },
+        "algorithm": {
+          "nome": "Algoritmo de busca",
+          "sklearn": "algorithm",
+          "tipo": "str",
+          "padrao": "auto",
+          "opcoes": [
+            "auto",
+            "ball_tree",
+            "kd_tree",
+            "brute"
+          ],
+          "descricao": "Estrutura usada para achar vizinhos.",
+          "implicacoes": "'auto' escolhe sozinho.",
+          "dicaPratica": "Deixe 'auto'.",
+          "avancado": true
+        },
+        "leaf_size": {
+          "nome": "Tamanho da folha",
+          "sklearn": "leaf_size",
+          "tipo": "int",
+          "padrao": 30,
+          "descricao": "Parâmetro interno das árvores de busca.",
+          "implicacoes": "Afeta velocidade/memória, não o resultado.",
+          "dicaPratica": "Deixe 30.",
+          "avancado": true
+        },
+        "p": {
+          "nome": "Parâmetro da distância (p)",
+          "sklearn": "p",
+          "tipo": "int",
+          "padrao": 2,
+          "opcoes": [
+            1,
+            2
+          ],
+          "descricao": "1 = Manhattan, 2 = Euclidiana.",
+          "implicacoes": "Define como medir 'distância'.",
+          "dicaPratica": "Deixe 2 (Euclidiana).",
+          "avancado": true
+        },
+        "metric": {
+          "nome": "Métrica de distância",
+          "sklearn": "metric",
+          "tipo": "str",
+          "padrao": "minkowski",
+          "descricao": "Fórmula de distância usada.",
+          "implicacoes": "'minkowski' com p=2 é a Euclidiana.",
+          "dicaPratica": "Deixe 'minkowski'.",
+          "avancado": true
+        }
+      }
+    },
+    "sgd": {
+      "nome": "SGD Classifier",
+      "sklearn": "sklearn.linear_model.SGDClassifier",
+      "tipo": "Modelo linear (gradiente estocástico)",
+      "complexidade": "O(n · d) por época",
+      "descricao": "O SGDClassifier treina modelos lineares (como SVM ou Regressão Logística) usando gradiente descendente estocástico — atualiza os pesos um exemplo por vez. Escala muito bem para grandes volumes.",
+      "intuicao": "Em vez de olhar todos os dados de uma vez, ele aprende aos poucos, ajustando um pouquinho a cada exemplo, como quem corrige a mira a cada tentativa.",
+      "comoFunciona": [
+        "Percorre os exemplos um a um.",
+        "Ajusta os pesos na direção que reduz o erro.",
+        "A função de perda (loss) define qual modelo linear ele imita."
+      ],
+      "passoAPasso": [
+        "1. Escolhe a perda (hinge=SVM, log_loss=Regressão Logística).",
+        "2. Atualiza os pesos exemplo a exemplo.",
+        "3. Repete por várias épocas."
+      ],
+      "quandoUsar": [
+        "Datasets muito grandes",
+        "Aprendizado online/incremental",
+        "Modelos lineares rápidos"
+      ],
+      "naoUsarQuando": [
+        "Datasets pequenos (prefira o modelo direto)",
+        "Sem normalizar os atributos",
+        "Relações não-lineares"
+      ],
+      "vantagens": [
+        "Escala para milhões de exemplos",
+        "Rápido e leve",
+        "Flexível (várias perdas)"
+      ],
+      "desvantagens": [
+        "Sensível à escala e aos hiperparâmetros",
+        "Resultado varia com a aleatoriedade",
+        "Só fronteiras lineares"
+      ],
+      "curiosidade": "Mudando só o parâmetro 'loss', o mesmo SGDClassifier vira um SVM linear ou uma Regressão Logística.",
+      "exemplo": "Classificar milhões de e-mails como spam/não-spam, atualizando o modelo conforme novos e-mails chegam.",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html",
+        "extra": [
+          "https://scikit-learn.org/stable/modules/sgd.html"
+        ]
+      },
+      "hiperparametros": {
+        "loss": {
+          "nome": "Função de perda",
+          "sklearn": "loss",
+          "tipo": "str",
+          "padrao": "hinge",
+          "opcoes": [
+            "hinge",
+            "log_loss",
+            "modified_huber",
+            "squared_hinge",
+            "perceptron"
+          ],
+          "descricao": "Define qual modelo linear é imitado.",
+          "implicacoes": "'hinge'=SVM linear; 'log_loss'=Regressão Logística (dá probabilidades).",
+          "dicaPratica": "Use 'log_loss' se quiser probabilidades."
+        },
+        "penalty": {
+          "nome": "Penalidade",
+          "sklearn": "penalty",
+          "tipo": "str",
+          "padrao": "l2",
+          "opcoes": [
+            "l2",
+            "l1",
+            "elasticnet"
+          ],
+          "descricao": "Tipo de regularização.",
+          "implicacoes": "'l2' encolhe pesos; 'l1' zera alguns; 'elasticnet' mistura.",
+          "dicaPratica": "Deixe 'l2'."
+        },
+        "alpha": {
+          "nome": "Regularização (alpha)",
+          "sklearn": "alpha",
+          "tipo": "float",
+          "padrao": 0.0001,
+          "descricao": "Força da regularização.",
+          "implicacoes": "Maior = modelo mais simples.",
+          "dicaPratica": "Padrão costuma ir bem."
+        },
+        "l1_ratio": {
+          "nome": "Proporção L1 (elasticnet)",
+          "sklearn": "l1_ratio",
+          "tipo": "float",
+          "padrao": 0.15,
+          "descricao": "Mistura entre L1 e L2 quando penalty='elasticnet'.",
+          "implicacoes": "0=tudo L2, 1=tudo L1.",
+          "dicaPratica": "Só afeta 'elasticnet'.",
+          "avancado": true
+        },
+        "max_iter": {
+          "nome": "Máximo de épocas",
+          "sklearn": "max_iter",
+          "tipo": "int",
+          "padrao": 1000,
+          "descricao": "Quantas passagens pelos dados.",
+          "implicacoes": "Mais épocas = mais treino.",
+          "dicaPratica": "1000 costuma bastar."
+        },
+        "tol": {
+          "nome": "Tolerância",
+          "sklearn": "tol",
+          "tipo": "float",
+          "padrao": 0.001,
+          "descricao": "Critério de parada.",
+          "implicacoes": "Menor = treina mais.",
+          "dicaPratica": "Deixe o padrão.",
+          "avancado": true
+        },
+        "learning_rate": {
+          "nome": "Taxa de aprendizado (modo)",
+          "sklearn": "learning_rate",
+          "tipo": "str",
+          "padrao": "optimal",
+          "opcoes": [
+            "optimal",
+            "constant",
+            "invscaling",
+            "adaptive"
+          ],
+          "descricao": "Como o passo de aprendizado evolui.",
+          "implicacoes": "'optimal' ajusta sozinho.",
+          "dicaPratica": "Deixe 'optimal'.",
+          "avancado": true
+        },
+        "eta0": {
+          "nome": "Taxa inicial (eta0)",
+          "sklearn": "eta0",
+          "tipo": "float",
+          "padrao": 0.01,
+          "descricao": "Passo inicial (modos não-'optimal').",
+          "implicacoes": "Só usado se learning_rate != 'optimal'.",
+          "dicaPratica": "Deixe o padrão.",
+          "avancado": true
+        },
+        "fit_intercept": {
+          "nome": "Calcular intercepto",
+          "sklearn": "fit_intercept",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Intercepto do modelo.",
+          "implicacoes": "true na maioria.",
+          "dicaPratica": "Deixe true.",
+          "avancado": true
+        },
+        "early_stopping": {
+          "nome": "Parada antecipada",
+          "sklearn": "early_stopping",
+          "tipo": "bool",
+          "padrao": false,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Para quando a validação para de melhorar.",
+          "implicacoes": "Ajuda contra overfitting.",
+          "dicaPratica": "Ative em datasets grandes.",
+          "avancado": true
+        }
+      }
+    },
+    "perceptron": {
+      "nome": "Perceptron",
+      "sklearn": "sklearn.linear_model.Perceptron",
+      "tipo": "Modelo linear (o mais simples)",
+      "complexidade": "O(n · d) por época",
+      "descricao": "O Perceptron é o classificador linear mais simples: traça uma reta separadora e a ajusta sempre que erra um exemplo. É a base histórica das redes neurais.",
+      "intuicao": "Ele 'chuta' uma reta e, toda vez que classifica errado, empurra a reta um pouco na direção certa, até separar as classes.",
+      "comoFunciona": [
+        "Para cada exemplo, prevê a classe.",
+        "Se errou, ajusta os pesos na direção do acerto.",
+        "Repete até acertar (ou atingir o limite de épocas)."
+      ],
+      "passoAPasso": [
+        "1. Inicializa os pesos.",
+        "2. Corrige a cada erro.",
+        "3. Para quando estabiliza."
+      ],
+      "quandoUsar": [
+        "Classes linearmente separáveis",
+        "Baseline linear muito rápido",
+        "Ensino do conceito de aprendizado"
+      ],
+      "naoUsarQuando": [
+        "Classes não-linearmente separáveis",
+        "Precisa de probabilidades",
+        "Dados com muito ruído"
+      ],
+      "vantagens": [
+        "Simplíssimo e rápido",
+        "Pouca memória",
+        "Ótimo para entender o conceito"
+      ],
+      "desvantagens": [
+        "Só funciona bem se as classes forem separáveis por uma reta",
+        "Não dá probabilidades",
+        "Sensível à ordem dos dados"
+      ],
+      "curiosidade": "Criado em 1958 por Frank Rosenblatt, o Perceptron é o ancestral direto das redes neurais modernas.",
+      "exemplo": "Separar duas classes bem distintas (ex.: aprovado/reprovado por uma única nota de corte).",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Perceptron.html"
+      },
+      "hiperparametros": {
+        "penalty": {
+          "nome": "Penalidade",
+          "sklearn": "penalty",
+          "tipo": "str",
+          "padrao": null,
+          "opcoes": [
+            null,
+            "l2",
+            "l1",
+            "elasticnet"
+          ],
+          "descricao": "Regularização (opcional).",
+          "implicacoes": "Vazio = sem regularização.",
+          "dicaPratica": "Pode deixar sem penalidade."
+        },
+        "alpha": {
+          "nome": "Regularização (alpha)",
+          "sklearn": "alpha",
+          "tipo": "float",
+          "padrao": 0.0001,
+          "descricao": "Força da regularização (se houver penalty).",
+          "implicacoes": "Maior = pesos menores.",
+          "dicaPratica": "Padrão costuma ir bem."
+        },
+        "max_iter": {
+          "nome": "Máximo de épocas",
+          "sklearn": "max_iter",
+          "tipo": "int",
+          "padrao": 1000,
+          "descricao": "Quantas passagens pelos dados.",
+          "implicacoes": "Mais épocas = mais chance de convergir.",
+          "dicaPratica": "1000 costuma bastar."
+        },
+        "tol": {
+          "nome": "Tolerância",
+          "sklearn": "tol",
+          "tipo": "float",
+          "padrao": 0.001,
+          "descricao": "Critério de parada.",
+          "implicacoes": "Menor = treina mais.",
+          "dicaPratica": "Deixe o padrão.",
+          "avancado": true
+        },
+        "eta0": {
+          "nome": "Taxa de aprendizado (eta0)",
+          "sklearn": "eta0",
+          "tipo": "float",
+          "padrao": 1.0,
+          "descricao": "Tamanho do passo de correção.",
+          "implicacoes": "Maior = correções mais agressivas.",
+          "dicaPratica": "1.0 é o padrão clássico.",
+          "avancado": true
+        },
+        "fit_intercept": {
+          "nome": "Calcular intercepto",
+          "sklearn": "fit_intercept",
+          "tipo": "bool",
+          "padrao": true,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Intercepto do modelo.",
+          "implicacoes": "true na maioria.",
+          "dicaPratica": "Deixe true.",
+          "avancado": true
+        },
+        "early_stopping": {
+          "nome": "Parada antecipada",
+          "sklearn": "early_stopping",
+          "tipo": "bool",
+          "padrao": false,
+          "opcoes": [
+            true,
+            false
+          ],
+          "descricao": "Para quando a validação para de melhorar.",
+          "implicacoes": "Ajuda contra overfitting.",
+          "dicaPratica": "Geralmente false em datasets pequenos.",
+          "avancado": true
+        }
+      }
     }
   },
   "metricas": {
