@@ -13,45 +13,172 @@ export class ScriptGeneratorService {
     modeloSelecionado: ItemPipeline | undefined,
     metricasSelecionadas: ItemPipeline[],
     hiperparametros: any,
-    preProcessamentoConfig?: any
+    preProcessamentoConfig?: any,
+    resultadosTreinamento?: Record<string, any>
   ): Promise<void> {
     const zip = new JSZip();
     const folder = zip.folder('pipeline_iana')!;
 
-    // Generate the Python script
-    const script = this.generatePythonScript(
-      resultadoColetaDado,
-      modeloSelecionado,
-      metricasSelecionadas,
-      hiperparametros,
-      preProcessamentoConfig
-    );
+    const modelosTreinados = resultadosTreinamento ? Object.values(resultadosTreinamento) : [];
+    const isMultiModelo = modelosTreinados.length > 1;
 
-    // Add script to the folder
+    const script = isMultiModelo
+      ? this.generateMultiModelScript(resultadoColetaDado, modelosTreinados, metricasSelecionadas, preProcessamentoConfig)
+      : this.generatePythonScript(resultadoColetaDado, modeloSelecionado, metricasSelecionadas, hiperparametros, preProcessamentoConfig);
+
     folder.file('pipeline.py', script);
 
-    // Add datasets if available (apenas para fonte de arquivo; toy datasets usam sklearn)
     if (resultadoColetaDado?.fonteDados !== 'dataset') {
       if (resultadoColetaDado?.treino?.dados && resultadoColetaDado.treino.dados.length > 0) {
-        const trainCsv = this.convertToCsv(resultadoColetaDado.treino.dados);
-        folder.file('data/treino.csv', trainCsv);
+        folder.file('data/treino.csv', this.convertToCsv(resultadoColetaDado.treino.dados));
       }
-
       if (resultadoColetaDado?.teste?.dados && resultadoColetaDado.teste.dados.length > 0) {
-        const testCsv = this.convertToCsv(resultadoColetaDado.teste.dados);
-        folder.file('data/teste.csv', testCsv);
+        folder.file('data/teste.csv', this.convertToCsv(resultadoColetaDado.teste.dados));
       }
     }
 
-    // Add README
-    const readme = this.generateReadme(modeloSelecionado, resultadoColetaDado);
-    folder.file('README.md', readme);
+    folder.file('README.md', this.generateReadme(modeloSelecionado, resultadoColetaDado, isMultiModelo ? modelosTreinados : undefined));
 
-    // Generate and download the ZIP
     const content = await zip.generateAsync({ type: 'blob' });
-    const nomeModelo = modeloSelecionado?.label || 'modelo';
+    const nomePipeline = isMultiModelo ? 'comparacao_modelos' : (modeloSelecionado?.label || 'modelo');
     const data = new Date().toISOString().slice(0, 10);
-    saveAs(content, `pipeline_${nomeModelo}_${data}.zip`);
+    saveAs(content, `pipeline_${nomePipeline}_${data}.zip`);
+  }
+
+  private generateMultiModelScript(
+    resultadoColetaDado: ResultadoColetaDado | undefined,
+    modelosTreinados: any[],
+    metricasSelecionadas: ItemPipeline[],
+    preProcessamentoConfig?: any
+  ): string {
+    const lines: string[] = [];
+
+    lines.push('#!/usr/bin/env python3');
+    lines.push('# -*- coding: utf-8 -*-');
+    lines.push('"""');
+    lines.push('Comparação de Modelos de Machine Learning — gerado pelo Iana');
+    lines.push('Data: ' + new Date().toLocaleDateString('pt-BR'));
+    lines.push('Modelos: ' + modelosTreinados.map(m => m.nome_modelo).join(', '));
+    lines.push('"""');
+    lines.push('');
+
+    // Imports
+    lines.push('import pandas as pd');
+    lines.push('import numpy as np');
+    lines.push('from sklearn.model_selection import train_test_split');
+
+    if (resultadoColetaDado?.fonteDados === 'dataset' && resultadoColetaDado.nomeDataset) {
+      const ds = this.getToyDatasetLoader(resultadoColetaDado.datasetId ?? resultadoColetaDado.nomeDataset);
+      if (ds) {
+        const fn = ds.importLine.split('(')[0];
+        lines.push(`from sklearn.datasets import ${fn}`);
+      }
+    }
+
+    if (preProcessamentoConfig?.itens?.length > 0) {
+      lines.push('from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, Normalizer,');
+      lines.push('    LabelEncoder, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, PowerTransformer');
+      lines.push('from sklearn.impute import SimpleImputer');
+    }
+
+    // One import line per unique model class
+    const importadosSet = new Set<string>();
+    for (const m of modelosTreinados) {
+      const imp = this.getModelImport(m.modelo ?? '');
+      if (imp && !imp.startsWith('#') && !importadosSet.has(imp)) {
+        importadosSet.add(imp);
+        lines.push(imp);
+      }
+    }
+
+    const metricImports: string[] = [];
+    for (const metrica of metricasSelecionadas) {
+      if (!metricImports.includes(metrica.valor)) metricImports.push(metrica.valor);
+    }
+    if (metricImports.length > 0) {
+      lines.push(`from sklearn.metrics import (${metricImports.join(', ')})`);
+    }
+    lines.push('');
+
+    // Data loading
+    lines.push(this.generateDataLoadingFunction(resultadoColetaDado));
+    lines.push('');
+    lines.push(this.generateFeatureSelectionFunction(resultadoColetaDado));
+    lines.push('');
+    lines.push(this.generatePreprocessingFunction(resultadoColetaDado, preProcessamentoConfig));
+    lines.push('');
+    lines.push(this.generateEvaluationFunction(metricasSelecionadas));
+    lines.push('');
+
+    // Dict with all models
+    lines.push('# ============================================');
+    lines.push('# Dicionário com todos os modelos a comparar');
+    lines.push('# ============================================');
+    lines.push('MODELOS = {');
+    for (const m of modelosTreinados) {
+      const cls = this.getModelClass(m.modelo ?? '');
+      lines.push(`    "${m.nome_modelo}": ${cls}(),`);
+    }
+    lines.push('}');
+    lines.push('');
+
+    // Main
+    const isClustering = modelosTreinados.some(m => {
+      const cls = m.modelo ?? '';
+      return ['k_means', 'dbscan', 'agglomerative'].includes(cls);
+    });
+
+    lines.push('# ============================================');
+    lines.push('# Execução Principal');
+    lines.push('# ============================================');
+    lines.push('');
+    lines.push('if __name__ == "__main__":');
+
+    if (resultadoColetaDado?.fonteDados === 'dataset' && resultadoColetaDado.nomeDataset) {
+      if (isClustering) {
+        lines.push('    X, y = carregar_dados()');
+        lines.push('    X_train, X_test = selecionar_features(X)');
+      } else {
+        lines.push('    X, y = carregar_dados()');
+        lines.push('    X_train, X_test, y_train, y_test = selecionar_features(X, y)');
+      }
+    } else {
+      if (isClustering) {
+        lines.push('    train_df, test_df = carregar_dados()');
+        lines.push('    X_train, X_test = selecionar_features(train_df, test_df)');
+      } else {
+        lines.push('    train_df, test_df = carregar_dados()');
+        lines.push('    X_train, y_train, X_test, y_test = selecionar_features(train_df, test_df)');
+      }
+    }
+    lines.push('    X_train, X_test = aplicar_preprocessamento(X_train, X_test)');
+    lines.push('');
+    lines.push('    resultados = {}');
+    lines.push('    for nome, modelo in MODELOS.items():');
+    if (isClustering) {
+      lines.push('        modelo.fit(X_train)');
+      lines.push('        resultados[nome] = avaliar_modelo(modelo, X_test)');
+    } else {
+      lines.push('        modelo.fit(X_train, y_train)');
+      lines.push('        resultados[nome] = avaliar_modelo(modelo, X_test, y_test)');
+    }
+    lines.push('');
+    lines.push('    # Tabela de comparação');
+    lines.push('    print("\\n" + "=" * 60)');
+    lines.push('    print("COMPARAÇÃO FINAL DE MODELOS")');
+    lines.push('    print("=" * 60)');
+    lines.push('    for nome, res in resultados.items():');
+    lines.push('        print(f"\\n{nome}:")');
+    lines.push('        for metrica, valor in res.items():');
+    lines.push('            if isinstance(valor, float):');
+    lines.push('                print(f"  {metrica}: {valor:.4f}")');
+    lines.push('            elif hasattr(valor, "tolist"):');
+    lines.push('                print(f"  {metrica}: {valor.tolist()}")');
+    lines.push('            else:');
+    lines.push('                print(f"  {metrica}: {valor}")');
+    lines.push('');
+
+    return lines.join('\n');
   }
 
   private convertToCsv(dados: any[]): string {
@@ -71,7 +198,7 @@ export class ScriptGeneratorService {
     return [headers.join(','), ...rows].join('\n');
   }
 
-  private generateReadme(modelo: ItemPipeline | undefined, resultado: ResultadoColetaDado | undefined): string {
+  private generateReadme(modelo: ItemPipeline | undefined, resultado: ResultadoColetaDado | undefined, modelosTreinados?: any[]): string {
     const lines: string[] = [];
     lines.push('# Pipeline de Machine Learning - Iana');
     lines.push('');
@@ -103,7 +230,14 @@ export class ScriptGeneratorService {
     lines.push('   ```');
     lines.push('');
 
-    if (modelo) {
+    if (modelosTreinados && modelosTreinados.length > 1) {
+      lines.push('## Modelos Comparados');
+      lines.push('');
+      for (const m of modelosTreinados) {
+        lines.push(`- **${m.nome_modelo}**`);
+      }
+      lines.push('');
+    } else if (modelo) {
       lines.push('## Modelo Utilizado');
       lines.push('');
       lines.push(`- **Modelo:** ${modelo.label || modelo.valor}`);

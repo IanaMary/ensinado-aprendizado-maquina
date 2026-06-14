@@ -318,27 +318,24 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   }
 
   async baixarScript(): Promise<void> {
-    console.log('baixarScript - preProcessamentoConfig:', this.preProcessamentoConfig);
-    console.log('baixarScript - resultadoColetaDado:', this.resultadoColetaDado);
-    console.log('baixarScript - modeloSelecionado:', this.modeloSelecionado);
-    console.log('baixarScript - metricasSelecionadas:', this.metricasSelecionadas);
-    console.log('baixarScript - hiperparametros:', this.hiperparametros);
-    
     await this.scriptGenerator.generatePipelineBundle(
       this.resultadoColetaDado,
       this.modeloSelecionado,
       this.metricasSelecionadas,
       this.hiperparametros,
-      this.preProcessamentoConfig
+      this.preProcessamentoConfig,
+      this.resultadoTreinamento
     );
   }
 
   gerarRelatorioAluno(): string {
     const dataset = this.resultadoColetaDado?.nomeDataset || this.resultadoColetaDado?.treino?.nomeArquivo || 'Dataset';
     const pergunta = (this.resultadoColetaDado as any)?.missao?.pergunta || 'Que padrão o modelo conseguiu aprender com os dados?';
-    const modelo = this.modeloSelecionado?.label || 'Modelo treinado';
     const isClustering = this.modeloSelecionado?.dadosRotulados === false;
     const isRegressao = !isClustering && this.modeloSelecionado?.preverCategoria === false;
+    const isComparacao = this.modelosAvaliados.length > 1;
+    const melhor = this.getMelhorModeloGeral();
+
     const linhasMetricas = this.metricsAvaliadas
       .filter(metrica => !this.isConfusionMatrix(this.resultadosDasAvaliacoes[metrica]?.[this.modelosAvaliados[0]]))
       .map(metrica => {
@@ -347,6 +344,16 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
           .join('; ');
         return `- ${metrica}: ${valores}`;
       });
+
+    const secaoModelos = isComparacao ? [
+      '## Modelos avaliados',
+      ...this.modelosAvaliados.map(m => `- ${m}`),
+      '',
+      ...(melhor ? [`**Melhor modelo** (mais métricas ganhas): ${melhor}`] : []),
+    ] : [
+      '## Modelo',
+      `Modelo escolhido: ${this.modeloSelecionado?.label || 'Modelo treinado'}`,
+    ];
 
     const observacoes = isClustering ? [
       '## O que observar',
@@ -360,9 +367,14 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       '- O RMSE e o MAE estão baixos em relação à faixa dos valores do target?',
       '- O gráfico "Previsto vs. Real" mostra pontos próximos da linha diagonal?',
       '- Os resíduos estão espalhados aleatoriamente ou mostram algum padrão?',
+      ...(isComparacao ? ['- Qual modelo teve o melhor R²? A diferença entre eles é grande ou pequena?'] : []),
     ] : [
       '## O que observar',
       '- O modelo acertou bem todas as classes ou errou mais em alguma?',
+      ...(isComparacao ? [
+        '- Qual modelo teve a melhor acurácia? A diferença foi grande ou pequena?',
+        '- Os modelos erraram nas mesmas amostras ou em amostras diferentes?',
+      ] : []),
       '- Alguma pista dos dados parece ter ajudado mais?',
       '- O que você mudaria para tentar melhorar o resultado?',
     ];
@@ -376,8 +388,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       '## Dados',
       `Dataset usado: ${dataset}`,
       '',
-      '## Modelo',
-      `Modelo escolhido: ${modelo}`,
+      ...secaoModelos,
       '',
       '## Resultados',
       ...(linhasMetricas.length ? linhasMetricas : ['- Gere as avaliações para preencher esta seção.']),
