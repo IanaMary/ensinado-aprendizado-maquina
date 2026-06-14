@@ -66,9 +66,8 @@ export class SelecaoMetricasComponent implements OnChanges {
   }
 
   private construirGrupos(): void {
-    const habilitadas = this.metricasHabilitadas;
     const mapa = new Map<string, ItemPipeline[]>();
-    for (const metrica of habilitadas) {
+    for (const metrica of this.metricasDisponiveis) {
       const grupo = metrica.grupo || 'outros';
       if (!mapa.has(grupo)) {
         mapa.set(grupo, []);
@@ -85,12 +84,14 @@ export class SelecaoMetricasComponent implements OnChanges {
       }
     }
 
-    this.temClassificacao = mapa.has('classificacao');
+    const habilitadas = this.metricasHabilitadas;
+    this.temClassificacao = habilitadas.some(m => m.grupo === 'classificacao');
     this.todasMarcadas = habilitadas.length > 0 && habilitadas.every(m => m.movido);
   }
 
   toggleMetrica(metrica: ItemPipeline) {
-    this.todasMarcadas = this.metricasHabilitadas.every(m => m.movido);
+    const habilitadas = this.metricasHabilitadas;
+    this.todasMarcadas = habilitadas.length > 0 && habilitadas.every(m => m.movido);
     this.emitSelecaoMetricas();
   }
 
@@ -100,6 +101,10 @@ export class SelecaoMetricasComponent implements OnChanges {
     this.metricaExpandida = this.metricaExpandida === metrica ? null : metrica;
   }
 
+  grupoTemHabilitada(grupo: GrupoMetricas): boolean {
+    return grupo.itens.some(m => m.habilitado);
+  }
+
   toggleTodas() {
     this.todasMarcadas = !this.todasMarcadas;
     this.metricasHabilitadas.forEach(m => m.movido = this.todasMarcadas);
@@ -107,9 +112,11 @@ export class SelecaoMetricasComponent implements OnChanges {
   }
 
   toggleGrupo(grupo: GrupoMetricas) {
-    const todasDoGrupoMarcadas = grupo.itens.every(m => m.movido);
-    grupo.itens.forEach(m => m.movido = !todasDoGrupoMarcadas);
-    this.todasMarcadas = this.metricasDisponiveis.every(m => m.movido);
+    const habilitadasDoGrupo = grupo.itens.filter(m => m.habilitado);
+    const todasDoGrupoMarcadas = habilitadasDoGrupo.length > 0 && habilitadasDoGrupo.every(m => m.movido);
+    habilitadasDoGrupo.forEach(m => m.movido = !todasDoGrupoMarcadas);
+    const todasHabilitadas = this.metricasHabilitadas;
+    this.todasMarcadas = todasHabilitadas.length > 0 && todasHabilitadas.every(m => m.movido);
     this.emitSelecaoMetricas();
   }
 

@@ -44,6 +44,12 @@
   border-radius: 12px;
   padding: 8px 14px 10px;
   box-shadow: 0 1px 4px rgba($roxo-escuro, 0.04);
+
+  &.grupo-desabilitado {
+    opacity: 0.55;
+    background: #f9f9f9;
+    border-style: dashed;
+  }
 }
 
 .grupo-header {
@@ -69,6 +75,16 @@
     border-radius: 8px;
   }
 
+  .grupo-tag {
+    font-size: 11px;
+    font-weight: 500;
+    color: #999;
+    background: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: auto;
+  }
+
   .btn-grupo-toggle {
     width: 24px;
     height: 24px;
@@ -92,6 +108,18 @@
 
   &.expandida {
     background: $roxo-fundo;
+  }
+
+  &.metrica-desabilitada {
+    opacity: 0.5;
+
+    .metrica-label {
+      color: #999;
+    }
+
+    .btn-info-metrica {
+      opacity: 0.3;
+    }
   }
 }
 

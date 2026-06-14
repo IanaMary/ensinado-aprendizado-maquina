@@ -9,20 +9,27 @@
   </div>
 
   <ng-container *ngIf="grupos.length">
-    <div *ngFor="let grupo of grupos" class="grupo-metricas">
+    <div *ngFor="let grupo of grupos" class="grupo-metricas" [class.grupo-desabilitado]="!grupoTemHabilitada(grupo)">
       <div class="grupo-header">
         <mat-icon>{{ grupo.icone }}</mat-icon>
         <span>{{ grupo.nome }}</span>
+        <span class="grupo-tag" *ngIf="!grupoTemHabilitada(grupo)">não se aplica</span>
         <button mat-icon-button class="btn-grupo-toggle"
+          *ngIf="grupoTemHabilitada(grupo)"
           [matTooltip]="'Selecionar todas do grupo'"
           (click)="toggleGrupo(grupo)">
           <mat-icon>select_all</mat-icon>
         </button>
       </div>
 
-      <div *ngFor="let metrica of grupo.itens" class="metrica-item" [class.expandida]="metrica === metricaExpandida">
+      <div *ngFor="let metrica of grupo.itens" class="metrica-item"
+        [class.expandida]="metrica === metricaExpandida"
+        [class.metrica-desabilitada]="!metrica.habilitado">
         <div class="metrica-linha">
-          <mat-checkbox (change)="toggleMetrica(metrica)" [(ngModel)]="metrica.movido">
+          <mat-checkbox
+            (change)="toggleMetrica(metrica)"
+            [(ngModel)]="metrica.movido"
+            [disabled]="!metrica.habilitado">
             <span class="metrica-label">{{ metrica?.label }}</span>
           </mat-checkbox>
           <button mat-icon-button class="btn-info-metrica"
