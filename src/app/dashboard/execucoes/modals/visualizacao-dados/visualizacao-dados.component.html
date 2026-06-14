@@ -1,0 +1,66 @@
+<div class="visualizacao-container">
+  <div class="visualizacao-header">
+    <h3>Visualização dos Dados</h3>
+    <p class="descricao">Pairplot - Matriz de dispersão para análise exploratória</p>
+  </div>
+
+  <!-- Controles -->
+  <div class="controles">
+    <div class="controle-grupo">
+      <label>Colunas para visualizar:</label>
+      <div class="colunas-grid">
+        <mat-checkbox
+          *ngFor="let col of colunasDisponiveis"
+          [checked]="colunasSelecionadas.includes(col)"
+          (change)="toggleColuna(col)">
+          {{ col }}
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div class="controle-grupo">
+      <label>Colorir por (hue):</label>
+      <mat-form-field appearance="outline">
+        <mat-select [(value)]="hueSelecionado">
+          <mat-option [value]="''">Nenhuma</mat-option>
+          <mat-option *ngFor="let col of colunasDisponiveis" [value]="col">
+            {{ col }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="gerarPairplot()"
+      [disabled]="colunasSelecionadas.length < 2 || carregando">
+      <mat-icon>bar_chart</mat-icon>
+      Gerar Pairplot
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="carregando">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Gerando visualização...</span>
+  </div>
+
+  <!-- Resultado -->
+  <div class="resultado" *ngIf="imagemBase64 && !carregando">
+    <div class="imagem-container">
+      <img [src]="'data:image/png;base64,' + imagemBase64" alt="Pairplot" />
+    </div>
+    <div class="info">
+      <span>Colunas: {{ colunasVisualizadas.join(', ') }}</span>
+      <span *ngIf="hueAtual">Hue: {{ hueAtual }}</span>
+      <span>Amostras: {{ totalAmostras }}</span>
+    </div>
+  </div>
+
+  <!-- Erro -->
+  <div class="erro" *ngIf="erro">
+    <mat-icon>error</mat-icon>
+    <span>{{ erro }}</span>
+  </div>
+</div>
