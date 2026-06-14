@@ -193,6 +193,19 @@
     display: inline-block;
     opacity: 0.9;
   }
+
+  .doc-sklearn-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 11px;
+    color: $branco;
+    text-decoration: underline;
+    opacity: 0.95;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 
 // Metric header

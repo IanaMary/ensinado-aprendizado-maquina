@@ -352,6 +352,27 @@
   }
 }
 
+.yellowbrick-doc-link {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: $roxo-medio;
+  text-decoration: none;
+
+  .btn-info {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+
+  &:hover {
+    color: $roxo-escuro;
+  }
+}
+
 .yellowbrick-info-button {
   flex-shrink: 0;
   width: 28px;

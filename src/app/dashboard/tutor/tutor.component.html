@@ -156,6 +156,10 @@
         <div class="model-badge">{{ contexto?.modelo?.tipo || 'Classificador' }}</div>
         <h3>{{ contexto?.titulo }}</h3>
         <code class="sklearn-path" *ngIf="modoAvancado">{{ contexto?.modelo?.sklearn }}</code>
+        <a class="doc-sklearn-link" *ngIf="contexto?.modelo?.links?.sklearn"
+          [href]="contexto?.modelo?.links?.sklearn" target="_blank" rel="noopener">
+          Ver na documentação do scikit-learn ↗
+        </a>
       </div>
 
       <div class="section">

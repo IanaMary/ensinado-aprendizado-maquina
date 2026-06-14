@@ -110,6 +110,12 @@
           matTooltipPosition="above">
           <figcaption>
             <span>{{ item.modelo }}</span>
+            <a class="yellowbrick-doc-link" [href]="getLinkVisualizacao(grupo.titulo)" target="_blank" rel="noopener"
+              (click)="$event.stopPropagation()"
+              [matTooltip]="'Abrir documentação de ' + grupo.titulo" matTooltipPosition="above"
+              [attr.aria-label]="'Documentação de ' + grupo.titulo">
+              <mat-icon class="btn-info">open_in_new</mat-icon>
+            </a>
             <button mat-icon-button class="yellowbrick-info-button"
               [attr.aria-label]="'Ler dica sobre ' + grupo.titulo"
               [matTooltip]="'Ler dica sobre ' + grupo.titulo"

@@ -171,6 +171,21 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     return ['mse', 'mae', 'rmse', 'erro', 'error', 'loss', 'perda', 'mean_squared', 'mean_absolute'].some(k => chave.includes(k));
   }
 
+  // Link para a pagina do Yellowbrick/sklearn de cada tipo de grafico.
+  getLinkVisualizacao(titulo: string): string {
+    const chave = (titulo || '').toLowerCase();
+    if (chave.includes('matriz de confusão')) return 'https://www.scikit-yb.org/en/latest/api/classifier/confusion_matrix.html';
+    if (chave.includes('relatório de classificação')) return 'https://www.scikit-yb.org/en/latest/api/classifier/classification_report.html';
+    if (chave.includes('erros de predição')) return 'https://www.scikit-yb.org/en/latest/api/classifier/class_prediction_error.html';
+    if (chave.includes('balanceamento')) return 'https://www.scikit-yb.org/en/latest/api/target/class_balance.html';
+    if (chave.includes('silhouette')) return 'https://www.scikit-yb.org/en/latest/api/cluster/silhouette.html';
+    if (chave.includes('distância entre clusters') || chave.includes('intercluster')) return 'https://www.scikit-yb.org/en/latest/api/cluster/icdm.html';
+    if (chave.includes('cotovelo') || chave.includes('elbow')) return 'https://www.scikit-yb.org/en/latest/api/cluster/elbow.html';
+    if (chave.includes('prediction error') || chave.includes('previsto')) return 'https://www.scikit-yb.org/en/latest/api/regressor/peplot.html';
+    if (chave.includes('residuals') || chave.includes('resíduos')) return 'https://www.scikit-yb.org/en/latest/api/regressor/residuals.html';
+    return 'https://www.scikit-yb.org/en/latest/api/index.html';
+  }
+
   isMelhorValor(metrica: string, modelo: string): boolean {
     const valoresPorModelo = this.resultadosDasAvaliacoes[metrica];
     if (!valoresPorModelo) return false;
