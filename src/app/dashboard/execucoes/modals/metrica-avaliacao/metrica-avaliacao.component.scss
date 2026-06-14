@@ -35,6 +35,15 @@
           background-color: #e8f5e9;
           color: #1b5e20;
           font-weight: 700;
+
+          .melhor-icone {
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+            color: #f9a825;
+            vertical-align: middle;
+            margin-right: 2px;
+          }
         }
       }
     }
@@ -47,8 +56,40 @@
     width: 100%;
   }
 
+  .melhor-modelo-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    color: #1b5e20;
+    font-size: 13px;
+
+    mat-icon {
+      color: #f9a825;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
   button {
     min-width: 150px;
+  }
+}
+
+// Matrizes de Confusão lado a lado
+.confusion-multi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+
+  .confusion-section {
+    flex: 1 1 340px;
+    min-width: 280px;
   }
 }
 

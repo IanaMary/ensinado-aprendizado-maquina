@@ -187,6 +187,27 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       : valorAtual === Math.max(...valores);
   }
 
+  getMelhorModeloGeral(): string | null {
+    if (this.modelosAvaliados.length < 2) return null;
+    const pontuacao = new Map<string, number>(this.modelosAvaliados.map(m => [m, 0]));
+    const metricasEscalares = this.metricsAvaliadas.filter(
+      m => !this.isConfusionMatrix(this.resultadosDasAvaliacoes[m]?.[this.modelosAvaliados[0]])
+    );
+    for (const metrica of metricasEscalares) {
+      for (const modelo of this.modelosAvaliados) {
+        if (this.isMelhorValor(metrica, modelo)) {
+          pontuacao.set(modelo, (pontuacao.get(modelo) ?? 0) + 1);
+        }
+      }
+    }
+    let melhor: string | null = null;
+    let maxPontos = 0;
+    for (const [modelo, pontos] of pontuacao) {
+      if (pontos > maxPontos) { maxPontos = pontos; melhor = modelo; }
+    }
+    return maxPontos > 0 ? melhor : null;
+  }
+
   getVisualizacoesPorTipo(): { titulo: string; itens: { modelo: string; visualizacao: { titulo: string; mime: string; base64: string } }[] }[] {
     const mapa = new Map<string, { modelo: string; visualizacao: { titulo: string; mime: string; base64: string } }[]>();
     for (const modelo of this.getModelosComVisualizacoes()) {

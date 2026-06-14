@@ -1,4 +1,10 @@
 <nav class="modal-coleta">
+  <!-- Chip: melhor modelo geral (só com 2+ modelos) -->
+  <div class="melhor-modelo-banner" *ngIf="getMelhorModeloGeral() as melhor">
+    <mat-icon>emoji_events</mat-icon>
+    <span>Melhor modelo nesta avaliação: <strong>{{ melhor }}</strong></span>
+  </div>
+
   <!-- Tabela de métricas escalares -->
   <div class="table-container" *ngIf="metricsAvaliadas.length">
     <table>
@@ -14,6 +20,7 @@
             <td>{{ metrica }}</td>
             <td *ngFor="let modelo of modelosAvaliados"
               [class.melhor-valor]="isMelhorValor(metrica, modelo)">
+              <mat-icon class="melhor-icone" *ngIf="isMelhorValor(metrica, modelo)">star</mat-icon>
               {{
               isNumber(resultadosDasAvaliacoes[metrica]?.[modelo])
               ? (resultadosDasAvaliacoes[metrica][modelo] | number: '1.2-4')
@@ -26,71 +33,61 @@
     </table>
   </div>
 
-  <!-- Matriz de Confusão -->
+  <!-- Matrizes de Confusão (lado a lado quando há 2+ modelos) -->
   <ng-container *ngFor="let metrica of metricsAvaliadas">
     <ng-container *ngIf="isConfusionMatrix(resultadosDasAvaliacoes[metrica]?.[modelosAvaliados[0]])">
-      <div class="confusion-section" *ngFor="let modelo of modelosAvaliados">
-        <div class="confusion-header">
-          <span class="confusion-title">Matriz de Confusão — {{ modelo }}</span>
-          <span class="confusion-acc">
-            Acurácia: {{ getAcuracia(resultadosDasAvaliacoes[metrica][modelo].matriz) | percent:'1.1-2' }}
-          </span>
-        </div>
-
-        <div class="confusion-wrapper">
-          <div class="confusion-matrix-container">
-            <!-- Label "Previsto" -->
-            <div class="cm-label-top">
-              <span>Previsto</span>
-            </div>
-
-            <!-- Tabela da matriz -->
-            <table class="cm-table">
-              <!-- Header com classes previstas -->
-              <thead>
-                <tr>
-                  <th class="cm-corner">
-                    <div class="cm-label-real">Real</div>
-                  </th>
-                  <th *ngFor="let classe of resultadosDasAvaliacoes[metrica][modelo].classes"
-                    class="cm-header-col">
-                    {{ classe }}
-                  </th>
-                </tr>
-              </thead>
-              <!-- Linhas da matriz -->
-              <tbody>
-                <tr *ngFor="let linha of resultadosDasAvaliacoes[metrica][modelo].matriz; let i = index">
-                  <td class="cm-header-row">
-                    {{ resultadosDasAvaliacoes[metrica][modelo].classes[i] }}
-                  </td>
-                  <td *ngFor="let valor of linha; let j = index"
-                    class="cm-data"
-                    [class.cm-diagonal]="i === j"
-                    [class.cm-erro]="i !== j"
-                    [style.background-color]="getCellColor(valor, resultadosDasAvaliacoes[metrica][modelo].total, i === j)"
-                    [style.color]="getCellTextColor(valor, resultadosDasAvaliacoes[metrica][modelo].total, i === j)"
-                    [matTooltip]="getCellTooltip(i, j, valor, resultadosDasAvaliacoes[metrica][modelo].classes)"
-                    matTooltipPosition="above">
-                    {{ valor }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+      <div class="confusion-multi">
+        <div class="confusion-section" *ngFor="let modelo of modelosAvaliados">
+          <div class="confusion-header">
+            <span class="confusion-title">Matriz de Confusão — {{ modelo }}</span>
+            <span class="confusion-acc">
+              Acurácia: {{ getAcuracia(resultadosDasAvaliacoes[metrica][modelo].matriz) | percent:'1.1-2' }}
+            </span>
           </div>
 
-          <!-- Legenda -->
-          <div class="confusion-legend">
-            <div class="legend-item">
-              <span class="legend-color legend-acerto"></span>
-              <span>Diagonal = Acertos (VP)</span>
+          <div class="confusion-wrapper">
+            <div class="confusion-matrix-container">
+              <div class="cm-label-top"><span>Previsto</span></div>
+              <table class="cm-table">
+                <thead>
+                  <tr>
+                    <th class="cm-corner"><div class="cm-label-real">Real</div></th>
+                    <th *ngFor="let classe of resultadosDasAvaliacoes[metrica][modelo].classes"
+                      class="cm-header-col">{{ classe }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let linha of resultadosDasAvaliacoes[metrica][modelo].matriz; let i = index">
+                    <td class="cm-header-row">
+                      {{ resultadosDasAvaliacoes[metrica][modelo].classes[i] }}
+                    </td>
+                    <td *ngFor="let valor of linha; let j = index"
+                      class="cm-data"
+                      [class.cm-diagonal]="i === j"
+                      [class.cm-erro]="i !== j"
+                      [style.background-color]="getCellColor(valor, resultadosDasAvaliacoes[metrica][modelo].total, i === j)"
+                      [style.color]="getCellTextColor(valor, resultadosDasAvaliacoes[metrica][modelo].total, i === j)"
+                      [matTooltip]="getCellTooltip(i, j, valor, resultadosDasAvaliacoes[metrica][modelo].classes)"
+                      matTooltipPosition="above">
+                      {{ valor }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div class="legend-item">
-              <span class="legend-color legend-erro"></span>
-              <span>Fora diagonal = Erros</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-count erros">{{ getTotalErros(resultadosDasAvaliacoes[metrica][modelo].matriz) }} erros</span>
+
+            <div class="confusion-legend">
+              <div class="legend-item">
+                <span class="legend-color legend-acerto"></span>
+                <span>Diagonal = Acertos (VP)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color legend-erro"></span>
+                <span>Fora diagonal = Erros</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-count erros">{{ getTotalErros(resultadosDasAvaliacoes[metrica][modelo].matriz) }} erros</span>
+              </div>
             </div>
           </div>
         </div>
