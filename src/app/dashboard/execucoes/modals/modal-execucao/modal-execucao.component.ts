@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { BodyTutor, ItemPipeline, MediaMetrica, ResultadoColetaDado, TipoArquivoDados } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
+import { ScriptGeneratorService } from '../../../../service/script-generator.service';
 import { TutorContexto } from '../../../tutor/tutor.component';
 import tutor from '../../../../constants/tutor.json';
 
@@ -66,6 +67,7 @@ export class ModalExecucaoComponent implements OnInit {
 
   constructor(
     private dashboardService: DashboardService,
+    private scriptGenerator: ScriptGeneratorService,
     public dialogRef: MatDialogRef<ModalExecucaoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -73,6 +75,58 @@ export class ModalExecucaoComponent implements OnInit {
   }
 
   ngOnInit(): void { }
+
+  // Contexto do pipeline para o chatbot tutor. Memoizado: so reconstroi (e regera o
+  // script Python, que e caro) quando algo relevante muda — getContextoChat() roda a
+  // cada ciclo de deteccao de mudancas.
+  private contextoChatCache: any = null;
+  private contextoChatAssinatura = '';
+
+  getContextoChat(): any {
+    const assinatura = JSON.stringify({
+      d: this.resultadoColetaDado?.nomeDataset || this.resultadoColetaDado?.treino?.nomeArquivo,
+      m: this.modeloSelecionado?.valor,
+      h: this.hiperparametrosAtuais,
+      mt: this.metricasSelecionadas.map(m => m.valor),
+      av: Object.keys(this.resultadosDasAvaliacoes || {}),
+    });
+    if (assinatura === this.contextoChatAssinatura && this.contextoChatCache) {
+      return this.contextoChatCache;
+    }
+
+    let codigoPython = '';
+    try {
+      if (this.modeloSelecionado) {
+        codigoPython = this.scriptGenerator.generatePythonScript(
+          this.resultadoColetaDado, this.modeloSelecionado, this.metricasSelecionadas,
+          this.hiperparametrosAtuais, this.preProcessamentoConfig
+        );
+      }
+    } catch { codigoPython = ''; }
+
+    const modeloInfo = (tutor.modelos as any)?.[this.modeloSelecionado?.valor || ''];
+    this.contextoChatCache = {
+      dataset: {
+        nome: this.resultadoColetaDado?.nomeDataset || this.resultadoColetaDado?.treino?.nomeArquivo || null,
+        target: this.resultadoColetaDado?.target || null,
+        tipoTarget: this.resultadoColetaDado?.tipoTarget || null,
+        colunas: this.resultadoColetaDado?.colunas || Object.keys(this.resultadoColetaDado?.atributos || {}),
+      },
+      modelo: this.modeloSelecionado ? {
+        valor: this.modeloSelecionado.valor,
+        label: this.modeloSelecionado.label,
+        descricao: modeloInfo?.descricao,
+        sklearn: modeloInfo?.sklearn,
+      } : null,
+      hiperparametros: this.hiperparametrosAtuais,
+      preProcessamento: this.preProcessamentoConfig,
+      metricas: this.metricasSelecionadas.map(m => ({ valor: m.valor, label: m.label })),
+      avaliacoes: this.resultadosDasAvaliacoes,
+      codigoPython,
+    };
+    this.contextoChatAssinatura = assinatura;
+    return this.contextoChatCache;
+  }
 
   proximo(): void {
     const indiceAtual = this.etapas[this.etapaAtual].indice;

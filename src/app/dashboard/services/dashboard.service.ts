@@ -132,6 +132,11 @@ export class DashboardService {
     return this.http.put(`${this.url}${this.endpointTutor}/${id}`, body);
   }
 
+  // Chatbot tutor: o backend faz o proxy para a NVIDIA (a chave fica no servidor).
+  chatTutor(mensagens: { role: string; content: string }[], contexto: any) {
+    return this.http.post<{ resposta: string }>(`${this.url}${this.endpointTutor}/chat`, { mensagens, contexto });
+  }
+
   putTutorTipoAprendizado(body: any, id: string) {
     return this.http.put(`${this.url}${this.endpointTutor}/editar-tipo-aprendizado/${id}`, body);
   }

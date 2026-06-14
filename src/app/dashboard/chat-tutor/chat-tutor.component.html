@@ -1,0 +1,38 @@
+<div class="chat-tutor">
+  <div class="chat-header">
+    <mat-icon>smart_toy</mat-icon>
+    <span>Tutor por chat</span>
+    <button mat-icon-button class="limpar-btn" *ngIf="mensagens.length" (click)="limpar()"
+      matTooltip="Limpar conversa" matTooltipPosition="above" aria-label="Limpar conversa">
+      <mat-icon>delete_outline</mat-icon>
+    </button>
+  </div>
+
+  <div class="chat-corpo">
+    <!-- Estado inicial: sugestoes -->
+    <div class="chat-sugestoes" *ngIf="!mensagens.length">
+      <p class="chat-intro">Pergunte ao tutor sobre o seu pipeline: modelo, dados, pré-processamento, métricas, gráficos ou o código gerado.</p>
+      <button class="sugestao" *ngFor="let s of sugestoes" (click)="usarSugestao(s)">{{ s }}</button>
+    </div>
+
+    <!-- Mensagens -->
+    <div class="msg" *ngFor="let m of mensagens" [class.user]="m.role === 'user'" [class.assistant]="m.role === 'assistant'">
+      <div class="bolha">{{ m.content }}</div>
+    </div>
+
+    <div class="msg assistant" *ngIf="carregando">
+      <div class="bolha digitando">O tutor está pensando…</div>
+    </div>
+
+    <div class="chat-erro" *ngIf="erro">{{ erro }}</div>
+  </div>
+
+  <div class="chat-entrada">
+    <textarea [(ngModel)]="entrada" rows="2" placeholder="Escreva sua pergunta…"
+      (keydown.enter)="$event.preventDefault(); enviar()" [disabled]="carregando"></textarea>
+    <button mat-icon-button color="primary" (click)="enviar()" [disabled]="carregando || !entrada.trim()"
+      aria-label="Enviar pergunta">
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
+</div>

@@ -41,6 +41,7 @@ import { TutorComponent } from './tutor/tutor.component';
 import { CsvConfigComponent } from './execucoes/modals/csv-config/csv-config.component';
 import { NomearPipelineDialogComponent } from './execucoes/modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
 import { VisualizacaoDadosComponent } from './execucoes/modals/visualizacao-dados/visualizacao-dados.component';
+import { ChatTutorComponent } from './chat-tutor/chat-tutor.component';
 import { SessionService } from '../service/sessao-store.service';
 
 
@@ -66,6 +67,7 @@ import { SessionService } from '../service/sessao-store.service';
     MetricasComponent,
     MetricaAvaliacaoComponent,
     TutorComponent,
+    ChatTutorComponent,
     CsvConfigComponent,
     NomearPipelineDialogComponent,
     VisualizacaoDadosComponent
