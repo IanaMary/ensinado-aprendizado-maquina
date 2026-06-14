@@ -47,6 +47,7 @@ export class ModalExecucaoComponent implements OnInit {
   resultadoTreinamento?: any;
   modeloSelecionado?: ItemPipeline;
   modelosDisponiveis: ItemPipeline[] = [];
+  modelosAgrupados: { tipo: string; titulo: string; modelos: any[] }[] = [];
   tutorModeloTarget: any[] = [];
   preProcessamentoConfig: any = null;
 
@@ -201,8 +202,12 @@ export class ModalExecucaoComponent implements OnInit {
 
     const preverCategoria = this.resultadoColetaDado.preverCategoria ?? false;
     const dadosRotulados = this.resultadoColetaDado.dadosRotulados ?? false;
-    this.modelosDisponiveis = this.dashboardService.getModelosPorTipo(preverCategoria, dadosRotulados);
-    this.modeloSelecionado = this.modelosDisponiveis[0];
+    // Todos os tipos como secoes (incompativeis desabilitados); a selecao padrao
+    // recai no primeiro modelo COMPATIVEL com o target do dataset.
+    this.modelosAgrupados = this.dashboardService.getModelosAgrupados(preverCategoria, dadosRotulados);
+    const compativeis = this.modelosAgrupados.flatMap(g => g.modelos).filter(m => m.compativel);
+    this.modelosDisponiveis = compativeis;
+    this.modeloSelecionado = compativeis[0];
     if (this.modeloSelecionado) {
       this.atualizarModelo(this.modeloSelecionado);
     }

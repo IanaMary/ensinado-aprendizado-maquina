@@ -355,6 +355,28 @@ export class DashboardService {
     return this.itensModelos.getValue().filter(item => (item?.preverCategoria === preverCategoria && item.dadosRotulados === dadosRotulados));
   }
 
+  // Agrupa TODO o catalogo por tipo de tarefa (classificacao/regressao/agrupamento)
+  // e marca cada modelo como `compativel` com o target do dataset. Usado pela tela
+  // de Selecao do Modelo para exibir secoes por tipo, desabilitando os incompativeis.
+  getModelosAgrupados(preverCategoria: boolean, dadosRotulados: boolean): { tipo: string; titulo: string; modelos: any[] }[] {
+    const todos = this.itensModelos.getValue();
+    const grupos = [
+      { tipo: 'classificacao', titulo: 'Classificação', modelos: [] as any[] },
+      { tipo: 'regressao', titulo: 'Regressão', modelos: [] as any[] },
+      { tipo: 'agrupamento', titulo: 'Agrupamento', modelos: [] as any[] },
+    ];
+    for (const m of todos) {
+      const grupo = grupos.find(g => g.tipo === this.determinarTipoModelo(m));
+      if (grupo) {
+        grupo.modelos.push({
+          ...m,
+          compativel: m.preverCategoria === preverCategoria && m.dadosRotulados === dadosRotulados,
+        });
+      }
+    }
+    return grupos.filter(g => g.modelos.length > 0);
+  }
+
 
   // getMetricasPorModelo(modelo: string, considerarMovido: boolean = false): string[] {
   //   // const itemTreino = this.itensModelos.value.find(item => item.valor === modelo);

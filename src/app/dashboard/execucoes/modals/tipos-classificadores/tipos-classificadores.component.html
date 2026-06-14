@@ -1,66 +1,89 @@
 <div class="modal-container">
-  <!-- Seleção do modelo -->
-  <div class="modelos-grid">
-    <div *ngFor="let model of modelosDisponiveis" 
-         class="modelo-card"
-         [class.selected]="modeloValor === model.valor"
-         (click)="modeloValor = model.valor; emitSelecaoModelo()">
-      <div class="modelo-header">
-        <mat-icon class="modelo-icon">memory</mat-icon>
-        <span class="modelo-label">{{ model.label }}</span>
+  <!-- Selecao do modelo: secoes por tipo de tarefa (incompativeis desabilitados) -->
+  <div class="tipo-secao" *ngFor="let grupo of modelosAgrupados">
+    <div class="tipo-header">
+      <span class="tipo-titulo">{{ grupo.titulo }}</span>
+    </div>
+    <div class="modelos-grid">
+      <div *ngFor="let model of grupo.modelos"
+           class="modelo-card"
+           [class.selected]="modeloValor === model.valor"
+           [class.desabilitado]="model.compativel === false"
+           [matTooltip]="model.compativel === false ? 'Indisponível para este dataset (tipo de alvo diferente)' : ''"
+           matTooltipPosition="above"
+           (click)="selecionarModelo(model)">
+        <div class="modelo-header">
+          <mat-icon class="modelo-icon">memory</mat-icon>
+          <span class="modelo-label">{{ model.label }}</span>
+        </div>
+        <p class="modelo-resumo">{{ model.resumo }}</p>
       </div>
-      <p class="modelo-resumo">{{ model.resumo }}</p>
     </div>
   </div>
 
-  <!-- Hiperparâmetros do modelo selecionado -->
-  <div class="hiperparametros-section" *ngIf="hiperparametrosArray.length > 0">
+  <!-- Hiperparametros do modelo selecionado -->
+  <div class="hiperparametros-section" *ngIf="hiperparametrosArray.length || hiperparametrosAvancados.length">
     <div class="section-header">
       <mat-icon>tune</mat-icon>
       <span>Hiperparâmetros</span>
     </div>
 
     <div class="hiperparametros-grid">
-      <div *ngFor="let param of hiperparametrosArray" class="param-field">
-        <label class="param-label">
-          {{ param.nome }}
-          <code class="param-sklearn">{{ param.sklearn }}</code>
-        </label>
-
-        <!-- Campo de texto para números -->
-        <input 
-          *ngIf="param.tipo === 'int' || param.tipo === 'float'"
-          matInput
-          [type]="param.tipo === 'int' ? 'number' : 'number'"
-          [step]="param.tipo === 'float' ? '0.1' : '1'"
-          [value]="param.valor"
-          (change)="atualizarHiperparametro(param, $any($event.target).value)"
-          class="param-input"
-          [placeholder]="'Padrão: ' + param.padrao">
-
-        <!-- Campo de seleção para opções -->
-        <mat-select
-          *ngIf="param.opcoes?.length"
-          [value]="param.valor"
-          (selectionChange)="atualizarHiperparametro(param, $event.value)"
-          class="param-select">
-          <mat-option *ngFor="let opcao of param.opcoes" [value]="opcao">
-            {{ opcao }}
-          </mat-option>
-        </mat-select>
-
-        <!-- Campo de texto para strings sem opções -->
-        <input 
-          *ngIf="param.tipo === 'str' && !param.opcoes?.length"
-          matInput
-          type="text"
-          [value]="param.valor"
-          (change)="atualizarHiperparametro(param, $any($event.target).value)"
-          class="param-input"
-          [placeholder]="'Padrão: ' + param.padrao">
-
-        <span class="param-hint" *ngIf="param.implicacoes">{{ param.implicacoes }}</span>
-      </div>
+      <ng-container *ngFor="let param of hiperparametrosArray">
+        <ng-container *ngTemplateOutlet="campoParam; context: { $implicit: param }"></ng-container>
+      </ng-container>
     </div>
+
+    <!-- Avancados recolhidos -->
+    <details class="avancados" *ngIf="hiperparametrosAvancados.length" [open]="mostrarAvancados">
+      <summary>Avançado ({{ hiperparametrosAvancados.length }})</summary>
+      <div class="hiperparametros-grid">
+        <ng-container *ngFor="let param of hiperparametrosAvancados">
+          <ng-container *ngTemplateOutlet="campoParam; context: { $implicit: param }"></ng-container>
+        </ng-container>
+      </div>
+    </details>
   </div>
 </div>
+
+<!-- Template de um campo de hiperparametro (caixa com borda) -->
+<ng-template #campoParam let-param>
+  <div class="param-field">
+    <label class="param-label">
+      {{ param.nome }}
+      <code class="param-sklearn">{{ param.sklearn }}</code>
+    </label>
+
+    <!-- Numerico -->
+    <input *ngIf="(param.tipo === 'int' || param.tipo === 'float') && !param.opcoes?.length"
+      matInput
+      type="number"
+      [step]="param.tipo === 'float' ? '0.1' : '1'"
+      [value]="param.valor"
+      (change)="atualizarHiperparametro(param, $any($event.target).value)"
+      class="param-input"
+      [placeholder]="'Padrão: ' + param.padrao">
+
+    <!-- Opcoes (select) -->
+    <mat-select
+      *ngIf="param.opcoes?.length"
+      [value]="param.valor"
+      (selectionChange)="atualizarHiperparametro(param, $event.value)"
+      class="param-select">
+      <mat-option *ngFor="let opcao of param.opcoes" [value]="opcao">
+        {{ opcao === null ? 'nenhum' : opcao }}
+      </mat-option>
+    </mat-select>
+
+    <!-- Texto -->
+    <input *ngIf="param.tipo === 'str' && !param.opcoes?.length"
+      matInput
+      type="text"
+      [value]="param.valor"
+      (change)="atualizarHiperparametro(param, $any($event.target).value)"
+      class="param-input"
+      [placeholder]="'Padrão: ' + param.padrao">
+
+    <span class="param-hint" *ngIf="param.implicacoes">{{ param.implicacoes }}</span>
+  </div>
+</ng-template>

@@ -7,14 +7,29 @@
 .modal-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+}
+
+// Secao por tipo de tarefa (Classificacao / Regressao / Agrupamento)
+.tipo-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .tipo-header .tipo-titulo {
+    font-size: 12px;
+    font-weight: 700;
+    color: $roxo-escuro;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 }
 
 // Grid de modelos
 .modelos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .modelo-card {
@@ -37,6 +52,18 @@
     .modelo-icon {
       color: $branco;
       background: $roxo-medio;
+    }
+  }
+
+  // Modelo de tipo incompativel com o target do dataset
+  &.desabilitado {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: $cinza-claro;
+
+    &:hover {
+      border-color: $cinza-claro;
+      box-shadow: none;
     }
   }
 
@@ -80,17 +107,16 @@
   }
 }
 
-// Hiperparâmetros
+// Hiperparâmetros — sem fundo na secao inteira; cada campo e uma caixa
 .hiperparametros-section {
-  background: $cinza-claro;
-  border-radius: 10px;
-  padding: 16px;
+  border-top: 1px solid rgba($roxo-claro, 0.6);
+  padding-top: 12px;
 
   .section-header {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 
     mat-icon {
       color: $roxo-medio;
@@ -110,13 +136,35 @@
 .hiperparametros-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
+  gap: 10px;
+}
+
+// Secao "Avancado" recolhivel
+.avancados {
+  margin-top: 12px;
+
+  summary {
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: $roxo-medio;
+    padding: 6px 0;
+    user-select: none;
+  }
+
+  .hiperparametros-grid {
+    margin-top: 10px;
+  }
 }
 
 .param-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  background: $branco;
+  border: 1px solid rgba($roxo-claro, 0.6);
+  border-radius: 10px;
+  padding: 10px 12px;
 
   .param-label {
     font-size: 12px;
