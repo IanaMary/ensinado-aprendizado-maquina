@@ -40,6 +40,7 @@ import { MetricaAvaliacaoComponent } from './execucoes/modals/metrica-avaliacao/
 import { TutorComponent } from './tutor/tutor.component';
 import { CsvConfigComponent } from './execucoes/modals/csv-config/csv-config.component';
 import { NomearPipelineDialogComponent } from './execucoes/modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
+import { VisualizacaoDadosComponent } from './execucoes/modals/visualizacao-dados/visualizacao-dados.component';
 import { SessionService } from '../service/sessao-store.service';
 
 
@@ -66,7 +67,8 @@ import { SessionService } from '../service/sessao-store.service';
     MetricaAvaliacaoComponent,
     TutorComponent,
     CsvConfigComponent,
-    NomearPipelineDialogComponent
+    NomearPipelineDialogComponent,
+    VisualizacaoDadosComponent
   ],
   imports: [CommonModule,
     DragDropModule,

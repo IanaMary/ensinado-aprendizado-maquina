@@ -312,4 +312,9 @@
         </nav>
       </nav>
     </ng-container>
+
+    <!-- Exploração visual dos dados (pairplot) -->
+    <ng-container *ngIf="resultColetaDadoL.colunas.length > 1">
+      <app-visualizacao-dados [resultadoColetaDado]="resultColetaDadoL"></app-visualizacao-dados>
+    </ng-container>
   </nav>

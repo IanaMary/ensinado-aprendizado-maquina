@@ -191,6 +191,10 @@ export class DashboardService {
     return this.http.post(`${this.url}${this.endpointClassificador}/avaliar_modelos`, body);
   }
 
+  gerarPairplot(body: { arquivo_id: string; configuracao_id: string; colunas?: string[]; hue?: string | null }) {
+    return this.http.post(`${this.url}visualizacao/pairplot`, body);
+  }
+
   classificadorPrever(body: any) {
     return this.http.post(`${this.url}${this.endpointClassificador}/prever`, body);
   }
