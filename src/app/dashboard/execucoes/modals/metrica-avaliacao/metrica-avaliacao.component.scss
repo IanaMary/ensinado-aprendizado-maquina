@@ -30,6 +30,12 @@
 
       td {
         background-color: $branco;
+
+        &.melhor-valor {
+          background-color: #e8f5e9;
+          color: #1b5e20;
+          font-weight: 700;
+        }
       }
     }
   }
@@ -235,7 +241,7 @@
   font-weight: 700;
 }
 
-.yellowbrick-model {
+.yellowbrick-tipo {
   h4 {
     margin: 8px 0 12px;
     color: $cinza-escuro;

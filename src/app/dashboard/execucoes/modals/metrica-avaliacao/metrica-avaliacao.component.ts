@@ -170,6 +170,34 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     return typeof value === 'number';
   }
 
+  isMetricaMenorMelhor(metrica: string): boolean {
+    const chave = metrica.toLowerCase();
+    return ['mse', 'mae', 'rmse', 'erro', 'error', 'loss', 'perda', 'mean_squared', 'mean_absolute'].some(k => chave.includes(k));
+  }
+
+  isMelhorValor(metrica: string, modelo: string): boolean {
+    const valoresPorModelo = this.resultadosDasAvaliacoes[metrica];
+    if (!valoresPorModelo) return false;
+    const valores = Object.values(valoresPorModelo).filter((v): v is number => typeof v === 'number');
+    if (valores.length < 2) return false;
+    const valorAtual = valoresPorModelo[modelo];
+    if (typeof valorAtual !== 'number') return false;
+    return this.isMetricaMenorMelhor(metrica)
+      ? valorAtual === Math.min(...valores)
+      : valorAtual === Math.max(...valores);
+  }
+
+  getVisualizacoesPorTipo(): { titulo: string; itens: { modelo: string; visualizacao: { titulo: string; mime: string; base64: string } }[] }[] {
+    const mapa = new Map<string, { modelo: string; visualizacao: { titulo: string; mime: string; base64: string } }[]>();
+    for (const modelo of this.getModelosComVisualizacoes()) {
+      for (const vis of this.visualizacoesYellowbrick[modelo] || []) {
+        if (!mapa.has(vis.titulo)) mapa.set(vis.titulo, []);
+        mapa.get(vis.titulo)!.push({ modelo, visualizacao: vis });
+      }
+    }
+    return Array.from(mapa.entries()).map(([titulo, itens]) => ({ titulo, itens }));
+  }
+
   isConfusionMatrix(value: any): boolean {
     return value && typeof value === 'object' && ('matriz' in value || Array.isArray(value)) && 'classes' in value;
   }
