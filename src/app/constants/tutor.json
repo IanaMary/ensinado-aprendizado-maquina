@@ -37,6 +37,11 @@
       "complexidade": "O(n·d) por predição",
       "descricao": "O KNN classifica cada nova amostra observando as K amostras de treino mais próximas no espaço de atributos. Não existe fase de treinamento real — o modelo simplesmente memoriza todo o conjunto de dados. Na predição, calcula a distância (padrão: Euclidiana) entre o novo ponto e todos os pontos de treino, seleciona os K mais próximos e faz uma votação majoritária para decidir a classe.",
       "intuicao": "Imagine que você quer saber se um filme vai gostar. Você olha para os 5 filmes mais parecidos que você já assistiu — se 4 de 5 são do gênero ação, provavelmente você vai gostar desse também. O KNN faz exatamente isso: classifica olhando os vizinhos mais próximos.",
+      "comoFunciona": [
+        "Guarda todos os exemplos de treino, sem montar uma fórmula.",
+        "Para classificar algo novo, procura os K exemplos mais parecidos (os vizinhos mais próximos).",
+        "A classe que mais aparece entre esses vizinhos é a resposta."
+      ],
       "passoAPasso": [
         "1. Recebe uma nova amostra para classificar",
         "2. Calcula a distância entre essa amostra e TODAS as amostras de treino",
@@ -158,6 +163,11 @@
       "complexidade": "O(log n) por predição",
       "descricao": "A Árvore de Decisão constrói uma estrutura hierárquica de perguntas sobre os atributos. Cada nó interno testa uma condição (ex: 'Idade > 30?'), cada ramo é a resposta (Sim/Não), e cada folha é a classe prevista. O algoritmo escolhe automaticamente qual atributo e limiar melhor separam os dados em cada nível.",
       "intuicao": "Pense no jogo '20 Perguntas'. Você faz perguntas sim/não para chegar à resposta. A Árvore de Decisão faz o mesmo: pergunta 'atributo X > valor?' sucessivamente até chegar a uma classificação. A diferença é que o algoritmo escolhe as perguntas que melhor separam os dados.",
+      "comoFunciona": [
+        "Faz uma sequência de perguntas do tipo 'o atributo X é maior que um valor?'.",
+        "Em cada pergunta, separa os dados no corte que melhor divide as classes.",
+        "Segue dividindo até chegar a uma resposta em cada folha da árvore."
+      ],
       "passoAPasso": [
         "1. Começa com todos os dados na raiz",
         "2. Para cada atributo, testa todos os limiares possíveis",
@@ -320,6 +330,11 @@
       "complexidade": "O(n² · d) a O(n³) no treino",
       "descricao": "O SVM encontra o hiperplano (linha de decisão) que separa as classes com a maior margem possível. A margem é a distância entre a linha de decisão e os pontos mais próximos de cada classe (chamados vetores de suporte). Quando os dados não são linearmente separáveis, o 'truque do kernel' mapeia os dados para um espaço de maior dimensão onde a separação linear é possível.",
       "intuicao": "Imagine duas classes de pontos em uma mesa. O SVM encontra a régua que separa os pontos, mas não qualquer régua — a que fica mais longe de ambos os grupos (maior margem). Se os pontos estão misturados, o SVM 'levanta' os pontos para o 3D onde consegue separar com um plano.",
+      "comoFunciona": [
+        "Procura a fronteira que separa as classes.",
+        "Entre as fronteiras possíveis, escolhe a que fica mais longe dos dois grupos (maior margem).",
+        "Só os pontos mais próximos da fronteira (vetores de suporte) influenciam o resultado."
+      ],
       "passoAPasso": [
         "1. Mapeia os dados para alta dimensionalidade (kernel trick)",
         "2. Encontra o hiperplano que maximiza a margem entre as classes",
@@ -478,6 +493,11 @@
       "complexidade": "O(n · d) no treino",
       "descricao": "Apesar do nome, a Regressão Logística é um classificador. Ela ajusta uma combinação linear dos atributos (como a Regressão Linear), mas aplica a função sigmoide para converter o resultado em uma probabilidade entre 0 e 1. Se a probabilidade for >= 0.5, classifica como classe positiva.",
       "intuicao": "Imagine que você quer prever se um aluno vai passar na prova. A Regressão Logística calcula uma nota ponderada (horas de estudo × peso1 + sono × peso2 + ...) e depois transforma essa nota em uma probabilidade de 0% a 100% usando uma curva em S (sigmoide). Se for >= 50%, prevê 'passa'.",
+      "comoFunciona": [
+        "Combina os atributos em uma nota, dando um peso para cada um.",
+        "Passa essa nota por uma curva (sigmoide) que devolve uma probabilidade de 0 a 1.",
+        "Se a probabilidade passa de 0,5, prevê uma classe; senão, a outra."
+      ],
       "passoAPasso": [
         "1. Calcula z = w1·x1 + w2·x2 + ... + wn·xn + bias",
         "2. Aplica a sigmoide: probabilidade = 1 / (1 + e^(-z))",
@@ -615,6 +635,11 @@
       "complexidade": "O(n · d²) no treino",
       "descricao": "A Regressão Linear encontra a reta (ou hiperplano) que minimiza a soma dos erros quadrados (MSE) entre as previsões e os valores reais. É o modelo mais simples e fundamental de Machine Learning para problemas de regressão.",
       "intuicao": "Imagine que você plota 'horas de estudo' no eixo X e 'nota da prova' no Y. A Regressão Linear encontra a melhor reta que passa 'no meio' dos pontos. Com essa reta, você pode prever a nota de alguém dado o número de horas de estudo.",
+      "comoFunciona": [
+        "Procura a reta (ou plano) que melhor passa pelo meio dos pontos.",
+        "Ajusta os pesos para deixar os erros (distância dos pontos até a reta) o menor possível.",
+        "Para prever, basta colocar os valores dos atributos na equação da reta."
+      ],
       "passoAPasso": [
         "1. Assume que y = w1·x1 + w2·x2 + ... + bias",
         "2. Encontra os pesos que minimizam o erro quadrático médio",
@@ -674,6 +699,11 @@
       "complexidade": "O(n · k · d · i) onde i=iterações",
       "descricao": "O K-Means particiona os dados em K grupos (clusters) minimizando a distância intra-cluster. Cada ponto pertence ao cluster cujo centroide (média dos pontos do cluster) é o mais próximo.",
       "intuicao": "Imagine que você tem 100 pontos espalhados e quer dividir em 3 grupos. O K-Means coloca 3 'centros' aleatórios, cada ponto vai para o centro mais perto, depois os centros se movem para a média dos seus pontos. Repete até os centros pararem de se mover.",
+      "comoFunciona": [
+        "Escolhe K centros e liga cada ponto ao centro mais próximo, formando grupos.",
+        "Recalcula cada centro como a média dos pontos do seu grupo.",
+        "Repete até os grupos pararem de mudar."
+      ],
       "passoAPasso": [
         "1. Escolhe K centroides aleatórios",
         "2. Atribui cada ponto ao centroide mais próximo",
@@ -783,6 +813,11 @@
       "complexidade": "O(min(n³, d³))",
       "descricao": "O PCA transforma os dados em um novo sistema de coordenadas onde as primeiras dimensões (componentes principais) capturam a maior variância dos dados. É uma técnica de compressão que preserva a informação mais importante.",
       "intuicao": "Imagine uma nuvem de pontos 3D (altura, peso, idade). O PCA encontra a 'direção' onde os pontos variam mais (componente 1), depois a segunda direção mais variada (componente 2), e assim por diante. Você pode projetar os pontos em 2D sem perder muita informação.",
+      "comoFunciona": [
+        "Procura as direções em que os dados mais variam.",
+        "Cria novos eixos (componentes) a partir dessas direções.",
+        "Mantém só os primeiros componentes, reduzindo atributos sem perder muita informação."
+      ],
       "passoAPasso": [
         "1. Centraliza os dados (subtrai a média)",
         "2. Calcula a matriz de covariância",

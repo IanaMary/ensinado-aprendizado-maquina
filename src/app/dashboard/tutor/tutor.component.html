@@ -172,10 +172,20 @@
         </div>
       </div>
 
+      <div class="section" *ngIf="contexto?.modelo?.comoFunciona?.length">
+        <div class="section-header">
+          <mat-icon>menu_book</mat-icon>
+          <span>Como funciona</span>
+        </div>
+        <ul class="steps-list">
+          <li *ngFor="let item of contexto?.modelo?.comoFunciona">{{ item }}</li>
+        </ul>
+      </div>
+
       <div class="section" *ngIf="contexto?.modelo?.passoAPasso?.length">
         <div class="section-header">
           <mat-icon>list_alt</mat-icon>
-          <span>Como funciona</span>
+          <span>Passo a passo</span>
         </div>
         <ol class="steps-list">
           <li *ngFor="let passo of contexto?.modelo?.passoAPasso">{{ passo }}</li>
