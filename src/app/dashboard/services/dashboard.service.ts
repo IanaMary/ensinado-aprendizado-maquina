@@ -201,11 +201,14 @@ export class DashboardService {
   }
 
   fetchItensModelos() {
-    return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointModelo}todos`);
+    // limite=100 (teto do backend): a rota /todos pagina com limite=10 por padrao,
+    // o que ocultava modelos quando o catalogo passou de 10 itens.
+    return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointModelo}todos?limite=100`);
   }
 
   fetchItensMetricas() {
-    return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointMetricas}todos`);
+    // limite=100: mesma paginacao padrao de 10 ocultava metricas alem da 10a.
+    return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointMetricas}todos?limite=100`);
   }
 
   // SERVIÇOS SEM LIGAÇÃO COM BANCO
