@@ -430,9 +430,6 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     this.teste.nomeArquivo = res.arquivo_nome_teste ?? '';
     this.teste.erro = '';
 
-    console.log('DEBUG teste.dados:', JSON.stringify(this.teste.dados));
-    console.log('DEBUG colunas:', this.resultColetaDadoL.colunas);
-
     this.opcoesNome = nomeColunas;
     this.opcoesTarget = nomeColunas;
 

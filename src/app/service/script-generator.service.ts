@@ -389,7 +389,8 @@ export class ScriptGeneratorService {
 
     // Model import
     if (modelo) {
-      imports.push(this.getModelImport(modelo.valor));
+      const imp = this.getModelImport(modelo.valor);
+      if (imp) imports.push(imp);
     }
 
     // Metrics imports
@@ -447,7 +448,7 @@ export class ScriptGeneratorService {
       'k_means': 'from sklearn.cluster import KMeans',
       'pca': 'from sklearn.decomposition import PCA'
     };
-    return imports[modeloValor] || `# TODO: Import para ${modeloValor}`;
+    return imports[modeloValor] || '';
   }
 
   private generateDataLoadingFunction(resultado?: ResultadoColetaDado): string {

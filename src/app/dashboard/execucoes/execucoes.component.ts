@@ -228,8 +228,6 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((resultado: any) => {
       this.modalAberto = false;
       if (resultado) {
-        console.log('Modal fechado com resultado:', resultado);
-        console.log('preProcessamentoConfig:', resultado.preProcessamentoConfig);
         this.resultadoColetaDado = resultado.resultadoColetaDado
         this.modeloSelecionado = resultado.modeloSelecionado
         this.resultadoTreinamento = resultado.resultadoTreinamento;
@@ -241,7 +239,6 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
 
         // Processar itens de pre-processamento
         if (resultado.preProcessamentoConfig?.itens) {
-          console.log('Processando itens pre-processamento:', resultado.preProcessamentoConfig.itens);
           this.processarItensPreProcessamento(resultado.preProcessamentoConfig.itens);
         }
 
@@ -661,9 +658,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
       };
 
-      this.pipelineService.salvarPipeline(state).pipe(takeUntil(this.destroy$)).subscribe(() => {
-        console.log('Pipeline salvo com sucesso:', nome);
-      });
+      this.pipelineService.salvarPipeline(state).pipe(takeUntil(this.destroy$)).subscribe(() => {});
     });
   }
 
@@ -859,7 +854,6 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   }
 
   processarItensPreProcessamento(itens: any[]): void {
-    console.log('processarItensPreProcessamento chamado com:', itens);
     this.dashboardService.sincronizarPreProcessamentosSelecionados(itens);
   }
 

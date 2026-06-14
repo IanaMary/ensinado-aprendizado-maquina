@@ -69,12 +69,8 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       }))
     };
 
-    console.log('[DEBUG] Enviando para avaliar_modelos:', body);
-    console.log('[DEBUG] resultadoTreinamento atual:', this.resultadoTreinamento);
-
     this.dashboardService.postMetricas(body).subscribe({
       next: (res) => {
-        console.log('[DEBUG] Resposta de avaliar_modelos:', res);
         this.resultadosDasAvaliacoes = res;
         this.atualizarVariaveis()
         this.atualizarResultadoAvaliacoes.emit(this.resultadosDasAvaliacoes);

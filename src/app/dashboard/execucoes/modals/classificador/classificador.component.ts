@@ -52,7 +52,6 @@ export class ClasificadorComponent implements OnChanges {
 
 
   async enviarParaClassificador(classificador: string) {
-    console.log(`[DEBUG] Iniciando treinamento para: ${classificador}`);
     this.treinando = true
     // Use the modeloSelecionado.valor directly (already correct in JSON: 'arvore_decisao', 'knn', etc.)
     // instead of normalizing the label which adds unwanted "de"
@@ -62,7 +61,6 @@ export class ClasificadorComponent implements OnChanges {
     const modeloId = this.modeloSelecionado?.id;
 
     if (!arquivoId || !configuracaoId || !modeloId) {
-      console.error('[DEBUG] Falha ao iniciar treinamento: IDs ausentes', { arquivoId, configuracaoId, modeloId });
       this.treinando = false;
       this.resultadoTreinamento = {
         ...this.resultadoTreinamento,
@@ -83,11 +81,8 @@ export class ClasificadorComponent implements OnChanges {
       hiperparametros: this.hiperparametros || {}
     }
 
-    console.log('[DEBUG] Enviando requisição de treinamento:', body);
-
     this.dashboardService.classificadorTreino(tipoClassficador, body).subscribe({
       next: (res: any) => {
-        console.log('[DEBUG] Resposta de treinamento recebida:', res);
         const modelo = res.modelo
         this.resultadoTreinamento = {
           ...this.resultadoTreinamento,
@@ -97,7 +92,7 @@ export class ClasificadorComponent implements OnChanges {
         this.atualizarResultadoTreinamento.emit(this.resultadoTreinamento)
       },
       error: (err) => {
-        console.error('[DEBUG] Erro no treinamento:', err);
+        console.error(err);
         this.treinando = false
       }
     });
