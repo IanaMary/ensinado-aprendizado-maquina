@@ -300,6 +300,13 @@ export class DashboardService {
     return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointMetricas}todos?limite=100`);
   }
 
+  patchHabilitado(tipo: 'coleta_dados' | 'modelos' | 'metricas', id: string, habilitado: boolean) {
+    return this.http.patch(
+      `${this.url}${this.endpointConfPipeline}${tipo}/${id}/habilitado`,
+      { habilitado }
+    );
+  }
+
   // SERVIÇOS SEM LIGAÇÃO COM BANCO
 
   carregarItensColetasDados() {
@@ -369,7 +376,8 @@ export class DashboardService {
     this.fetchItensModelos()
       .subscribe({
         next: dados => {
-          this.itensModelos.next(dados);
+          // Filtra itens desabilitados pelo admin (flag habilitado=false)
+          this.itensModelos.next((dados || []).filter((d: any) => d?.habilitado !== false));
         },
         error: err => {
           console.error('Erro ao carregar itens modelos:', err);
@@ -384,7 +392,7 @@ export class DashboardService {
   carregarItensMetricas() {
     this.fetchItensMetricas()
       .subscribe({
-        next: dados => this.itensMetricas.next(dados),
+        next: dados => this.itensMetricas.next((dados || []).filter((d: any) => d?.habilitado !== false)),
         error: err => {
           console.error('Erro ao carregar itens coleta dados:', err);
         }

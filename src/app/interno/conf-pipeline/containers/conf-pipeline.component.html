@@ -1,13 +1,115 @@
 <div class="container">
-  <mat-tab-group>
+  <header class="cabecalho">
+    <h2>Configuração do Pipeline</h2>
+    <p>Habilite ou desabilite quais módulos ficam disponíveis para os alunos em cada lane do pipeline.</p>
+  </header>
+
+  <mat-tab-group animationDuration="200ms">
+    <!-- COLETA -->
     <mat-tab label="Coleta">
-      Coleta
+      <div class="lane">
+        <div class="lane-info">
+          <mat-icon>upload_file</mat-icon>
+          <span>Itens disponíveis na lane <strong>Coleta de Dados</strong>.</span>
+        </div>
+
+        <div class="loading" *ngIf="carregandoColeta">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+
+        <div class="vazio" *ngIf="!carregandoColeta && !itensColeta.length">Nenhum item de coleta cadastrado.</div>
+
+        <ul class="lista-itens" *ngIf="!carregandoColeta && itensColeta.length">
+          <li class="item" *ngFor="let item of itensColeta" [class.desabilitado]="!item.habilitado">
+            <div class="item-info">
+              <span class="item-label">{{ item.label || item.valor }}</span>
+              <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
+            </div>
+            <mat-slide-toggle
+              [checked]="item.habilitado"
+              [disabled]="!!item.salvando"
+              (change)="toggle('coleta_dados', item)"
+              color="primary">
+              {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
+            </mat-slide-toggle>
+          </li>
+        </ul>
+      </div>
     </mat-tab>
+
+    <!-- MODELOS -->
     <mat-tab label="Modelos">
-      Modelos
+      <div class="lane">
+        <div class="lane-info">
+          <mat-icon>model_training</mat-icon>
+          <span>Modelos disponíveis na lane <strong>Treinamento</strong>.</span>
+        </div>
+
+        <div class="loading" *ngIf="carregandoModelos">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+
+        <div class="vazio" *ngIf="!carregandoModelos && !itensModelos.length">Nenhum modelo cadastrado.</div>
+
+        <ul class="lista-itens" *ngIf="!carregandoModelos && itensModelos.length">
+          <li class="item" *ngFor="let item of itensModelos" [class.desabilitado]="!item.habilitado">
+            <div class="item-info">
+              <span class="item-label">{{ item.label || item.valor }}</span>
+              <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
+              <span class="badge" *ngIf="tipoModelo(item)">{{ tipoModelo(item) }}</span>
+            </div>
+            <mat-slide-toggle
+              [checked]="item.habilitado"
+              [disabled]="!!item.salvando"
+              (change)="toggle('modelos', item)"
+              color="primary">
+              {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
+            </mat-slide-toggle>
+          </li>
+        </ul>
+      </div>
     </mat-tab>
+
+    <!-- METRICAS -->
     <mat-tab label="Métricas">
-      Métricas
+      <div class="lane">
+        <div class="lane-info">
+          <mat-icon>analytics</mat-icon>
+          <span>Métricas disponíveis na lane <strong>Avaliação</strong>.</span>
+        </div>
+
+        <div class="loading" *ngIf="carregandoMetricas">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+
+        <div class="vazio" *ngIf="!carregandoMetricas && !itensMetricas.length">Nenhuma métrica cadastrada.</div>
+
+        <ul class="lista-itens" *ngIf="!carregandoMetricas && itensMetricas.length">
+          <li class="item" *ngFor="let item of itensMetricas" [class.desabilitado]="!item.habilitado">
+            <div class="item-info">
+              <span class="item-label">{{ item.label || item.valor }}</span>
+              <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
+            </div>
+            <mat-slide-toggle
+              [checked]="item.habilitado"
+              [disabled]="!!item.salvando"
+              (change)="toggle('metricas', item)"
+              color="primary">
+              {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
+            </mat-slide-toggle>
+          </li>
+        </ul>
+      </div>
+    </mat-tab>
+
+    <!-- PRE-PROCESSAMENTO (placeholder) -->
+    <mat-tab label="Pré-processamento">
+      <div class="lane">
+        <div class="lane-info">
+          <mat-icon>transform</mat-icon>
+          <span>Configuração dos itens de pré-processamento será habilitada em breve (hoje estes itens vivem em <code>itens-coletas-dados.json</code> no front-end).</span>
+        </div>
+      </div>
     </mat-tab>
   </mat-tab-group>
 </div>
