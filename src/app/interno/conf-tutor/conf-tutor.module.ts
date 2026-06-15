@@ -8,6 +8,9 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { QuillModule } from 'ngx-quill';
 
 import { ConfTutorRoutingModule } from './conf-tutor-routing.module';
@@ -44,6 +47,9 @@ import { TtutorTiposAprendizadoComponent } from './components/tutor-tipos-aprend
     MatTabsModule,
     MatExpansionModule,
     MatDividerModule,
+    MatButtonModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule,
     QuillModule.forRoot(),
   ],
   providers: []

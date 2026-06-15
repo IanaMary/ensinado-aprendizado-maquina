@@ -132,6 +132,14 @@ export class DashboardService {
     return this.http.put(`${this.url}${this.endpointTutor}/${id}`, body);
   }
 
+  // Auditoria: log de edicoes do tutor por pipe
+  getTutorAudit(pipe?: string, limite = 20) {
+    const params = new URLSearchParams();
+    if (pipe) params.set('pipe', pipe);
+    params.set('limite', String(limite));
+    return this.http.get<any[]>(`${this.url}${this.endpointTutor}/audit?${params.toString()}`);
+  }
+
   // Chatbot tutor: o backend faz o proxy para a NVIDIA (a chave fica no servidor).
   chatTutor(mensagens: { role: string; content: string }[], contexto: any) {
     return this.http.post<{ resposta: string }>(`${this.url}${this.endpointTutor}/chat`, { mensagens, contexto });

@@ -6,6 +6,23 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 import { BodyTutor } from '../../../models/item-coleta-dado.model';
 
+// Mapeia o indice da aba para o slug "pipe" usado no backend/audit log.
+const TAB_PIPES = [
+  'inicio',
+  'coleta-dado',
+  'selecao-modelo',      // tipos-aprendizado edita selecao-modelo
+  'selecao-modelo',      // selecao-modelo
+  'treinamento',
+  'selecao-metricas',
+  'avaliacao',
+];
+
+const OPERACOES_LABEL: Record<string, string> = {
+  atualizar_descricao: 'Atualização de texto',
+  atualizar_modelos: 'Atualização de modelos',
+  atualizar_chaves_fixas: 'Atualização de chaves',
+};
+
 @Component({
   selector: 'app-conf-tutor',
   templateUrl: './conf-tutor.component.html',
@@ -22,13 +39,18 @@ export class ConfTutorComponent implements OnInit {
     tamanho_arq: 0
   };
 
-  tabs = [true, false, false, false, false, false, false]
+  tabs = [true, false, false, false, false, false, false];
 
   erroTutor = false;
 
   formConfTutor: FormGroup;
   formConfTutor2: FormGroup;
 
+  // Historico de edicoes
+  historico: any[] = [];
+  historicoAberto = true;
+  carregandoHistorico = false;
+  pipeAtual: string = TAB_PIPES[0];
 
   constructor(private readonly loginService: LoginService,
     private readonly formBuilder: FormBuilder,
@@ -38,9 +60,7 @@ export class ConfTutorComponent implements OnInit {
     private dashboardService: DashboardService) {
 
     this.formConfTutor = this.formBuilder.group({
-      tamanho_arq: [0, [
-        Validators.required
-      ]],
+      tamanho_arq: [0, [Validators.required]],
       prever_categoria: [null, []],
       dados_rotulados: [null, []],
       num_categorias_conhecidas: [null, []],
@@ -70,17 +90,55 @@ export class ConfTutorComponent implements OnInit {
         agrupamento: [null, [Validators.required]]
       })
     });
-
   }
 
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.carregarHistorico(this.pipeAtual);
+  }
 
   tabAtual(e: any) {
-    const idx = e.index
+    const idx = e.index;
     if (!this.tabs[idx]) {
       this.tabs[idx] = true;
     }
+    this.pipeAtual = TAB_PIPES[idx] || TAB_PIPES[0];
+    this.carregarHistorico(this.pipeAtual);
+  }
+
+  recarregarHistorico() {
+    this.carregarHistorico(this.pipeAtual);
+  }
+
+  private carregarHistorico(pipe: string) {
+    this.carregandoHistorico = true;
+    this.dashboardService.getTutorAudit(pipe, 20).subscribe({
+      next: (entradas: any[]) => {
+        this.historico = entradas || [];
+        this.carregandoHistorico = false;
+      },
+      error: () => {
+        this.historico = [];
+        this.carregandoHistorico = false;
+      }
+    });
+  }
+
+  formatarTimestamp(ts: string | null): string {
+    if (!ts) return '';
+    try {
+      const d = new Date(ts);
+      return d.toLocaleString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      });
+    } catch {
+      return ts;
+    }
+  }
+
+  formatarOperacao(op: string): string {
+    return OPERACOES_LABEL[op] || op;
   }
 
   get formConfTutorInicio(): FormGroup {
@@ -103,7 +161,4 @@ export class ConfTutorComponent implements OnInit {
       this.router.navigate(['/autenticacao/login']);
     }
   }
-
-
-
 }

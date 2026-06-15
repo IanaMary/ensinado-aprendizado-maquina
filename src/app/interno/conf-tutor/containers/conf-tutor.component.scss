@@ -1,121 +1,249 @@
-@import '../../../../styles/colores.scss';
-@import '../../../../styles/styles.scss';
+@use '../../../../styles/colores.scss' as *;
 
-
-.box-principal {
-
-  display: flex;
+.container {
+  padding: 24px;
   width: 100%;
-  // height: 100%;
-  justify-content: flex-start;
-  align-content: center;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  align-items: baseline;
-  padding: 16px;
-
-  .box {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    border-radius: 5px;
-    width: 100%;
-    gap: 16px;
-
-    .box-titulo {
-      display: flex;
-      width: 100%;
-      flex-wrap: nowrap;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-
-      .titulo {
-        display: flex;
-        flex-direction: row;
-        width: 50%;
-        color: $cor-principal;
-        font-weight: 600;
-      }
-
-      .bloco {
-        justify-content: flex-end;
-      }
-    }
-
-  }
-
-  .mat-tab-group {
-    width: 100%;
-
-    .box-coluna {
-      margin-top: 1rem;
-      display: flex;
-      flex-direction: column;
-      flex-wrap: nowrap;
-      width: 100%;
-      border: 2px solid $cor-principal;
-      border-radius: 4px;
-      padding: 1rem;
-    }
-
-
-  }
-
-
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
+.cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
 
+  .titulo-bloco {
+    h2 {
+      margin: 0 0 6px 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: $roxo-escuro;
+    }
+    p {
+      margin: 0;
+      font-size: 13px;
+      color: $cinza-escuro;
+    }
+  }
+
+  .acoes-bloco {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.conf-tutor-tabs {
+  background: $branco;
+  border: 1px solid $roxo-claro;
+  border-radius: 12px;
+  overflow: hidden;
+
+  ::ng-deep .mat-mdc-tab-header {
+    border-bottom: 1px solid $roxo-claro;
+    background: $roxo-fundo;
+  }
+}
+
+.box-coluna {
+  padding: 20px;
+  background: $branco;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+// Mantem compatibilidade com SCSS dos child components que usam .box-formulario / .editor / .linha
 .box-formulario {
   width: 100%;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-content: center;
-
+  flex-direction: column;
 
   .box-titulo {
     display: flex;
     width: 100%;
-    flex-wrap: nowrap;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 8px;
 
-    .titulo {
-      display: flex;
-      flex-direction: row;
-      width: 50%;
-      color: $cor-principal;
-      font-weight: 600;
+    .titulo h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: $roxo-escuro;
     }
 
-    .bloco {
-      justify-content: flex-end;
-    }
+    .bloco { justify-content: flex-end; }
   }
 
+  form { width: 100%; }
 
-  form {
-    width: 100%;
-  }
+  .editor { width: 100%; height: 400px; }
 
-  .editor {
-    width: 100%;
-    height: 400px;
-  }
-
-  .linha {
-    margin: 1rem 0 1rem 0;
-  }
-
+  .linha { margin: 12px 0; }
 }
 
 .texto-label {
-  color: $cor-principal;
-  margin: 1rem 0 1rem 0;
-  font-size: 16px;
+  color: $roxo-escuro;
+  margin: 12px 0;
+  font-size: 14px;
   font-weight: 600;
+}
+
+// =========================
+// Historico de edicoes
+// =========================
+.historico-card {
+  background: $branco;
+  border: 1px solid $roxo-claro;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.historico-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  background: $roxo-fundo;
+  border-bottom: 1px solid $roxo-claro;
+  transition: background 0.15s ease;
+
+  &:hover { background: rgba($roxo-claro, 0.5); }
+
+  .historico-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    font-size: 14px;
+    font-weight: 700;
+    color: $roxo-escuro;
+
+    mat-icon {
+      color: $roxo-medio;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .badge {
+      background: $roxo-medio;
+      color: $branco;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 8px;
+      border-radius: 999px;
+      min-width: 22px;
+      text-align: center;
+    }
+  }
+
+  .chevron {
+    color: $cinza-medio;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.historico-body {
+  padding: 12px 16px 16px;
+}
+
+.historico-loading {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.historico-vazio {
+  padding: 16px;
+  text-align: center;
+  color: $cinza-medio;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.historico-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.historico-item {
+  background: $roxo-fundo;
+  border: 1px solid $roxo-claro;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .historico-linha-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+
+    .usuario {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: $roxo-escuro;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+        color: $roxo-medio;
+      }
+    }
+
+    .ts {
+      font-size: 11px;
+      color: $cinza-medio;
+      white-space: nowrap;
+    }
+  }
+
+  .historico-linha-bottom {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    color: $cinza-escuro;
+
+    .op {
+      background: $branco;
+      border: 1px solid $roxo-claro;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-weight: 600;
+      color: $roxo-medio;
+    }
+
+    .campos {
+      font-family: monospace;
+      color: $cinza-medio;
+    }
+  }
 }
