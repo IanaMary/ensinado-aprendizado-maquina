@@ -10,7 +10,7 @@ import { AuthService } from '../../../service/auth/auth.service';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 import { NotificacaoService } from '../../../service/notificacao.service';
 
-type Lane = 'coleta_dados' | 'modelos' | 'metricas';
+type Lane = 'coleta_dados' | 'modelos' | 'metricas' | 'pre_processamento';
 
 interface ItemAdmin {
   id: string;
@@ -44,14 +44,17 @@ export class ConfPipelineComponent implements OnInit {
   itensColeta: ItemAdmin[] = [];
   itensModelos: ItemAdmin[] = [];
   itensMetricas: ItemAdmin[] = [];
+  itensPreProc: ItemAdmin[] = [];
 
   carregandoColeta = true;
   carregandoModelos = true;
   carregandoMetricas = true;
+  carregandoPreProc = true;
 
   buscaColeta = '';
   buscaModelos = '';
   buscaMetricas = '';
+  buscaPreProc = '';
 
   get itensColetaFiltrados(): ItemAdmin[] {
     return this.filtrar(this.itensColeta, this.buscaColeta);
@@ -63,6 +66,10 @@ export class ConfPipelineComponent implements OnInit {
 
   get itensMetricasFiltradas(): ItemAdmin[] {
     return this.filtrar(this.itensMetricas, this.buscaMetricas);
+  }
+
+  get itensPreProcFiltrados(): ItemAdmin[] {
+    return this.filtrar(this.itensPreProc, this.buscaPreProc);
   }
 
   private filtrar(itens: ItemAdmin[], termo: string): ItemAdmin[] {
@@ -86,6 +93,38 @@ export class ConfPipelineComponent implements OnInit {
     this.carregarColeta();
     this.carregarModelos();
     this.carregarMetricas();
+    this.carregarPreProcessamento();
+  }
+
+  private carregarPreProcessamento() {
+    this.carregandoPreProc = true;
+    const catalogo = this.dashboard.getPreProcessamentoCatalogo();
+    this.dashboard.fetchPreProcessamentoOverrides().subscribe({
+      next: (overrides: any[]) => {
+        const map = new Map((overrides || []).map((o: any) => [o.valor, o.habilitado]));
+        this.itensPreProc = catalogo.map((c: any) => ({
+          id: c.valor,
+          label: c.label,
+          valor: c.valor,
+          grupo: c.grupo,
+          resumo: c.resumo,
+          habilitado: map.get(c.valor) !== false,
+        }));
+        this.carregandoPreProc = false;
+      },
+      error: () => {
+        this.itensPreProc = catalogo.map((c: any) => ({
+          id: c.valor,
+          label: c.label,
+          valor: c.valor,
+          grupo: c.grupo,
+          resumo: c.resumo,
+          habilitado: c.habilitado !== false,
+        }));
+        this.carregandoPreProc = false;
+        this.notificacao.erro('Não foi possível carregar configurações salvas de pré-processamento.');
+      }
+    });
   }
 
   private carregarColeta() {

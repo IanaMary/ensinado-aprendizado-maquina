@@ -300,10 +300,22 @@ export class DashboardService {
     return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointMetricas}todos?limite=100`);
   }
 
-  patchHabilitado(tipo: 'coleta_dados' | 'modelos' | 'metricas', id: string, habilitado: boolean) {
+  patchHabilitado(tipo: 'coleta_dados' | 'modelos' | 'metricas' | 'pre_processamento', id: string, habilitado: boolean) {
     return this.http.patch(
       `${this.url}${this.endpointConfPipeline}${tipo}/${id}/habilitado`,
       { habilitado }
+    );
+  }
+
+  // Catalogo canonico de pre-processamento vive no front (itens-coletas-dados.json).
+  // Overrides de habilitado/desabilitado vivem em db.pre_processamento.
+  getPreProcessamentoCatalogo(): any[] {
+    return (itensPipeline.itensPreProcessamento as any[]) || [];
+  }
+
+  fetchPreProcessamentoOverrides() {
+    return this.http.get<{valor: string, habilitado: boolean}[]>(
+      `${this.url}${this.endpointConfPipeline}pre_processamento/todos`
     );
   }
 
@@ -339,7 +351,17 @@ export class DashboardService {
 
   carregarItensPreProcessamento() {
     const itens = itensPipeline.itensPreProcessamento as any[];
-    this.itensPreProcessamento.next(itens as any);
+    // Aplica overrides do admin (habilitado/desabilitado por valor) antes de propagar
+    this.fetchPreProcessamentoOverrides().subscribe({
+      next: overrides => {
+        const map = new Map((overrides || []).map(o => [o.valor, o.habilitado]));
+        const filtrados = (itens || []).filter(i => map.get(i.valor) !== false);
+        this.itensPreProcessamento.next(filtrados as any);
+      },
+      error: () => {
+        this.itensPreProcessamento.next(itens as any);
+      }
+    });
   }
 
   getItensPreProcessamento(): Observable<ItemPipeline[]> {

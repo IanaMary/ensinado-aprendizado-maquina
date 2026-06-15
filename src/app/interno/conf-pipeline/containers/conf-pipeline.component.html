@@ -129,13 +129,45 @@
       </div>
     </mat-tab>
 
-    <!-- PRE-PROCESSAMENTO (placeholder) -->
+    <!-- PRE-PROCESSAMENTO -->
     <mat-tab label="Pré-processamento">
       <div class="lane">
         <div class="lane-info">
           <mat-icon>transform</mat-icon>
-          <span>Configuração dos itens de pré-processamento será habilitada em breve (hoje estes itens vivem em <code>itens-coletas-dados.json</code> no front-end).</span>
+          <span>Itens disponíveis na lane <strong>Pré-processamento</strong>.</span>
         </div>
+
+        <div class="busca" *ngIf="!carregandoPreProc && itensPreProc.length">
+          <mat-icon>search</mat-icon>
+          <input type="text" [(ngModel)]="buscaPreProc" placeholder="Buscar por nome ou valor…" />
+          <button type="button" class="limpar" *ngIf="buscaPreProc" (click)="buscaPreProc = ''" aria-label="Limpar busca">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="loading" *ngIf="carregandoPreProc">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+
+        <div class="vazio" *ngIf="!carregandoPreProc && !itensPreProc.length">Nenhum item de pré-processamento cadastrado.</div>
+        <div class="vazio" *ngIf="!carregandoPreProc && itensPreProc.length && !itensPreProcFiltrados.length">Nenhum item corresponde à busca.</div>
+
+        <ul class="lista-itens" *ngIf="!carregandoPreProc && itensPreProcFiltrados.length">
+          <li class="item" *ngFor="let item of itensPreProcFiltrados" [class.desabilitado]="!item.habilitado">
+            <div class="item-info">
+              <span class="item-label">{{ item.label || item.valor }}</span>
+              <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
+              <span class="badge" *ngIf="item['grupo']">{{ item['grupo'] }}</span>
+            </div>
+            <mat-slide-toggle
+              [checked]="item.habilitado"
+              [disabled]="!!item.salvando"
+              (change)="toggle('pre_processamento', item)"
+              color="primary">
+              {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
+            </mat-slide-toggle>
+          </li>
+        </ul>
       </div>
     </mat-tab>
   </mat-tab-group>
