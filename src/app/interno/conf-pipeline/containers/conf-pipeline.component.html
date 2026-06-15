@@ -17,10 +17,19 @@
           <mat-spinner diameter="32"></mat-spinner>
         </div>
 
-        <div class="vazio" *ngIf="!carregandoColeta && !itensColeta.length">Nenhum item de coleta cadastrado.</div>
+        <div class="busca" *ngIf="!carregandoColeta && itensColeta.length">
+          <mat-icon>search</mat-icon>
+          <input type="text" [(ngModel)]="buscaColeta" placeholder="Buscar por nome ou valor…" />
+          <button type="button" class="limpar" *ngIf="buscaColeta" (click)="buscaColeta = ''" aria-label="Limpar busca">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
 
-        <ul class="lista-itens" *ngIf="!carregandoColeta && itensColeta.length">
-          <li class="item" *ngFor="let item of itensColeta" [class.desabilitado]="!item.habilitado">
+        <div class="vazio" *ngIf="!carregandoColeta && !itensColeta.length">Nenhum item de coleta cadastrado.</div>
+        <div class="vazio" *ngIf="!carregandoColeta && itensColeta.length && !itensColetaFiltrados.length">Nenhum item corresponde à busca.</div>
+
+        <ul class="lista-itens" *ngIf="!carregandoColeta && itensColetaFiltrados.length">
+          <li class="item" *ngFor="let item of itensColetaFiltrados" [class.desabilitado]="!item.habilitado">
             <div class="item-info">
               <span class="item-label">{{ item.label || item.valor }}</span>
               <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
@@ -49,10 +58,19 @@
           <mat-spinner diameter="32"></mat-spinner>
         </div>
 
-        <div class="vazio" *ngIf="!carregandoModelos && !itensModelos.length">Nenhum modelo cadastrado.</div>
+        <div class="busca" *ngIf="!carregandoModelos && itensModelos.length">
+          <mat-icon>search</mat-icon>
+          <input type="text" [(ngModel)]="buscaModelos" placeholder="Buscar por nome ou valor…" />
+          <button type="button" class="limpar" *ngIf="buscaModelos" (click)="buscaModelos = ''" aria-label="Limpar busca">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
 
-        <ul class="lista-itens" *ngIf="!carregandoModelos && itensModelos.length">
-          <li class="item" *ngFor="let item of itensModelos" [class.desabilitado]="!item.habilitado">
+        <div class="vazio" *ngIf="!carregandoModelos && !itensModelos.length">Nenhum modelo cadastrado.</div>
+        <div class="vazio" *ngIf="!carregandoModelos && itensModelos.length && !itensModelosFiltrados.length">Nenhum modelo corresponde à busca.</div>
+
+        <ul class="lista-itens" *ngIf="!carregandoModelos && itensModelosFiltrados.length">
+          <li class="item" *ngFor="let item of itensModelosFiltrados" [class.desabilitado]="!item.habilitado">
             <div class="item-info">
               <span class="item-label">{{ item.label || item.valor }}</span>
               <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
@@ -82,10 +100,19 @@
           <mat-spinner diameter="32"></mat-spinner>
         </div>
 
-        <div class="vazio" *ngIf="!carregandoMetricas && !itensMetricas.length">Nenhuma métrica cadastrada.</div>
+        <div class="busca" *ngIf="!carregandoMetricas && itensMetricas.length">
+          <mat-icon>search</mat-icon>
+          <input type="text" [(ngModel)]="buscaMetricas" placeholder="Buscar por nome ou valor…" />
+          <button type="button" class="limpar" *ngIf="buscaMetricas" (click)="buscaMetricas = ''" aria-label="Limpar busca">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
 
-        <ul class="lista-itens" *ngIf="!carregandoMetricas && itensMetricas.length">
-          <li class="item" *ngFor="let item of itensMetricas" [class.desabilitado]="!item.habilitado">
+        <div class="vazio" *ngIf="!carregandoMetricas && !itensMetricas.length">Nenhuma métrica cadastrada.</div>
+        <div class="vazio" *ngIf="!carregandoMetricas && itensMetricas.length && !itensMetricasFiltradas.length">Nenhuma métrica corresponde à busca.</div>
+
+        <ul class="lista-itens" *ngIf="!carregandoMetricas && itensMetricasFiltradas.length">
+          <li class="item" *ngFor="let item of itensMetricasFiltradas" [class.desabilitado]="!item.habilitado">
             <div class="item-info">
               <span class="item-label">{{ item.label || item.valor }}</span>
               <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>

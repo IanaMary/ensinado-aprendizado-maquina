@@ -49,6 +49,31 @@ export class ConfPipelineComponent implements OnInit {
   carregandoModelos = true;
   carregandoMetricas = true;
 
+  buscaColeta = '';
+  buscaModelos = '';
+  buscaMetricas = '';
+
+  get itensColetaFiltrados(): ItemAdmin[] {
+    return this.filtrar(this.itensColeta, this.buscaColeta);
+  }
+
+  get itensModelosFiltrados(): ItemAdmin[] {
+    return this.filtrar(this.itensModelos, this.buscaModelos);
+  }
+
+  get itensMetricasFiltradas(): ItemAdmin[] {
+    return this.filtrar(this.itensMetricas, this.buscaMetricas);
+  }
+
+  private filtrar(itens: ItemAdmin[], termo: string): ItemAdmin[] {
+    const t = (termo || '').trim().toLowerCase();
+    if (!t) return itens;
+    return itens.filter(i =>
+      (i.label || '').toLowerCase().includes(t) ||
+      (i.valor || '').toLowerCase().includes(t)
+    );
+  }
+
   constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
