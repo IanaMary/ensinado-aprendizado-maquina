@@ -106,12 +106,109 @@
     color: $cinza-medio;
     font-style: italic;
   }
+
+  .stream {
+    .cursor {
+      animation: piscar 0.8s step-end infinite;
+      color: $roxo-medio;
+      font-weight: bold;
+    }
+  }
+
+  .markdown {
+    white-space: normal;
+
+    ::ng-deep {
+      .md-code {
+        background: rgba(0, 0, 0, 0.06);
+        border-radius: 6px;
+        padding: 8px 10px;
+        font-size: 12px;
+        font-family: 'Courier New', Courier, monospace;
+        overflow-x: auto;
+        margin: 6px 0;
+
+        code {
+          background: none;
+          padding: 0;
+        }
+      }
+
+      .md-inline {
+        background: rgba(0, 0, 0, 0.06);
+        border-radius: 3px;
+        padding: 1px 4px;
+        font-size: 12px;
+        font-family: 'Courier New', Courier, monospace;
+      }
+
+      ul {
+        margin: 4px 0;
+        padding-left: 16px;
+      }
+
+      li {
+        margin: 2px 0;
+      }
+
+      strong {
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+.cursor-inline {
+  animation: piscar 0.8s step-end infinite;
+  color: $roxo-medio;
+  font-weight: bold;
+  margin-left: -2px;
+}
+
+@keyframes piscar {
+  50% { opacity: 0; }
 }
 
 .chat-erro {
   font-size: 12px;
   color: $erro;
   padding: 4px 2px;
+}
+
+.historico-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgba($roxo-claro, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: $cinza-claro;
+  }
+
+  .historico-titulo {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: $roxo-escuro;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .historico-data {
+    font-size: 11px;
+    color: $cinza-medio;
+    width: 100%;
+  }
+
+  .historico-deletar {
+    margin-left: auto;
+  }
 }
 
 .chat-entrada {

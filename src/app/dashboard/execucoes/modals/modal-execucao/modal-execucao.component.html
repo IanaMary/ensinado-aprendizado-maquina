@@ -1,6 +1,6 @@
-<div class="modal-layout" [class.expanded]="drawerOpen">
+<div class="modal-layout">
   <!-- Coluna principal -->
-  <div class="main-content" [class.main-content-pad]="drawerOpen">
+  <div class="main-content">
 
     <nav class="modal-cabecalho">
       <div class="cabecalho-topo">
@@ -94,8 +94,18 @@
     </div>
   </div>
 
-  <!-- Gaveta lateral -->
-  <div class="side-drawer" *ngIf="drawerOpen">
+  <!-- FAB do tutor (fixo no canto inferior direito da tela) -->
+  <button type="button" class="tutor-fab"
+    [class.active]="drawerOpen"
+    (click)="toggleDrawer()"
+    [matTooltip]="drawerOpen ? 'Fechar tutor' : 'Abrir tutor'"
+    matTooltipPosition="left"
+    aria-label="Toggle tutor">
+    <mat-icon>{{ drawerOpen ? 'close' : 'smart_toy' }}</mat-icon>
+  </button>
+
+  <!-- Painel flutuante do tutor -->
+  <div class="tutor-floating-panel" *ngIf="drawerOpen">
     <!-- Info da etapa atual -->
     <div *ngIf="tutorPipelineInfo" class="pipeline-info">
       <h4>{{ tutorPipelineInfo.titulo }}</h4>

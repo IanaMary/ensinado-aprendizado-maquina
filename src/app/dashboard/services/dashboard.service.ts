@@ -137,6 +137,86 @@ export class DashboardService {
     return this.http.post<{ resposta: string }>(`${this.url}${this.endpointTutor}/chat`, { mensagens, contexto });
   }
 
+  // Chatbot tutor via streaming (SSE)
+  chatTutorStream(mensagens: { role: string; content: string }[], contexto: any): Observable<string> {
+    return new Observable<string>(subscriber => {
+      const body = JSON.stringify({ mensagens, contexto });
+      fetch(`${this.url}${this.endpointTutor}/chat/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionStorage.getItem('token') || ''}`,
+        },
+        body,
+      }).then(async response => {
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({ detail: 'Erro desconhecido' }));
+          subscriber.error(new Error(err.detail || 'Erro ao conectar com o tutor'));
+          return;
+        }
+        const reader = response.body?.getReader();
+        if (!reader) {
+          subscriber.error(new Error('Stream não disponível'));
+          return;
+        }
+        const decoder = new TextDecoder();
+        let buffer = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') {
+              subscriber.complete();
+              return;
+            }
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.error) {
+                subscriber.error(new Error(parsed.error));
+                return;
+              }
+              if (parsed.token) {
+                subscriber.next(parsed.token);
+              }
+            } catch { /* skip malformed */ }
+          }
+        }
+        subscriber.complete();
+      }).catch(err => subscriber.error(err));
+    });
+  }
+
+  // Histórico de conversas do chat tutor
+  chatHistoricoListar(pipelineId?: string) {
+    const params = pipelineId ? `?pipeline_id=${pipelineId}` : '';
+    return this.http.get<any[]>(`${this.url}${this.endpointTutor}/chat/historico${params}`);
+  }
+
+  chatHistoricoObter(chatId: string) {
+    return this.http.get<any>(`${this.url}${this.endpointTutor}/chat/historico/${chatId}`);
+  }
+
+  chatHistoricoCriar(pipelineId?: string, titulo?: string) {
+    const params = new URLSearchParams();
+    if (pipelineId) params.set('pipeline_id', pipelineId);
+    if (titulo) params.set('titulo', titulo);
+    return this.http.post<any>(`${this.url}${this.endpointTutor}/chat/historico?${params.toString()}`, {});
+  }
+
+  chatHistoricoAtualizar(chatId: string, mensagens: { role: string; content: string }[], titulo?: string) {
+    const params = titulo ? `?titulo=${encodeURIComponent(titulo)}` : '';
+    return this.http.put<any>(`${this.url}${this.endpointTutor}/chat/historico/${chatId}${params}`, mensagens);
+  }
+
+  chatHistoricoDeletar(chatId: string) {
+    return this.http.delete<any>(`${this.url}${this.endpointTutor}/chat/historico/${chatId}`);
+  }
+
   putTutorTipoAprendizado(body: any, id: string) {
     return this.http.put(`${this.url}${this.endpointTutor}/editar-tipo-aprendizado/${id}`, body);
   }

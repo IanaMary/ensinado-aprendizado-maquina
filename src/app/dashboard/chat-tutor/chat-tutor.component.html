@@ -2,35 +2,71 @@
   <div class="chat-header">
     <mat-icon>smart_toy</mat-icon>
     <span>Tutor por chat</span>
-    <button mat-icon-button class="limpar-btn" *ngIf="mensagens.length" (click)="limpar()"
-      matTooltip="Limpar conversa" matTooltipPosition="above" aria-label="Limpar conversa">
-      <mat-icon>delete_outline</mat-icon>
+    <button mat-icon-button *ngIf="!mostrarHistorico" (click)="toggleHistorico()"
+      matTooltip="Conversas anteriores" matTooltipPosition="above" aria-label="Histórico">
+      <mat-icon>history</mat-icon>
+    </button>
+    <button mat-icon-button *ngIf="mostrarHistorico" (click)="toggleHistorico()"
+      matTooltip="Voltar ao chat" matTooltipPosition="above" aria-label="Voltar ao chat">
+      <mat-icon>chat</mat-icon>
+    </button>
+    <button mat-icon-button class="limpar-btn" *ngIf="mensagens.length && !mostrarHistorico" (click)="novaConversa()"
+      matTooltip="Nova conversa" matTooltipPosition="above" aria-label="Nova conversa">
+      <mat-icon>add</mat-icon>
     </button>
   </div>
 
-  <div class="chat-corpo">
+  <!-- Lista de histórico -->
+  <div class="chat-corpo" *ngIf="mostrarHistorico">
+    <div class="chat-sugestoes" *ngIf="!historico.length">
+      <p class="chat-intro">Nenhuma conversa anterior ainda.</p>
+    </div>
+    <div class="historico-item" *ngFor="let h of historico" (click)="abrirConversa(h)">
+      <div class="historico-titulo">{{ h.titulo }}</div>
+      <div class="historico-data">{{ h.atualizado_em | date:'dd/MM/yy HH:mm' }}</div>
+      <button mat-icon-button class="historico-deletar" (click)="deletarConversa($event, h)"
+        matTooltip="Apagar" aria-label="Apagar conversa">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat normal -->
+  <div class="chat-corpo" *ngIf="!mostrarHistorico">
     <!-- Estado inicial: sugestoes -->
-    <div class="chat-sugestoes" *ngIf="!mensagens.length">
+    <div class="chat-sugestoes" *ngIf="!mensagens.length && !carregando">
       <p class="chat-intro">Pergunte ao tutor sobre o seu pipeline: modelo, dados, pré-processamento, métricas, gráficos ou o código gerado.</p>
       <button class="sugestao" *ngFor="let s of sugestoes" (click)="usarSugestao(s)">{{ s }}</button>
     </div>
 
     <!-- Mensagens -->
     <div class="msg" *ngFor="let m of mensagens" [class.user]="m.role === 'user'" [class.assistant]="m.role === 'assistant'">
-      <div class="bolha">{{ m.content }}</div>
+      <div class="bolha" *ngIf="m.role === 'user'">{{ m.content }}</div>
+      <div class="bolha markdown" *ngIf="m.role === 'assistant'" [innerHTML]="m.content | markdown"></div>
     </div>
 
-    <div class="msg assistant" *ngIf="carregando">
+    <!-- Resposta streaming em andamento -->
+    <div class="msg assistant" *ngIf="respostaStream">
+      <div class="bolha stream markdown" [innerHTML]="respostaStream | markdown"></div>
+      <span class="cursor-inline">▍</span>
+    </div>
+
+    <!-- Indicador de carregamento (antes do primeiro token) -->
+    <div class="msg assistant" *ngIf="carregando && !respostaStream">
       <div class="bolha digitando">O tutor está pensando…</div>
     </div>
 
     <div class="chat-erro" *ngIf="erro">{{ erro }}</div>
   </div>
 
-  <div class="chat-entrada">
+  <div class="chat-entrada" *ngIf="!mostrarHistorico">
     <textarea [(ngModel)]="entrada" rows="2" placeholder="Escreva sua pergunta…"
       (keydown.enter)="$event.preventDefault(); enviar()" [disabled]="carregando"></textarea>
-    <button mat-icon-button color="primary" (click)="enviar()" [disabled]="carregando || !entrada.trim()"
+    <button mat-icon-button color="warn" *ngIf="carregando" (click)="cancelar()"
+      matTooltip="Cancelar" aria-label="Cancelar resposta">
+      <mat-icon>stop</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" *ngIf="!carregando" (click)="enviar()" [disabled]="!entrada.trim()"
       aria-label="Enviar pergunta">
       <mat-icon>send</mat-icon>
     </button>

@@ -25,10 +25,6 @@
   max-height: 90vh;
   box-shadow: 0 8px 32px rgba($roxo-escuro, 0.12);
 
-  &.expanded {
-    width: 900px;
-  }
-
   .main-content {
     display: flex;
     flex-direction: column;
@@ -203,72 +199,122 @@
     }
   }
 
-  .main-content-pad {
-    border-right: 1px solid $roxo-claro;
+}
+
+// FAB do tutor — fixo no canto inferior direito da janela (fora do modal)
+::ng-deep .tutor-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: $roxo-medio;
+  color: $branco;
+  cursor: pointer;
+  z-index: 2100;
+  box-shadow: 0 6px 20px rgba($roxo-escuro, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.06);
+    box-shadow: 0 8px 24px rgba($roxo-escuro, 0.4);
   }
 
-  .side-drawer {
-    width: 300px;
-    flex-shrink: 0;
-    overflow-y: auto;
-    border-left: 1px solid $roxo-claro;
-    display: flex;
-    flex-direction: column;
-    background: $roxo-fundo;
-    padding: 16px;
-    gap: 12px;
+  &:active {
+    transform: scale(0.96);
+  }
 
-    .pipeline-info {
-      background: $branco;
-      border: 1px solid $roxo-claro;
-      border-radius: 12px;
-      padding: 14px;
+  &.active {
+    background: $roxo-escuro;
+  }
 
-      h4 {
-        margin: 0 0 8px 0;
-        font-size: 14px;
-        font-weight: 700;
-        color: $roxo-escuro;
-      }
+  mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+  }
+}
 
-      p {
-        margin: 0 0 10px 0;
-        font-size: 12px;
-        line-height: 1.6;
+// Painel flutuante do tutor — ancorado acima do FAB
+::ng-deep .tutor-floating-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 96px;
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 140px);
+  background: $roxo-fundo;
+  border: 1px solid $roxo-claro;
+  border-radius: 14px;
+  box-shadow: 0 12px 36px rgba($roxo-escuro, 0.22);
+  z-index: 2090;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  animation: tutorPanelIn 0.18s ease-out;
+
+  .pipeline-info {
+    background: $branco;
+    border: 1px solid $roxo-claro;
+    border-radius: 12px;
+    padding: 14px;
+
+    h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: $roxo-escuro;
+    }
+
+    p {
+      margin: 0 0 10px 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: $cinza-escuro;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 14px;
+      list-style: none;
+
+      li {
+        font-size: 11px;
+        line-height: 1.5;
         color: $cinza-escuro;
-      }
+        margin-bottom: 6px;
+        padding-left: 10px;
+        position: relative;
 
-      ul {
-        margin: 0;
-        padding-left: 14px;
-        list-style: none;
-
-        li {
-          font-size: 11px;
-          line-height: 1.5;
-          color: $cinza-escuro;
-          margin-bottom: 6px;
-          padding-left: 10px;
-          position: relative;
-
-          &::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 6px;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: $roxo-medio;
-          }
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 6px;
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: $roxo-medio;
         }
       }
     }
   }
 }
 
-.drawer-toggle {
-  border: none;
-  border-radius: 8px 0 0 8px;
-  cursor: pointer;
+@keyframes tutorPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
