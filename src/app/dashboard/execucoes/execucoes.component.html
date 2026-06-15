@@ -217,6 +217,10 @@
       <h4>{{ tutorPipelineInfo.titulo }}</h4>
       <p>{{ tutorPipelineInfo.descricao }}</p>
     </div>
-    <app-chat-tutor [contexto]="chatContexto"></app-chat-tutor>
+    <app-chat-tutor
+      [contexto]="chatContexto"
+      [conteudoInicial]="chatConteudoInicial"
+      [sugestoesCustom]="chatSugestoes">
+    </app-chat-tutor>
   </div>
 </div>

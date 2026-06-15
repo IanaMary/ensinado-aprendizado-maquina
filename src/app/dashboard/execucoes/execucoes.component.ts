@@ -34,6 +34,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   tutorThemeClass: string = 'theme-default';
   chatAberto: boolean = false;
   chatContexto: any = null;
+  chatConteudoInicial: string | null = null;
+  chatSugestoes: string[] = [];
   paramsTutor = '';
   etapaAtual = '';
   usuarioMenuAberto = false;
@@ -272,9 +274,61 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     this.tutorItemInfo = this.getItemInfo(item);
     this.tutorPipelineInfo = null;
 
-    // Abre o chatbot com o contexto do item clicado
+    // Abre o chatbot com o contexto + conteudo educacional do item clicado
     this.chatContexto = this.montarContextoChat(item, this.tutorItemInfo);
+    this.chatConteudoInicial = this.montarConteudoEducacional(this.tutorItemInfo);
+    this.chatSugestoes = this.montarSugestoesContextuais(item, this.tutorItemInfo);
     this.chatAberto = true;
+  }
+
+  private montarConteudoEducacional(info: any): string | null {
+    if (!info) return null;
+    const partes: string[] = [];
+    if (info.titulo) partes.push(`### ${info.titulo}`);
+    if (info.descricao) partes.push(info.descricao);
+    if (info.intuicao) partes.push(`**Intuição:** ${info.intuicao}`);
+    if (info.exemplo) partes.push(`**Exemplo:** ${info.exemplo}`);
+    if (info.dicas?.length) {
+      partes.push('**Dicas:**');
+      partes.push(info.dicas.map((d: string) => `- ${d}`).join('\n'));
+    }
+    if (info.conceitos?.length) {
+      partes.push('**Conceitos:**');
+      partes.push(info.conceitos.map((c: any) => `- **${c.nome}:** ${c.desc}`).join('\n'));
+    }
+    if (info.quandoUsar?.length) {
+      partes.push('**Quando usar:**');
+      partes.push(info.quandoUsar.map((q: string) => `- ${q}`).join('\n'));
+    }
+    if (info.naoUsarQuando?.length) {
+      partes.push('**Evitar quando:**');
+      partes.push(info.naoUsarQuando.map((q: string) => `- ${q}`).join('\n'));
+    }
+    partes.push('\nQuer que eu aprofunde algum ponto? Use as sugestões abaixo ou pergunte à vontade. 👇');
+    return partes.join('\n\n');
+  }
+
+  private montarSugestoesContextuais(item: ItemPipeline, info: any): string[] {
+    const nome = info?.titulo || item?.label || 'isso';
+    const tipo = item?.tipoItem;
+    const base = [
+      `Me explique melhor sobre ${nome}.`,
+      `Dê um exemplo prático de ${nome}.`,
+    ];
+    if (tipo === 'coleta-dado') {
+      base.push(`Como preparar bem os dados para ${nome}?`);
+      base.push('Quais erros comuns na coleta de dados eu devo evitar?');
+    } else if (tipo === 'pre-processamento') {
+      base.push(`Quando devo aplicar ${nome} no meu pipeline?`);
+      base.push(`Que problema acontece se eu não usar ${nome}?`);
+    } else if (tipo === 'treino-validacao-teste') {
+      base.push(`Quais hiperparâmetros de ${nome} mais importam?`);
+      base.push(`Quando ${nome} não é uma boa escolha?`);
+    } else if (tipo === 'metrica') {
+      base.push(`Como interpretar valores de ${nome}?`);
+      base.push(`${nome} é maior-melhor ou menor-melhor?`);
+    }
+    return base.slice(0, 4);
   }
 
   toggleChat(): void {

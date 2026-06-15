@@ -23,6 +23,8 @@ interface HistoricoItem {
 export class ChatTutorComponent implements OnDestroy, OnChanges {
   @Input() contexto: any = null;
   @Input() pipelineId: string | null = null;
+  @Input() conteudoInicial: string | null = null;
+  @Input() sugestoesCustom: string[] | null = null;
 
   mensagens: MensagemChat[] = [];
   entrada = '';
@@ -36,12 +38,16 @@ export class ChatTutorComponent implements OnDestroy, OnChanges {
 
   private streamSub: Subscription | null = null;
 
-  sugestoes = [
+  sugestoesPadrao = [
     'Explique o modelo que estou usando.',
     'O que significam estas métricas?',
     'Como funciona o pré-processamento aplicado?',
     'Explique o código Python gerado.',
   ];
+
+  get sugestoes(): string[] {
+    return this.sugestoesCustom?.length ? this.sugestoesCustom : this.sugestoesPadrao;
+  }
 
   constructor(private dashboardService: DashboardService) { }
 
@@ -50,6 +56,12 @@ export class ChatTutorComponent implements OnDestroy, OnChanges {
       this.limpar();
       this.chatId = null;
       this.carregarHistorico();
+    }
+    if (changes['conteudoInicial'] && this.conteudoInicial) {
+      // Reinicia o chat com o conteudo educacional do item clicado
+      this.limpar();
+      this.chatId = null;
+      this.mensagens = [{ role: 'assistant', content: this.conteudoInicial }];
     }
   }
 
