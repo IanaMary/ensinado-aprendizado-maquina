@@ -211,15 +211,21 @@
     <mat-icon>{{ chatAberto ? 'close' : 'smart_toy' }}</mat-icon>
   </button>
 
-  <!-- Painel flutuante do tutor (chatbot ciente do contexto clicado) -->
-  <div class="tutor-floating-panel" *ngIf="chatAberto">
-    <div *ngIf="tutorPipelineInfo" class="pipeline-info">
-      <h4>{{ tutorPipelineInfo.titulo }}</h4>
-      <p>{{ tutorPipelineInfo.descricao }}</p>
-    </div>
+  <!-- Painel flutuante do tutor (conteudo educacional + chatbot) -->
+  <div class="tutor-floating-panel" *ngIf="chatAberto" [ngClass]="tutorThemeClass">
+    <!-- Conteudo educacional do item clicado (mesmo do antigo painel) -->
+    <app-tutor *ngIf="tutorItemInfo || tutorPipelineInfo"
+      [tutorGeral]="tutor"
+      [modeloSelecionado]="modeloSelecionado"
+      [metricaSelecionada]="metricasSelecionadas[0]"
+      [tutorPipelineInfo]="tutorPipelineInfo"
+      [tutorItemInfo]="tutorItemInfo"
+      [tutorTheme]="tutorTheme">
+    </app-tutor>
+
+    <!-- Chatbot ciente do contexto -->
     <app-chat-tutor
       [contexto]="chatContexto"
-      [conteudoInicial]="chatConteudoInicial"
       [sugestoesCustom]="chatSugestoes">
     </app-chat-tutor>
   </div>

@@ -17,6 +17,11 @@ export class MarkdownPipe implements PipeTransform {
     // Inline code `...`
     html = html.replace(/`([^`]+)`/g, '<code class="md-inline">$1</code>');
 
+    // Headings (###, ##, #) — antes de bold/italic para nao conflitar
+    html = html.replace(/^###\s+(.+)$/gm, '<h4 class="md-h">$1</h4>');
+    html = html.replace(/^##\s+(.+)$/gm, '<h3 class="md-h">$1</h3>');
+    html = html.replace(/^#\s+(.+)$/gm, '<h2 class="md-h">$1</h2>');
+
     // Bold **...**
     html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 

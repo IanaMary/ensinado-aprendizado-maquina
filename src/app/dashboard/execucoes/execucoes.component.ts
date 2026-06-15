@@ -34,7 +34,6 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   tutorThemeClass: string = 'theme-default';
   chatAberto: boolean = false;
   chatContexto: any = null;
-  chatConteudoInicial: string | null = null;
   chatSugestoes: string[] = [];
   paramsTutor = '';
   etapaAtual = '';
@@ -274,38 +273,10 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     this.tutorItemInfo = this.getItemInfo(item);
     this.tutorPipelineInfo = null;
 
-    // Abre o chatbot com o contexto + conteudo educacional do item clicado
+    // Abre o painel: conteudo estruturado vem do <app-tutor>; o chat recebe contexto + sugestoes
     this.chatContexto = this.montarContextoChat(item, this.tutorItemInfo);
-    this.chatConteudoInicial = this.montarConteudoEducacional(this.tutorItemInfo);
     this.chatSugestoes = this.montarSugestoesContextuais(item, this.tutorItemInfo);
     this.chatAberto = true;
-  }
-
-  private montarConteudoEducacional(info: any): string | null {
-    if (!info) return null;
-    const partes: string[] = [];
-    if (info.titulo) partes.push(`### ${info.titulo}`);
-    if (info.descricao) partes.push(info.descricao);
-    if (info.intuicao) partes.push(`**Intuição:** ${info.intuicao}`);
-    if (info.exemplo) partes.push(`**Exemplo:** ${info.exemplo}`);
-    if (info.dicas?.length) {
-      partes.push('**Dicas:**');
-      partes.push(info.dicas.map((d: string) => `- ${d}`).join('\n'));
-    }
-    if (info.conceitos?.length) {
-      partes.push('**Conceitos:**');
-      partes.push(info.conceitos.map((c: any) => `- **${c.nome}:** ${c.desc}`).join('\n'));
-    }
-    if (info.quandoUsar?.length) {
-      partes.push('**Quando usar:**');
-      partes.push(info.quandoUsar.map((q: string) => `- ${q}`).join('\n'));
-    }
-    if (info.naoUsarQuando?.length) {
-      partes.push('**Evitar quando:**');
-      partes.push(info.naoUsarQuando.map((q: string) => `- ${q}`).join('\n'));
-    }
-    partes.push('\nQuer que eu aprofunde algum ponto? Use as sugestões abaixo ou pergunte à vontade. 👇');
-    return partes.join('\n\n');
   }
 
   private montarSugestoesContextuais(item: ItemPipeline, info: any): string[] {
