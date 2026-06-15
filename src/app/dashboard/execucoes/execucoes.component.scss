@@ -615,12 +615,12 @@ $metrica-cor-escuro: #E65100;
   }
 }
 
-// Painel flutuante do tutor (chatbot) — ancorado acima do FAB
+// Painel flutuante do tutor (conteudo + chatbot) — ancorado acima do FAB
 .tutor-floating-panel {
   position: fixed;
   right: 24px;
   bottom: 96px;
-  width: 400px;
+  width: 420px;
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 140px);
   background: $roxo-fundo;
@@ -634,6 +634,22 @@ $metrica-cor-escuro: #E65100;
   padding: 16px;
   gap: 12px;
   animation: tutorPanelIn 0.18s ease-out;
+
+  // Cor da borda segue o tema do item clicado
+  &.theme-coleta { border-color: rgba($coleta-cor, 0.5); }
+  &.theme-treino { border-color: rgba($treino-cor, 0.5); }
+  &.theme-metrica { border-color: rgba($metrica-cor, 0.5); }
+
+  // O app-tutor embutido fica num cartao branco compacto acima do chat
+  app-tutor {
+    display: block;
+    background: $branco;
+    border: 1px solid $roxo-claro;
+    border-radius: 12px;
+    padding: 12px 14px;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
 
   .pipeline-info {
     background: $branco;
