@@ -32,6 +32,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   tutorItemInfo: any = null;
   tutorTheme: string = 'default';
   tutorThemeClass: string = 'theme-default';
+  chatAberto: boolean = false;
+  chatContexto: any = null;
   paramsTutor = '';
   etapaAtual = '';
   usuarioMenuAberto = false;
@@ -269,6 +271,36 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     // Busca informacoes do item
     this.tutorItemInfo = this.getItemInfo(item);
     this.tutorPipelineInfo = null;
+
+    // Abre o chatbot com o contexto do item clicado
+    this.chatContexto = this.montarContextoChat(item, this.tutorItemInfo);
+    this.chatAberto = true;
+  }
+
+  toggleChat(): void {
+    this.chatAberto = !this.chatAberto;
+    if (this.chatAberto && !this.chatContexto) {
+      this.chatContexto = this.montarContextoChat();
+    }
+  }
+
+  private montarContextoChat(item?: ItemPipeline, info?: any): any {
+    return {
+      etapaAtual: this.etapaAtual || null,
+      itemSelecionado: item ? { tipo: item.tipoItem, valor: item.valor, label: item.label } : null,
+      infoSelecionada: info || null,
+      dataset: this.resultadoColetaDado ? {
+        target: this.resultadoColetaDado.target,
+        fonte: this.getResumoFonteColeta?.() || null,
+      } : null,
+      modelo: this.modeloSelecionado ? {
+        valor: this.modeloSelecionado.valor,
+        label: this.modeloSelecionado.label,
+      } : null,
+      hiperparametros: this.hiperparametrosAtuais || null,
+      preProcessamento: this.preProcessamentoConfig || null,
+      metricas: this.metricasSelecionadas?.map(m => m.valor) || [],
+    };
   }
 
   private getItemInfo(item: ItemPipeline): any {

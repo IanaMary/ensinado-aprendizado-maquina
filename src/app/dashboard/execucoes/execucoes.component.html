@@ -198,24 +198,25 @@
       </div>
     </div>
 
-    <!-- Tutor -->
-    <div class="column tutor-column" [ngClass]="tutorThemeClass">
-      <div class="column-header" [ngClass]="tutorThemeClass + '-header'">
-        <div class="column-icon tutor">
-          <mat-icon>school</mat-icon>
-        </div>
-        <span>Tutor</span>
-      </div>
-      <div class="column-content tutor-content">
-        <app-tutor
-          [tutorGeral]="tutor"
-          [modeloSelecionado]="modeloSelecionado"
-          [metricaSelecionada]="metricasSelecionadas[0]"
-          [tutorPipelineInfo]="tutorPipelineInfo"
-          [tutorItemInfo]="tutorItemInfo"
-          [tutorTheme]="tutorTheme">
-        </app-tutor>
-      </div>
+  </div>
+
+  <!-- FAB do tutor — fixo no canto inferior direito -->
+  <button type="button" class="tutor-fab"
+    [class.active]="chatAberto"
+    [ngClass]="tutorThemeClass"
+    (click)="toggleChat()"
+    [matTooltip]="chatAberto ? 'Fechar tutor' : 'Abrir tutor'"
+    matTooltipPosition="left"
+    aria-label="Toggle tutor">
+    <mat-icon>{{ chatAberto ? 'close' : 'smart_toy' }}</mat-icon>
+  </button>
+
+  <!-- Painel flutuante do tutor (chatbot ciente do contexto clicado) -->
+  <div class="tutor-floating-panel" *ngIf="chatAberto">
+    <div *ngIf="tutorPipelineInfo" class="pipeline-info">
+      <h4>{{ tutorPipelineInfo.titulo }}</h4>
+      <p>{{ tutorPipelineInfo.descricao }}</p>
     </div>
+    <app-chat-tutor [contexto]="chatContexto"></app-chat-tutor>
   </div>
 </div>

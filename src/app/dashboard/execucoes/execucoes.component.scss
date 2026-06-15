@@ -308,7 +308,7 @@ $metrica-cor-escuro: #E65100;
 // Columns
 .execucoes-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1.5fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 12px;
   flex: 1;
   min-height: 0;
@@ -572,25 +572,94 @@ $metrica-cor-escuro: #E65100;
   }
 }
 
-// Tutor column com tema
-.tutor-column {
-  transition: border-color 0.3s ease;
+// FAB do tutor — fixo no canto inferior direito da janela
+.tutor-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: $roxo-medio;
+  color: $branco;
+  cursor: pointer;
+  z-index: 2100;
+  box-shadow: 0 6px 20px rgba($roxo-escuro, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 
-  &.theme-coleta {
-    border-color: rgba($coleta-cor, 0.3);
+  &:hover {
+    transform: scale(1.06);
+    box-shadow: 0 8px 24px rgba($roxo-escuro, 0.4);
   }
 
-  &.theme-treino {
-    border-color: rgba($treino-cor, 0.3);
+  &:active {
+    transform: scale(0.96);
   }
 
-  &.theme-metrica {
-    border-color: rgba($metrica-cor, 0.3);
+  &.active {
+    background: $roxo-escuro;
+  }
+
+  &.theme-coleta { background: $coleta-cor; }
+  &.theme-treino { background: $treino-cor; }
+  &.theme-metrica { background: $metrica-cor; }
+
+  mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
   }
 }
 
-.tutor-content {
-  padding: 12px;
+// Painel flutuante do tutor (chatbot) — ancorado acima do FAB
+.tutor-floating-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 96px;
+  width: 400px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 140px);
+  background: $roxo-fundo;
+  border: 1px solid $roxo-claro;
+  border-radius: 14px;
+  box-shadow: 0 12px 36px rgba($roxo-escuro, 0.22);
+  z-index: 2090;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  animation: tutorPanelIn 0.18s ease-out;
+
+  .pipeline-info {
+    background: $branco;
+    border: 1px solid $roxo-claro;
+    border-radius: 12px;
+    padding: 14px;
+
+    h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: $roxo-escuro;
+    }
+
+    p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: $cinza-escuro;
+    }
+  }
+}
+
+@keyframes tutorPanelIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 // Responsive
