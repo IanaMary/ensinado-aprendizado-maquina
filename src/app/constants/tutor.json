@@ -2840,6 +2840,9 @@
     "accuracy_score": {
       "nome": "Acurácia (Accuracy)",
       "sklearn": "sklearn.metrics.accuracy_score",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html"
+      },
       "formula": "acurácia = (VP + VN) / (VP + VN + FP + FN)",
       "intuicao": "De todas as previsões que o modelo fez, qual porcentagem ele acertou?",
       "descricao": "A acurácia é a métrica mais intuitiva: mede a proporção de previsões corretas sobre o total. É a primeira métrica que todo mundo olha, mas pode ser enganosa em datasets desbalanceados.",
@@ -2864,6 +2867,9 @@
     "precision_score": {
       "nome": "Precisão (Precision)",
       "sklearn": "sklearn.metrics.precision_score",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html"
+      },
       "formula": "precisão = VP / (VP + FP)",
       "intuicao": "Quando o modelo diz 'é positivo', com que frequência ele está certo?",
       "descricao": "A precisão mede a qualidade das previsões positivas. Se o modelo classifica 100 amostras como positivas e 90 realmente são, a precisão é 90%. É a métrica do 'quando eu digo sim, eu acerto'.",
@@ -2884,6 +2890,9 @@
     "recall_score": {
       "nome": "Recall (Sensibilidade / Taxa de Verdadeiros Positivos)",
       "sklearn": "sklearn.metrics.recall_score",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html"
+      },
       "formula": "recall = VP / (VP + FN)",
       "intuicao": "De todos os positivos reais, quantos o modelo encontrou?",
       "descricao": "O recall mede a capacidade do modelo de encontrar TODOS os positivos. Se existem 100 pacientes com câncer e o modelo detecta 80, o recall é 80%. É a métrica do 'eu não deixo passar nenhum caso'.",
@@ -2904,6 +2913,9 @@
     "f1_score": {
       "nome": "F1-Score",
       "sklearn": "sklearn.metrics.f1_score",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html"
+      },
       "formula": "F1 = 2 × (precisão × recall) / (precisão + recall)",
       "intuicao": "Qual é o equilíbrio entre precisão e recall?",
       "descricao": "O F1-Score é a média harmônica entre precisão e recall. A média harmônica penaliza desequilíbrios: se precisão é alta e recall é baixo (ou vice-versa), o F1 será baixo. Só é alto quando AMBAS as métricas são razoáveis.",
@@ -2924,6 +2936,9 @@
     "confusion_matrix": {
       "nome": "Matriz de Confusão",
       "sklearn": "sklearn.metrics.confusion_matrix",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html"
+      },
       "formula": "Tabela N×N (N = número de classes)",
       "intuicao": "Mostra exatamente onde o modelo acerta e onde ele erra, classe por classe.",
       "descricao": "A matriz de confusão é a tabela que resume todas as previsões do modelo. As linhas representam as classes REAIS, as colunas representam as classes PREVISTAS. A diagonal principal mostra os acertos; tudo fora da diagonal são erros.",
@@ -2947,6 +2962,187 @@
         "Use heatmap para visualizar — cores mais escuras = mais erros"
       ],
       "interpretacao": "Valores altos na diagonal = bom. Valores altos fora da diagonal = o modelo confunde classes específicas."
+    },
+    "roc_auc_score": {
+      "nome": "AUC-ROC",
+      "sklearn": "sklearn.metrics.roc_auc_score",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html"
+      },
+      "formula": "AUC = área sob a curva ROC (TPR vs FPR em vários limiares)",
+      "intuicao": "Se você sortear um positivo e um negativo, qual a chance do modelo ranquear o positivo acima do negativo?",
+      "descricao": "O AUC mede a capacidade do modelo de separar classes. A curva ROC plota a taxa de verdadeiros positivos contra a taxa de falsos positivos em diferentes limiares de decisão. AUC = 1.0 é perfeito; AUC = 0.5 é aleatório (cara ou coroa).",
+      "exemploReal": "Dois modelos têm acurácia de 85%. Mas o modelo A tem AUC=0.95 (separa bem as classes) e o modelo B tem AUC=0.60 (quase não separa). O AUC revela o que a acurácia escondeu.",
+      "quandoUsar": [
+        "Datasets desbalanceados",
+        "Quando o limiar de decisão pode mudar",
+        "Comparação entre modelos independentemente do limiar",
+        "Quando FP e FN têm custos diferentes"
+      ],
+      "naoUsarQuando": [
+        "Quando o limiar de decisão é fixo e bem definido",
+        "Multiclasse sem escolher 'ovr' ou 'ovo'"
+      ],
+      "interpretacao": "0.95+ = excelente separação. 0.7-0.9 = bom. 0.5-0.7 = fraco. 0.5 = aleatório."
+    },
+    "r2_score": {
+      "nome": "R² (Coeficiente de Determinação)",
+      "sklearn": "sklearn.metrics.r2_score",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html"
+      },
+      "formula": "R² = 1 - (SS_res / SS_tot)",
+      "intuicao": "O modelo é melhor do que simplesmente chutar a média?",
+      "descricao": "O R² mede quanto da variação do target o modelo explica. R²=1.0 significa previsão perfeita. R²=0.0 equivale a sempre chutar a média. Pode ser negativo quando o modelo é pior que a média.",
+      "exemploReal": "Prever preço de casas: R²=0.85 significa que o modelo explica 85% da variação nos preços. Os outros 25% ficam por conta de fatores que o modelo não capturou (localização exata, estado do imóvel, etc.).",
+      "quandoUsar": [
+        "Problemas de regressão",
+        "Primeira métrica para avaliar modelos de regressão",
+        "Comparar modelos de regressão entre si"
+      ],
+      "naoUsarQuando": [
+        "Problemas de classificação",
+        "Quando o erro tem unidade (use RMSE ou MAE)"
+      ],
+      "interpretacao": "1.0 = previsão perfeita. 0.0 = igual a chutar a média. Negativo = pior que chutar a média."
+    },
+    "mean_squared_error": {
+      "nome": "Erro Quadrático Médio (MSE)",
+      "sklearn": "sklearn.metrics.mean_squared_error",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html"
+      },
+      "formula": "MSE = (1/n) × Σ(y_real - y_previsto)²",
+      "intuicao": "Quanto o modelo erra, em média, ao quadrado. Erros grandes pesam mais que erros pequenos.",
+      "descricao": "O MSE eleva cada erro ao quadrado e tira a média. Por elevar ao quadrado, pune mais os erros grandes. O problema: fica na unidade ao quadrado (preço²), o que dificulta a interpretação direta.",
+      "exemploReal": "Se o MSE é 25 e a unidade é 'reais', o erro médio é 5 reais (raiz de 25). Mas o MSE em si (25) não é intuitivo — por isso usamos RMSE.",
+      "quandoUsar": [
+        "Treinar modelos (é uma loss function popular)",
+        "Quer penalizar erros grandes mais que erros pequenos"
+      ],
+      "naoUsarQuando": [
+        "Quando precisa de interpretação na mesma unidade do alvo (use RMSE)",
+        "Quando outliers não devem dominar (use MAE)"
+      ],
+      "interpretacao": "0 = previsão perfeita. Quanto menor, melhor. Mas a unidade é ao quadrado."
+    },
+    "root_mean_squared_error": {
+      "nome": "Raiz do Erro Quadrático (RMSE)",
+      "sklearn": "sklearn.metrics.root_mean_squared_error",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.root_mean_squared_error.html"
+      },
+      "formula": "RMSE = √MSE = √((1/n) × Σ(y_real - y_previsto)²)",
+      "intuicao": "O erro médio na mesma unidade do alvo. É o MSE voltando para a escala original.",
+      "descricao": "O RMSE é a raiz do MSE. Volta para a mesma unidade do valor previsto — se você prevê preços em reais, o RMSE também fica em reais. É a métrica mais usada para comunicar erros de regressão.",
+      "exemploReal": "RMSE de 500 reais significa que, em média, o modelo erra R$ 500 para cima ou para baixo. Se o preço médio é R$ 50.000, um erro de R$ 500 é bem aceitável.",
+      "quandoUsar": [
+        "Comunicar erro de regressão em linguagem natural",
+        "Comparar modelos de regressão",
+        "Quando erros grandes preocupam (penaliza mais que MAE)"
+      ],
+      "naoUsarQuando": [
+        "Quando há muitos outliers e eles não devem dominar (use MAE)",
+        "Problemas de classificação"
+      ],
+      "interpretacao": "0 = perfeito. Comparar com a escala do alvo: se o alvo vai de 0 a 1000, RMSE de 50 é bom; de 500 é ruim."
+    },
+    "mean_absolute_error": {
+      "nome": "Erro Absoluto Médio (MAE)",
+      "sklearn": "sklearn.metrics.mean_absolute_error",
+      "links": {
+        "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_absolute_error.html"
+      },
+      "formula": "MAE = (1/n) × Σ|y_real - y_previsto|",
+      "intuicao": "Em média, quanto o modelo erra? Sem elevar ao quadrado, sem favoritismos.",
+      "descricao": "O MAE tira a média do tamanho dos erros, sem elevar ao quadrado. É menos sensível a outliers que o RMSE — um erro enorme conta tanto quanto dois erros moderados.",
+      "exemploReal": "MAE de 3 anos em previsão de idade significa que o modelo erra, em média, 3 anos para cima ou para baixo. Se houver um erro de 20 anos, o MAE não dispara tanto quanto o RMSE.",
+      "quandoUsar": [
+        "Quando outliers não devem dominar a métrica",
+        "Comunicar erro médio em linguagem simples",
+        "Comparar modelos quando erros grandes e pequenos têm o mesmo peso"
+      ],
+      "naoUsarQuando": [
+        "Quer penalizar erros grandes mais que pequenos (use RMSE)",
+        "Problemas de classificação"
+      ],
+      "interpretacao": "0 = perfeito. Comparar com a escala do alvo. MAE < RMSE sempre (a raiz quadrada da média dos quadrados é sempre ≥ à média dos absolutos)."
+    }
+  },
+  "preprocessamento": {
+    "por_que_escalonar": {
+      "titulo": "Por que escalonar importa",
+      "explicacao": "Muitos algoritmos (KNN, SVM, Regressão Logística, Redes Neurais) calculam distâncias ou usam gradientes. Se um atributo varia de 0 a 1000 e outro de 0 a 1, o primeiro domina completamente o cálculo. Escalonar coloca tudo na mesma escala.",
+      "exemplo": "Prever preço de casa: 'área' vai de 30 a 500 m², 'nº de quartos' de 1 a 6. Sem escalonamento, o KNN sempre olha para a área porque os números são maiores."
+    },
+    "transformadores": {
+      "StandardScaler": {
+        "nome": "StandardScaler (Padronização)",
+        "sklearn": "sklearn.preprocessing.StandardScaler",
+        "links": {
+          "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html"
+        },
+        "explicacao": "Subtrai a média e divide pelo desvio padrão. O resultado tem média 0 e desvio 1.",
+        "quandoUsar": [
+          "A maioria dos algoritmos lineares (Regressão Logística, SVM, etc.)",
+          "Quando os dados têm distribuição aproximadamente normal",
+          "Como primeira tentativa de escalonamento"
+        ],
+        "intuicao": "Transforma os dados para que fiquem centrados em zero com espalhamento uniforme. É como colocar todas as notas dos alunos na mesma prova — uns começaram com nota alta, outros com baixa, e oScaler normaliza isso."
+      },
+      "MinMaxScaler": {
+        "nome": "MinMaxScaler (Normalização)",
+        "sklearn": "sklearn.preprocessing.MinMaxScaler",
+        "links": {
+          "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html"
+        },
+        "explicacao": "Escala os dados para o intervalo [0, 1] (ou outro intervalo definido).",
+        "quandoUsar": [
+          "Redes neurais (a maioria funciona melhor com dados em [0,1])",
+          "Algoritmos que não assumem distribuição (KNN)",
+          "Quando a escala exata importa (imagens pixeladas)"
+        ],
+        "intuicao": "O valor mínimo vira 0, o máximo vira 1, e tudo o mais fica proporcional entre eles."
+      },
+      "RobustScaler": {
+        "nome": "RobustScaler",
+        "sklearn": "sklearn.preprocessing.RobustScaler",
+        "links": {
+          "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html"
+        },
+        "explicacao": "Usa mediana e IQR (intervalo interquartílico) em vez de média e desvio padrão. Mais resistente a outliers.",
+        "quandoUsar": [
+          "Dados com muitos outliers",
+          "Quando a média é distorcida por valores extremos"
+        ],
+        "intuicao": "Em vez de se basear na média (que um único valor enorme pode distorcer), usa a mediana como referência."
+      },
+      "OneHotEncoder": {
+        "nome": "OneHotEncoder (Codificação One-Hot)",
+        "sklearn": "sklearn.preprocessing.OneHotEncoder",
+        "links": {
+          "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html"
+        },
+        "explicacao": "Converte categorias em colunas binárias. Cada categoria vira uma coluna com 0 ou 1.",
+        "quandoUsar": [
+          "Atributos categóricos sem ordem (cor, cidade, tipo)",
+          "Quando o algoritmo exige entrada numérica"
+        ],
+        "intuicao": "Uma coluna 'cor' com valores 'azul', 'vermelho', 'verde' vira três colunas: 'cor_azul' (0/1), 'cor_vermelho' (0/1), 'cor_verde' (0/1)."
+      },
+      "SimpleImputer": {
+        "nome": "SimpleImputer (Imputação de Valores Faltantes)",
+        "sklearn": "sklearn.impute.SimpleImputer",
+        "links": {
+          "sklearn": "https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html"
+        },
+        "explicacao": "Preenche valores faltantes com a média, mediana, moda ou um valor constante.",
+        "quandoUsar": [
+          "Dados com poucos valores faltantes",
+          "Quando os dados faltam aleatoriamente (MCAR)"
+        ],
+        "intuicao": "Se um aluno faltou numa prova mas tirou 8 nas outras, podemos estimar que ele tiraria algo em torno de 8 na que faltou. O SimpleImputer faz isso automaticamente."
+      }
     }
   },
   "pipeline": {
@@ -2971,6 +3167,10 @@
         {
           "nome": "Divisão Treino/Teste",
           "descricao": "Separar dados para treinar e dados para avaliar. O modelo nunca vê os dados de teste durante o treino — isso simula dados novos do mundo real."
+        },
+        {
+          "nome": "Tipos de Dados",
+          "descricao": "Numéricos (contínuos como peso, discretos como idade), Categóricos (cor, cidade — sem ordem entre si) e Ordinais (grau escolar, classificação de restaurantes — têm ordem mas não distância fixa). Saber o tipo define qual transformação usar."
         }
       ]
     },
@@ -2981,7 +3181,8 @@
       "dicas": [
         "Comece com modelos simples (Regressão Logística, KNN) como baseline",
         "Compare pelo menos 2-3 modelos antes de decidir",
-        "Considere o trade-off entre desempenho e interpretabilidade"
+        "Considere o trade-off entre desempenho e interpretabilidade",
+        "Use validação cruzada para uma estimativa mais robusta do desempenho"
       ],
       "conceitos": [
         {
@@ -2995,6 +3196,10 @@
         {
           "nome": "Underfitting",
           "descricao": "Quando o modelo é simples demais para capturar os padrões. Sinal: acurácia baixa tanto no treino quanto no teste."
+        },
+        {
+          "nome": "Validação Cruzada",
+          "descricao": "Em vez de separar uma vez em treino/teste, divide os dados em K partes (folds). Treina K vezes, cada vez usando uma parte diferente para teste. A média dos K resultados é mais confiável que um único split. É como fazer K provas simuladas em vez de uma."
         }
       ]
     },
@@ -3025,7 +3230,8 @@
       "dicas": [
         "Use acurácia para datasets balanceados como primeira avaliação",
         "Use F1-Score para datasets desbalanceados",
-        "A matriz de confusão mostra exatamente onde o modelo erra"
+        "A matriz de confusão mostra exatamente onde o modelo erra",
+        "Para regressão, use RMSE para comunicar o erro na mesma unidade do alvo"
       ],
       "conceitos": [
         {
@@ -3043,6 +3249,10 @@
         {
           "nome": "Falso Negativo (FN)",
           "descricao": "O modelo prevê negativo mas a resposta é positiva. Ex: disse que não tem câncer mas o paciente tem (erro grave)."
+        },
+        {
+          "nome": "Trade-off Precisão vs Recall",
+          "descricao": "Aumentar a precisão geralmente diminui o recall e vice-versa. O limiar de decisão (threshold) controla esse trade-off. Pense: se você é mais exigente para dizer 'sim' (limiar alto), erra menos quando diz sim (precisão sobe), mas deixa passar mais positivos reais (recall cai)."
         }
       ]
     },
@@ -3054,7 +3264,8 @@
         "Compare os resultados entre diferentes modelos para escolher o melhor",
         "Se a acurácia de treino é muito maior que a de teste, há overfitting",
         "A matriz de confusão revela quais classes o modelo confunde entre si",
-        "Um bom modelo generaliza bem — funciona tanto no treino quanto no teste"
+        "Um bom modelo generaliza bem — funciona tanto no treino quanto no teste",
+        "Use validação cruzada para uma estimativa mais confiável que um único split"
       ],
       "conceitos": [
         {
@@ -3064,6 +3275,10 @@
         {
           "nome": "Validação Cruzada",
           "descricao": "Técnica que divide os dados em K partes e treina K vezes, cada vez usando uma parte diferente para teste. Dá uma estimativa mais robusta do desempenho."
+        },
+        {
+          "nome": "Curva de Aprendizado",
+          "descricao": "Gráfico que mostra como o desempenho muda conforme o tamanho do conjunto de treino aumenta. Se treino e teste convergem para um valor alto, o modelo está bom. Se ficam longe, há overfitting."
         }
       ]
     }
