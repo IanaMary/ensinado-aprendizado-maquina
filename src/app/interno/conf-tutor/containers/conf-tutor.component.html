@@ -13,39 +13,84 @@
 
   <div class="conteudo">
     <mat-tab-group animationDuration="200ms" (selectedTabChange)="tabAtual($event)" class="conf-tutor-tabs">
-      <mat-tab label="Início">
+      <mat-tab label="Dados">
         <div class="box-coluna">
-          <app-tutor-inicio [atualizar]="tabs[0]"></app-tutor-inicio>
+          <app-tutor-elementos-catalogo
+            [atualizar]="tabs[0]"
+            tipoCatalogo="coleta_dados"
+            titulo="Datasets disponíveis"
+            icone="table_chart">
+          </app-tutor-elementos-catalogo>
         </div>
       </mat-tab>
-      <mat-tab label="Coleta de dados">
+      <mat-tab label="Pré-processamento">
         <div class="box-coluna">
-          <app-tutor-coleta-dados [atualizar]="tabs[1]"></app-tutor-coleta-dados>
+          <app-tutor-elementos-catalogo
+            [atualizar]="tabs[1]"
+            tipoCatalogo="pre_processamento"
+            titulo="Etapas de pré-processamento"
+            icone="transform">
+          </app-tutor-elementos-catalogo>
         </div>
       </mat-tab>
-      <mat-tab label="Tipos de aprendizado">
+      <mat-tab label="Modelos">
         <div class="box-coluna">
-          <app-tutor-tipos-aprendizado [atualizar]="tabs[2]"></app-tutor-tipos-aprendizado>
+          <app-tutor-elementos-catalogo
+            [atualizar]="tabs[2]"
+            tipoCatalogo="modelos"
+            titulo="Modelos disponíveis"
+            icone="model_training">
+          </app-tutor-elementos-catalogo>
         </div>
       </mat-tab>
-      <mat-tab label="Seleção de modelo">
+      <mat-tab label="Métricas">
         <div class="box-coluna">
-          <app-tutor-selecao-modelo [atualizar]="tabs[3]"></app-tutor-selecao-modelo>
+          <app-tutor-elementos-catalogo
+            [atualizar]="tabs[3]"
+            tipoCatalogo="metricas"
+            titulo="Métricas disponíveis"
+            icone="analytics">
+          </app-tutor-elementos-catalogo>
         </div>
       </mat-tab>
-      <mat-tab label="Treinamento">
-        <div class="box-coluna">
-          <app-tutor-treinamento [atualizar]="tabs[4]"></app-tutor-treinamento>
-        </div>
-      </mat-tab>
-      <mat-tab label="Seleção de métricas">
-        <div class="box-coluna">
-          <app-tutor-selecao-metricas [atualizar]="tabs[5]"></app-tutor-selecao-metricas>
-        </div>
-      </mat-tab>
-      <mat-tab label="Avaliação">
-        <div class="box-coluna">
-          <app-tutor-avaliacao [atualizar]="tabs[6]"></app-tutor-avaliacao>
+      <mat-tab label="LLM">
+        <div class="box-coluna llm-config">
+          <div class="cabecalho-llm">
+            <mat-icon>smart_toy</mat-icon>
+            <h3>Modelo LLM do Tutor</h3>
+          </div>
+          <p class="desc-llm">Escolha qual modelo de linguagem vai responder as perguntas dos alunos no chat do tutor.</p>
+
+          <div class="carregando-modelos" *ngIf="carregandoModelos">
+            <mat-spinner diameter="24"></mat-spinner>
+            <span>Carregando modelos disponíveis...</span>
+          </div>
+
+          <div class="lista-modelos" *ngIf="!carregandoModelos && modelosLLM.length">
+            <div class="modelo-item"
+                 *ngFor="let m of modelosLLM"
+                 [class.ativo]="m.id === modeloLLMAtual"
+                 (click)="selecionarModeloLLM(m.id)">
+              <div class="modelo-info">
+                <mat-icon class="modelo-icon">{{ m.id === modeloLLMAtual ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                <div class="modelo-detalhes">
+                  <span class="modelo-id">{{ m.id }}</span>
+                  <span class="modelo-own" *ngIf="m.owned_by">{{ m.owned_by }}</span>
+                </div>
+              </div>
+              <mat-spinner diameter="16" *ngIf="salvandoModelo && m.id === modeloLLMAtual"></mat-spinner>
+            </div>
+          </div>
+
+          <div class="vazio-modelos" *ngIf="!carregandoModelos && !modelosLLM.length">
+            <mat-icon>cloud_off</mat-icon>
+            <p>Nenhum modelo disponível. Verifique a configuração da NVIDIA_API_KEY.</p>
+          </div>
+
+          <div class="modelo-atual-info" *ngIf="modeloLLMAtual && !carregandoModelos">
+            <mat-icon>info</mat-icon>
+            <span>Modelo ativo: <strong>{{ modeloLLMAtual }}</strong></span>
+          </div>
         </div>
       </mat-tab>
     </mat-tab-group>

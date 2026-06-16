@@ -4,17 +4,16 @@ import { AuthService } from '../../../service/auth/auth.service';
 import { LoginService } from '../../../externo/autenticacao/login/services/login.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
+import { NotificacaoService } from '../../../service/notificacao.service';
 import { BodyTutor } from '../../../models/item-coleta-dado.model';
 
 // Mapeia o indice da aba para o slug "pipe" usado no backend/audit log.
 const TAB_PIPES = [
-  'inicio',
-  'coleta-dado',
-  'selecao-modelo',      // tipos-aprendizado edita selecao-modelo
-  'selecao-modelo',      // selecao-modelo
-  'treinamento',
-  'selecao-metricas',
-  'avaliacao',
+  'coleta_dados',        // dados (catalogo)
+  'pre_processamento',   // pre-processamento (catalogo)
+  'modelos',             // modelos (catalogo)
+  'metricas',            // metricas (catalogo)
+  'llm',                 // configuracao do LLM
 ];
 
 const OPERACOES_LABEL: Record<string, string> = {
@@ -39,7 +38,7 @@ export class ConfTutorComponent implements OnInit {
     tamanho_arq: 0
   };
 
-  tabs = [true, false, false, false, false, false, false];
+  tabs = [true, false, false, false, false];
 
   erroTutor = false;
 
@@ -52,11 +51,18 @@ export class ConfTutorComponent implements OnInit {
   carregandoHistorico = false;
   pipeAtual: string = TAB_PIPES[0];
 
+  // Configuracao LLM
+  modelosLLM: { id: string; owned_by: string }[] = [];
+  modeloLLMAtual: string = '';
+  carregandoModelos = false;
+  salvandoModelo = false;
+
   constructor(private readonly loginService: LoginService,
     private readonly formBuilder: FormBuilder,
     private readonly auth: AuthService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly notificacao: NotificacaoService,
     private dashboardService: DashboardService) {
 
     this.formConfTutor = this.formBuilder.group({
@@ -104,6 +110,10 @@ export class ConfTutorComponent implements OnInit {
     }
     this.pipeAtual = TAB_PIPES[idx] || TAB_PIPES[0];
     this.carregarHistorico(this.pipeAtual);
+
+    if (this.pipeAtual === 'llm' && !this.modelosLLM.length) {
+      this.carregarModelosLLM();
+    }
   }
 
   recarregarHistorico() {
@@ -120,6 +130,39 @@ export class ConfTutorComponent implements OnInit {
       error: () => {
         this.historico = [];
         this.carregandoHistorico = false;
+      }
+    });
+  }
+
+  // === LLM Model Management ===
+
+  carregarModelosLLM() {
+    this.carregandoModelos = true;
+    this.dashboardService.listarModelosLLM().subscribe({
+      next: (res) => {
+        this.modelosLLM = res.modelos || [];
+        this.modeloLLMAtual = res.modelo_atual || '';
+        this.carregandoModelos = false;
+      },
+      error: (err) => {
+        this.notificacao.erro(err.error?.detail || 'Erro ao carregar modelos LLM.');
+        this.carregandoModelos = false;
+      }
+    });
+  }
+
+  selecionarModeloLLM(modeloId: string) {
+    if (this.salvandoModelo || modeloId === this.modeloLLMAtual) return;
+    this.salvandoModelo = true;
+    this.dashboardService.definirModeloLLM(modeloId).subscribe({
+      next: (res) => {
+        this.modeloLLMAtual = res.modelo;
+        this.salvandoModelo = false;
+        this.notificacao.sucesso('Modelo LLM atualizado com sucesso.');
+      },
+      error: (err) => {
+        this.notificacao.erro(err.error?.detail || 'Erro ao salvar modelo LLM.');
+        this.salvandoModelo = false;
       }
     });
   }

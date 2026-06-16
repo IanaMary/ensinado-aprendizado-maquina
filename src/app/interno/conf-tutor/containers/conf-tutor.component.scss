@@ -247,3 +247,162 @@
     }
   }
 }
+
+// =========================
+// Configuracao LLM
+// =========================
+.llm-config {
+  padding: 24px;
+}
+
+.cabecalho-llm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+
+  mat-icon {
+    color: $roxo-medio;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: $roxo-escuro;
+  }
+}
+
+.desc-llm {
+  margin: 0 0 20px 0;
+  font-size: 13px;
+  color: $cinza-escuro;
+  line-height: 1.5;
+}
+
+.carregando-modelos {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  color: $cinza-medio;
+  font-size: 13px;
+}
+
+.lista-modelos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid $roxo-claro;
+  border-radius: 10px;
+  background: $roxo-fundo;
+}
+
+.modelo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba($roxo-claro, 0.5);
+  transition: background 0.15s ease;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: rgba($roxo-claro, 0.3); }
+
+  &.ativo {
+    background: rgba($roxo-medio, 0.08);
+    border-left: 3px solid $roxo-medio;
+  }
+}
+
+.modelo-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.modelo-icon {
+  color: $cinza-medio;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+
+  .ativo & { color: $roxo-medio; }
+}
+
+.modelo-detalhes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.modelo-id {
+  font-size: 13px;
+  font-weight: 600;
+  color: $roxo-escuro;
+  font-family: monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modelo-own {
+  font-size: 11px;
+  color: $cinza-medio;
+}
+
+.vazio-modelos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px;
+  color: $cinza-medio;
+  text-align: center;
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+  }
+}
+
+.modelo-atual-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 10px 14px;
+  background: rgba($roxo-medio, 0.06);
+  border: 1px solid rgba($roxo-medio, 0.2);
+  border-radius: 8px;
+  font-size: 12px;
+  color: $roxo-escuro;
+
+  mat-icon {
+    color: $roxo-medio;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  strong {
+    color: $roxo-medio;
+  }
+}

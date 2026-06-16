@@ -225,6 +225,21 @@ export class DashboardService {
     return this.http.delete<any>(`${this.url}${this.endpointTutor}/chat/historico/${chatId}`);
   }
 
+  // Configuração do modelo LLM
+  listarModelosLLM() {
+    return this.http.get<{ modelos: { id: string; owned_by: string }[]; modelo_atual: string }>(
+      `${this.url}${this.endpointTutor}/modelos`
+    );
+  }
+
+  obterModeloLLM() {
+    return this.http.get<{ modelo: string }>(`${this.url}${this.endpointTutor}/modelo`);
+  }
+
+  definirModeloLLM(modelo: string) {
+    return this.http.put<{ modelo: string }>(`${this.url}${this.endpointTutor}/modelo`, { modelo });
+  }
+
   putTutorTipoAprendizado(body: any, id: string) {
     return this.http.put(`${this.url}${this.endpointTutor}/editar-tipo-aprendizado/${id}`, body);
   }
@@ -313,6 +328,27 @@ export class DashboardService {
       `${this.url}${this.endpointConfPipeline}${tipo}/${id}/habilitado`,
       { habilitado }
     );
+  }
+
+  // CRUD generico de itens do catalogo (coleta_dados, modelos, metricas)
+  getCatalogoItem(tipo: string, itemId: string) {
+    return this.http.get<any>(`${this.url}${this.endpointConfPipeline}catalogo/${tipo}/${itemId}`);
+  }
+
+  putCatalogoItem(tipo: string, itemId: string, body: any) {
+    return this.http.put<any>(`${this.url}${this.endpointConfPipeline}catalogo/${tipo}/${itemId}`, body);
+  }
+
+  postCatalogoItem(tipo: string, body: any) {
+    return this.http.post<any>(`${this.url}${this.endpointConfPipeline}catalogo/${tipo}`, body);
+  }
+
+  deleteCatalogoItem(tipo: string, itemId: string) {
+    return this.http.delete<any>(`${this.url}${this.endpointConfPipeline}catalogo/${tipo}/${itemId}`);
+  }
+
+  putPreProcessamentoDoc(valor: string, body: any) {
+    return this.http.put<any>(`${this.url}${this.endpointConfPipeline}pre_processamento_doc/${valor}`, body);
   }
 
   // Catalogo canonico de pre-processamento vive no front (itens-coletas-dados.json).
