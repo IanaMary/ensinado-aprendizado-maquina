@@ -38,6 +38,41 @@
       color: $roxo-escuro;
       letter-spacing: 0.3px;
     }
+
+    .pipeline-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+
+      .pipeline-action-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          color: $cinza-medio;
+        }
+
+        &:hover {
+          background: rgba($roxo-medio, 0.08);
+
+          mat-icon {
+            color: $roxo-medio;
+          }
+        }
+      }
+    }
   }
 
   .pipeline-content {
