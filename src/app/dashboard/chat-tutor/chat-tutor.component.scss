@@ -142,6 +142,28 @@
         font-family: 'Courier New', Courier, monospace;
       }
 
+      .md-table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 8px 0;
+        font-size: 13px;
+
+        th, td {
+          border: 1px solid rgba(0, 0, 0, 0.12);
+          padding: 6px 10px;
+          text-align: left;
+        }
+
+        th {
+          background: rgba(0, 0, 0, 0.04);
+          font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+          background: rgba(0, 0, 0, 0.02);
+        }
+      }
+
       ul {
         margin: 4px 0;
         padding-left: 16px;

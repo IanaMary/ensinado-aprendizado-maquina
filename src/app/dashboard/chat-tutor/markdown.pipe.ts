@@ -9,6 +9,9 @@ export class MarkdownPipe implements PipeTransform {
     if (!value) return '';
     let html = this.escapeHtml(value);
 
+    // Tables (before other rules to avoid conflicts)
+    html = this.parseTables(html);
+
     // Code blocks ```...```
     html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (_m, _lang, code) =>
       `<pre class="md-code"><code>${code.trim()}</code></pre>`
@@ -36,6 +39,69 @@ export class MarkdownPipe implements PipeTransform {
     html = html.replace(/\n/g, '<br>');
 
     return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  private parseTables(text: string): string {
+    const lines = text.split('\n');
+    let result: string[] = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i].trim();
+
+      // Check if this line is a table header (starts and ends with |)
+      if (line.startsWith('|') && line.endsWith('|') && i + 1 < lines.length) {
+        const nextLine = lines[i + 1].trim();
+        // Check if next line is a separator (|---|---|...)
+        if (/^\|[\s\-:|]+\|$/.test(nextLine)) {
+          // Parse table
+          const headers = this.parseTableRow(line);
+          const alignments = this.parseAlignments(nextLine);
+          let tableHtml = '<table class="md-table"><thead><tr>';
+          headers.forEach((h, idx) => {
+            const align = alignments[idx] || 'left';
+            tableHtml += `<th style="text-align:${align}">${h.trim()}</th>`;
+          });
+          tableHtml += '</tr></thead><tbody>';
+
+          i += 2; // skip header and separator
+          while (i < lines.length) {
+            const rowLine = lines[i].trim();
+            if (!rowLine.startsWith('|') || !rowLine.endsWith('|')) break;
+            const cells = this.parseTableRow(rowLine);
+            tableHtml += '<tr>';
+            cells.forEach((c, idx) => {
+              const align = alignments[idx] || 'left';
+              tableHtml += `<td style="text-align:${align}">${c.trim()}</td>`;
+            });
+            tableHtml += '</tr>';
+            i++;
+          }
+          tableHtml += '</tbody></table>';
+          result.push(tableHtml);
+          continue;
+        }
+      }
+
+      result.push(lines[i]);
+      i++;
+    }
+
+    return result.join('\n');
+  }
+
+  private parseTableRow(line: string): string[] {
+    return line.split('|').filter((_, idx, arr) => idx > 0 && idx < arr.length - 1);
+  }
+
+  private parseAlignments(separatorLine: string): string[] {
+    const cells = this.parseTableRow(separatorLine);
+    return cells.map(cell => {
+      const trimmed = cell.trim();
+      if (trimmed.startsWith(':') && trimmed.endsWith(':')) return 'center';
+      if (trimmed.endsWith(':')) return 'right';
+      return 'left';
+    });
   }
 
   private escapeHtml(text: string): string {

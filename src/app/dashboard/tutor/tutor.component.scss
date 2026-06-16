@@ -157,6 +157,56 @@
   font-size: 12px;
   line-height: 1.7;
   color: $cinza-escuro;
+
+  ::ng-deep {
+    .md-table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 8px 0;
+      font-size: 12px;
+
+      th, td {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        padding: 5px 8px;
+        text-align: left;
+      }
+
+      th {
+        background: rgba(0, 0, 0, 0.04);
+        font-weight: 600;
+      }
+
+      tr:nth-child(even) {
+        background: rgba(0, 0, 0, 0.02);
+      }
+    }
+
+    .md-code {
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 11px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .md-inline {
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 3px;
+      padding: 1px 3px;
+      font-size: 11px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    strong { font-weight: 600; }
+    em { font-style: italic; }
+
+    ul {
+      margin: 4px 0;
+      padding-left: 16px;
+    }
+
+    li { margin: 2px 0; }
+  }
 }
 
 // Model header

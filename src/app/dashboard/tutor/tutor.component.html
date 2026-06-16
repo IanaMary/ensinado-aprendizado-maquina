@@ -25,7 +25,7 @@
         <mat-icon>lightbulb</mat-icon>
         <span>{{ getTituloBasico() }}</span>
       </div>
-      <p class="desc-text">{{ getExplicacaoBasica() }}</p>
+      <p class="desc-text" [innerHTML]="getExplicacaoBasica() | markdown"></p>
     </div>
 
     <!-- ITEM INFO (quando clica no botao info) -->
