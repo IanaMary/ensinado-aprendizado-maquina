@@ -6,10 +6,6 @@
       <p>Arraste os itens do pipeline ou clique para executar</p>
     </div>
     <div class="header-actions">
-      <button class="btn-download" (click)="baixarPipeline()" [disabled]="!modeloSelecionado">
-        <mat-icon>download</mat-icon>
-        Baixar Pipeline
-      </button>
       <div class="usuario-menu">
         <button class="usuario-avatar-btn" (click)="alternarMenuUsuario($event)" matTooltip="Menu do usuário">
           <span>{{ iniciaisUsuario }}</span>

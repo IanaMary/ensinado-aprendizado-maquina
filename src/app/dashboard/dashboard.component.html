@@ -11,6 +11,9 @@
         <button mat-icon-button class="pipeline-action-btn" (click)="limparSessao()" matTooltip="Limpar">
           <mat-icon>cleaning_services</mat-icon>
         </button>
+        <button mat-icon-button class="pipeline-action-btn" (click)="baixarPipeline()" [disabled]="!modeloSelecionado" matTooltip="Baixar Pipeline">
+          <mat-icon>download</mat-icon>
+        </button>
       </div>
     </div>
     <div class="pipeline-content">

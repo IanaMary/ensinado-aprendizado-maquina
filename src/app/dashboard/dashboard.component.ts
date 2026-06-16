@@ -26,4 +26,8 @@ export class DashboardComponent implements OnInit {
     this.execucoesComponent?.limparSessao();
   }
 
+  baixarPipeline() {
+    this.execucoesComponent?.baixarPipeline();
+  }
+
 }
