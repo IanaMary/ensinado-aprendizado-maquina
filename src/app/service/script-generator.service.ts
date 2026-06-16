@@ -84,7 +84,7 @@ export class ScriptGeneratorService {
     // One import line per unique model class
     const importadosSet = new Set<string>();
     for (const m of modelosTreinados) {
-      const imp = this.getModelImport(m.modelo ?? '');
+      const imp = this.getModelImport(m.modelo ?? '', m.execucao);
       if (imp && !imp.startsWith('#') && !importadosSet.has(imp)) {
         importadosSet.add(imp);
         lines.push(imp);
@@ -116,7 +116,7 @@ export class ScriptGeneratorService {
     lines.push('# ============================================');
     lines.push('MODELOS = {');
     for (const m of modelosTreinados) {
-      const cls = this.getModelClass(m.modelo ?? '');
+      const cls = this.getModelClass(m.modelo ?? '', m.execucao);
       lines.push(`    "${m.nome_modelo}": ${cls}(),`);
     }
     lines.push('}');
@@ -389,39 +389,57 @@ export class ScriptGeneratorService {
 
     // Model import
     if (modelo) {
-      const imp = this.getModelImport(modelo.valor);
+      const imp = this.getModelImport(modelo.valor, modelo.execucao);
       if (imp) imports.push(imp);
     }
 
     // Metrics imports
     const metricImports: string[] = [];
+    const metricModuleImports: string[] = [];
     for (const metrica of metricas) {
-      switch (metrica.valor) {
-        case 'accuracy_score':
-          if (!metricImports.includes('accuracy_score')) metricImports.push('accuracy_score');
-          break;
-        case 'precision_score':
-          if (!metricImports.includes('precision_score')) metricImports.push('precision_score');
-          break;
-        case 'recall_score':
-          if (!metricImports.includes('recall_score')) metricImports.push('recall_score');
-          break;
-        case 'f1_score':
-          if (!metricImports.includes('f1_score')) metricImports.push('f1_score');
-          break;
-        case 'confusion_matrix':
-          if (!metricImports.includes('confusion_matrix')) metricImports.push('confusion_matrix');
-          break;
-        case 'silhouette_score':
-          if (!metricImports.includes('silhouette_score')) metricImports.push('silhouette_score');
-          break;
-        case 'calinski_harabasz_score':
-          if (!metricImports.includes('calinski_harabasz_score')) metricImports.push('calinski_harabasz_score');
-          break;
-        case 'davies_bouldin_score':
-          if (!metricImports.includes('davies_bouldin_score')) metricImports.push('davies_bouldin_score');
-          break;
+      if (metrica.execucao?.modulo && metrica.execucao?.funcao) {
+        const importLine = `from ${metrica.execucao.modulo} import ${metrica.execucao.funcao}`;
+        if (!metricModuleImports.includes(importLine)) metricModuleImports.push(importLine);
+      } else {
+        switch (metrica.valor) {
+          case 'accuracy_score':
+            if (!metricImports.includes('accuracy_score')) metricImports.push('accuracy_score');
+            break;
+          case 'precision_score':
+            if (!metricImports.includes('precision_score')) metricImports.push('precision_score');
+            break;
+          case 'recall_score':
+            if (!metricImports.includes('recall_score')) metricImports.push('recall_score');
+            break;
+          case 'f1_score':
+            if (!metricImports.includes('f1_score')) metricImports.push('f1_score');
+            break;
+          case 'confusion_matrix':
+            if (!metricImports.includes('confusion_matrix')) metricImports.push('confusion_matrix');
+            break;
+          case 'silhouette_score':
+            if (!metricImports.includes('silhouette_score')) metricImports.push('silhouette_score');
+            break;
+          case 'calinski_harabasz_score':
+            if (!metricImports.includes('calinski_harabasz_score')) metricImports.push('calinski_harabasz_score');
+            break;
+          case 'davies_bouldin_score':
+            if (!metricImports.includes('davies_bouldin_score')) metricImports.push('davies_bouldin_score');
+            break;
+          case 'r2_score':
+            if (!metricImports.includes('r2_score')) metricImports.push('r2_score');
+            break;
+          case 'mean_squared_error':
+            if (!metricImports.includes('mean_squared_error')) metricImports.push('mean_squared_error');
+            break;
+          case 'mean_absolute_error':
+            if (!metricImports.includes('mean_absolute_error')) metricImports.push('mean_absolute_error');
+            break;
+        }
       }
+    }
+    for (const imp of metricModuleImports) {
+      imports.push(imp);
     }
     if (metricImports.length > 0) {
       imports.push(`from sklearn.metrics import (${metricImports.join(', ')})`);
@@ -430,7 +448,10 @@ export class ScriptGeneratorService {
     return imports;
   }
 
-  private getModelImport(modeloValor: string): string {
+  private getModelImport(modeloValor: string, execucao?: any): string {
+    if (execucao?.modulo && execucao?.classe) {
+      return `from ${execucao.modulo} import ${execucao.classe}`;
+    }
     const imports: Record<string, string> = {
       'knn': 'from sklearn.neighbors import KNeighborsClassifier',
       'arvore_decisao': 'from sklearn.tree import DecisionTreeClassifier',
@@ -831,7 +852,7 @@ export class ScriptGeneratorService {
       lines.push(`        LinearRegression(fit_intercept=${fitInt}, positive=${positive})`);
       lines.push(`    )`);
     } else {
-      const modelClass = this.getModelClass(modelo.valor);
+      const modelClass = this.getModelClass(modelo.valor, modelo.execucao);
       lines.push(`    modelo = ${modelClass}(${params})`);
     }
     lines.push('    ');
@@ -956,7 +977,10 @@ export class ScriptGeneratorService {
     return lines.join('\n');
   }
 
-  private getModelClass(modeloValor: string): string {
+  private getModelClass(modeloValor: string, execucao?: any): string {
+    if (execucao?.classe) {
+      return execucao.classe;
+    }
     const classes: Record<string, string> = {
       'knn': 'KNeighborsClassifier',
       'arvore_decisao': 'DecisionTreeClassifier',

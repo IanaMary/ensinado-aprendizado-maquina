@@ -57,6 +57,12 @@ export interface Modelo {
 }
 
 // Interfaces principais
+export interface ExecucaoModelo {
+  modulo?: string;
+  classe?: string;
+  funcao?: string;
+}
+
 export interface ItemPipeline {
   icon: string;
   label: string;
@@ -74,6 +80,10 @@ export interface ItemPipeline {
   hiperparametros?: any[];
   metricas?: any[];
   average?: MediaMetrica;
+  execucao?: ExecucaoModelo;
+  import_pacote?: string;
+  classe?: string;
+  funcao?: string;
 }
 
 export interface ResultadoColetaDado {
