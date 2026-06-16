@@ -70,20 +70,105 @@
         <div class="vazio" *ngIf="!carregandoPreProc && itensPreProc.length && !itensPreProcFiltrados.length">Nenhum item corresponde à busca.</div>
 
         <ul class="lista-itens" *ngIf="!carregandoPreProc && itensPreProcFiltrados.length">
-          <li class="item" *ngFor="let item of itensPreProcFiltrados" [class.desabilitado]="!item.habilitado">
-            <div class="item-info">
-              <span class="item-label">{{ item.label || item.valor }}</span>
-              <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
-              <span class="badge" *ngIf="item['grupo']">{{ item['grupo'] }}</span>
-            </div>
-            <mat-slide-toggle
-              [checked]="item.habilitado"
-              [disabled]="!!item.salvando"
-              (change)="toggle('pre_processamento', item)"
-              color="primary">
-              {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
-            </mat-slide-toggle>
-          </li>
+          <ng-container *ngFor="let item of itensPreProcFiltrados">
+            <li class="item" [class.desabilitado]="!item.habilitado">
+              <div class="item-info">
+                <span class="item-label">{{ item.label || item.valor }}</span>
+                <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
+                <span class="badge" *ngIf="item['grupo']">{{ item['grupo'] }}</span>
+                <span class="badge badge-exec" *ngIf="item.execucao?.modulo && item.execucao?.classe"
+                      title="{{ item.execucao.modulo }}.{{ item.execucao.classe }}">
+                  exec: {{ item.execucao.classe }}
+                </span>
+              </div>
+              <div class="item-actions">
+                <button mat-icon-button type="button"
+                        (click)="alternarConteudo(item)"
+                        [attr.aria-label]="'Editar conteúdo educacional'" title="Conteúdo educacional">
+                  <mat-icon>menu_book</mat-icon>
+                </button>
+                <button mat-icon-button type="button"
+                        (click)="alternarExecucao(item)"
+                        [attr.aria-label]="item.expandido ? 'Fechar execução' : 'Editar execução'">
+                  <mat-icon>{{ item.expandido ? 'expand_less' : 'tune' }}</mat-icon>
+                </button>
+                <mat-slide-toggle
+                  [checked]="item.habilitado"
+                  [disabled]="!!item.salvando"
+                  (change)="toggle('pre_processamento', item)"
+                  color="primary">
+                  {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
+                </mat-slide-toggle>
+              </div>
+            </li>
+
+            <li class="execucao-panel" *ngIf="item.conteudoExpandido">
+              <app-conteudo-editor [conteudo]="item.conteudo" [salvando]="!!item.salvandoConteudo"
+                (salvar)="salvarConteudo('pre_processamento', item, $event)"
+                (cancelar)="item.conteudoExpandido = false"></app-conteudo-editor>
+            </li>
+
+            <li class="execucao-panel" *ngIf="item.expandido && item.execucaoDraft">
+              <div class="execucao-grid">
+                <label>
+                  <span>Módulo Python</span>
+                  <input type="text" [(ngModel)]="item.execucaoDraft.modulo"
+                         placeholder="ex.: sklearn.preprocessing" />
+                </label>
+                <label>
+                  <span>Classe</span>
+                  <input type="text" [(ngModel)]="item.execucaoDraft.classe"
+                         placeholder="ex.: StandardScaler" />
+                </label>
+                <label>
+                  <span>Aplica em</span>
+                  <select [(ngModel)]="item.execucaoDraft.aplica_em">
+                    <option ngValue="todas">Todas as features</option>
+                    <option ngValue="colunas_escolhidas">Colunas escolhidas</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="hiperparam-header">
+                <strong>Hiperparâmetros</strong>
+                <button mat-stroked-button color="primary" type="button" (click)="addHiperparam(item)">
+                  <mat-icon>add</mat-icon> Adicionar
+                </button>
+              </div>
+
+              <div class="hiperparam-vazio"
+                   *ngIf="!item.execucaoDraft.hiperparametros.length">
+                Nenhum hiperparâmetro declarado.
+              </div>
+
+              <div class="hiperparam-row"
+                   *ngFor="let h of item.execucaoDraft.hiperparametros; let i = index">
+                <input class="h-nome" type="text" [(ngModel)]="h.nome" placeholder="nome" />
+                <select class="h-tipo" [(ngModel)]="h.tipo">
+                  <option [ngValue]="undefined">tipo…</option>
+                  <option *ngFor="let t of tiposHiperparam" [ngValue]="t">{{ t }}</option>
+                </select>
+                <input class="h-default" type="text" [(ngModel)]="h.default" placeholder="default" />
+                <input class="h-opcoes" *ngIf="h.tipo === 'enum'"
+                       type="text" [(ngModel)]="h.opcoesTexto" placeholder="opc1, opc2, …" />
+                <button mat-icon-button type="button" (click)="removerHiperparam(item, i)"
+                        aria-label="Remover hiperparâmetro">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+
+              <div class="execucao-actions">
+                <button mat-button type="button" (click)="alternarExecucao(item)"
+                        [disabled]="!!item.salvandoExecucao">Cancelar</button>
+                <button mat-raised-button color="primary" type="button"
+                        (click)="salvarExecucao('pre_processamento', item)"
+                        [disabled]="!!item.salvandoExecucao">
+                  <mat-spinner *ngIf="item.salvandoExecucao" diameter="16"></mat-spinner>
+                  <span *ngIf="!item.salvandoExecucao">Salvar execução</span>
+                </button>
+              </div>
+            </li>
+          </ng-container>
         </ul>
       </div>
     </mat-tab>
@@ -112,20 +197,102 @@
         <div class="vazio" *ngIf="!carregandoModelos && itensModelos.length && !itensModelosFiltrados.length">Nenhum modelo corresponde à busca.</div>
 
         <ul class="lista-itens" *ngIf="!carregandoModelos && itensModelosFiltrados.length">
-          <li class="item" *ngFor="let item of itensModelosFiltrados" [class.desabilitado]="!item.habilitado">
-            <div class="item-info">
-              <span class="item-label">{{ item.label || item.valor }}</span>
-              <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
-              <span class="badge" *ngIf="tipoModelo(item)">{{ tipoModelo(item) }}</span>
-            </div>
-            <mat-slide-toggle
-              [checked]="item.habilitado"
-              [disabled]="!!item.salvando"
-              (change)="toggle('modelos', item)"
-              color="primary">
-              {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
-            </mat-slide-toggle>
-          </li>
+          <ng-container *ngFor="let item of itensModelosFiltrados">
+            <li class="item" [class.desabilitado]="!item.habilitado">
+              <div class="item-info">
+                <span class="item-label">{{ item.label || item.valor }}</span>
+                <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
+                <span class="badge" *ngIf="tipoModelo(item)">{{ tipoModelo(item) }}</span>
+                <span class="badge badge-exec" *ngIf="item.execucao?.modulo && item.execucao?.classe"
+                      title="{{ item.execucao.modulo }}.{{ item.execucao.classe }}">
+                  exec: {{ item.execucao.classe }}
+                </span>
+              </div>
+              <div class="item-actions">
+                <button mat-icon-button type="button"
+                        (click)="alternarConteudo(item)"
+                        [attr.aria-label]="'Editar conteúdo educacional'" title="Conteúdo educacional">
+                  <mat-icon>menu_book</mat-icon>
+                </button>
+                <button mat-icon-button type="button"
+                        (click)="alternarExecucao(item)"
+                        [attr.aria-label]="item.expandido ? 'Fechar execução' : 'Editar execução'">
+                  <mat-icon>{{ item.expandido ? 'expand_less' : 'tune' }}</mat-icon>
+                </button>
+                <mat-slide-toggle
+                  [checked]="item.habilitado"
+                  [disabled]="!!item.salvando"
+                  (change)="toggle('modelos', item)"
+                  color="primary">
+                  {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
+                </mat-slide-toggle>
+              </div>
+            </li>
+
+            <li class="execucao-panel" *ngIf="item.conteudoExpandido">
+              <app-conteudo-editor [conteudo]="item.conteudo" [salvando]="!!item.salvandoConteudo"
+                (salvar)="salvarConteudo('modelos', item, $event)"
+                (cancelar)="item.conteudoExpandido = false"></app-conteudo-editor>
+            </li>
+
+            <li class="execucao-panel" *ngIf="item.expandido && item.execucaoDraft">
+              <div class="execucao-grid">
+                <label>
+                  <span>Módulo Python</span>
+                  <input type="text" [(ngModel)]="item.execucaoDraft.modulo"
+                         placeholder="ex.: sklearn.ensemble" />
+                </label>
+                <label>
+                  <span>Classe</span>
+                  <input type="text" [(ngModel)]="item.execucaoDraft.classe"
+                         placeholder="ex.: RandomForestClassifier" />
+                </label>
+              </div>
+
+              <div class="hiperparam-header">
+                <strong>Hiperparâmetros</strong>
+                <button mat-stroked-button color="primary" type="button" (click)="addHiperparam(item)">
+                  <mat-icon>add</mat-icon> Adicionar
+                </button>
+              </div>
+
+              <div class="hiperparam-vazio"
+                   *ngIf="!item.execucaoDraft.hiperparametros.length">
+                Nenhum hiperparâmetro declarado.
+              </div>
+
+              <div class="hiperparam-row"
+                   *ngFor="let h of item.execucaoDraft.hiperparametros; let i = index">
+                <input class="h-nome" type="text" [(ngModel)]="h.nome" placeholder="nome" />
+                <select class="h-tipo" [(ngModel)]="h.tipo">
+                  <option [ngValue]="undefined">tipo…</option>
+                  <option *ngFor="let t of tiposHiperparam" [ngValue]="t">{{ t }}</option>
+                </select>
+                <input class="h-default" type="text" [(ngModel)]="h.default" placeholder="default" />
+                <input class="h-num" *ngIf="h.tipo === 'int' || h.tipo === 'float'"
+                       type="number" [(ngModel)]="h.min" placeholder="min" />
+                <input class="h-num" *ngIf="h.tipo === 'int' || h.tipo === 'float'"
+                       type="number" [(ngModel)]="h.max" placeholder="max" />
+                <input class="h-opcoes" *ngIf="h.tipo === 'enum'"
+                       type="text" [(ngModel)]="h.opcoesTexto" placeholder="opc1, opc2, …" />
+                <button mat-icon-button type="button" (click)="removerHiperparam(item, i)"
+                        aria-label="Remover hiperparâmetro">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+
+              <div class="execucao-actions">
+                <button mat-button type="button" (click)="alternarExecucao(item)"
+                        [disabled]="!!item.salvandoExecucao">Cancelar</button>
+                <button mat-raised-button color="primary" type="button"
+                        (click)="salvarExecucao('modelos', item)"
+                        [disabled]="!!item.salvandoExecucao">
+                  <mat-spinner *ngIf="item.salvandoExecucao" diameter="16"></mat-spinner>
+                  <span *ngIf="!item.salvandoExecucao">Salvar execução</span>
+                </button>
+              </div>
+            </li>
+          </ng-container>
         </ul>
       </div>
     </mat-tab>
@@ -154,19 +321,34 @@
         <div class="vazio" *ngIf="!carregandoMetricas && itensMetricas.length && !itensMetricasFiltradas.length">Nenhuma métrica corresponde à busca.</div>
 
         <ul class="lista-itens" *ngIf="!carregandoMetricas && itensMetricasFiltradas.length">
-          <li class="item" *ngFor="let item of itensMetricasFiltradas" [class.desabilitado]="!item.habilitado">
-            <div class="item-info">
-              <span class="item-label">{{ item.label || item.valor }}</span>
-              <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
-            </div>
-            <mat-slide-toggle
-              [checked]="item.habilitado"
-              [disabled]="!!item.salvando"
-              (change)="toggle('metricas', item)"
-              color="primary">
-              {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
-            </mat-slide-toggle>
-          </li>
+          <ng-container *ngFor="let item of itensMetricasFiltradas">
+            <li class="item" [class.desabilitado]="!item.habilitado">
+              <div class="item-info">
+                <span class="item-label">{{ item.label || item.valor }}</span>
+                <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
+              </div>
+              <div class="item-actions">
+                <button mat-icon-button type="button"
+                        (click)="alternarConteudo(item)"
+                        [attr.aria-label]="'Editar conteúdo educacional'" title="Conteúdo educacional">
+                  <mat-icon>menu_book</mat-icon>
+                </button>
+                <mat-slide-toggle
+                  [checked]="item.habilitado"
+                  [disabled]="!!item.salvando"
+                  (change)="toggle('metricas', item)"
+                  color="primary">
+                  {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
+                </mat-slide-toggle>
+              </div>
+            </li>
+
+            <li class="execucao-panel" *ngIf="item.conteudoExpandido">
+              <app-conteudo-editor [conteudo]="item.conteudo" [salvando]="!!item.salvandoConteudo"
+                (salvar)="salvarConteudo('metricas', item, $event)"
+                (cancelar)="item.conteudoExpandido = false"></app-conteudo-editor>
+            </li>
+          </ng-container>
         </ul>
       </div>
     </mat-tab>

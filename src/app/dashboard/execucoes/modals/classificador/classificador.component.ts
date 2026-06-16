@@ -17,6 +17,7 @@ export class ClasificadorComponent implements OnChanges {
   @Input() modeloSelecionado: ItemPipeline | undefined;
   @Input() resultadoColetaDado: ResultadoColetaDado | undefined;
   @Input() hiperparametros: Record<string, any> = {};
+  @Input() preProcessamentoConfig: any = null;
   @Output() atualizarResultadoTreinamento = new EventEmitter<any>();
 
   treinando = false;
@@ -73,12 +74,21 @@ export class ClasificadorComponent implements OnChanges {
       return;
     }
 
+    // Envia o pré-processamento montado no pipeline gráfico para o backend aplicá-lo
+    // de fato (vira um sklearn Pipeline junto do modelo), mantendo o modelo treinado
+    // coerente com o código gerado.
+    const preProcessamento = (this.preProcessamentoConfig?.itens || []).map((item: any) => ({
+      valor: item.valor,
+      colunas: item.colunas || []
+    }));
+
     const body = {
       tipo_arquivo: 'xlsx',
       arquivo_id: arquivoId,
       configuracao_id: configuracaoId,
       modelo_id: modeloId,
-      hiperparametros: this.hiperparametros || {}
+      hiperparametros: this.hiperparametros || {},
+      pre_processamento: preProcessamento
     }
 
     this.dashboardService.classificadorTreino(tipoClassficador, body).subscribe({

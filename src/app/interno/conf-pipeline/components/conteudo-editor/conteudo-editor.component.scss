@@ -1,0 +1,70 @@
+.conteudo-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px 4px;
+
+  .campos-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--texto-secundario, #555);
+
+      input, textarea {
+        font-size: 13px;
+        padding: 6px 8px;
+        border: 1px solid var(--borda, #ccc);
+        border-radius: 6px;
+        resize: vertical;
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
+  }
+
+  .bloco {
+    border: 1px solid var(--borda, #e0e0e0);
+    border-radius: 8px;
+    padding: 8px 10px;
+
+    .bloco-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .linha, .linha-hiper, .linha-ref, .linha-midia {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 6px;
+
+      input, select {
+        font-size: 13px;
+        padding: 5px 7px;
+        border: 1px solid var(--borda, #ccc);
+        border-radius: 6px;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+    }
+
+    .linha-hiper, .linha-ref, .linha-midia { flex-wrap: wrap; }
+  }
+
+  .acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    button { display: inline-flex; align-items: center; gap: 6px; }
+  }
+}

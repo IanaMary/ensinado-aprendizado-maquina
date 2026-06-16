@@ -328,9 +328,51 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     };
   }
 
+  /** Converte o bloco `conteudo` (DB) na estrutura consumida pelo <app-tutor>. */
+  private conteudoParaItemInfo(conteudo: any, item: ItemPipeline): any {
+    // hiperparametros_doc (lista) -> mapa esperado pelo card (nome/descricao/padrao/implicacoes).
+    let hiperparametros: any = undefined;
+    if (Array.isArray(conteudo.hiperparametros_doc) && conteudo.hiperparametros_doc.length) {
+      hiperparametros = {};
+      conteudo.hiperparametros_doc.forEach((h: any, i: number) => {
+        const faixa = Array.isArray(h.opcoes) ? h.opcoes.join(' | ') : h.faixa;
+        hiperparametros[h.nome || i] = {
+          nome: h.nome,
+          descricao: h.descricao,
+          padrao: h.default ?? faixa ?? '',
+          implicacoes: h.efeito || h.quando_ajustar || '',
+          sklearn: h.nome,
+        };
+      });
+    }
+    return {
+      titulo: conteudo.titulo || item.label,
+      descricao: conteudo.descricao || '',
+      dicas: conteudo.dicas,
+      conceitos: conteudo.conceitos,
+      quandoUsar: conteudo.quandoUsar,
+      naoUsarQuando: conteudo.naoUsarQuando,
+      vantagens: conteudo.vantagens,
+      desvantagens: conteudo.desvantagens,
+      formula: conteudo.formula,
+      intuicao: conteudo.intuicao,
+      exemplo: conteudo.exemplo,
+      midia: conteudo.midia,
+      referencias: conteudo.referencias,
+      hiperparametros,
+    };
+  }
+
   private getItemInfo(item: ItemPipeline): any {
     const tipo = item.tipoItem;
     const valor = item.valor;
+
+    // Conteudo educacional vindo do DB (campo `conteudo` no documento do catalogo).
+    // Tem prioridade sobre o conteudo hardcoded; quando ausente, cai no fallback.
+    const conteudo = (item as any).conteudo;
+    if (conteudo && (conteudo.descricao || conteudo.titulo)) {
+      return this.conteudoParaItemInfo(conteudo, item);
+    }
 
     // Info para itens de coleta
     if (tipo === 'coleta-dado') {

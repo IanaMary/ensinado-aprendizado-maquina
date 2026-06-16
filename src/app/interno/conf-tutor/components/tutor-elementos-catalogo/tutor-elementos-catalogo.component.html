@@ -1,0 +1,416 @@
+<div class="box-formulario">
+  <div class="cabecalho-elemento">
+    <div class="titulo-elemento">
+      <mat-icon>{{ icone }}</mat-icon>
+      <h3>{{ titulo }}</h3>
+    </div>
+    <div class="acoes-elemento">
+      <button mat-stroked-button color="primary" (click)="iniciarCriacao()" *ngIf="!criandoNovo">
+        <mat-icon>add</mat-icon> Novo item
+      </button>
+      <button mat-stroked-button (click)="carregarElementos()" matTooltip="Recarregar">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="busca" *ngIf="!carregando && elementos.length">
+    <mat-icon>search</mat-icon>
+    <input type="text" [(ngModel)]="busca" placeholder="Buscar por nome ou valor…" />
+    <button type="button" class="limpar" *ngIf="busca" (click)="busca = ''" aria-label="Limpar busca">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="loading" *ngIf="carregando">
+    <mat-spinner diameter="32"></mat-spinner>
+  </div>
+
+  <div class="vazio" *ngIf="!carregando && !elementos.length">Nenhum item cadastrado.</div>
+  <div class="vazio" *ngIf="!carregando && elementos.length && !elementosFiltrados.length">Nenhum item corresponde à busca.</div>
+
+  <!-- Formulario de criacao -->
+  <div class="form-criacao" *ngIf="criandoNovo">
+    <h4>Novo item</h4>
+
+    <div class="campos-grid">
+      <mat-form-field appearance="outline" class="campo">
+        <mat-label>Nome (label)</mat-label>
+        <input matInput [formControl]="labelControl" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="campo">
+        <mat-label>Valor interno</mat-label>
+        <input matInput [formControl]="valorControl" placeholder="auto-gerado se vazio" />
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="campo-full">
+      <mat-label>Resumo / Descrição curta</mat-label>
+      <textarea matInput [formControl]="resumoControl" rows="2"></textarea>
+    </mat-form-field>
+
+    <!-- Modelos: campos tecnicos -->
+    <ng-container *ngIf="tipoCatalogo === 'modelos'">
+      <div class="campos-grid">
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Pacote Python (import)</mat-label>
+          <input matInput [formControl]="importPacoteControl" placeholder="ex: sklearn.neighbors" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Classe</mat-label>
+          <input matInput [formControl]="classeControl" placeholder="ex: KNeighborsClassifier" />
+        </mat-form-field>
+      </div>
+
+      <div class="campos-grid">
+        <div class="campo-radio">
+          <label>Tipo de aprendizado:</label>
+          <mat-radio-group [formControl]="preverCategoriaControl">
+            <mat-radio-button [value]="true">Supervisionado</mat-radio-button>
+            <mat-radio-button [value]="false">Não-supervisionado</mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <div class="campo-radio">
+          <label>Tarefa:</label>
+          <mat-radio-group [formControl]="dadosRotuladosControl">
+            <mat-radio-button [value]="true">Classificação</mat-radio-button>
+            <mat-radio-button [value]="false">Regressão / Agrupamento</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </div>
+
+      <h5>Hiperparâmetros</h5>
+      <table class="tabela-hiperparametros">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Valor padrão</th>
+            <th>Tipo</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody formArrayName="hiperparametros">
+          <tr *ngFor="let hip of hiperparametrosArray.controls; let i = index" [formGroupName]="i">
+            <td><input matInput formControlName="nomeHiperparametro" placeholder="n_neighbors" /></td>
+            <td><input matInput formControlName="valorPadrao" placeholder="5" /></td>
+            <td>
+              <mat-select formControlName="tipo" class="select-tipo">
+                <mat-option *ngFor="let t of tiposHiperparametro" [value]="t">{{ t }}</mat-option>
+              </mat-select>
+            </td>
+            <td>
+              <button mat-icon-button color="warn" (click)="removerHiperparametro(i)" matTooltip="Remover">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button mat-stroked-button color="primary" (click)="adicionarHiperparametro()" class="btn-add">
+        <mat-icon>add</mat-icon> Adicionar hiperparâmetro
+      </button>
+
+      <h5>Métricas compatíveis</h5>
+      <div class="checklist-metricas" formArrayName="metricas">
+        <label *ngFor="let m of metricasArray.controls; let i = index" class="check-item" [formGroupName]="i">
+          <input type="checkbox" [checked]="m.value.selecionado" (change)="toggleMetrica(i)" />
+          <span>{{ metricasDisponiveis[i]?.label || m.value.valor }}</span>
+          <code>{{ m.value.valor }}</code>
+        </label>
+      </div>
+    </ng-container>
+
+    <!-- Metricas: campos tecnicos -->
+    <ng-container *ngIf="tipoCatalogo === 'metricas'">
+      <div class="campos-grid">
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Pacote Python (import)</mat-label>
+          <input matInput [formControl]="importPacoteControl" placeholder="ex: sklearn.metrics" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Função</mat-label>
+          <input matInput [formControl]="funcaoControl" placeholder="ex: accuracy_score" />
+        </mat-form-field>
+      </div>
+      <mat-form-field appearance="outline" class="campo-full">
+        <mat-label>Grupo</mat-label>
+        <mat-select [formControl]="grupoControl">
+          <mat-option value="classificacao">Classificação</mat-option>
+          <mat-option value="regressao">Regressão</mat-option>
+          <mat-option value="agrupamento">Agrupamento</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="campo-full">
+        <mat-label>Explicação educacional</mat-label>
+        <textarea matInput [formControl]="explicacaoControl" rows="4"></textarea>
+      </mat-form-field>
+    </ng-container>
+
+    <!-- Pre-processamento: campos tecnicos -->
+    <ng-container *ngIf="tipoCatalogo === 'pre_processamento'">
+      <div class="campos-grid">
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Pacote Python (import)</mat-label>
+          <input matInput [formControl]="importPacoteControl" placeholder="ex: sklearn.preprocessing" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Classe</mat-label>
+          <input matInput [formControl]="classeControl" placeholder="ex: StandardScaler" />
+        </mat-form-field>
+      </div>
+      <mat-form-field appearance="outline" class="campo-full">
+        <mat-label>Grupo</mat-label>
+        <mat-select [formControl]="grupoControl">
+          <mat-option value="scalers">Scalers</mat-option>
+          <mat-option value="encoders">Encoders</mat-option>
+          <mat-option value="imputers">Imputers</mat-option>
+          <mat-option value="transformers">Transformers</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-container>
+
+    <div class="acoes-form">
+      <button mat-stroked-button (click)="cancelarEdicao()">Cancelar</button>
+      <button mat-flat-button color="primary" (click)="salvarNovo()" [disabled]="salvando">
+        <mat-spinner diameter="16" *ngIf="salvando"></mat-spinner>
+        <span *ngIf="!salvando">Salvar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de elementos -->
+  <mat-accordion *ngIf="!carregando && elementosFiltrados.length" multi>
+    <mat-expansion-panel *ngFor="let item of elementosFiltrados" [disabled]="!!item.salvando">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <span class="item-label">{{ item.label || item.valor }}</span>
+          <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
+          <span class="badge" *ngIf="tipoModelo(item)">{{ tipoModelo(item) }}</span>
+          <span class="badge" *ngIf="item.grupo">{{ item.grupo }}</span>
+        </mat-panel-title>
+        <mat-panel-description>
+          <span class="resumo-preview" *ngIf="item.resumo">{{ item.resumo | slice:0:80 }}{{ item.resumo && item.resumo.length > 80 ? '…' : '' }}</span>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <!-- Modo visualizacao -->
+      <div class="detalhes-item" *ngIf="editandoId !== item.id">
+        <div class="campo-info" *ngIf="item.resumo">
+          <strong>Resumo:</strong>
+          <p>{{ item.resumo }}</p>
+        </div>
+        <div class="campo-info" *ngIf="item.explicacao">
+          <strong>Explicação:</strong>
+          <p>{{ item.explicacao }}</p>
+        </div>
+        <div class="campo-info" *ngIf="item.valor">
+          <strong>Valor interno:</strong>
+          <code>{{ item.valor }}</code>
+        </div>
+
+        <!-- Modelos: info tecnica -->
+        <ng-container *ngIf="tipoCatalogo === 'modelos'">
+          <div class="campo-info" *ngIf="item.import_pacote || item.classe">
+            <strong>Execução Python:</strong>
+            <code class="code-block">{{ item.import_pacote }}<span *ngIf="item.classe"> → {{ item.classe }}</span></code>
+          </div>
+          <div class="campo-info" *ngIf="item.hiperparametros?.length">
+            <strong>Hiperparâmetros:</strong>
+            <div class="lista-hips">
+              <span class="hip-chip" *ngFor="let h of item.hiperparametros">
+                {{ h.nomeHiperparametro }} = {{ h.valorPadrao }}
+              </span>
+            </div>
+          </div>
+          <div class="campo-info" *ngIf="item.metricas?.length">
+            <strong>Métricas compatíveis:</strong>
+            <span class="hip-chip" *ngFor="let m of item.metricas">{{ m }}</span>
+          </div>
+        </ng-container>
+
+        <!-- Metricas: info tecnica -->
+        <ng-container *ngIf="tipoCatalogo === 'metricas'">
+          <div class="campo-info" *ngIf="item.import_pacote || item.funcao">
+            <strong>Execução Python:</strong>
+            <code class="code-block">{{ item.import_pacote }}<span *ngIf="item.funcao"> → {{ item.funcao }}()</span></code>
+          </div>
+        </ng-container>
+
+        <!-- Pre-processamento: info tecnica -->
+        <ng-container *ngIf="tipoCatalogo === 'pre_processamento'">
+          <div class="campo-info" *ngIf="item.import_pacote || item.classe">
+            <strong>Execução Python:</strong>
+            <code class="code-block">{{ item.import_pacote }} → {{ item.classe }}</code>
+          </div>
+        </ng-container>
+
+        <div class="acoes-item">
+          <mat-slide-toggle
+            [checked]="item.habilitado"
+            [disabled]="!!item.salvando"
+            (change)="toggleHabilitado(item)"
+            color="primary">
+            {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
+          </mat-slide-toggle>
+          <div class="acoes-direita">
+            <button mat-stroked-button color="primary" (click)="iniciarEdicao(item)">
+              <mat-icon>edit</mat-icon> Editar
+            </button>
+            <button mat-stroked-button color="warn" (click)="excluir(item)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modo edicao -->
+      <div class="form-edicao" *ngIf="editandoId === item.id">
+        <div class="campos-grid">
+          <mat-form-field appearance="outline" class="campo">
+            <mat-label>Nome (label)</mat-label>
+            <input matInput [formControl]="labelControl" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="campo">
+            <mat-label>Valor interno</mat-label>
+            <input matInput [formControl]="valorControl" />
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="campo-full">
+          <mat-label>Resumo / Descrição curta</mat-label>
+          <textarea matInput [formControl]="resumoControl" rows="2"></textarea>
+        </mat-form-field>
+
+        <!-- Modelos: edicao tecnica -->
+        <ng-container *ngIf="tipoCatalogo === 'modelos'">
+          <div class="campos-grid">
+            <mat-form-field appearance="outline" class="campo">
+              <mat-label>Pacote Python (import)</mat-label>
+              <input matInput [formControl]="importPacoteControl" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="campo">
+              <mat-label>Classe</mat-label>
+              <input matInput [formControl]="classeControl" />
+            </mat-form-field>
+          </div>
+
+          <div class="campos-grid">
+            <div class="campo-radio">
+              <label>Tipo de aprendizado:</label>
+              <mat-radio-group [formControl]="preverCategoriaControl">
+                <mat-radio-button [value]="true">Supervisionado</mat-radio-button>
+                <mat-radio-button [value]="false">Não-supervisionado</mat-radio-button>
+              </mat-radio-group>
+            </div>
+            <div class="campo-radio">
+              <label>Tarefa:</label>
+              <mat-radio-group [formControl]="dadosRotuladosControl">
+                <mat-radio-button [value]="true">Classificação</mat-radio-button>
+                <mat-radio-button [value]="false">Regressão / Agrupamento</mat-radio-button>
+              </mat-radio-group>
+            </div>
+          </div>
+
+          <h5>Hiperparâmetros</h5>
+          <table class="tabela-hiperparametros">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Valor padrão</th>
+                <th>Tipo</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody formArrayName="hiperparametros">
+              <tr *ngFor="let hip of hiperparametrosArray.controls; let i = index" [formGroupName]="i">
+                <td><input matInput formControlName="nomeHiperparametro" /></td>
+                <td><input matInput formControlName="valorPadrao" /></td>
+                <td>
+                  <mat-select formControlName="tipo" class="select-tipo">
+                    <mat-option *ngFor="let t of tiposHiperparametro" [value]="t">{{ t }}</mat-option>
+                  </mat-select>
+                </td>
+                <td>
+                  <button mat-icon-button color="warn" (click)="removerHiperparametro(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <button mat-stroked-button color="primary" (click)="adicionarHiperparametro()" class="btn-add">
+            <mat-icon>add</mat-icon> Adicionar hiperparâmetro
+          </button>
+
+          <h5>Métricas compatíveis</h5>
+          <div class="checklist-metricas" formArrayName="metricas">
+            <label *ngFor="let m of metricasArray.controls; let i = index" class="check-item" [formGroupName]="i">
+              <input type="checkbox" [checked]="m.value.selecionado" (change)="toggleMetrica(i)" />
+              <span>{{ metricasDisponiveis[i]?.label || m.value.valor }}</span>
+              <code>{{ m.value.valor }}</code>
+            </label>
+          </div>
+        </ng-container>
+
+        <!-- Metricas: edicao tecnica -->
+        <ng-container *ngIf="tipoCatalogo === 'metricas'">
+          <div class="campos-grid">
+            <mat-form-field appearance="outline" class="campo">
+              <mat-label>Pacote Python (import)</mat-label>
+              <input matInput [formControl]="importPacoteControl" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="campo">
+              <mat-label>Função</mat-label>
+              <input matInput [formControl]="funcaoControl" />
+            </mat-form-field>
+          </div>
+          <mat-form-field appearance="outline" class="campo-full">
+            <mat-label>Grupo</mat-label>
+            <mat-select [formControl]="grupoControl">
+              <mat-option value="classificacao">Classificação</mat-option>
+              <mat-option value="regressao">Regressão</mat-option>
+              <mat-option value="agrupamento">Agrupamento</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="campo-full">
+            <mat-label>Explicação educacional</mat-label>
+            <textarea matInput [formControl]="explicacaoControl" rows="4"></textarea>
+          </mat-form-field>
+        </ng-container>
+
+        <!-- Pre-processamento: edicao tecnica -->
+        <ng-container *ngIf="tipoCatalogo === 'pre_processamento'">
+          <div class="campos-grid">
+            <mat-form-field appearance="outline" class="campo">
+              <mat-label>Pacote Python (import)</mat-label>
+              <input matInput [formControl]="importPacoteControl" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="campo">
+              <mat-label>Classe</mat-label>
+              <input matInput [formControl]="classeControl" />
+            </mat-form-field>
+          </div>
+          <mat-form-field appearance="outline" class="campo-full">
+            <mat-label>Grupo</mat-label>
+            <mat-select [formControl]="grupoControl">
+              <mat-option value="scalers">Scalers</mat-option>
+              <mat-option value="encoders">Encoders</mat-option>
+              <mat-option value="imputers">Imputers</mat-option>
+              <mat-option value="transformers">Transformers</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+
+        <div class="acoes-form">
+          <button mat-stroked-button (click)="cancelarEdicao()">Cancelar</button>
+          <button mat-flat-button color="primary" (click)="salvarEdicao(item)" [disabled]="salvando">
+            <mat-spinner diameter="16" *ngIf="salvando"></mat-spinner>
+            <span *ngIf="!salvando">Salvar</span>
+          </button>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>

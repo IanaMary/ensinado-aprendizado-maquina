@@ -3,6 +3,14 @@ import { ItemPipeline, ResultadoColetaDado } from '../models/item-coleta-dado.mo
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
+// Pré-processadores com template curado no gerador. Itens fora deste conjunto
+// (registrados pelo admin) são gerados de forma genérica a partir do bloco `execucao`.
+const PRE_PROC_BUILTINS = new Set<string>([
+  'standard_scaler', 'minmax_scaler', 'robust_scaler', 'normalizer',
+  'onehot_encoder', 'ordinal_encoder', 'label_encoder', 'simple_imputer',
+  'polynomial_features', 'power_transformer',
+]);
+
 @Injectable({
   providedIn: 'root'
 })
@@ -377,14 +385,26 @@ export class ScriptGeneratorService {
       }
     }
 
-    // Preprocessing imports
+    // Preprocessing imports.
+    // Para os 10 built-ins mantemos o bloco curado (os templates usam os nomes de
+    // classe diretamente). Para itens registrados pelo admin (valor desconhecido),
+    // o import vem do bloco `execucao` — assim aparecem no código sem hardcode.
     if (preProcessamentoConfig?.itens?.length > 0) {
-      imports.push('from sklearn.preprocessing import (');
-      imports.push('    StandardScaler, MinMaxScaler, RobustScaler, Normalizer,');
-      imports.push('    LabelEncoder, OneHotEncoder, OrdinalEncoder,');
-      imports.push('    PolynomialFeatures, PowerTransformer');
-      imports.push(')');
-      imports.push('from sklearn.impute import SimpleImputer');
+      const itens = preProcessamentoConfig.itens as any[];
+      if (itens.some(i => PRE_PROC_BUILTINS.has(i.valor))) {
+        imports.push('from sklearn.preprocessing import (');
+        imports.push('    StandardScaler, MinMaxScaler, RobustScaler, Normalizer,');
+        imports.push('    LabelEncoder, OneHotEncoder, OrdinalEncoder,');
+        imports.push('    PolynomialFeatures, PowerTransformer');
+        imports.push(')');
+        imports.push('from sklearn.impute import SimpleImputer');
+      }
+      for (const item of itens) {
+        if (!PRE_PROC_BUILTINS.has(item.valor) && item.execucao?.modulo && item.execucao?.classe) {
+          const line = `from ${item.execucao.modulo} import ${item.execucao.classe}`;
+          if (!imports.includes(line)) imports.push(line);
+        }
+      }
     }
 
     // Model import
@@ -799,7 +819,22 @@ export class ScriptGeneratorService {
           break;
 
         default:
-          lines.push(`    # ${item.label}: Transformação não implementada automaticamente`);
+          // Pré-processador registrado pelo admin: gera código a partir do execucao.
+          if (item.execucao?.classe) {
+            const cls = item.execucao.classe;
+            const kwargs = this.execKwargs(item.execucao.hiperparametros);
+            lines.push(`    # ${item.label}: ${item.resumo || cls}`);
+            lines.push(`    transformer = ${cls}(${kwargs})`);
+            if (colsArray) {
+              lines.push(`    X_train${colsArray} = transformer.fit_transform(X_train${colsArray})`);
+              lines.push(`    X_test${colsArray} = transformer.transform(X_test${colsArray})`);
+            } else {
+              lines.push('    X_train = pd.DataFrame(transformer.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
+              lines.push('    X_test = pd.DataFrame(transformer.transform(X_test), columns=X_test.columns, index=X_test.index)');
+            }
+          } else {
+            lines.push(`    # ${item.label}: Transformação não implementada automaticamente`);
+          }
       }
     }
 
@@ -807,6 +842,27 @@ export class ScriptGeneratorService {
     lines.push('    return X_train, X_test');
 
     return lines.join('\n');
+  }
+
+  /** Converte hiperparâmetros do execucao ([{nome, valorPadrao}]) em kwargs Python. */
+  private execKwargs(hiperparametros?: any[]): string {
+    if (!Array.isArray(hiperparametros)) return '';
+    return hiperparametros
+      .filter(h => h && (h.nome || h.nomeHiperparametro))
+      .map(h => {
+        const nome = h.nome || h.nomeHiperparametro;
+        const valor = h.valorPadrao !== undefined ? h.valorPadrao : h.default;
+        return `${nome}=${this.pyLiteral(valor)}`;
+      })
+      .join(', ');
+  }
+
+  /** Serializa um valor JS como literal Python (str/bool/None/num). */
+  private pyLiteral(valor: any): string {
+    if (valor === null || valor === undefined) return 'None';
+    if (typeof valor === 'boolean') return valor ? 'True' : 'False';
+    if (typeof valor === 'number') return String(valor);
+    return `"${String(valor).replace(/"/g, '\\"')}"`;
   }
 
   private generateModelTrainingFunction(modelo: ItemPipeline | undefined, hiperparametros: any): string {

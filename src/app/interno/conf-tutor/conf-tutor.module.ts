@@ -11,6 +11,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSelectModule } from '@angular/material/select';
 import { QuillModule } from 'ngx-quill';
 
 import { ConfTutorRoutingModule } from './conf-tutor-routing.module';
@@ -22,6 +24,7 @@ import { TutorTreinamentoComponent } from './components/tutor-treinamento/tutor-
 import { TutorAvaliacaoComponent } from './components/tutor-avaliacao/tutor-avaliacao.component';
 import { TutorSelecaoMetricasComponent } from './components/tutor-selecao-metricas/tutor-selecao-metricas.component';
 import { TtutorTiposAprendizadoComponent } from './components/tutor-tipos-aprendizado/tutor-tipos-aprendizado.component';
+import { TutorElementosCatalogoComponent } from './components/tutor-elementos-catalogo/tutor-elementos-catalogo.component';
 
 
 @NgModule({
@@ -33,7 +36,8 @@ import { TtutorTiposAprendizadoComponent } from './components/tutor-tipos-aprend
     TutorSelecaoModeloComponent,
     TutorTreinamentoComponent,
     TutorSelecaoMetricasComponent,
-    TutorAvaliacaoComponent
+    TutorAvaliacaoComponent,
+    TutorElementosCatalogoComponent
   ],
   imports: [
     ConfTutorRoutingModule,
@@ -50,6 +54,8 @@ import { TtutorTiposAprendizadoComponent } from './components/tutor-tipos-aprend
     MatButtonModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
+    MatSlideToggleModule,
+    MatSelectModule,
     QuillModule.forRoot(),
   ],
   providers: []

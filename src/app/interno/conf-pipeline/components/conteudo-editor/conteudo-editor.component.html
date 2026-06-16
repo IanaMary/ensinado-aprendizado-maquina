@@ -1,0 +1,104 @@
+<div class="conteudo-editor" *ngIf="draft">
+  <div class="campos-texto">
+    <label><span>Título</span>
+      <input type="text" [(ngModel)]="draft.titulo" placeholder="ex.: k-Nearest Neighbors" /></label>
+    <label><span>Descrição</span>
+      <textarea rows="2" [(ngModel)]="draft.descricao" placeholder="O que é, em uma ou duas frases."></textarea></label>
+    <label><span>Intuição</span>
+      <textarea rows="2" [(ngModel)]="draft.intuicao" placeholder="A ideia central em linguagem simples."></textarea></label>
+    <label><span>Exemplo</span>
+      <textarea rows="2" [(ngModel)]="draft.exemplo" placeholder="Exemplo concreto para o aluno."></textarea></label>
+    <label><span>Fórmula (opcional)</span>
+      <input type="text" [(ngModel)]="draft.formula" placeholder="ex.: z = (x - média) / desvio" /></label>
+  </div>
+
+  <!-- Listas de texto simples -->
+  <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Dicas', lista: draft.dicas }"></ng-container>
+  <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Quando usar', lista: draft.quandoUsar }"></ng-container>
+  <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Quando evitar', lista: draft.naoUsarQuando }"></ng-container>
+  <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Vantagens', lista: draft.vantagens }"></ng-container>
+  <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Desvantagens', lista: draft.desvantagens }"></ng-container>
+
+  <!-- Conceitos -->
+  <div class="bloco">
+    <div class="bloco-header"><strong>Conceitos</strong>
+      <button mat-stroked-button type="button" (click)="addConceito()"><mat-icon>add</mat-icon> Adicionar</button>
+    </div>
+    <div class="linha" *ngFor="let c of draft.conceitos; let i = index; trackBy: trackByIndex">
+      <input type="text" [(ngModel)]="c.nome" placeholder="nome" />
+      <input type="text" [(ngModel)]="c.desc" placeholder="descrição" />
+      <button mat-icon-button type="button" (click)="removeAt(draft.conceitos, i)"><mat-icon>delete_outline</mat-icon></button>
+    </div>
+  </div>
+
+  <!-- Hiperparâmetros conceituais -->
+  <div class="bloco">
+    <div class="bloco-header"><strong>Hiperparâmetros (conceitual)</strong>
+      <button mat-stroked-button type="button" (click)="addHiper()"><mat-icon>add</mat-icon> Adicionar</button>
+    </div>
+    <div class="linha-hiper" *ngFor="let h of draft.hiperparametros_doc; let i = index; trackBy: trackByIndex">
+      <input type="text" [(ngModel)]="h.nome" placeholder="nome (ex.: n_neighbors)" />
+      <input type="text" [(ngModel)]="h.descricao" placeholder="o que faz" />
+      <input type="text" [(ngModel)]="h.default" placeholder="padrão" />
+      <input type="text" [(ngModel)]="h.efeito" placeholder="efeito de mudar" />
+      <input type="text" [(ngModel)]="h.quando_ajustar" placeholder="quando ajustar" />
+      <button mat-icon-button type="button" (click)="removeAt(draft.hiperparametros_doc, i)"><mat-icon>delete_outline</mat-icon></button>
+    </div>
+  </div>
+
+  <!-- Referências -->
+  <div class="bloco">
+    <div class="bloco-header"><strong>Referências / fontes</strong>
+      <button mat-stroked-button type="button" (click)="addReferencia()"><mat-icon>add</mat-icon> Adicionar</button>
+    </div>
+    <div class="linha-ref" *ngFor="let r of draft.referencias; let i = index; trackBy: trackByIndex">
+      <input type="text" [(ngModel)]="r.titulo" placeholder="título" />
+      <input type="text" [(ngModel)]="r.autor" placeholder="autor" />
+      <input type="text" [(ngModel)]="r.url" placeholder="url" />
+      <select [(ngModel)]="r.tipo">
+        <option value="doc">doc</option><option value="livro">livro</option>
+        <option value="paper">paper</option><option value="video">vídeo</option>
+      </select>
+      <input type="text" [(ngModel)]="r.citacao" placeholder="citação (opcional)" />
+      <button mat-icon-button type="button" (click)="removeAt(draft.referencias, i)"><mat-icon>delete_outline</mat-icon></button>
+    </div>
+  </div>
+
+  <!-- Mídia -->
+  <div class="bloco">
+    <div class="bloco-header"><strong>Mídia (imagens / gráficos)</strong>
+      <button mat-stroked-button type="button" (click)="addMidia()"><mat-icon>add</mat-icon> Adicionar</button>
+    </div>
+    <div class="linha-midia" *ngFor="let m of draft.midia; let i = index; trackBy: trackByIndex">
+      <select [(ngModel)]="m.tipo">
+        <option value="imagem">imagem</option><option value="grafico">gráfico</option>
+        <option value="diagrama">diagrama</option>
+      </select>
+      <input type="text" [(ngModel)]="m.url" placeholder="url da imagem" />
+      <input type="text" [(ngModel)]="m.legenda" placeholder="legenda" />
+      <input type="text" [(ngModel)]="m.fonte" placeholder="fonte" />
+      <button mat-icon-button type="button" (click)="removeAt(draft.midia, i)"><mat-icon>delete_outline</mat-icon></button>
+    </div>
+  </div>
+
+  <div class="acoes">
+    <button mat-button type="button" (click)="cancelar.emit()" [disabled]="salvando">Cancelar</button>
+    <button mat-raised-button color="primary" type="button" (click)="emitirSalvar()" [disabled]="salvando">
+      <mat-spinner *ngIf="salvando" diameter="16"></mat-spinner>
+      <span *ngIf="!salvando">Salvar conteúdo</span>
+    </button>
+  </div>
+</div>
+
+<!-- Template reutilizável de lista de strings -->
+<ng-template #listaStr let-titulo="titulo" let-lista="lista">
+  <div class="bloco">
+    <div class="bloco-header"><strong>{{ titulo }}</strong>
+      <button mat-stroked-button type="button" (click)="addStr(lista)"><mat-icon>add</mat-icon> Adicionar</button>
+    </div>
+    <div class="linha" *ngFor="let _ of lista; let i = index; trackBy: trackByIndex">
+      <input type="text" [(ngModel)]="lista[i]" placeholder="item" />
+      <button mat-icon-button type="button" (click)="removeAt(lista, i)"><mat-icon>delete_outline</mat-icon></button>
+    </div>
+  </div>
+</ng-template>

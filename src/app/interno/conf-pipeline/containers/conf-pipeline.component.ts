@@ -5,12 +5,30 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../service/auth/auth.service';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 import { NotificacaoService } from '../../../service/notificacao.service';
+import { ConteudoEditorComponent } from '../components/conteudo-editor/conteudo-editor.component';
 
 type Lane = 'coleta_dados' | 'modelos' | 'metricas' | 'pre_processamento';
+
+export interface HiperparamSchema {
+  nome: string;
+  tipo?: 'int' | 'float' | 'str' | 'bool' | 'enum';
+  default?: any;
+  min?: number | null;
+  max?: number | null;
+  opcoesTexto?: string;  // CSV apresentado ao admin; convertido para `opcoes` ao salvar
+}
+
+export interface ExecucaoSchema {
+  modulo: string;
+  classe: string;
+  hiperparametros: HiperparamSchema[];
+  aplica_em?: 'todas' | 'colunas_escolhidas' | 'target';  // relevante ao pré-processamento
+}
 
 interface ItemAdmin {
   id: string;
@@ -20,8 +38,19 @@ interface ItemAdmin {
   preverCategoria?: boolean;
   dadosRotulados?: boolean;
   salvando?: boolean;
+  // Edicao do bloco `execucao`
+  execucao?: any;
+  expandido?: boolean;
+  execucaoDraft?: ExecucaoSchema;
+  salvandoExecucao?: boolean;
+  // Edicao do bloco `conteudo` educacional
+  conteudo?: any;
+  conteudoExpandido?: boolean;
+  salvandoConteudo?: boolean;
   [k: string]: any;
 }
+
+const TIPOS_HIPERPARAM: HiperparamSchema['tipo'][] = ['int', 'float', 'str', 'bool', 'enum'];
 
 @Component({
   selector: 'app-conf-pipeline',
@@ -35,6 +64,8 @@ interface ItemAdmin {
     MatSlideToggleModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatButtonModule,
+    ConteudoEditorComponent,
   ]
 })
 export class ConfPipelineComponent implements OnInit {
@@ -99,28 +130,34 @@ export class ConfPipelineComponent implements OnInit {
   private carregarPreProcessamento() {
     this.carregandoPreProc = true;
     const catalogo = this.dashboard.getPreProcessamentoCatalogo();
-    this.dashboard.fetchPreProcessamentoOverrides().subscribe({
-      next: (overrides: any[]) => {
-        const map = new Map((overrides || []).map((o: any) => [o.valor, o.habilitado]));
-        this.itensPreProc = catalogo.map((c: any) => ({
-          id: c.valor,
-          label: c.label,
-          valor: c.valor,
-          grupo: c.grupo,
-          resumo: c.resumo,
-          habilitado: map.get(c.valor) !== false,
-        }));
+    const doJson = (c: any): ItemAdmin => ({
+      id: c.valor, label: c.label, valor: c.valor, grupo: c.grupo,
+      resumo: c.resumo, execucao: c.execucao, conteudo: c.conteudo, habilitado: c.habilitado !== false,
+    });
+    this.dashboard.fetchPreProcessamento().subscribe({
+      next: (docs: any[]) => {
+        if (!docs || docs.length === 0) {
+          this.itensPreProc = catalogo.map(doJson);
+        } else {
+          const jsonPorValor = new Map(catalogo.map((c: any) => [c.valor, c]));
+          this.itensPreProc = docs.map((d: any) => {
+            const base = jsonPorValor.get(d.valor) || {};
+            return {
+              id: d.valor,
+              label: d.label || (base as any).label,
+              valor: d.valor,
+              grupo: d.grupo || (base as any).grupo,
+              resumo: d.resumo || (base as any).resumo,
+              execucao: d.execucao || (base as any).execucao,
+              conteudo: d.conteudo || (base as any).conteudo,
+              habilitado: d.habilitado !== false,
+            };
+          });
+        }
         this.carregandoPreProc = false;
       },
       error: () => {
-        this.itensPreProc = catalogo.map((c: any) => ({
-          id: c.valor,
-          label: c.label,
-          valor: c.valor,
-          grupo: c.grupo,
-          resumo: c.resumo,
-          habilitado: c.habilitado !== false,
-        }));
+        this.itensPreProc = catalogo.map(doJson);
         this.carregandoPreProc = false;
         this.notificacao.erro('Não foi possível carregar configurações salvas de pré-processamento.');
       }
@@ -199,6 +236,133 @@ export class ConfPipelineComponent implements OnInit {
       this.auth.limparSessionStorage();
       this.router.navigate(['/autenticacao/login']);
     }
+  }
+
+  // ---------- Edição do bloco `execucao` (admin > Modelos) ----------
+
+  tiposHiperparam = TIPOS_HIPERPARAM;
+
+  alternarExecucao(item: ItemAdmin): void {
+    if (item.expandido) {
+      item.expandido = false;
+      item.execucaoDraft = undefined;
+      return;
+    }
+    item.execucaoDraft = this.execucaoParaDraft(item.execucao, item);
+    item.expandido = true;
+  }
+
+  private execucaoParaDraft(execucao: any, item: ItemAdmin): ExecucaoSchema {
+    const hiperparametros: HiperparamSchema[] = Array.isArray(execucao?.hiperparametros)
+      ? execucao.hiperparametros.map((h: any) => ({
+          nome: h.nome || h.nomeHiperparametro || '',
+          tipo: h.tipo,
+          default: h.default ?? h.valorPadrao,
+          min: h.min ?? null,
+          max: h.max ?? null,
+          opcoesTexto: Array.isArray(h.opcoes) ? h.opcoes.join(', ') : (h.opcoesTexto || ''),
+        }))
+      : (Array.isArray(item['hiperparametros'])
+          ? item['hiperparametros'].map((h: any) => ({
+              nome: h.nomeHiperparametro || h.nome || '',
+              default: h.valorPadrao ?? h.default,
+              opcoesTexto: '',
+            }))
+          : []);
+    return {
+      modulo: execucao?.modulo || '',
+      classe: execucao?.classe || '',
+      hiperparametros,
+      aplica_em: execucao?.aplica_em || 'todas',
+    };
+  }
+
+  addHiperparam(item: ItemAdmin): void {
+    item.execucaoDraft?.hiperparametros.push({ nome: '', tipo: 'str', default: '', opcoesTexto: '' });
+  }
+
+  removerHiperparam(item: ItemAdmin, idx: number): void {
+    item.execucaoDraft?.hiperparametros.splice(idx, 1);
+  }
+
+  salvarExecucao(tipo: Lane, item: ItemAdmin): void {
+    if (!item.execucaoDraft) return;
+    const draft = item.execucaoDraft;
+    if (!draft.modulo.trim() || !draft.classe.trim()) {
+      this.notificacao.erro('Módulo e classe são obrigatórios.');
+      return;
+    }
+    const execucao: any = {
+      modulo: draft.modulo.trim(),
+      classe: draft.classe.trim(),
+      hiperparametros: draft.hiperparametros
+        .filter(h => (h.nome || '').trim() !== '')
+        .map(h => {
+          const out: any = { nome: h.nome.trim() };
+          if (h.tipo) out.tipo = h.tipo;
+          if (h.default !== undefined && h.default !== '') out.default = h.default;
+          if (h.min !== null && h.min !== undefined) out.min = h.min;
+          if (h.max !== null && h.max !== undefined) out.max = h.max;
+          if (h.tipo === 'enum' && h.opcoesTexto) {
+            out.opcoes = h.opcoesTexto.split(',').map(s => s.trim()).filter(Boolean);
+          }
+          return out;
+        })
+    };
+
+    // Pré-processamento é chaveado por `valor` e persiste o escopo/aplica_em
+    // que o treino e a geração de código usam; demais lanes usam o CRUD genérico.
+    let req;
+    if (tipo === 'pre_processamento') {
+      execucao.aplica_em = draft.aplica_em || 'todas';
+      execucao.escopo = item.execucao?.escopo || 'transform_X';
+      if (item.execucao?.trata_ausentes) execucao.trata_ausentes = true;
+      req = this.dashboard.putPreProcessamentoDoc(item.valor as string, { execucao });
+    } else {
+      req = this.dashboard.putCatalogoItem(tipo, item.id, { execucao });
+    }
+
+    item.salvandoExecucao = true;
+    req.subscribe({
+      next: () => {
+        item.execucao = execucao;
+        item.salvandoExecucao = false;
+        item.expandido = false;
+        item.execucaoDraft = undefined;
+        this.notificacao.sucesso(`Configuração de execução salva: ${item.label || item.valor}`);
+      },
+      error: (err) => {
+        item.salvandoExecucao = false;
+        const msg = err?.error?.detail || 'Falha ao salvar configuração de execução.';
+        this.notificacao.erro(msg);
+      }
+    });
+  }
+
+  // ---------- Edição do conteúdo educacional ----------
+
+  alternarConteudo(item: ItemAdmin): void {
+    item.conteudoExpandido = !item.conteudoExpandido;
+  }
+
+  salvarConteudo(tipo: Lane, item: ItemAdmin, conteudo: any): void {
+    const req = tipo === 'pre_processamento'
+      ? this.dashboard.putPreProcessamentoDoc(item.valor as string, { conteudo })
+      : this.dashboard.putCatalogoItem(tipo, item.id, { conteudo });
+    item.salvandoConteudo = true;
+    req.subscribe({
+      next: () => {
+        item.conteudo = conteudo;
+        item.salvandoConteudo = false;
+        item.conteudoExpandido = false;
+        this.notificacao.sucesso(`Conteúdo educacional salvo: ${item.label || item.valor}`);
+      },
+      error: (err) => {
+        item.salvandoConteudo = false;
+        const msg = err?.error?.detail || 'Falha ao salvar conteúdo educacional.';
+        this.notificacao.erro(msg);
+      }
+    });
   }
 
 }

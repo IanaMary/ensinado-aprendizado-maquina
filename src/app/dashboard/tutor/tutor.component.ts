@@ -9,6 +9,22 @@ export interface TutorContexto {
   metrica?: any;
 }
 
+export interface TutorReferencia {
+  titulo: string;
+  autor?: string;
+  url?: string;
+  tipo?: 'livro' | 'paper' | 'doc' | 'video' | string;
+  citacao?: string;
+}
+
+export interface TutorMidia {
+  tipo?: 'imagem' | 'grafico' | 'diagrama' | string;
+  url?: string;
+  base64?: string;
+  legenda?: string;
+  fonte?: string;
+}
+
 export interface TutorItemInfo {
   titulo: string;
   descricao: string;
@@ -17,9 +33,13 @@ export interface TutorItemInfo {
   hiperparametros?: any;
   vantagens?: string[];
   desvantagens?: string[];
+  quandoUsar?: string[];
+  naoUsarQuando?: string[];
   formula?: string;
   intuicao?: string;
   exemplo?: string;
+  midia?: TutorMidia[];
+  referencias?: TutorReferencia[];
 }
 
 @Component({
@@ -42,6 +62,15 @@ export class TutorComponent implements OnChanges {
 
   tutor = tutor;
   objectKeys = Object.keys;
+
+  /** Resolve o src de uma mídia: URL direta ou data-URI a partir de base64. */
+  midiaSrc(m: TutorMidia): string {
+    if (m?.url) return m.url;
+    if (m?.base64) {
+      return m.base64.startsWith('data:') ? m.base64 : `data:image/png;base64,${m.base64}`;
+    }
+    return '';
+  }
   modoTutor: 'basico' | 'avancado' = 'basico';
 
   get themeClass(): string {

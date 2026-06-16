@@ -136,6 +136,60 @@
           </ul>
         </div>
       </div>
+
+      <!-- Quando usar / Quando evitar -->
+      <div class="section dual-cards" *ngIf="tutorItemInfo.quandoUsar?.length || tutorItemInfo.naoUsarQuando?.length">
+        <div class="use-card" *ngIf="tutorItemInfo.quandoUsar?.length">
+          <div class="card-header good">
+            <mat-icon>check_circle</mat-icon>
+            <span>Quando usar</span>
+          </div>
+          <ul>
+            <li *ngFor="let item of tutorItemInfo.quandoUsar">{{ item }}</li>
+          </ul>
+        </div>
+        <div class="avoid-card" *ngIf="tutorItemInfo.naoUsarQuando?.length">
+          <div class="card-header bad">
+            <mat-icon>cancel</mat-icon>
+            <span>Quando evitar</span>
+          </div>
+          <ul>
+            <li *ngFor="let item of tutorItemInfo.naoUsarQuando">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Mídia (imagens, gráficos, diagramas) -->
+      <div class="section midia-section" *ngIf="tutorItemInfo.midia?.length">
+        <div class="section-header">
+          <mat-icon>image</mat-icon>
+          <span>Visualizações</span>
+        </div>
+        <figure class="midia-figura" *ngFor="let m of tutorItemInfo.midia">
+          <img [src]="midiaSrc(m)" [alt]="m.legenda || 'ilustração'" loading="lazy" />
+          <figcaption *ngIf="m.legenda || m.fonte">
+            <span *ngIf="m.legenda">{{ m.legenda }}</span>
+            <small *ngIf="m.fonte">Fonte: {{ m.fonte }}</small>
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- Referências / fontes -->
+      <div class="section referencias-section" *ngIf="tutorItemInfo.referencias?.length">
+        <div class="section-header">
+          <mat-icon>menu_book</mat-icon>
+          <span>Referências</span>
+        </div>
+        <ul class="referencias-list">
+          <li *ngFor="let r of tutorItemInfo.referencias">
+            <a *ngIf="r.url" [href]="r.url" target="_blank" rel="noopener">{{ r.titulo }}</a>
+            <span *ngIf="!r.url">{{ r.titulo }}</span>
+            <small *ngIf="r.autor"> — {{ r.autor }}</small>
+            <span class="badge" *ngIf="r.tipo">{{ r.tipo }}</span>
+            <p class="ref-citacao" *ngIf="r.citacao">{{ r.citacao }}</p>
+          </li>
+        </ul>
+      </div>
     </ng-container>
 
     <!-- Pipeline info (fallback) -->

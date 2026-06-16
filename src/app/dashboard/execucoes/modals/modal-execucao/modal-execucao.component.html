@@ -57,6 +57,7 @@
         <ng-container *ngSwitchCase="3">
           <app-classificador [resultadoTreinamento]="resultadoTreinamento" [resultadoColetaDado]="resultadoColetaDado"
             [modeloSelecionado]="modeloSelecionado" [hiperparametros]="hiperparametrosEditados"
+            [preProcessamentoConfig]="preProcessamentoConfig"
             (atualizarResultadoTreinamento)="atualizarResultadoTreinamento($event)">
           </app-classificador>
         </ng-container>

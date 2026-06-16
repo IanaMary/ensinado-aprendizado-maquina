@@ -351,16 +351,23 @@ export class DashboardService {
     return this.http.put<any>(`${this.url}${this.endpointConfPipeline}pre_processamento_doc/${valor}`, body);
   }
 
-  // Catalogo canonico de pre-processamento vive no front (itens-coletas-dados.json).
-  // Overrides de habilitado/desabilitado vivem em db.pre_processamento.
+  // Catalogo de pre-processamento vive em db.pre_processamento (com execucao +
+  // conteudo). O JSON do front (itens-coletas-dados.json) serve de fallback quando
+  // o banco ainda nao foi semeado.
   getPreProcessamentoCatalogo(): any[] {
     return (itensPipeline.itensPreProcessamento as any[]) || [];
   }
 
-  fetchPreProcessamentoOverrides() {
-    return this.http.get<{valor: string, habilitado: boolean}[]>(
+  fetchPreProcessamento() {
+    return this.http.get<any[]>(
       `${this.url}${this.endpointConfPipeline}pre_processamento/todos`
     );
+  }
+
+  /** @deprecated Use fetchPreProcessamento(). Mantido por compat: os docs completos
+   *  ainda expõem `valor` e `habilitado`. */
+  fetchPreProcessamentoOverrides() {
+    return this.fetchPreProcessamento();
   }
 
   // SERVIÇOS SEM LIGAÇÃO COM BANCO
@@ -394,16 +401,29 @@ export class DashboardService {
   }
 
   carregarItensPreProcessamento() {
-    const itens = itensPipeline.itensPreProcessamento as any[];
-    // Aplica overrides do admin (habilitado/desabilitado por valor) antes de propagar
-    this.fetchPreProcessamentoOverrides().subscribe({
-      next: overrides => {
-        const map = new Map((overrides || []).map(o => [o.valor, o.habilitado]));
-        const filtrados = (itens || []).filter(i => map.get(i.valor) !== false);
-        this.itensPreProcessamento.next(filtrados as any);
+    const fallback = (itensPipeline.itensPreProcessamento as any[]) || [];
+    // Fonte: db.pre_processamento (traz execucao + conteudo). Mescla o JSON por
+    // 'valor' apenas para completar campos ausentes; o DB tem prioridade. Itens
+    // desabilitados sao removidos. Se o banco vier vazio, usa o JSON local.
+    this.fetchPreProcessamento().subscribe({
+      next: docs => {
+        if (!docs || docs.length === 0) {
+          this.itensPreProcessamento.next(fallback as any);
+          return;
+        }
+        const jsonPorValor = new Map(fallback.map(i => [i.valor, i]));
+        const itens = docs
+          .filter(d => d.habilitado !== false)
+          .map(d => ({
+            ...(jsonPorValor.get(d.valor) || {}),
+            ...d,
+            tipoItem: 'pre-processamento',
+            movido: false,
+          }));
+        this.itensPreProcessamento.next(itens as any);
       },
       error: () => {
-        this.itensPreProcessamento.next(itens as any);
+        this.itensPreProcessamento.next(fallback as any);
       }
     });
   }
