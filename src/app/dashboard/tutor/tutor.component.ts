@@ -86,7 +86,7 @@ export class TutorComponent implements OnChanges {
     if (changes['modeloSelecionado'] && this.modeloSelecionado && !this.tutorItemInfo) {
       this.buildModeloContexto();
     }
-    if (changes['metricaSelecionada'] && this.metricaSelecionada && !this.tutorItemInfo) {
+    if (changes['metricaSelecionada'] && this.metricaSelecionada && !this.tutorItemInfo && !this.contexto?.modelo) {
       this.buildMetricaContexto();
     }
   }
