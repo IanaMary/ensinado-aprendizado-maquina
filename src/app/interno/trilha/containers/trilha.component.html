@@ -19,6 +19,8 @@
       <span>{{ progresso }}%</span>
       <div class="bar"><div class="fill" [style.width.%]="progresso"></div></div>
     </div>
+    <button class="btn-ghost" (click)="abrirProjetos()">Meus projetos</button>
+    <button class="btn-ghost" [disabled]="!temDados" (click)="abrirSalvar()">Salvar</button>
     <button class="btn-ghost" [disabled]="!modelosTreinados.length" (click)="abrirExport()">Exportar</button>
     <button class="btn-ghost" [disabled]="execRunning" (click)="recomecar()">Recomeçar</button>
     <button class="btn-run" [class.stale]="desatualizado" [disabled]="!podeRodar()" (click)="rodarTrilha()">
@@ -340,6 +342,43 @@
       <div class="export-actions">
         <button class="btn-ghost" (click)="fecharExport()">Cancelar</button>
         <button class="btn-run" (click)="exportar()"><mat-icon>download</mat-icon> Baixar .zip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SALVAR -->
+  <div class="picker-backdrop" *ngIf="salvarOpen" (click)="fecharSalvar()">
+    <div class="picker salvar" (click)="$event.stopPropagation()">
+      <div class="picker-head">
+        <div><div class="picker-title">Salvar projeto</div><div class="picker-hint">Dê um nome para encontrar depois</div></div>
+        <button class="picker-x" (click)="fecharSalvar()">✕</button>
+      </div>
+      <div class="export-body">
+        <input class="nome-input" type="text" [(ngModel)]="projetoNome" placeholder="Nome do projeto" (keyup.enter)="confirmarSalvar()">
+      </div>
+      <div class="export-actions">
+        <button class="btn-ghost" (click)="fecharSalvar()">Cancelar</button>
+        <button class="btn-run" [disabled]="salvandoProj" (click)="confirmarSalvar()"><mat-icon>save</mat-icon> {{ salvandoProj ? 'Salvando…' : 'Salvar' }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MEUS PROJETOS -->
+  <div class="picker-backdrop" *ngIf="projetosOpen" (click)="fecharProjetos()">
+    <div class="picker" (click)="$event.stopPropagation()">
+      <div class="picker-head">
+        <div><div class="picker-title">Meus projetos</div><div class="picker-hint">Abra um pipeline salvo (também abre no dashboard clássico)</div></div>
+        <button class="picker-x" (click)="fecharProjetos()">✕</button>
+      </div>
+      <div class="picker-grid" style="grid-template-columns: 1fr;">
+        <div class="picker-empty" *ngIf="!projetos.length">Nenhum projeto salvo ainda.</div>
+        <button class="picker-item proj" *ngFor="let p of projetos" (click)="carregarProjeto(p)">
+          <div style="flex:1; min-width:0;">
+            <div class="pi-label">{{ p.nome }}</div>
+            <div class="pi-short">{{ p.modelosSelecionados?.length || (p.modeloSelecionado ? 1 : 0) }} modelo(s) · {{ p.dataModificacao || p.dataCriacao | slice:0:10 }}</div>
+          </div>
+          <span class="card-del" (click)="excluirProjeto(p, $event)" title="Excluir">🗑</span>
+        </button>
       </div>
     </div>
   </div>

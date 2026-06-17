@@ -77,7 +77,16 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
   todosMarcados: boolean = false;
 
   // Toy Datasets
-  fonteDados: 'arquivo' | 'dataset' = 'arquivo';
+  fonteDados: 'arquivo' | 'dataset' | 'url' = 'arquivo';
+
+  // Ingestão por URL
+  urlInput = '';
+  urlCarregando = false;
+  urlEtapa = '';
+  urlPct = 0;
+  urlErro = '';
+  private urlTimer: any;
+  get urlValida(): boolean { return /^https?:\/\/.+\..+/.test((this.urlInput || '').trim()); }
   datasets: any[] = [];
   filtroTipoDataset: string = '';
   datasetSelecionado: string = '';
@@ -147,6 +156,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    clearInterval(this.urlTimer);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -317,6 +327,40 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
 
         this.enviarArquivo(formData, tipo);
       }
+    });
+  }
+
+  carregarUrl() {
+    const url = (this.urlInput || '').trim();
+    if (!this.urlValida) { this.urlErro = 'Informe uma URL http/https válida.'; return; }
+    this.urlErro = ''; this.urlCarregando = true; this.urlEtapa = 'Baixando…'; this.urlPct = 8;
+    clearInterval(this.urlTimer);
+    this.urlTimer = setInterval(() => { if (this.urlPct < 80) this.urlPct += 6; }, 250);
+    const body = {
+      url,
+      test_size: 1 - (this.resultColetaDadoL.porcentagemTreino || 70) / 100,
+      shuffle: this.resultColetaDadoL.embaralharDados ?? true,
+      stratify: this.resultColetaDadoL.estratificarDados ?? false,
+    };
+    this.dashboardService.ingerirUrl(body).subscribe({
+      next: (res: any) => {
+        clearInterval(this.urlTimer);
+        this.urlEtapa = 'Lendo colunas…'; this.urlPct = 95;
+        this.idColeta = res.id_coleta;
+        this.sessionService.setColetaId(this.idColeta);
+        if (res.id_configuracoes_treinamento) {
+          this.idConfigurcacaoTreinamento = res.id_configuracoes_treinamento;
+          this.sessionService.setConfigurcaoTreinamento(this.idConfigurcacaoTreinamento);
+        }
+        this.preencherDados(res);
+        this.urlPct = 100; this.urlEtapa = 'Pronto';
+        setTimeout(() => { this.urlCarregando = false; }, 300);
+      },
+      error: (err) => {
+        clearInterval(this.urlTimer);
+        this.urlCarregando = false; this.urlPct = 0;
+        this.urlErro = err?.error?.detail || 'Não foi possível carregar a URL.';
+      },
     });
   }
 

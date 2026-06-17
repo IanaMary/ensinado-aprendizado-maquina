@@ -9,7 +9,10 @@ export interface PipelineState {
   nome: string;
   descricao?: string;
   resultadoColetaDado?: any;
+  coletaId?: string;            // id do arquivo no backend (p/ re-treinar um projeto salvo)
+  configId?: string;            // id da configuração de treino
   modeloSelecionado?: any;
+  modelosSelecionados?: any[];  // Trilha: vários modelos (ramos). Clássico usa modeloSelecionado.
   metricasSelecionadas?: any[];
   mediaMetricas?: MediaMetrica;
   preProcessamentoConfig?: any;

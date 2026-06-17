@@ -667,3 +667,16 @@ input[type="file"] {
     height: 24px;
   }
 }
+
+/* Ingestão por URL */
+.btn-carregar-url {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+  padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;
+  background: #7C3AED; color: #fff; font-weight: 600; font-size: 13px;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  &:disabled { opacity: .5; cursor: not-allowed; }
+}
+.url-progresso { margin: 10px 0; }
+.url-etapa { font-size: 12px; color: #7C3AED; font-weight: 600; margin-bottom: 4px; }
+.url-bar { height: 6px; background: #E0D3F2; border-radius: 3px; overflow: hidden; }
+.url-fill { height: 100%; background: linear-gradient(90deg, #7C3AED, #A855F7); transition: width .25s; }

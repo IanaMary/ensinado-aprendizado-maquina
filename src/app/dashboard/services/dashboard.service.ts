@@ -270,6 +270,10 @@ export class DashboardService {
     return this.http.post(`${this.url}${this.endpointColeta}csv/preview`, body);
   }
 
+  ingerirUrl(body: { url: string; test_size?: number; shuffle?: boolean; stratify?: boolean }) {
+    return this.http.post(`${this.url}${this.endpointColeta}url`, body);
+  }
+
   getColetaInfo(tipo: string, idConfigurcacaoTreinamento: string) {
     return this.http.get(`${this.url}${this.endpointConfiguraca}/${tipo}/${idConfigurcacaoTreinamento}`);
   }

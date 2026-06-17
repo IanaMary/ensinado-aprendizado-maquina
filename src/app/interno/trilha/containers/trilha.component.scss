@@ -259,3 +259,7 @@
   li { margin: 2px 0; } }
 .export-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 22px; border-top: 1px solid #F0EBF8;
   .btn-run { height: 38px; } }
+.picker.salvar { width: 420px; }
+.nome-input { width: 100%; padding: 10px 12px; border: 1.5px solid #E6DDF3; border-radius: 10px; font-size: 14px; color: #5B4B78; box-sizing: border-box; }
+.picker-item.proj { display: flex; align-items: center; gap: 10px;
+  .card-del { color: #C4ABE8; font-size: 14px; &:hover { color: #EF4444; } } }

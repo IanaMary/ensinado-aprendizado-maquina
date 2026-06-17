@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 import { SessionService } from '../../../service/sessao-store.service';
 import { ScriptGeneratorService } from '../../../service/script-generator.service';
+import { PipelineService, PipelineState } from '../../../service/pipeline.service';
 import { ItemPipeline, ResultadoColetaDado } from '../../../models/item-coleta-dado.model';
 import { TutorItemInfo } from '../../../dashboard/tutor/tutor.component';
 import { ModalExecucaoComponent } from '../../../dashboard/execucoes/modals/modal-execucao/modal-execucao.component';
@@ -83,6 +84,7 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     private session: SessionService,
     private dialog: MatDialog,
     private scriptGen: ScriptGeneratorService,
+    private pipelineSvc: PipelineService,
   ) {}
 
   ngOnInit(): void {
@@ -609,6 +611,109 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     return [head, ...rows].join('\n');
   }
 
+  // ---------- persistência (salvar/carregar via PipelineService) ----------
+  projetoId?: string;
+  projetoNome = '';
+  salvarOpen = false;
+  projetosOpen = false;
+  projetos: PipelineState[] = [];
+  salvandoProj = false;
+
+  private montarEstado(): PipelineState {
+    return {
+      id: this.projetoId,
+      nome: this.projetoNome || this.resultadoColetaDado?.nomeDataset || 'Trilha sem nome',
+      resultadoColetaDado: this.resultadoColetaDado,
+      coletaId: this.session.getColetaId() || undefined,
+      configId: this.session.getConfigurcaoTreinamento() || undefined,
+      modeloSelecionado: this.modelCards[0]?.item,
+      modelosSelecionados: this.modelCards.map(c => c.item),
+      metricasSelecionadas: this.evalCards.map(c => c.item),
+      mediaMetricas: this.mediaMetricas as any,
+      preProcessamentoConfig: this.preProcCfg(),
+      resultadoTreinamento: this.resultadoTreinamento,
+      resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
+    };
+  }
+
+  abrirSalvar(): void {
+    if (!this.temDados) { this.flash('Monte a trilha antes de salvar.'); return; }
+    this.projetoNome = this.projetoNome || this.resultadoColetaDado?.nomeDataset || '';
+    this.salvarOpen = true;
+  }
+  fecharSalvar(): void { this.salvarOpen = false; }
+  confirmarSalvar(): void {
+    const nome = (this.projetoNome || '').trim();
+    if (!nome) { this.flash('Dê um nome ao projeto.'); return; }
+    this.salvandoProj = true;
+    const estado = this.montarEstado(); estado.nome = nome;
+    this.pipelineSvc.salvarPipeline(estado).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (saved: any) => { this.projetoId = saved?.id || this.projetoId; this.salvandoProj = false; this.salvarOpen = false; this.flash('Projeto salvo.'); },
+      error: (err) => { this.salvandoProj = false; this.flash(err?.error?.detail || 'Falha ao salvar.'); },
+    });
+  }
+
+  abrirProjetos(): void {
+    this.pipelineSvc.listarPipelines().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (lista) => { this.projetos = lista || []; this.projetosOpen = true; },
+      error: () => this.flash('Falha ao listar projetos.'),
+    });
+  }
+  fecharProjetos(): void { this.projetosOpen = false; }
+  excluirProjeto(p: PipelineState, ev: Event): void {
+    ev.stopPropagation();
+    if (!p.id) return;
+    this.pipelineSvc.excluirPipeline(p.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => { this.projetos = this.projetos.filter(x => x.id !== p.id); },
+    });
+  }
+  carregarProjeto(p: PipelineState): void {
+    if (!p.id) return;
+    this.pipelineSvc.carregarPipeline(p.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (estado) => { if (estado) this.mapToTrilha(estado); this.projetosOpen = false; },
+      error: () => this.flash('Falha ao abrir o projeto.'),
+    });
+  }
+
+  /** Reconstrói a trilha a partir de uma PipelineState salva (mesmo projeto nas duas visões). */
+  private mapToTrilha(s: PipelineState): void {
+    this.recomecar();
+    this.projetoId = s.id; this.projetoNome = s.nome || '';
+    this.resultadoColetaDado = s.resultadoColetaDado;
+    if (s.coletaId) this.session.setColetaId(s.coletaId);
+    if (s.configId) this.session.setConfigurcaoTreinamento(s.configId);
+    if (this.resultadoColetaDado) {
+      const r = this.resultadoColetaDado;
+      const nome = r.nomeDataset || r.treino?.nomeArquivo || 'Dados';
+      this.dataCards = [{ uid: this.uid(), fase: 'data', valor: 'dados', label: nome, short: r.target ? `alvo: ${r.target}` : 'dados', item: { valor: 'dados', label: nome } as any, status: 'done' }];
+      this.splitCard = this.montarSplitCard(r);
+    }
+    for (const it of (s.preProcessamentoConfig?.itens || [])) {
+      const cat = this.catPreProc.find(p => p.valor === it.valor);
+      const escopo = cat ? this.escopoPreProc(cat) : (it.valor === 'label_encoder' ? 'encode_y' : 'transform_X');
+      const card: TrilhaCard = { uid: this.uid(), fase: escopo === 'encode_y' ? 'labelY' : 'featX', valor: it.valor, label: it.label || cat?.label || it.valor, short: cat?.resumo, item: (cat || { valor: it.valor, label: it.label }) as any, status: 'idle', colunas: it.colunas || [] };
+      if (card.fase === 'labelY') this.labelCards.push(card); else this.featCards.push(card);
+    }
+    const modelos = (s.modelosSelecionados && s.modelosSelecionados.length) ? s.modelosSelecionados : (s.modeloSelecionado ? [s.modeloSelecionado] : []);
+    for (const m of modelos) {
+      const card: TrilhaCard = { uid: this.uid(), fase: 'model', valor: m.valor, label: m.label || m.valor, short: (m as any).resumo, item: m, status: 'idle' };
+      this.carregarHiperParams(card); this.modelCards.push(card);
+    }
+    for (const me of (s.metricasSelecionadas || [])) {
+      this.evalCards.push({ uid: this.uid(), fase: 'eval', valor: me.valor, label: me.label || me.valor, short: (me as any).resumo, item: me, status: 'idle' });
+    }
+    this.mediaMetricas = (s.mediaMetricas as any) || 'weighted';
+    this.resultadoTreinamento = s.resultadoTreinamento || {};
+    this.resultadosDasAvaliacoes = s.resultadosDasAvaliacoes || {};
+    Object.keys(this.resultadoTreinamento).forEach(v => {
+      const mc = this.modelCards.find(c => c.valor === v);
+      if (mc) { mc.status = 'done'; mc.resultado = this.resultadoTreinamento[v]; }
+    });
+    if (Object.keys(this.resultadosDasAvaliacoes).length) {
+      this.montarComparacao(this.resultadosDasAvaliacoes, Object.values(this.resultadoTreinamento));
+    }
+  }
+
   private concluir(): void { this.execDone = true; setTimeout(() => this.execDone = false, 2600); }
   private flash(msg: string): void { this.execMsg = msg; this.execRunning = false; this.avisando = true; setTimeout(() => this.avisando = false, 2600); }
 
@@ -621,5 +726,6 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     this.comparacaoMetricas = []; this.comparacaoModelos = [];
     this.execRunning = false; this.execDone = false; this.desatualizado = false;
     this.hiperParams = {}; this.fecharInsp(); this.chatAberto = false;
+    this.projetoId = undefined; this.projetoNome = '';
   }
 }
