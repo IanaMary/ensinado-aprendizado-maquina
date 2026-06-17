@@ -246,12 +246,14 @@
                   <option value="true">Sim</option><option value="false">Não</option>
                 </select>
               </div>
-              <div class="hp">
+              <!-- Estratificação só faz sentido em classificação (mantém a proporção das classes). -->
+              <div class="hp" *ngIf="tarefa === 'classificacao'">
                 <div class="hp-top"><span class="hp-nome">Estratificar</span></div>
                 <select [value]="splitDraft.stratify ? 'true' : 'false'" (change)="splitDraft.stratify = $any($event.target).value==='true'">
                   <option value="false">Não</option><option value="true">Sim</option>
                 </select>
               </div>
+              <div class="insp-hint" *ngIf="tarefa !== 'classificacao'">Estratificação não se aplica a esta tarefa (só em classificação).</div>
               <button class="ask-tutor" [disabled]="salvandoSplit" (click)="aplicarDivisao()">{{ salvandoSplit ? 'Aplicando…' : 'Aplicar divisão' }}</button>
             </ng-container>
             <div class="insp-hint" *ngIf="splitPreDividido">Os dados já vieram divididos (treino + teste). Não há re-divisão.</div>

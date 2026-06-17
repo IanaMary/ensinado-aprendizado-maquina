@@ -277,7 +277,8 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     const body = {
       test_size: this.splitDraft.testSize,
       shuffle: this.splitDraft.shuffle,
-      stratify: this.splitDraft.stratify,
+      // estratificação só se aplica a classificação
+      stratify: this.tarefa === 'classificacao' ? this.splitDraft.stratify : false,
       target: this.resultadoColetaDado.target,
     };
     this.dashboard.redividirColeta('xlxs', cfg, body).pipe(takeUntil(this.destroy$)).subscribe({
