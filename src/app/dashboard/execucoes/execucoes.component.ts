@@ -340,7 +340,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
           nome: h.nome,
           descricao: h.descricao,
           padrao: h.default ?? faixa ?? '',
-          implicacoes: h.efeito || h.quando_ajustar || '',
+          // Mantém efeito E quando_ajustar (antes o segundo era descartado pelo ||)
+          implicacoes: [h.efeito, h.quando_ajustar].filter(Boolean).join(' — '),
           sklearn: h.nome,
         };
       });

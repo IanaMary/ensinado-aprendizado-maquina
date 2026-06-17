@@ -701,7 +701,7 @@ export class ScriptGeneratorService {
       switch (item.valor) {
         case 'standard_scaler':
           lines.push(`    # ${item.label}: Remove média e escala para variância unitária`);
-          lines.push('    scaler = StandardScaler()');
+          lines.push(`    scaler = StandardScaler(${this.preprocArgs(item, '')})`);
           if (colsArray) {
             lines.push(`    X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
             lines.push(`    X_test${colsArray} = scaler.transform(X_test${colsArray})`);
@@ -713,7 +713,7 @@ export class ScriptGeneratorService {
 
         case 'minmax_scaler':
           lines.push(`    # ${item.label}: Escala dados para intervalo [0, 1]`);
-          lines.push('    scaler = MinMaxScaler()');
+          lines.push(`    scaler = MinMaxScaler(${this.preprocArgs(item, '')})`);
           if (colsArray) {
             lines.push(`    X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
             lines.push(`    X_test${colsArray} = scaler.transform(X_test${colsArray})`);
@@ -725,7 +725,7 @@ export class ScriptGeneratorService {
 
         case 'robust_scaler':
           lines.push(`    # ${item.label}: Escala usando estatísticas robustas a outliers`);
-          lines.push('    scaler = RobustScaler()');
+          lines.push(`    scaler = RobustScaler(${this.preprocArgs(item, '')})`);
           if (colsArray) {
             lines.push(`    X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
             lines.push(`    X_test${colsArray} = scaler.transform(X_test${colsArray})`);
@@ -737,7 +737,7 @@ export class ScriptGeneratorService {
 
         case 'normalizer':
           lines.push(`    # ${item.label}: Normaliza amostras para norma unitária`);
-          lines.push('    normalizer = Normalizer(norm="l2")');
+          lines.push(`    normalizer = Normalizer(${this.preprocArgs(item, 'norm="l2"')})`);
           if (colsArray) {
             lines.push(`    X_train${colsArray} = normalizer.fit_transform(X_train${colsArray})`);
             lines.push(`    X_test${colsArray} = normalizer.transform(X_test${colsArray})`);
@@ -759,7 +759,7 @@ export class ScriptGeneratorService {
 
         case 'ordinal_encoder':
           lines.push(`    # ${item.label}: Codifica features categóricas como inteiros ordinais`);
-          lines.push('    encoder = OrdinalEncoder()');
+          lines.push(`    encoder = OrdinalEncoder(${this.preprocArgs(item, 'handle_unknown="use_encoded_value", unknown_value=-1')})`);
           if (colsArray) {
             lines.push(`    X_train${colsArray} = encoder.fit_transform(X_train${colsArray})`);
             lines.push(`    X_test${colsArray} = encoder.transform(X_test${colsArray})`);
@@ -781,8 +781,8 @@ export class ScriptGeneratorService {
           break;
 
         case 'simple_imputer':
-          lines.push(`    # ${item.label}: Preenche valores ausentes com a média`);
-          lines.push("    imputer = SimpleImputer(strategy='mean')");
+          lines.push(`    # ${item.label}: Preenche valores ausentes`);
+          lines.push(`    imputer = SimpleImputer(${this.preprocArgs(item, "strategy='mean'")})`);
           if (colsArray) {
             lines.push(`    X_train${colsArray} = imputer.fit_transform(X_train${colsArray})`);
             lines.push(`    X_test${colsArray} = imputer.transform(X_test${colsArray})`);
@@ -794,7 +794,7 @@ export class ScriptGeneratorService {
 
         case 'polynomial_features':
           lines.push(`    # ${item.label}: Gera features polinomiais`);
-          lines.push('    poly = PolynomialFeatures(degree=2, include_bias=False)');
+          lines.push(`    poly = PolynomialFeatures(${this.preprocArgs(item, 'degree=2, include_bias=False')})`);
           if (colsArray) {
             lines.push(`    X_train_poly = poly.fit_transform(X_train${colsArray})`);
             lines.push(`    X_test_poly = poly.transform(X_test${colsArray})`);
@@ -808,7 +808,7 @@ export class ScriptGeneratorService {
 
         case 'power_transformer':
           lines.push(`    # ${item.label}: Transformação para dados mais Gaussianos`);
-          lines.push('    pt = PowerTransformer(method="yeo-johnson")');
+          lines.push(`    pt = PowerTransformer(${this.preprocArgs(item, 'method="yeo-johnson"')})`);
           if (colsArray) {
             lines.push(`    X_train${colsArray} = pt.fit_transform(X_train${colsArray})`);
             lines.push(`    X_test${colsArray} = pt.transform(X_test${colsArray})`);
@@ -842,6 +842,14 @@ export class ScriptGeneratorService {
     lines.push('    return X_train, X_test');
 
     return lines.join('\n');
+  }
+
+  /** Args de instanciação de um pré-processador built-in: usa execucao.hiperparametros
+   *  quando o admin os definiu no DB (mantém o código exportado fiel à execução),
+   *  senão cai no default do template. */
+  private preprocArgs(item: any, fallback: string): string {
+    const h = item?.execucao?.hiperparametros;
+    return Array.isArray(h) && h.length ? this.execKwargs(h) : fallback;
   }
 
   /** Converte hiperparâmetros do execucao ([{nome, valorPadrao}]) em kwargs Python. */
