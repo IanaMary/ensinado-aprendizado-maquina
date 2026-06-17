@@ -7,6 +7,12 @@ $lane-gap: 56px;
 $branch-span: $lane-w + $lane-gap;
 $conn-cor: #C9B8E8;
 
+/* layout das fileiras paralelas (modelos/métricas) — o barramento (.bus) espelha
+   exatamente esse flex, por isso as descidas caem no centro de cada card. */
+$row-gap: 18px;
+$mini-card-w: 180px;
+$addbox-w: 44px;
+
 .trilha {
   display: flex; flex-direction: column; height: 100vh; overflow: hidden;
   background: #F7F5FB; font-family: 'Nunito', system-ui, sans-serif; color: #5B4B78;
@@ -108,7 +114,7 @@ $conn-cor: #C9B8E8;
   position: relative; width: 240px; background: #fff; border-radius: 14px;
   box-shadow: 0 4px 16px rgba(124,58,237,.10); border: 1px solid #F0EBF8; cursor: default;
   --cor: #7C3AED;
-  &.mini { width: 180px; }
+  &.mini { width: $mini-card-w; }
   &.model { width: 260px; }
   .card-head {
     display: flex; align-items: center; gap: 8px; padding: 9px 12px;
@@ -148,10 +154,23 @@ $conn-cor: #C9B8E8;
   &.ghost { border-color: #E0D3F2; color: #A78BCA; font-size: 11px; padding: 6px 14px; }
 }
 .add-mini { width: 34px; height: 34px; border-radius: 10px; border: 2px dashed #D6C8EE; background: #fff; cursor: pointer; font-size: 18px; font-weight: 700; &.tag-x { color: #A855F7; } &.tag-y { color: #C026D3; } &:hover { border-style: solid; } }
-.add-box { width: 44px; height: 60px; align-self: center; border-radius: 14px; border: 2px dashed #FCD9A0; background: rgba(245,158,11,.08); color: #F59E0B; cursor: pointer; font-size: 22px; font-weight: 700; &:hover { border-style: solid; background: #fff; } }
+.add-box { width: $addbox-w; height: 60px; align-self: center; border-radius: 14px; border: 2px dashed #FCD9A0; background: rgba(245,158,11,.08); color: #F59E0B; cursor: pointer; font-size: 22px; font-weight: 700; &:hover { border-style: solid; background: #fff; } }
 
 .fase-tag { font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
-.row-cards { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+.row-cards { display: flex; gap: $row-gap; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+
+/* barramento: tronco central → barra horizontal → uma descida por card.
+   Mesma estrutura flex de .row-cards (mesmos gap/larguras) → cada .bus-drop
+   cai exatamente sobre o centro do card correspondente, para qualquer N.
+   left/right da barra: centro do 1º card (=card/2) e do último card antes do "+"
+   (=addbox + gap + card/2), constantes em relação às bordas do barramento. */
+.bus {
+  position: relative; display: flex; gap: $row-gap; justify-content: center; height: 16px; margin-bottom: 2px;
+  .bus-bar { position: absolute; top: 0; left: calc(#{$mini-card-w} / 2); right: calc(#{$addbox-w} + #{$row-gap} + #{$mini-card-w} / 2); height: 2px; background: $conn-cor; }
+  .bus-up { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 2px; height: 12px; background: $conn-cor; }
+  .bus-slot { width: $mini-card-w; display: flex; justify-content: center; &.add { width: $addbox-w; } }
+  .bus-drop { width: 2px; height: 100%; background: $conn-cor; }
+}
 
 /* ---------- overlays ---------- */
 .overlay {

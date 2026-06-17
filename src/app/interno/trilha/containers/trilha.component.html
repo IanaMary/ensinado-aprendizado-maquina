@@ -58,8 +58,12 @@
             <div class="badge done" *ngIf="c.status==='done'"><mat-icon>check</mat-icon></div>
           </div>
         </ng-container>
-        <div class="conn"></div>
-        <button class="add add-data" *ngIf="!dataCards.length" (click)="addData()">＋ dados</button>
+        <!-- conector + botão de adicionar dados só aparecem quando ainda não há dados
+             (evita uma linha órfã pendurada entre o card de dados e a Divisão). -->
+        <ng-container *ngIf="!dataCards.length">
+          <div class="conn"></div>
+          <button class="add add-data" (click)="addData()">＋ dados</button>
+        </ng-container>
 
         <!-- FASE 2: DIVISÃO TREINO/TESTE (adaptativo) -->
         <ng-container *ngIf="splitCard">
@@ -129,6 +133,11 @@
 
           <!-- FASE 5: MODELOS (ramos paralelos) -->
           <div class="fase-tag" [style.color]="cores['model']">5 · Modelos (ramos paralelos)</div>
+          <div class="bus" *ngIf="modelCards.length">
+            <span class="bus-up"></span><span class="bus-bar"></span>
+            <div class="bus-slot" *ngFor="let c of modelCards"><span class="bus-drop"></span></div>
+            <span class="bus-slot add"></span>
+          </div>
           <div class="row-cards">
             <div class="card mini branch sel-able" [class.sel]="selecionado===c" (click)="selecionar(c)" *ngFor="let c of modelCards" [style.--cor]="cores['model']">
               <div class="card-head">
@@ -148,6 +157,11 @@
           <ng-container *ngIf="modelCards.length">
             <div class="conn"></div>
             <div class="fase-tag" [style.color]="cores['eval']">6 · Avaliação (métricas compartilhadas)</div>
+            <div class="bus" *ngIf="evalCards.length">
+              <span class="bus-up"></span><span class="bus-bar"></span>
+              <div class="bus-slot" *ngFor="let c of evalCards"><span class="bus-drop"></span></div>
+              <span class="bus-slot add"></span>
+            </div>
             <div class="row-cards">
               <div class="card mini sel-able" [class.sel]="selecionado===c" (click)="selecionar(c)" *ngFor="let c of evalCards" [style.--cor]="cores['eval']">
                 <div class="card-head">
