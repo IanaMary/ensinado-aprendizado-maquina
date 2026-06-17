@@ -38,6 +38,8 @@ export interface TutorItemInfo {
   formula?: string;
   intuicao?: string;
   exemplo?: string;
+  exemplo_codigo?: string;
+  link_sklearn?: string;
   midia?: TutorMidia[];
   referencias?: TutorReferencia[];
 }

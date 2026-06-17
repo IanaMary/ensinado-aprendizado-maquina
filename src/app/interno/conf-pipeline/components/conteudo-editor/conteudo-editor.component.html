@@ -10,6 +10,12 @@
       <textarea rows="2" [(ngModel)]="draft.exemplo" placeholder="Exemplo concreto para o aluno."></textarea></label>
     <label><span>Fórmula (opcional)</span>
       <input type="text" [(ngModel)]="draft.formula" placeholder="ex.: z = (x - média) / desvio" /></label>
+    <label><span>Exemplo de código (opcional)</span>
+      <textarea rows="4" class="mono" [(ngModel)]="draft.exemplo_codigo"
+        placeholder="from sklearn.ensemble import ExtraTreesClassifier&#10;modelo = ExtraTreesClassifier(n_estimators=100)&#10;modelo.fit(X_train, y_train)"></textarea></label>
+    <label><span>Link da documentação sklearn (opcional)</span>
+      <input type="text" [(ngModel)]="draft.link_sklearn"
+        placeholder="https://scikit-learn.org/stable/modules/generated/..." /></label>
   </div>
 
   <!-- Listas de texto simples -->
@@ -40,6 +46,9 @@
       <input type="text" [(ngModel)]="h.nome" placeholder="nome (ex.: n_neighbors)" />
       <input type="text" [(ngModel)]="h.descricao" placeholder="o que faz" />
       <input type="text" [(ngModel)]="h.default" placeholder="padrão" />
+      <input type="text" [(ngModel)]="h.tipo" placeholder="tipo (int/float/str/bool/enum)" />
+      <input type="text" [(ngModel)]="h.faixa" placeholder="faixa (ex.: 1–50)" />
+      <input type="text" [(ngModel)]="h.opcoesTexto" placeholder="opções (csv, p/ enum)" />
       <input type="text" [(ngModel)]="h.efeito" placeholder="efeito de mudar" />
       <input type="text" [(ngModel)]="h.quando_ajustar" placeholder="quando ajustar" />
       <button mat-icon-button type="button" (click)="removeAt(draft.hiperparametros_doc, i)"><mat-icon>delete_outline</mat-icon></button>

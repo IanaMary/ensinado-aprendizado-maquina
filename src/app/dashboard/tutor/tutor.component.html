@@ -32,6 +32,10 @@
     <ng-container *ngIf="tutorItemInfo">
       <div class="section item-header">
         <h3>{{ tutorItemInfo.titulo }}</h3>
+        <a class="doc-sklearn-link" *ngIf="tutorItemInfo.link_sklearn"
+          [href]="tutorItemInfo.link_sklearn" target="_blank" rel="noopener">
+          Ver na documentação do scikit-learn ↗
+        </a>
       </div>
 
       <div class="section">
@@ -91,6 +95,15 @@
         </div>
       </div>
 
+      <!-- Exemplo de código -->
+      <div class="section codigo-section" *ngIf="tutorItemInfo.exemplo_codigo">
+        <div class="section-header">
+          <mat-icon>code</mat-icon>
+          <span>Exemplo de código</span>
+        </div>
+        <pre class="codigo-bloco"><code>{{ tutorItemInfo.exemplo_codigo }}</code></pre>
+      </div>
+
       <!-- Hiperparametros (para modelos) -->
       <div class="section" *ngIf="tutorItemInfo.hiperparametros && objectKeys(tutorItemInfo.hiperparametros).length && modoAvancado">
         <div class="section-header">
@@ -105,6 +118,8 @@
             </div>
             <div class="param-meta">
               <span class="param-default">Padrao: <strong>{{ tutorItemInfo.hiperparametros[param]?.padrao }}</strong></span>
+              <span class="param-tipo" *ngIf="tutorItemInfo.hiperparametros[param]?.tipo">Tipo: <strong>{{ tutorItemInfo.hiperparametros[param]?.tipo }}</strong></span>
+              <span class="param-faixa" *ngIf="tutorItemInfo.hiperparametros[param]?.faixa">Faixa/opções: <strong>{{ tutorItemInfo.hiperparametros[param]?.faixa }}</strong></span>
             </div>
             <p class="param-desc">{{ tutorItemInfo.hiperparametros[param]?.descricao }}</p>
             <div class="param-implication" *ngIf="tutorItemInfo.hiperparametros[param]?.implicacoes">

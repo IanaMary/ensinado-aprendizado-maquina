@@ -56,14 +56,30 @@ export class TiposClassificadoresComponent implements OnChanges {
     const modelos = tutor.modelos as any;
     const modeloInfo = modelos?.[this.modeloValor || ''];
 
-    const todos = modeloInfo?.hiperparametros
-      ? Object.entries(modeloInfo.hiperparametros).map(([key, value]: [string, any]) => ({
-          key,
-          nome: value.nome,
-          valor: value.padrao,
-          ...value
-        }))
-      : [];
+    let todos: any[] = [];
+    if (modeloInfo?.hiperparametros) {
+      todos = Object.entries(modeloInfo.hiperparametros).map(([key, value]: [string, any]) => ({
+        key,
+        nome: value.nome,
+        valor: value.padrao,
+        ...value
+      }));
+    } else {
+      // Modelo NOVO (fora do tutor.json estático): hiperparâmetros vêm do bloco
+      // `execucao` do catálogo, para que apareçam na UI e cheguem ao treino/código.
+      const m: any = this.modelo || this.modeloSelecionado;
+      const execHip = m?.execucao?.hiperparametros;
+      if (Array.isArray(execHip)) {
+        todos = execHip.map((h: any) => {
+          const nome = h.nome || h.nomeHiperparametro;
+          return {
+            key: nome, nome, sklearn: nome,
+            valor: h.default ?? h.valorPadrao,
+            tipo: h.tipo, opcoes: h.opcoes, avancado: false,
+          };
+        });
+      }
+    }
 
     // Avancados (avancado: true) vao para uma secao recolhivel separada.
     this.hiperparametrosArray = todos.filter((p: any) => !p.avancado);

@@ -335,11 +335,13 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     if (Array.isArray(conteudo.hiperparametros_doc) && conteudo.hiperparametros_doc.length) {
       hiperparametros = {};
       conteudo.hiperparametros_doc.forEach((h: any, i: number) => {
-        const faixa = Array.isArray(h.opcoes) ? h.opcoes.join(' | ') : h.faixa;
         hiperparametros[h.nome || i] = {
           nome: h.nome,
           descricao: h.descricao,
-          padrao: h.default ?? faixa ?? '',
+          padrao: h.default ?? '',
+          tipo: h.tipo || '',
+          // faixa numérica ou opções (enum) — exibidas separadas do padrão
+          faixa: Array.isArray(h.opcoes) ? h.opcoes.join(' | ') : (h.faixa || ''),
           // Mantém efeito E quando_ajustar (antes o segundo era descartado pelo ||)
           implicacoes: [h.efeito, h.quando_ajustar].filter(Boolean).join(' — '),
           sklearn: h.nome,
@@ -358,6 +360,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       formula: conteudo.formula,
       intuicao: conteudo.intuicao,
       exemplo: conteudo.exemplo,
+      exemplo_codigo: conteudo.exemplo_codigo,
+      link_sklearn: conteudo.link_sklearn,
       midia: conteudo.midia,
       referencias: conteudo.referencias,
       hiperparametros,

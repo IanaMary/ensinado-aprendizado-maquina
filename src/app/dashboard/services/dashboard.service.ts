@@ -667,13 +667,12 @@ export class DashboardService {
           .map(m => m.metricas ?? [])
           .reduce((acc, metricas) => acc.filter(m => metricas.includes(m)));
       } else {
-        const metricasPorTipo: Record<string, string[]> = {
-          classificacao: ['accuracy_score', 'precision_score', 'recall_score', 'f1_score', 'confusion_matrix'],
-          regressao: ['r2_score', 'mean_squared_error', 'root_mean_squared_error', 'mean_absolute_error'],
-          agrupamento: ['silhouette_score', 'calinski_harabasz_score', 'davies_bouldin_score'],
-        };
+        // Deriva do catálogo pelo `grupo` da métrica (data-driven) — assim uma
+        // métrica nova cadastrada pelo admin com o grupo certo já fica selecionável.
         const tipo = this.determinarTipoModelo(modelosSelecionados[0]);
-        metricasComuns = metricasPorTipo[tipo] ?? [];
+        metricasComuns = this.itensMetricas.value
+          .filter((m: any) => (m.grupo || 'classificacao') === tipo)
+          .map((m: any) => m.valor);
       }
     }
 
