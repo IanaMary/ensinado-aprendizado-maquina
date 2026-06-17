@@ -344,7 +344,8 @@
     padding: 2px;
     border-radius: 8px;
     background: rgba($roxo-medio, 0.08);
-    z-index: 2;
+    position: relative;   // fica acima do .zoom-icon (que é só decorativo)
+    z-index: 3;
   }
 
   img {
@@ -374,43 +375,34 @@
   }
 }
 
-.yellowbrick-doc-link {
+// Doc-link e botão de dica: caixas flex idênticas (alinhadas e com alvo de clique
+// confortável). O botão de dica é um <button> simples (não mat-icon-button) para
+// não herdar o alvo de 40px do Material que desalinhava o ícone.
+.yellowbrick-doc-link,
+.yellowbrick-info-button {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
   color: $roxo-medio;
   text-decoration: none;
+  cursor: pointer;
 
   .btn-info {
     width: 18px;
     height: 18px;
     font-size: 18px;
+    line-height: 18px;
   }
 
   &:hover {
-    color: $roxo-escuro;
-  }
-}
-
-.yellowbrick-info-button {
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  line-height: 28px;
-  color: $roxo-medio;
-  cursor: help;
-
-  .btn-info {
-    width: 18px;
-    height: 18px;
-    font-size: 18px;
-  }
-
-  &:hover {
-    background: rgba($roxo-medio, 0.1);
+    background: rgba($roxo-medio, 0.16);
     color: $roxo-escuro;
   }
 }
