@@ -319,13 +319,32 @@
     justify-content: space-between;
     gap: 8px;
     margin-bottom: 8px;
+    // libera o canto superior direito para o ícone de zoom, evitando que ele
+    // fique por cima do cluster de ações (doc + dica).
+    padding-right: 28px;
     color: $roxo-escuro;
     font-size: 12px;
     font-weight: 700;
 
-    span {
+    .yellowbrick-modelo {
       min-width: 0;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
+  }
+
+  // cluster agrupado das ações do gráfico (documentação + dica)
+  .yellowbrick-acoes {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    padding: 2px;
+    border-radius: 8px;
+    background: rgba($roxo-medio, 0.08);
+    z-index: 2;
   }
 
   img {
@@ -349,6 +368,9 @@
     color: $roxo-escuro;
     font-size: 16px;
     box-shadow: 0 1px 5px rgba($preto, 0.18);
+    // dica visual apenas: o card inteiro abre o zoom. Não deve capturar cliques,
+    // senão bloqueia os ícones de ação do header.
+    pointer-events: none;
   }
 }
 
