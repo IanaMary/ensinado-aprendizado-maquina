@@ -406,3 +406,26 @@
     color: $roxo-medio;
   }
 }
+
+/* ---- health-check dos modelos ---- */
+.saude-barra {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 10px 0 8px; flex-wrap: wrap;
+}
+.saude-status {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: $roxo-medio;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+.saude-retestar {
+  font-size: 12px; line-height: 30px;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; margin-right: 2px; }
+}
+.modelo-direita { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.saude-chip {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; white-space: nowrap;
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  &.responde { background: rgba(#16A34A, 0.12); color: #15803D; }
+  &.sem-resposta { background: rgba(#DC2626, 0.10); color: #B91C1C; }
+  &.testando { background: rgba(#9CA3AF, 0.18); color: #6B7280; }
+}

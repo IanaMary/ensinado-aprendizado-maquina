@@ -31,6 +31,34 @@
   .limpar-btn {
     margin-left: auto;
   }
+
+  .chat-titulo {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    min-width: 0;
+  }
+
+  .chat-modelo {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 1px;
+    font-size: 10px;
+    font-weight: 600;
+    color: $roxo-medio;
+    opacity: 0.85;
+    max-width: 210px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    mat-icon {
+      font-size: 12px;
+      width: 12px;
+      height: 12px;
+    }
+  }
 }
 
 .chat-corpo {

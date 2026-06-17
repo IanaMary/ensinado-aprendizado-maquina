@@ -238,7 +238,7 @@
             </mat-checkbox>
             <mat-checkbox
               [(ngModel)]="resultColetaDadoL.estratificarDados"
-              [disabled]="!!teste.nomeArquivo || !resultColetaDadoL.embaralharDados || tipoPredicao !== 'classificacao' || !resultColetaDadoL.target"
+              [disabled]="!!teste.nomeArquivo || !resultColetaDadoL.embaralharDados || !resultColetaDadoL.preverCategoria || !resultColetaDadoL.target"
               (change)="onDivisaoDadosChange()">
               Separar treino/teste com estratificação
             </mat-checkbox>

@@ -133,6 +133,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
       this.resultColetaDadoL = this.resultadoColetaDado;
       this.treino = this.resultColetaDadoL.treino;
       this.teste = this.resultColetaDadoL.teste;
+      this.sincronizarTipoPredicao();
     }
 
     // Widget novo (sem dados nem configuração salva): abrir direto na aba Toy Datasets.
@@ -463,6 +464,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
       tipos = this.detectarTipos(res.preview_treino);
     }
     this.resultColetaDadoL.tipos = tipos;
+    this.sincronizarTipoPredicao();
 
     this.treino.dados = res.preview_treino;
     this.treino.totalDados = res.num_linhas_treino;
@@ -487,6 +489,17 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     const dadoss_rotulados = this.resultColetaDadoL.dadosRotulados ?? false;
     this.resultColetaDadoL.target = dadoss_rotulados && bool ? this.resultColetaDadoL.target : '';
     this.putConfiguracaoTreino();
+  }
+
+  /** Deriva o tipo de predição a partir dos flags do dataset carregado
+   *  (preverCategoria/dadosRotulados). Sem isso, ao reabrir dados já configurados
+   *  o tipoPredicao ficava em 'exploratorio' e travava ações que dependem dele —
+   *  como o checkbox de estratificação e a habilitação de colunas. */
+  private sincronizarTipoPredicao() {
+    const r = this.resultColetaDadoL;
+    if (r?.dadosRotulados && r?.preverCategoria) this.tipoPredicao = 'classificacao';
+    else if (r?.dadosRotulados) this.tipoPredicao = 'regressao';
+    else this.tipoPredicao = 'exploratorio';
   }
 
   onTipoPredicaoChange(tipo: 'regressao' | 'classificacao' | 'exploratorio') {

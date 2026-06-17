@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DashboardService } from '../services/dashboard.service';
 
@@ -20,11 +20,13 @@ interface HistoricoItem {
   styleUrls: ['./chat-tutor.component.scss'],
   standalone: false
 })
-export class ChatTutorComponent implements OnDestroy, OnChanges {
+export class ChatTutorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() contexto: any = null;
   @Input() pipelineId: string | null = null;
   @Input() conteudoInicial: string | null = null;
   @Input() sugestoesCustom: string[] | null = null;
+
+  modeloLLM = '';                 // modelo do tutor em uso (exibido no header)
 
   mensagens: MensagemChat[] = [];
   entrada = '';
@@ -50,6 +52,14 @@ export class ChatTutorComponent implements OnDestroy, OnChanges {
   }
 
   constructor(private dashboardService: DashboardService) { }
+
+  ngOnInit(): void {
+    // Mostra qual LLM está respondendo no chat (apenas informativo).
+    this.dashboardService.obterModeloLLM().subscribe({
+      next: (r) => { this.modeloLLM = r?.modelo || ''; },
+      error: () => { this.modeloLLM = ''; },
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['pipelineId'] && !changes['pipelineId'].firstChange) {

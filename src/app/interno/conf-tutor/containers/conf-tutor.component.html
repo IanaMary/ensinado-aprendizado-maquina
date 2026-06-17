@@ -66,6 +66,19 @@
             <span>Carregando modelos disponíveis...</span>
           </div>
 
+          <div class="saude-barra" *ngIf="!carregandoModelos && modelosLLM.length">
+            <span class="saude-status" *ngIf="saudeEmAndamento">
+              <mat-spinner diameter="14"></mat-spinner>
+              Testando modelos… {{ saudeProgresso.concluidos }}/{{ saudeProgresso.total }}
+            </span>
+            <span class="saude-status" *ngIf="!saudeEmAndamento && saudeProgresso.total">
+              <mat-icon>verified</mat-icon> Teste concluído ({{ saudeProgresso.total }} modelos)
+            </span>
+            <button mat-stroked-button class="saude-retestar" (click)="retestarModelos()" [disabled]="saudeEmAndamento">
+              <mat-icon>refresh</mat-icon> Re-testar
+            </button>
+          </div>
+
           <div class="lista-modelos" *ngIf="!carregandoModelos && modelosLLM.length">
             <div class="modelo-item"
                  *ngFor="let m of modelosLLM"
@@ -78,7 +91,17 @@
                   <span class="modelo-own" *ngIf="m.owned_by">{{ m.owned_by }}</span>
                 </div>
               </div>
-              <mat-spinner diameter="16" *ngIf="salvandoModelo && m.id === modeloLLMAtual"></mat-spinner>
+              <div class="modelo-direita">
+                <span class="saude-chip" [ngClass]="statusModelo(m.id)"
+                  [matTooltip]="saudeModelos[m.id]?.erro || (saudeModelos[m.id]?.latencia_ms ? saudeModelos[m.id]?.latencia_ms + ' ms' : 'Testando…')">
+                  <ng-container [ngSwitch]="statusModelo(m.id)">
+                    <ng-container *ngSwitchCase="'responde'"><mat-icon>check_circle</mat-icon> responde</ng-container>
+                    <ng-container *ngSwitchCase="'sem-resposta'"><mat-icon>cancel</mat-icon> sem resposta</ng-container>
+                    <ng-container *ngSwitchDefault><mat-icon>hourglass_empty</mat-icon> testando</ng-container>
+                  </ng-container>
+                </span>
+                <mat-spinner diameter="16" *ngIf="salvandoModelo && m.id === modeloLLMAtual"></mat-spinner>
+              </div>
             </div>
           </div>
 

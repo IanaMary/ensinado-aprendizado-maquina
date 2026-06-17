@@ -1,7 +1,12 @@
 <div class="chat-tutor">
   <div class="chat-header">
     <mat-icon>smart_toy</mat-icon>
-    <span>Tutor por chat</span>
+    <div class="chat-titulo">
+      <span>Tutor por chat</span>
+      <small class="chat-modelo" *ngIf="modeloLLM" [matTooltip]="'Modelo de IA respondendo: ' + modeloLLM">
+        <mat-icon>memory</mat-icon>{{ modeloLLM }}
+      </small>
+    </div>
     <button mat-icon-button *ngIf="!mostrarHistorico" (click)="toggleHistorico()"
       matTooltip="Conversas anteriores" matTooltipPosition="above" aria-label="Histórico">
       <mat-icon>history</mat-icon>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../service/auth/auth.service';
 import { LoginService } from '../../../externo/autenticacao/login/services/login.service';
@@ -28,7 +28,7 @@ const OPERACOES_LABEL: Record<string, string> = {
   styleUrls: ['./conf-tutor.component.scss'],
   standalone: false,
 })
-export class ConfTutorComponent implements OnInit {
+export class ConfTutorComponent implements OnInit, OnDestroy {
 
   role: string = sessionStorage.getItem('role') || '';
 
@@ -56,6 +56,13 @@ export class ConfTutorComponent implements OnInit {
   modeloLLMAtual: string = '';
   carregandoModelos = false;
   salvandoModelo = false;
+
+  // Health-check dos modelos (testado em segundo plano no backend)
+  saudeModelos: Record<string, { responde: boolean; latencia_ms?: number; erro?: string }> = {};
+  saudeEmAndamento = false;
+  saudeProgresso = { concluidos: 0, total: 0 };
+  private saudeTimer: any = null;
+  private destruido = false;
 
   constructor(private readonly loginService: LoginService,
     private readonly formBuilder: FormBuilder,
@@ -143,12 +150,47 @@ export class ConfTutorComponent implements OnInit {
         this.modelosLLM = res.modelos || [];
         this.modeloLLMAtual = res.modelo_atual || '';
         this.carregandoModelos = false;
+        this.verificarSaudeModelos();
       },
       error: (err) => {
         this.notificacao.erro(err.error?.detail || 'Erro ao carregar modelos LLM.');
         this.carregandoModelos = false;
       }
     });
+  }
+
+  // Pergunta ao backend quais modelos respondem (teste em segundo plano). Enquanto o
+  // teste roda, faz polling para mostrar o progresso na listagem.
+  verificarSaudeModelos(forcar = false) {
+    if (this.saudeTimer) { clearTimeout(this.saudeTimer); this.saudeTimer = null; }
+    this.dashboardService.verificarSaudeModelos(forcar).subscribe({
+      next: (res) => {
+        this.saudeModelos = res.resultados || {};
+        this.saudeEmAndamento = res.em_andamento;
+        this.saudeProgresso = { concluidos: res.concluidos, total: res.total };
+        if (res.em_andamento && !this.destruido) {
+          this.saudeTimer = setTimeout(() => this.verificarSaudeModelos(), 3000);
+        }
+      },
+      error: () => { this.saudeEmAndamento = false; },
+    });
+  }
+
+  retestarModelos() {
+    this.saudeModelos = {};
+    this.verificarSaudeModelos(true);
+  }
+
+  /** 'responde' | 'sem-resposta' | 'testando' para o chip de status na listagem. */
+  statusModelo(id: string): 'responde' | 'sem-resposta' | 'testando' {
+    const s = this.saudeModelos[id];
+    if (!s) return 'testando';
+    return s.responde ? 'responde' : 'sem-resposta';
+  }
+
+  ngOnDestroy(): void {
+    this.destruido = true;
+    if (this.saudeTimer) clearTimeout(this.saudeTimer);
   }
 
   selecionarModeloLLM(modeloId: string) {

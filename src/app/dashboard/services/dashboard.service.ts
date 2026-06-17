@@ -236,6 +236,15 @@ export class DashboardService {
     return this.http.get<{ modelo: string }>(`${this.url}${this.endpointTutor}/modelo`);
   }
 
+  // Health-check dos modelos (testado em segundo plano no backend). `resultados` é
+  // um mapa { id_modelo: { responde, latencia_ms?, erro? } }.
+  verificarSaudeModelos(forcar = false) {
+    return this.http.get<{
+      resultados: Record<string, { responde: boolean; latencia_ms?: number; erro?: string }>;
+      atualizado_em: number; em_andamento: boolean; total: number; concluidos: number;
+    }>(`${this.url}${this.endpointTutor}/modelos/saude${forcar ? '?forcar=true' : ''}`);
+  }
+
   definirModeloLLM(modelo: string) {
     return this.http.put<{ modelo: string }>(`${this.url}${this.endpointTutor}/modelo`, { modelo });
   }
