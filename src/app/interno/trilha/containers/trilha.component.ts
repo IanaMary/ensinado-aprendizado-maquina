@@ -138,7 +138,18 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     this.modalAberto = true;
     const ref = this.dialog.open(ModalExecucaoComponent, {
       maxWidth: 'none', width: 'auto', disableClose: true, hasBackdrop: true,
-      data: { etapa: 'coleta-dado', resultadoColetaDado: this.resultadoColetaDado },
+      // Passa o shape completo que o ModalExecucaoComponent espera (ele lê
+      // metricasSelecionadas.length e Object.keys(resultadosDasAvaliacoes) sem guarda).
+      data: {
+        etapa: 'coleta-dado',
+        resultadoColetaDado: this.resultadoColetaDado,
+        modeloSelecionado: undefined,
+        resultadoTreinamento: undefined,
+        metricasSelecionadas: [],
+        mediaMetricas: this.mediaMetricas,
+        resultadosDasAvaliacoes: {},
+        preProcessamentoConfig: this.preProcCfg(),
+      },
     });
     const tarefaAntes = this.tarefa;
     ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {

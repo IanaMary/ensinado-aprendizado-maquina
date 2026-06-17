@@ -364,7 +364,7 @@ export class ModalExecucaoComponent implements OnInit {
         todosExistem = true;
         this.atualizarResultadoTreinamento(data.resultadoTreinamento);
       }
-      if (data.metricasSelecionadas.length) {
+      if (data.metricasSelecionadas?.length) {
         todosExistem = true;
         this.atualizarMetricasSelecionadas(data.metricasSelecionadas);
       }
@@ -372,7 +372,7 @@ export class ModalExecucaoComponent implements OnInit {
         this.mediaMetricas = data.mediaMetricas;
         this.atualizarMetricasSelecionadas(this.metricasSelecionadas);
       }
-      if (Object.keys(data.resultadosDasAvaliacoes).length) {
+      if (Object.keys(data.resultadosDasAvaliacoes || {}).length) {
         todosExistem = true;
         this.funcResultadoAvaliacoes(data.resultadosDasAvaliacoes)
       }
