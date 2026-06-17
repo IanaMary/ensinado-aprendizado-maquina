@@ -406,11 +406,14 @@
     </div>
   </div>
 
-  <!-- CHAT FAB + PAINEL (reusa app-chat-tutor) -->
-  <button class="chat-fab" (click)="toggleChat()" [class.aberto]="chatAberto" title="Tutor IA">
-    <mat-icon>{{ chatAberto ? 'close' : 'chat' }}</mat-icon>
-  </button>
-  <div class="chat-painel" *ngIf="chatAberto">
-    <app-chat-tutor [contexto]="chatContexto" [sugestoesCustom]="chatSugestoes"></app-chat-tutor>
-  </div>
+  <!-- CHAT FAB + PAINEL (reusa app-chat-tutor) — escondidos enquanto o modal de
+       dados está aberto, pois ele já tem o próprio FAB de tutor (evita dois botões). -->
+  <ng-container *ngIf="!modalAberto">
+    <button class="chat-fab" (click)="toggleChat()" [class.aberto]="chatAberto" title="Tutor IA">
+      <mat-icon>{{ chatAberto ? 'close' : 'chat' }}</mat-icon>
+    </button>
+    <div class="chat-painel" *ngIf="chatAberto">
+      <app-chat-tutor [contexto]="chatContexto" [sugestoesCustom]="chatSugestoes"></app-chat-tutor>
+    </div>
+  </ng-container>
 </div>
