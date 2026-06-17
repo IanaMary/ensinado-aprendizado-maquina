@@ -58,7 +58,9 @@ export class PipelineService {
         tap(saved => this.pipelineAtual.next(saved))
       );
     }
-    return this.http.post<PipelineState>(this.endpoint, state).pipe(
+    // Barra final: a rota é POST /pipelines/ e, atrás do nginx (prefixo /h2ia/api),
+    // o redirect 307 sem-barra perde o prefixo e vira 404.
+    return this.http.post<PipelineState>(`${this.endpoint}/`, state).pipe(
       tap(saved => this.pipelineAtual.next(saved))
     );
   }
@@ -71,7 +73,7 @@ export class PipelineService {
   }
 
   listarPipelines(): Observable<PipelineState[]> {
-    return this.http.get<PipelineState[]>(this.endpoint);
+    return this.http.get<PipelineState[]>(`${this.endpoint}/`);
   }
 
   excluirPipeline(id: string): Observable<boolean> {

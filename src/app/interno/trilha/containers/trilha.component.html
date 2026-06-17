@@ -79,7 +79,11 @@
 
         <!-- FASE 3/4: PRÉ-PROCESSAMENTO (ramos X | y) -->
         <ng-container *ngIf="splitCard">
-          <div class="fork"></div>
+          <!-- bifurcação: tronco central → barra → descidas até o centro de cada faixa -->
+          <div class="branch fork">
+            <span class="b-trunk"></span><span class="b-bar"></span>
+            <span class="b-drop l"></span><span class="b-drop r"></span>
+          </div>
           <div class="lanes">
             <div class="lane">
               <div class="lane-tag tag-x">3 · Entrada (X)</div>
@@ -118,7 +122,10 @@
               <div class="lane-tail"></div>
             </div>
           </div>
-          <div class="join"></div>
+          <!-- reunião: barra ligando o fim das duas faixas → tronco central → modelos -->
+          <div class="branch join">
+            <span class="b-bar"></span><span class="b-trunk"></span>
+          </div>
 
           <!-- FASE 5: MODELOS (ramos paralelos) -->
           <div class="fase-tag" [style.color]="cores['model']">5 · Modelos (ramos paralelos)</div>
@@ -171,16 +178,16 @@
               </table>
             </div>
 
-            <!-- VISUALIZAÇÕES (Yellowbrick, por modelo) -->
+            <!-- VISUALIZAÇÕES (Yellowbrick) — comparadas por tipo de gráfico, modelos lado a lado -->
             <div class="viz-sec" *ngIf="modelosComViz.length">
               <div class="conn"></div>
-              <div class="fase-tag" [style.color]="cores['viz']">Visualizações</div>
-              <div class="viz-modelo" *ngFor="let m of modelosComViz">
-                <div class="viz-modelo-nome">{{ m }}</div>
-                <div class="viz-grid">
-                  <figure *ngFor="let v of visualizacoesPorModelo[m]">
-                    <img [src]="imgViz(v)" [alt]="v.titulo" loading="lazy">
-                    <figcaption>{{ v.titulo }}</figcaption>
+              <div class="fase-tag" [style.color]="cores['viz']">Visualizações (comparação)</div>
+              <div class="viz-cmp" *ngFor="let g of vizComparada">
+                <div class="viz-cmp-tit">{{ g.titulo }}</div>
+                <div class="viz-cmp-row">
+                  <figure *ngFor="let it of g.itens">
+                    <figcaption class="viz-cmp-modelo">{{ it.modelo }}</figcaption>
+                    <img [src]="imgViz(it.viz)" [alt]="g.titulo + ' — ' + it.modelo" loading="lazy">
                   </figure>
                 </div>
               </div>

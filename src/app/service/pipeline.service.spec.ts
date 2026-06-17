@@ -26,7 +26,7 @@ describe('PipelineService', () => {
     const state: PipelineState = { nome: 'Novo' };
     service.salvarPipeline(state).subscribe();
 
-    const req = httpMock.expectOne(endpoint);
+    const req = httpMock.expectOne(`${endpoint}/`);
     expect(req.request.method).toBe('POST');
     req.flush({ id: '1', nome: 'Novo' });
   });

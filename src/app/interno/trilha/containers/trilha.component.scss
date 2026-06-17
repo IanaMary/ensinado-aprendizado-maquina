@@ -1,5 +1,12 @@
 :host { display: block; height: 100%; }
 
+/* largura das faixas X|y — a distância entre os centros das faixas é ($lane-w + $lane-gap),
+   usada para dimensionar os conectores ramificados (fork/join). */
+$lane-w: 220px;
+$lane-gap: 56px;
+$branch-span: $lane-w + $lane-gap;
+$conn-cor: #C9B8E8;
+
 .trilha {
   display: flex; flex-direction: column; height: 100vh; overflow: hidden;
   background: #F7F5FB; font-family: 'Nunito', system-ui, sans-serif; color: #5B4B78;
@@ -78,7 +85,23 @@
 
 /* ---------- conectores ---------- */
 .conn { width: 2px; height: 20px; background: #D6C8EE; &.sm { height: 14px; } }
-.fork, .join { width: 2px; height: 22px; background: #C9B8E8; }
+
+/* bifurcação/reunião dos ramos X|y: peças absolutas que ligam o tronco central
+   (centro do grupo) aos centros das duas faixas (a ±$branch-span/2 do centro). */
+.branch {
+  position: relative; width: $branch-span;
+  .b-trunk { position: absolute; left: 50%; transform: translateX(-50%); width: 2px; background: $conn-cor; }
+  .b-bar   { position: absolute; left: 0; right: 0; height: 2px; background: $conn-cor; }
+  .b-drop  { position: absolute; width: 2px; height: 16px; background: $conn-cor;
+    &.l { left: 0; } &.r { right: 0; } }
+  &.fork { height: 30px;
+    .b-trunk { top: 0; height: 16px; }
+    .b-bar { top: 14px; }
+    .b-drop { top: 14px; } }
+  &.join { height: 22px;
+    .b-bar { top: 0; }
+    .b-trunk { top: 0; height: 22px; } }
+}
 
 /* ---------- cards ---------- */
 .card {
@@ -107,8 +130,8 @@
 @keyframes pulseRun { 0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.5); } 50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); } }
 
 /* ---------- lanes X|y ---------- */
-.lanes { display: flex; gap: 56px; justify-content: center; align-items: stretch; }
-.lane { width: 220px; display: flex; flex-direction: column; align-items: center; }
+.lanes { display: flex; gap: $lane-gap; justify-content: center; align-items: stretch; }
+.lane { width: $lane-w; display: flex; flex-direction: column; align-items: center; }
 .lane-tag { font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: .4px; padding: 4px 11px; border-radius: 8px; }
 .tag-x { background: #F3E8FF; color: #A855F7; }
 .tag-y { background: #FBEAFB; color: #C026D3; }
@@ -220,14 +243,17 @@
   &:hover { transform: translateY(-1px); }
 }
 
-/* ---------- visualizações ---------- */
+/* ---------- visualizações (comparação por tipo de gráfico) ---------- */
 .viz-sec { display: flex; flex-direction: column; align-items: center; margin-top: 14px; width: 100%; }
-.viz-modelo { width: 100%; max-width: 760px; margin-top: 10px; }
-.viz-modelo-nome { font-weight: 800; font-size: 12px; color: #4C1D95; margin: 6px 0; text-align: center; }
-.viz-grid { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
-  figure { margin: 0; background: #fff; border: 1px solid #F0EBF8; border-radius: 12px; padding: 8px; box-shadow: 0 4px 14px rgba(124,58,237,.08); max-width: 340px;
-    img { width: 100%; height: auto; border-radius: 8px; display: block; }
-    figcaption { font-size: 10.5px; color: #8B7AA8; font-weight: 700; text-align: center; margin-top: 6px; } } }
+.viz-cmp { width: 100%; max-width: 820px; margin-top: 12px;
+  background: #fff; border: 1px solid #F0EBF8; border-radius: 14px; padding: 12px 14px;
+  box-shadow: 0 4px 16px rgba(124,58,237,.08); }
+.viz-cmp-tit { font-weight: 800; font-size: 12px; color: #4C1D95; text-align: center; margin-bottom: 10px;
+  text-transform: uppercase; letter-spacing: .4px; }
+.viz-cmp-row { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; align-items: flex-start;
+  figure { margin: 0; flex: 1 1 0; min-width: 240px; max-width: 360px;
+    img { width: 100%; height: auto; border-radius: 8px; display: block; border: 1px solid #F0EBF8; }
+    .viz-cmp-modelo { font-size: 11px; color: #3B82F6; font-weight: 800; text-align: center; margin-bottom: 6px; } } }
 
 /* ---------- chat FAB ---------- */
 .chat-fab {

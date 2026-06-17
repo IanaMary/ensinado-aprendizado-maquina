@@ -144,6 +144,7 @@ export class TrilhaComponent implements OnInit, OnDestroy {
       // metricasSelecionadas.length e Object.keys(resultadosDasAvaliacoes) sem guarda).
       data: {
         etapa: 'coleta-dado',
+        somenteColeta: true,   // a Trilha cuida de pré-proc/modelo/métricas — modal só carrega dados
         resultadoColetaDado: this.resultadoColetaDado,
         modeloSelecionado: undefined,
         resultadoTreinamento: undefined,
@@ -551,6 +552,25 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     return Object.keys(v).filter(m => (v[m] || []).length > 0);
   }
   imgViz(v: any): string { return `data:${v.mime};base64,${v.base64}`; }
+
+  /** Reagrupa as visualizações por tipo de gráfico (título) para comparar modelos lado a lado:
+   *  ex.: matriz de confusão do modelo 1 ao lado da do modelo 2. */
+  get vizComparada(): { titulo: string; itens: { modelo: string; viz: any }[] }[] {
+    const porModelo = this.visualizacoesPorModelo;
+    const modelos = this.modelosComViz;
+    const titulos: string[] = [];
+    for (const m of modelos) {
+      for (const v of (porModelo[m] || [])) {
+        if (v?.titulo && !titulos.includes(v.titulo)) titulos.push(v.titulo);
+      }
+    }
+    return titulos.map(titulo => ({
+      titulo,
+      itens: modelos
+        .map(m => ({ modelo: m, viz: (porModelo[m] || []).find((v: any) => v.titulo === titulo) }))
+        .filter(x => !!x.viz),
+    }));
+  }
 
   // ---------- exportação (modal) ----------
   exportOpen = false;

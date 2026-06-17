@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; overflow: hidden; }
+    * { box-sizing: border-box; }
+    @keyframes pulseRun { 0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.5); } 50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); } }
+    @keyframes fadeUp { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+    @keyframes slideIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform:none; } }
+    @keyframes popIn { from { opacity:0; transform: scale(0.92); } to { opacity:1; transform: scale(1); } }
+    input[type="range"] { accent-color: #7C3AED; height: 4px; }
+    ::-webkit-scrollbar { width: 9px; height: 9px; }
+    ::-webkit-scrollbar-thumb { background: #DDD0F0; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
+    ::-webkit-scrollbar-thumb:hover { background: #C4ABE8; background-clip: content-box; }
+  </style>
+</helmet>
+
+<div style="display: flex; flex-direction: column; height: 100vh; font-family: 'Nunito', sans-serif; overflow: hidden; background: #F7F5FB;">
+
+  <!-- TOP BAR -->
+  <div style="height: 56px; background: white; border-bottom: 1px solid #ECE7F5; display: flex; align-items: center; padding: 0 18px; gap: 12px; flex-shrink: 0; z-index: 50;">
+    <div style="display: flex; align-items: center; gap: 9px;">
+      <div style="width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, #7C3AED, #A855F7); display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(124,58,237,0.3);">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"></path><circle cx="5" cy="5" r="1.5" fill="white"></circle><circle cx="5" cy="19" r="1.5" fill="white"></circle></svg>
+      </div>
+      <div>
+        <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 17px; color: #4C1D95; letter-spacing: -0.3px; line-height: 1;">Trilha de ML</div>
+        <div style="font-size: 10px; color: #A78BCA; font-weight: 600; margin-top: 1px;">monte seu pipeline passo a passo</div>
+      </div>
+    </div>
+    <div style="flex: 1;"></div>
+    <div style="{{ taskPillStyle }}" title="Tipo de tarefa, definido pelo modelo da trilha">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12l2.2 2.2L15.5 9.5"></path></svg>
+      <span>{{ taskPillLabel }}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; background: #F3EEFB; border-radius: 10px; padding: 5px 12px; margin-right: 4px;">
+      <span style="font-size: 11px; color: #7C3AED; font-weight: 700;">{{ progressLabel }}</span>
+      <div style="width: 80px; height: 6px; background: #E0D3F2; border-radius: 3px; overflow: hidden;">
+        <div style="{{ progressBarStyle }}"></div>
+      </div>
+    </div>
+    <button onClick="{{ onClear }}" style="height: 36px; padding: 0 14px; background: #F3EEFB; color: #7C3AED; border: none; border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; transition: background 0.12s;" style-hover="background: #E8DDF7;">Recomeçar</button>
+    <button onClick="{{ onExecute }}" style="height: 36px; padding: 0 20px; background: linear-gradient(135deg, #22C55E, #16A34A); color: white; border: none; border-radius: 10px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: transform 0.12s, box-shadow 0.12s; box-shadow: 0 3px 12px rgba(34,197,94,0.3);" style-hover="transform: translateY(-1px); box-shadow: 0 5px 16px rgba(34,197,94,0.4);">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21"></polygon></svg>
+      Rodar Trilha
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <div style="display: flex; flex: 1; min-height: 0;">
+
+    <!-- LEFT PHASE GUIDE -->
+    <div style="width: 192px; background: white; border-right: 1px solid #ECE7F5; flex-shrink: 0; padding: 18px 14px; overflow-y: auto;">
+      <div style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 11px; color: #A78BCA; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 14px;">As Fases do ML</div>
+      <sc-for list="{{ phaseGuide }}" as="ph" hint-placeholder-count="7">
+        <div style="{{ ph.rowStyle }}">
+          <div style="{{ ph.numStyle }}">{{ ph.num }}</div>
+          <div style="min-width: 0; flex: 1;">
+            <div style="{{ ph.labelStyle }}">{{ ph.label }}</div>
+          </div>
+          <div style="{{ ph.countStyle }}">{{ ph.count }}</div>
+        </div>
+      </sc-for>
+      <div style="margin-top: 12px; padding: 11px; background: #F3EEFB; border-radius: 12px;">
+        <div style="font-size: 10px; color: #7C3AED; font-weight: 700; line-height: 1.5;">💡 O ramo <b>X</b> (entradas) é sequencial; o ramo <b>y</b> (rótulo) corre em paralelo e vai direto ao modelo.</div>
+      </div>
+    </div>
+
+    <!-- CENTER: TRAIL -->
+    <div ref="{{ scrollRef }}" style="flex: 1; overflow: auto; position: relative; background: #F7F5FB; background-image: radial-gradient(circle, #E6DDF3 1px, transparent 1px); background-size: 22px 22px;">
+      <div style="min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: 26px 40px 90px;">
+
+        <!-- START -->
+        <div style="display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7C3AED, #A855F7); color: white; padding: 8px 20px; border-radius: 20px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 13px; box-shadow: 0 4px 14px rgba(124,58,237,0.3);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21"></polygon></svg>
+          Início da Trilha
+        </div>
+
+        <!-- ===== PHASE 1: DADOS ===== -->
+        <sc-for list="{{ dataCards }}" as="c" hint-placeholder-count="2">
+          <div style="width: 2px; height: 20px; background: #D6C8EE;"></div>
+          <div style="{{ c.cardStyle }}" onClick="{{ c.onSelect }}">
+            <div style="{{ c.headerStyle }}">
+              <span style="{{ c.numChipStyle }}">{{ c.number }}</span>
+              <div style="width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">{{ c.iconEl }}</div>
+              <span style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 12.5px; color: white; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ c.label }}</span>
+              <span onClick="{{ c.onDelete }}" title="Remover" style="width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer; flex-shrink: 0;" style-hover="background: rgba(255,255,255,0.25);">✕</span>
+            </div>
+            <div style="padding: 9px 13px 11px;">
+              <div style="font-size: 11px; color: #8B7AA8; font-weight: 600;">{{ c.short }}</div>
+              <sc-if value="{{ c.hasResult }}"><div style="{{ c.resultStyle }}">{{ c.resultEl }}</div></sc-if>
+            </div>
+            <sc-if value="{{ c.done }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #22C55E; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 8px rgba(34,197,94,0.4);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div></sc-if>
+            <sc-if value="{{ c.running }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #F59E0B; z-index: 10; animation: pulseRun 0.8s ease infinite;"></div></sc-if>
+          </div>
+        </sc-for>
+        <div style="width: 2px; height: 18px; background: #D6C8EE;"></div>
+        <button onClick="{{ addData }}" style="display: flex; align-items: center; gap: 6px; background: white; border: 2px dashed #C4ABE8; color: #7C3AED; padding: 7px 16px; border-radius: 13px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 11.5px; cursor: pointer; transition: all 0.12s;" style-hover="border-style: solid; background: #FAF7FE;"><span style="font-size: 15px; line-height: 1;">+</span> dados</button>
+
+        <!-- ===== PHASE 2: PRÉ-PROCESSAMENTO (ramos X | y) ===== -->
+        <!-- fork -->
+        <div style="position: relative; width: 476px; height: 30px; flex-shrink: 0;">
+          <div style="position: absolute; left: 237px; top: 0; width: 2px; height: 15px; background: #C9B8E8;"></div>
+          <div style="position: absolute; left: 105px; top: 14px; width: 266px; height: 2px; background: #C9B8E8;"></div>
+          <div style="position: absolute; left: 104px; top: 14px; width: 2px; height: 16px; background: #C9B8E8;"></div>
+          <div style="position: absolute; left: 370px; top: 14px; width: 2px; height: 16px; background: #C9B8E8;"></div>
+        </div>
+        <!-- lanes -->
+        <div style="display: flex; align-items: stretch; gap: 56px; justify-content: center;">
+          <!-- LANE X -->
+          <div style="width: 210px; display: flex; flex-direction: column; align-items: center;">
+            <div style="background: #F3E8FF; color: #A855F7; font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.4px; padding: 4px 11px; border-radius: 8px;">2a · Entrada (X)</div>
+            <sc-for list="{{ featCards }}" as="c" hint-placeholder-count="1">
+              <div style="width: 2px; height: 16px; background: #D6C8EE;"></div>
+              <div style="{{ c.cardStyle }}" onClick="{{ c.onSelect }}">
+                <div style="{{ c.headerStyle }}">
+                  <span style="{{ c.numChipStyle }}">{{ c.number }}</span>
+                  <div style="width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">{{ c.iconEl }}</div>
+                  <span style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 12.5px; color: white; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ c.label }}</span>
+                  <span onClick="{{ c.onDelete }}" title="Remover" style="width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer; flex-shrink: 0;" style-hover="background: rgba(255,255,255,0.25);">✕</span>
+                </div>
+                <div style="padding: 9px 13px 11px;">
+                  <div style="font-size: 11px; color: #8B7AA8; font-weight: 600;">{{ c.short }}</div>
+                  <sc-if value="{{ c.hasResult }}"><div style="{{ c.resultStyle }}">{{ c.resultEl }}</div></sc-if>
+                </div>
+                <sc-if value="{{ c.done }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #22C55E; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 8px rgba(34,197,94,0.4);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div></sc-if>
+                <sc-if value="{{ c.running }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #F59E0B; z-index: 10; animation: pulseRun 0.8s ease infinite;"></div></sc-if>
+              </div>
+            </sc-for>
+            <div style="width: 2px; height: 14px; background: #D6C8EE;"></div>
+            <button onClick="{{ addFeat }}" title="Adicionar pré-processamento de entrada (sequencial)" style="width: 34px; height: 34px; border-radius: 10px; background: rgba(168,85,247,0.08); border: 2px dashed #D6C8EE; color: #A855F7; cursor: pointer; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all 0.12s;" style-hover="border-style: solid; border-color: #A855F7; background: white;">+</button>
+            <div style="flex: 1; width: 2px; background: #D6C8EE; min-height: 14px;"></div>
+          </div>
+          <!-- LANE Y -->
+          <div style="width: 210px; display: flex; flex-direction: column; align-items: center;">
+            <div style="background: #FBEAFB; color: #C026D3; font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.4px; padding: 4px 11px; border-radius: 8px;">2b · Rótulo (y)</div>
+            <sc-for list="{{ labelCards }}" as="c" hint-placeholder-count="1">
+              <div style="width: 2px; height: 16px; background: #D6C8EE;"></div>
+              <div style="{{ c.cardStyle }}" onClick="{{ c.onSelect }}">
+                <div style="{{ c.headerStyle }}">
+                  <span style="{{ c.numChipStyle }}">{{ c.number }}</span>
+                  <div style="width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">{{ c.iconEl }}</div>
+                  <span style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 12.5px; color: white; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ c.label }}</span>
+                  <span onClick="{{ c.onDelete }}" title="Remover" style="width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer; flex-shrink: 0;" style-hover="background: rgba(255,255,255,0.25);">✕</span>
+                </div>
+                <div style="padding: 9px 13px 11px;">
+                  <div style="font-size: 11px; color: #8B7AA8; font-weight: 600;">{{ c.short }}</div>
+                  <sc-if value="{{ c.hasResult }}"><div style="{{ c.resultStyle }}">{{ c.resultEl }}</div></sc-if>
+                </div>
+                <sc-if value="{{ c.done }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #22C55E; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 8px rgba(34,197,94,0.4);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div></sc-if>
+                <sc-if value="{{ c.running }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #F59E0B; z-index: 10; animation: pulseRun 0.8s ease infinite;"></div></sc-if>
+              </div>
+            </sc-for>
+            <sc-if value="{{ canAddLabel }}">
+              <div style="width: 2px; height: 14px; background: #D6C8EE;"></div>
+              <button onClick="{{ addLabel }}" title="Adicionar tratamento do rótulo (y)" style="width: 34px; height: 34px; border-radius: 10px; background: rgba(192,38,211,0.08); border: 2px dashed #E8C4EC; color: #C026D3; cursor: pointer; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all 0.12s;" style-hover="border-style: solid; border-color: #C026D3; background: white;">+</button>
+            </sc-if>
+            <div style="flex: 1; width: 2px; background: #D6C8EE; min-height: 14px;"></div>
+          </div>
+        </div>
+        <!-- join -->
+        <div style="position: relative; width: 476px; height: 30px; flex-shrink: 0;">
+          <div style="position: absolute; left: 104px; top: 0; width: 2px; height: 16px; background: #C9B8E8;"></div>
+          <div style="position: absolute; left: 370px; top: 0; width: 2px; height: 16px; background: #C9B8E8;"></div>
+          <div style="position: absolute; left: 105px; top: 14px; width: 266px; height: 2px; background: #C9B8E8;"></div>
+          <div style="position: absolute; left: 237px; top: 14px; width: 2px; height: 16px; background: #C9B8E8;"></div>
+        </div>
+
+        <!-- ===== PHASE 3: MODELO ===== -->
+        <sc-if value="{{ hasModel }}">
+          <div style="{{ modelCard.cardStyle }}" onClick="{{ modelCard.onSelect }}">
+            <div style="{{ modelCard.headerStyle }}">
+              <span style="{{ modelCard.numChipStyle }}">{{ modelCard.number }}</span>
+              <div style="width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">{{ modelCard.iconEl }}</div>
+              <span style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 12.5px; color: white; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ modelCard.label }}</span>
+              <span onClick="{{ modelCard.onDelete }}" title="Remover" style="width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer; flex-shrink: 0;" style-hover="background: rgba(255,255,255,0.25);">✕</span>
+            </div>
+            <div style="padding: 9px 13px 11px;">
+              <div style="font-size: 11px; color: #8B7AA8; font-weight: 600;">{{ modelCard.short }}</div>
+            </div>
+            <sc-if value="{{ modelCard.done }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #22C55E; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 8px rgba(34,197,94,0.4);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div></sc-if>
+            <sc-if value="{{ modelCard.running }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #F59E0B; z-index: 10; animation: pulseRun 0.8s ease infinite;"></div></sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noModel }}">
+          <button onClick="{{ chooseModel }}" style="display: flex; align-items: center; gap: 9px; background: white; border: 2.5px dashed #93C5FD; color: #3B82F6; padding: 14px 26px; border-radius: 16px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.12s;" style-hover="border-style: solid; background: #EFF6FF; transform: translateY(-1px);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+            3 · Escolher modelo
+          </button>
+        </sc-if>
+
+        <!-- ===== PHASE 4 + 5 (só com modelo) ===== -->
+        <sc-if value="{{ hasModel }}">
+          <div style="width: 2px; height: 20px; background: #D6C8EE;"></div>
+          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 11px; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">4 · Avaliação</div>
+          <div style="display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; justify-content: center;">
+            <sc-for list="{{ evalCards }}" as="c" hint-placeholder-count="2">
+              <div style="{{ c.cardStyle }}" onClick="{{ c.onSelect }}">
+                <div style="{{ c.headerStyle }}">
+                  <span style="{{ c.numChipStyle }}">{{ c.number }}</span>
+                  <div style="width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">{{ c.iconEl }}</div>
+                  <span style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 12.5px; color: white; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ c.label }}</span>
+                  <span onClick="{{ c.onDelete }}" title="Remover" style="width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer; flex-shrink: 0;" style-hover="background: rgba(255,255,255,0.25);">✕</span>
+                </div>
+                <div style="padding: 9px 13px 11px;">
+                  <div style="font-size: 11px; color: #8B7AA8; font-weight: 600;">{{ c.short }}</div>
+                  <sc-if value="{{ c.hasResult }}"><div style="{{ c.resultStyle }}">{{ c.resultEl }}</div></sc-if>
+                </div>
+                <sc-if value="{{ c.done }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #22C55E; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 8px rgba(34,197,94,0.4);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div></sc-if>
+                <sc-if value="{{ c.running }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #F59E0B; z-index: 10; animation: pulseRun 0.8s ease infinite;"></div></sc-if>
+              </div>
+            </sc-for>
+            <button onClick="{{ addEval }}" title="Adicionar métrica" style="width: 44px; align-self: center; height: 60px; border-radius: 14px; background: rgba(245,158,11,0.08); border: 2px dashed #FCD9A0; color: #F59E0B; cursor: pointer; font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all 0.12s;" style-hover="border-style: solid; border-color: #F59E0B; background: white;">+</button>
+          </div>
+
+          <div style="width: 2px; height: 20px; background: #D6C8EE; margin-top: 14px;"></div>
+          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 11px; color: #EC4899; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">5 · Visualização</div>
+          <div style="display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; justify-content: center;">
+            <sc-for list="{{ vizCards }}" as="c" hint-placeholder-count="0">
+              <div style="{{ c.cardStyle }}" onClick="{{ c.onSelect }}">
+                <div style="{{ c.headerStyle }}">
+                  <span style="{{ c.numChipStyle }}">{{ c.number }}</span>
+                  <div style="width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">{{ c.iconEl }}</div>
+                  <span style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 12.5px; color: white; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ c.label }}</span>
+                  <span onClick="{{ c.onDelete }}" title="Remover" style="width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer; flex-shrink: 0;" style-hover="background: rgba(255,255,255,0.25);">✕</span>
+                </div>
+                <div style="padding: 9px 13px 11px;">
+                  <div style="font-size: 11px; color: #8B7AA8; font-weight: 600;">{{ c.short }}</div>
+                  <sc-if value="{{ c.hasResult }}"><div style="{{ c.resultStyle }}">{{ c.resultEl }}</div></sc-if>
+                </div>
+                <sc-if value="{{ c.done }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #22C55E; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 8px rgba(34,197,94,0.4);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div></sc-if>
+                <sc-if value="{{ c.running }}"><div style="position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #F59E0B; z-index: 10; animation: pulseRun 0.8s ease infinite;"></div></sc-if>
+              </div>
+            </sc-for>
+            <button onClick="{{ addViz }}" title="Adicionar visualização" style="width: 44px; align-self: center; height: 60px; border-radius: 14px; background: rgba(236,72,153,0.08); border: 2px dashed #F7C2DD; color: #EC4899; cursor: pointer; font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all 0.12s;" style-hover="border-style: solid; border-color: #EC4899; background: white;">+</button>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- exec overlay -->
+      <sc-if value="{{ execRunning }}">
+        <div style="position: absolute; top: 16px; left: 50%; transform: translateX(-50%); background: white; border-radius: 12px; padding: 10px 22px; box-shadow: 0 6px 24px rgba(124,58,237,0.18); display: flex; align-items: center; gap: 10px; z-index: 100; animation: fadeUp 0.2s ease; border: 1px solid #ECE7F5;">
+          <div style="width: 9px; height: 9px; border-radius: 50%; background: #F59E0B; animation: pulseRun 0.8s ease infinite;"></div>
+          <span style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 13px; color: #7C3AED;">{{ execMsg }}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ execDoneOverlay }}">
+        <div style="position: absolute; top: 16px; left: 50%; transform: translateX(-50%); background: #ECFDF3; border: 1px solid #A5D6A7; border-radius: 12px; padding: 10px 22px; box-shadow: 0 6px 24px rgba(34,197,94,0.15); display: flex; align-items: center; gap: 10px; z-index: 100; animation: fadeUp 0.2s ease;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><polyline points="16 8 10 16 7 13"></polyline></svg>
+          <span style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 13px; color: #16A34A;">Trilha concluída! 🎉</span>
+        </div>
+      </sc-if>
+    </div>
+
+    <!-- RIGHT DETAIL PANEL -->
+    <sc-if value="{{ showInsp }}" hint-placeholder-val="{{ false }}">
+      <div style="width: 330px; background: white; border-left: 1px solid #ECE7F5; display: flex; flex-direction: column; flex-shrink: 0; animation: slideIn 0.16s ease;">
+        <div style="{{ inspHeaderStyle }}">
+          <div style="display: flex; align-items: center; gap: 11px; min-width: 0;">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">{{ inspIconEl }}</div>
+            <div style="min-width: 0;">
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 15px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ inspLabel }}</div>
+              <div style="font-size: 10px; color: rgba(255,255,255,0.8); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">{{ inspCat }}</div>
+            </div>
+          </div>
+          <button onClick="{{ closeInsp }}" style="width: 26px; height: 26px; border: none; background: rgba(255,255,255,0.2); cursor: pointer; border-radius: 8px; font-size: 14px; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" style-hover="background: rgba(255,255,255,0.35);">✕</button>
+        </div>
+        <div style="display: flex; padding: 0 16px; border-bottom: 1px solid #F0EBF8; flex-shrink: 0;">
+          <button onClick="{{ setBasico }}" style="{{ tabBasicoStyle }}">Básico</button>
+          <button onClick="{{ setAvancado }}" style="{{ tabAvancadoStyle }}">Código</button>
+        </div>
+        <div style="flex: 1; overflow-y: auto; min-height: 0;">
+          <sc-if value="{{ isBasico }}">
+            <sc-if value="{{ hasTaskWarn }}">
+              <div style="margin: 14px 18px 0; background: #FEF2F2; border: 1.5px solid #FCA5A5; border-radius: 12px; padding: 11px 13px; display: flex; gap: 9px; align-items: flex-start;">
+                <span style="font-size: 15px; flex-shrink: 0;">⚠️</span>
+                <div style="font-size: 11.5px; color: #B91C1C; line-height: 1.5; font-weight: 600;">{{ taskWarnMsg }}</div>
+              </div>
+            </sc-if>
+            <div style="padding: 16px 18px; border-bottom: 1px solid #F7F5FB;">
+              <div style="font-weight: 800; font-size: 9px; color: #C4ABE8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 7px;">O que faz</div>
+              <p style="font-size: 12.5px; color: #5B4B78; line-height: 1.65; margin: 0;">{{ inspDesc }}</p>
+            </div>
+            <sc-if value="{{ hasInspResult }}">{{ inspResultEl }}</sc-if>
+            <sc-if value="{{ hasPreview }}">{{ previewEl }}</sc-if>
+            <sc-if value="{{ hasParams }}">
+              <div style="padding: 16px 18px; border-bottom: 1px solid #F7F5FB;">
+                <div style="font-weight: 800; font-size: 9px; color: #C4ABE8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;">Ajustes</div>
+                <sc-for list="{{ inspParams }}" as="p">
+                  <div style="margin-bottom: 13px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                      <span style="font-size: 11.5px; font-weight: 700; color: #5B4B78;">{{ p.label }}</span>
+                      <span style="font-size: 10px; color: #7C3AED; font-weight: 700; font-family: 'JetBrains Mono', monospace; background: #F3EEFB; padding: 2px 7px; border-radius: 5px;">{{ p.display }}</span>
+                    </div>
+                    <sc-if value="{{ p.isSlider }}"><input type="range" min="{{ p.min }}" max="{{ p.max }}" step="{{ p.step }}" value="{{ p.value }}" onInput="{{ p.onChange }}" style="width: 100%;"></sc-if>
+                    <sc-if value="{{ p.isSelect }}">
+                      <select onChange="{{ p.onChange }}" value="{{ p.value }}" style="width: 100%; padding: 6px 9px; border: 1.5px solid #E6DDF3; border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 11.5px; outline: none; background: white; color: #5B4B78; font-weight: 600;">
+                        <sc-for list="{{ p.options }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+                      </select>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasTip }}">
+              <div style="padding: 16px 18px; border-bottom: 1px solid #F7F5FB;">
+                <div style="background: linear-gradient(135deg, #F3EEFB, #EFE6FB); border-radius: 12px; padding: 13px 15px;">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 7px;">
+                    <span style="font-size: 15px;">💡</span>
+                    <span style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 11px; color: #7C3AED; text-transform: uppercase; letter-spacing: 0.3px;">Dica do Tutor</span>
+                  </div>
+                  <p style="font-size: 12px; color: #4C1D95; line-height: 1.6; margin: 0;">{{ inspTip }}</p>
+                </div>
+              </div>
+            </sc-if>
+            <div style="padding: 16px 18px;">
+              <div style="font-weight: 800; font-size: 9px; color: #C4ABE8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 7px;">Referência sklearn</div>
+              <code style="font-size: 10.5px; color: #7C3AED; background: #F3EEFB; padding: 6px 11px; border-radius: 7px; font-family: 'JetBrains Mono', monospace; display: block; word-break: break-all;">{{ inspRef }}</code>
+            </div>
+            <div style="padding: 0 18px 18px;">
+              <button onClick="{{ askAboutBlock }}" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 11px; background: linear-gradient(135deg, #7C3AED, #A855F7); color: white; border: none; border-radius: 12px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 12.5px; cursor: pointer; box-shadow: 0 3px 10px rgba(124,58,237,0.28); transition: transform 0.12s;" style-hover="transform: translateY(-1px);">
+                <span style="font-size: 14px;">🤖</span> Perguntar ao tutor sobre este bloco
+              </button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isAvancado }}">
+            {{ nodeCodeEl }}
+            {{ pipelineCodeEl }}
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- PICKER MODAL -->
+  <sc-if value="{{ pickerOpen }}">
+    <div onClick="{{ closePicker }}" style="position: fixed; inset: 0; background: rgba(76,29,149,0.25); backdrop-filter: blur(3px); z-index: 3000; display: flex; align-items: center; justify-content: center;">
+      <div onClick="{{ stopProp }}" style="width: 540px; max-width: calc(100vw - 40px); max-height: 80vh; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(76,29,149,0.3); display: flex; flex-direction: column; overflow: hidden; animation: popIn 0.16s ease;">
+        <div style="padding: 18px 22px; border-bottom: 1px solid #F0EBF8; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 17px; color: #4C1D95;">{{ pickerTitle }}</div>
+            <div style="font-size: 11px; color: #A78BCA; font-weight: 600; margin-top: 1px;">{{ pickerHint }}</div>
+          </div>
+          <button onClick="{{ closePicker }}" style="width: 30px; height: 30px; border: none; background: #F3EEFB; cursor: pointer; border-radius: 9px; font-size: 15px; color: #7C3AED; display: flex; align-items: center; justify-content: center;" style-hover="background: #E8DDF7;">✕</button>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: 16px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <sc-if value="{{ pickerEmpty }}">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 28px 12px; color: #A78BCA;">
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; color: #8B7AA8; margin-bottom: 4px;">Nada para adicionar aqui</div>
+              <div style="font-size: 11.5px;">{{ pickerEmptyMsg }}</div>
+            </div>
+          </sc-if>
+          <sc-for list="{{ pickerItems }}" as="it" hint-placeholder-count="4">
+            <button onClick="{{ it.onClick }}" style="display: flex; align-items: center; gap: 11px; padding: 12px 14px; background: #FBF9FE; border: 1.5px solid #F0EBF8; border-radius: 13px; cursor: pointer; text-align: left; font-family: 'Nunito', sans-serif; transition: all 0.12s;" style-hover="border-color: #C4ABE8; background: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.08);">
+              <div style="{{ it.iconBg }}">{{ it.iconEl }}</div>
+              <div style="min-width: 0;">
+                <div style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 13px; color: #4C1D95; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ it.label }}</div>
+                <div style="font-size: 10.5px; color: #A78BCA; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ it.short }}</div>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- CHATBOT FAB -->
+  <button onClick="{{ toggleChat }}" style="position: fixed; bottom: 22px; right: 22px; width: 52px; height: 52px; border-radius: 16px; border: none; background: linear-gradient(135deg, #7C3AED, #A855F7); color: white; cursor: pointer; z-index: 2100; box-shadow: 0 6px 20px rgba(124,58,237,0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.12s;" style-hover="transform: scale(1.06);" style-active="transform: scale(0.94);">
+    <sc-if value="{{ chatClosed }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path></svg></sc-if>
+    <sc-if value="{{ chatOpen }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></sc-if>
+  </button>
+
+  <sc-if value="{{ chatOpen }}">
+    <div style="position: fixed; bottom: 86px; right: 22px; width: 380px; max-height: calc(100vh - 140px); background: white; border: 1px solid #ECE7F5; border-radius: 16px; box-shadow: 0 16px 48px rgba(76,29,149,0.22); z-index: 2090; display: flex; flex-direction: column; overflow: hidden; animation: slideIn 0.16s ease;">
+      <div style="padding: 13px 16px; background: linear-gradient(135deg, #7C3AED, #A855F7); display: flex; align-items: center; gap: 9px; flex-shrink: 0;">
+        <div style="width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center;"><span style="font-size: 15px;">🤖</span></div>
+        <div>
+          <div style="font-family: 'Baloo 2', sans-serif; color: white; font-weight: 700; font-size: 13px; line-height: 1;">Tutor IA</div>
+          <div style="color: rgba(255,255,255,0.8); font-size: 9.5px; font-weight: 600; margin-top: 2px;">pergunte qualquer coisa sobre ML</div>
+        </div>
+      </div>
+      <sc-if value="{{ hasChatCtx }}">
+        <div style="padding: 7px 14px; background: #F3EEFB; border-bottom: 1px solid #E8DDF7; display: flex; align-items: center; gap: 7px; flex-shrink: 0;">
+          <span style="font-size: 10px; color: #7C3AED; font-weight: 700;">📎 Contexto:</span>
+          <span style="font-size: 10.5px; color: #5B4B78; font-weight: 700; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ chatCtxLabel }}</span>
+          <button onClick="{{ clearChatCtx }}" title="Remover contexto" style="width: 18px; height: 18px; border: none; background: #E8DDF7; border-radius: 6px; color: #7C3AED; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">✕</button>
+        </div>
+      </sc-if>
+      <div ref="{{ chatScrollRef }}" style="flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 9px; max-height: 340px; min-height: 170px; background: #FBF9FE;">
+        <sc-for list="{{ chatMsgs }}" as="m" hint-placeholder-count="1">
+          <div style="{{ m.wrapStyle }}"><div style="{{ m.bubbleStyle }}">{{ m.text }}</div></div>
+        </sc-for>
+        <sc-if value="{{ typing }}">
+          <div style="display: flex; justify-content: flex-start;"><div style="background: #F3EEFB; border-radius: 12px 12px 12px 3px; padding: 9px 13px; font-size: 11.5px; color: #A855F7; font-style: italic;">digitando…</div></div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ hasSugg }}">
+        <div style="padding: 0 14px 9px; display: flex; flex-wrap: wrap; gap: 5px; background: #FBF9FE;">
+          <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="3">
+            <button onClick="{{ s.onClick }}" style="padding: 4px 11px; background: white; color: #7C3AED; border: 1.5px solid #E6DDF3; border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.12s; white-space: nowrap;" style-hover="background: #F3EEFB; border-color: #C4ABE8;">{{ s.text }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="padding: 11px 14px; border-top: 1px solid #F0EBF8; display: flex; gap: 7px; flex-shrink: 0;">
+        <input type="text" placeholder="Pergunte ao tutor…" value="{{ chatInput }}" onInput="{{ onChatInput }}" onKeyDown="{{ onChatKey }}" style="flex: 1; padding: 8px 12px; border: 1.5px solid #E6DDF3; border-radius: 10px; font-family: 'Nunito', sans-serif; font-size: 11.5px; outline: none; background: #FBF9FE; color: #5B4B78; min-width: 0;" style-focus="border-color: #A855F7;">
+        <button onClick="{{ onChatSend }}" style="padding: 8px 14px; background: linear-gradient(135deg, #7C3AED, #A855F7); color: white; border: none; border-radius: 10px; font-family: 'Baloo 2', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;">→</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+class Component extends DCLogic {
+  BW = 210;
+  PHASES = {
+    data:   { label: 'Dados',             color: '#22C55E', icon: 'db' },
+    featX:  { label: 'Entrada (X)',       color: '#A855F7', icon: 'filter' },
+    labelY: { label: 'Rótulo (y)',        color: '#C026D3', icon: 'tag' },
+    model:  { label: 'Modelo',            color: '#3B82F6', icon: 'cpu' },
+    eval:   { label: 'Avaliação',         color: '#F59E0B', icon: 'chart' },
+    viz:    { label: 'Visualização',      color: '#EC4899', icon: 'eye' },
+  };
+  PHASE_OF = {
+    iris:'data', wine:'data', breast_cancer:'data', train_test_split:'data',
+    standard_scaler:'featX', minmax_scaler:'featX', one_hot_encoder:'featX',
+    label_encoder:'labelY',
+    random_forest:'model', decision_tree:'model', knn:'model', adaboost:'model', svm:'model',
+    linear_regression:'model', rf_regressor:'model', kmeans:'model',
+    accuracy:'eval', f1_score:'eval', confusion_matrix:'eval', r2_score:'eval', mse:'eval', silhouette:'eval',
+    pred_vs_real:'viz', cluster_plot:'viz',
+  };
+  TASK_OF = {
+    random_forest:'classification', decision_tree:'classification', knn:'classification', adaboost:'classification', svm:'classification',
+    linear_regression:'regression', rf_regressor:'regression',
+    kmeans:'clustering',
+    accuracy:'classification', f1_score:'classification', confusion_matrix:'classification',
+    r2_score:'regression', mse:'regression', pred_vs_real:'regression',
+    silhouette:'clustering', cluster_plot:'clustering',
+    label_encoder:'classification',
+  };
+  ICONS = {
+    db: (c,s=15) => React.createElement('svg',{width:s,height:s,viewBox:'0 0 24 24',fill:'none',stroke:c,strokeWidth:2,strokeLinecap:'round'},[React.createElement('ellipse',{key:'e',cx:12,cy:5,rx:9,ry:3}),React.createElement('path',{key:'p1',d:'M21 12c0 1.66-4 3-9 3s-9-1.34-9-3'}),React.createElement('path',{key:'p2',d:'M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5'})]),
+    filter: (c,s=15) => React.createElement('svg',{width:s,height:s,viewBox:'0 0 24 24',fill:'none',stroke:c,strokeWidth:2,strokeLinecap:'round'},[React.createElement('polygon',{key:'p',points:'22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3'})]),
+    tag: (c,s=15) => React.createElement('svg',{width:s,height:s,viewBox:'0 0 24 24',fill:'none',stroke:c,strokeWidth:2,strokeLinecap:'round'},[React.createElement('path',{key:'p',d:'M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z'}),React.createElement('line',{key:'l',x1:7,y1:7,x2:7.01,y2:7})]),
+    cpu: (c,s=15) => React.createElement('svg',{width:s,height:s,viewBox:'0 0 24 24',fill:'none',stroke:c,strokeWidth:2,strokeLinecap:'round'},[React.createElement('rect',{key:'r',x:4,y:4,width:16,height:16,rx:2}),React.createElement('rect',{key:'r2',x:9,y:9,width:6,height:6}),React.createElement('line',{key:'l1',x1:9,y1:1,x2:9,y2:4}),React.createElement('line',{key:'l2',x1:15,y1:1,x2:15,y2:4}),React.createElement('line',{key:'l3',x1:9,y1:20,x2:9,y2:23}),React.createElement('line',{key:'l4',x1:15,y1:20,x2:15,y2:23})]),
+    chart: (c,s=15) => React.createElement('svg',{width:s,height:s,viewBox:'0 0 24 24',fill:'none',stroke:c,strokeWidth:2,strokeLinecap:'round'},[React.createElement('line',{key:'l1',x1:18,y1:20,x2:18,y2:10}),React.createElement('line',{key:'l2',x1:12,y1:20,x2:12,y2:4}),React.createElement('line',{key:'l3',x1:6,y1:20,x2:6,y2:14})]),
+    eye: (c,s=15) => React.createElement('svg',{width:s,height:s,viewBox:'0 0 24 24',fill:'none',stroke:c,strokeWidth:2,strokeLinecap:'round'},[React.createElement('path',{key:'p',d:'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'}),React.createElement('circle',{key:'c',cx:12,cy:12,r:3})]),
+  };
+  TYPES = {
+    iris:              { label:'Iris Dataset',      short:'150 amostras · 3 classes', desc:'Dataset clássico com 4 medições de flores (sépalas e pétalas) de 3 espécies: setosa, versicolor e virginica.', tip:'Comece com datasets pequenos e conhecidos. O Iris é perfeito porque tem poucas features e classes bem separadas.', ref:'sklearn.datasets.load_iris()', },
+    wine:              { label:'Wine Dataset',      short:'178 amostras · 3 classes', desc:'Análise química de vinhos de 3 cultivares italianos, com 13 atributos como teor alcoólico e acidez.', tip:'Datasets com mais features ajudam a entender quais atributos são mais importantes.', ref:'sklearn.datasets.load_wine()', },
+    breast_cancer:     { label:'Breast Cancer',     short:'569 amostras · 2 classes', desc:'Diagnóstico de tumores como malignos ou benignos com base em 30 características celulares.', tip:'Classificação binária (2 classes) é mais simples que multi-classe. Ótimo para praticar!', ref:'sklearn.datasets.load_breast_cancer()', },
+    train_test_split:  { label:'Train/Test Split',  short:'Dividir treino e teste',   desc:'Divide os dados em treino (para o modelo aprender) e teste (para avaliar o desempenho).', tip:'Nunca avalie um modelo nos mesmos dados de treino! A divisão evita que o modelo "cole na prova".', ref:'sklearn.model_selection.train_test_split()', params:[{id:'test_size',label:'Proporção de teste',type:'slider',min:0.1,max:0.5,step:0.05,def:0.3},{id:'shuffle',label:'Embaralhar',type:'select',opts:[{v:'true',l:'Sim'},{v:'false',l:'Não'}],def:'true'},{id:'stratify',label:'Estratificar',type:'select',opts:[{v:'false',l:'Não'},{v:'true',l:'Sim'}],def:'false'}] },
+    standard_scaler:   { label:'StandardScaler',    short:'Média 0, desvio 1',        desc:'Transforma cada feature para ter média zero e desvio padrão 1 (normalização Z-score).', tip:'Modelos como SVM e k-NN funcionam muito melhor quando as features estão na mesma escala.', ref:'sklearn.preprocessing.StandardScaler()', },
+    minmax_scaler:     { label:'MinMaxScaler',      short:'Escala entre 0 e 1',       desc:'Transforma cada feature para ficar entre 0 e 1, mantendo a distribuição original.', tip:'Use MinMaxScaler quando os dados não têm muitos outliers.', ref:'sklearn.preprocessing.MinMaxScaler()', },
+    label_encoder:     { label:'LabelEncoder',      short:'Texto → número',           desc:'Converte os rótulos (y) de texto em números (ex: setosa=0, versicolor=1, virginica=2).', tip:'Trata o rótulo (y), em paralelo ao pré-processamento das entradas (X). Vai direto ao modelo.', ref:'sklearn.preprocessing.LabelEncoder()', },
+    one_hot_encoder:   { label:'OneHotEncoder',     short:'Colunas binárias',         desc:'Transforma cada categoria de uma feature em uma coluna binária (0 ou 1).', tip:'Quando as categorias não têm ordem natural (cores, países), use OneHotEncoder.', ref:'sklearn.preprocessing.OneHotEncoder()', },
+    random_forest:     { label:'Random Forest',     short:'Floresta de árvores',      desc:'Combina várias árvores de decisão treinadas em subconjuntos aleatórios. A predição é por votação.', tip:'Imagine pedir a opinião de muitos especialistas e usar a resposta mais votada!', ref:'sklearn.ensemble.RandomForestClassifier()', params:[{id:'n_estimators',label:'Nº de árvores',type:'slider',min:10,max:200,step:10,def:100},{id:'max_depth',label:'Profundidade máx.',type:'slider',min:1,max:20,step:1,def:5}] },
+    decision_tree:     { label:'Árvore de Decisão', short:'Perguntas sim/não',        desc:'Cria uma série de perguntas sim/não sobre os dados para chegar a uma classificação.', tip:'Funciona como um fluxograma: "pétala > 2.5cm? Se sim, vá pra esquerda...". Fácil de visualizar!', ref:'sklearn.tree.DecisionTreeClassifier()', params:[{id:'max_depth',label:'Profundidade máx.',type:'slider',min:1,max:20,step:1,def:5}] },
+    knn:               { label:'k-NN',              short:'K vizinhos próximos',      desc:'Classifica uma amostra pela maioria dos seus K vizinhos mais próximos.', tip:'É como ser novo na escola: olhe os 5 alunos mais parecidos com você — a turma deles é a sua!', ref:'sklearn.neighbors.KNeighborsClassifier()', params:[{id:'n_neighbors',label:'K (vizinhos)',type:'slider',min:1,max:21,step:2,def:5}] },
+    adaboost:          { label:'AdaBoost',          short:'Boosting adaptativo',      desc:'Combina vários classificadores fracos, dando mais peso aos exemplos classificados errados.', tip:'É como estudar pra prova: cada vez que erra uma questão, foca mais nela até acertar!', ref:'sklearn.ensemble.AdaBoostClassifier()', params:[{id:'n_estimators',label:'Nº estimadores',type:'slider',min:10,max:200,step:10,def:50},{id:'learning_rate',label:'Taxa aprendizado',type:'slider',min:0.01,max:2,step:0.01,def:1}] },
+    svm:               { label:'SVM',               short:'Máquina de vetores',       desc:'Encontra o melhor hiperplano que separa as classes, maximizando a margem.', tip:'O SVM procura a melhor "linha divisória" entre as classes. Ótimo quando os dados são bem separados!', ref:'sklearn.svm.SVC()', },
+    linear_regression: { label:'Regressão Linear',  short:'Prevê números',            desc:'Ajusta uma reta (ou plano) que melhor prevê um valor numérico contínuo a partir das features.', tip:'Use quando quer prever um NÚMERO (preço, temperatura), não uma categoria. É o "Hello World" da regressão!', ref:'sklearn.linear_model.LinearRegression()', },
+    rf_regressor:      { label:'Random Forest (Reg.)', short:'Floresta p/ números',   desc:'Combina várias árvores para prever um valor numérico contínuo, calculando a média das previsões.', tip:'A versão do Random Forest para prever números em vez de categorias.', ref:'sklearn.ensemble.RandomForestRegressor()', params:[{id:'n_estimators',label:'Nº de árvores',type:'slider',min:10,max:200,step:10,def:100},{id:'max_depth',label:'Profundidade máx.',type:'slider',min:1,max:20,step:1,def:5}] },
+    kmeans:            { label:'K-Means',           short:'Agrupa em K grupos',       desc:'Separa os dados em K grupos (clusters) juntando amostras parecidas, SEM usar rótulos.', tip:'Agrupamento não usa respostas certas! O K-Means descobre grupos sozinho — como organizar alunos por semelhança sem saber a turma.', ref:'sklearn.cluster.KMeans()', params:[{id:'n_clusters',label:'Nº de grupos (K)',type:'slider',min:2,max:10,step:1,def:3}] },
+    accuracy:          { label:'Acurácia',          short:'Proporção de acertos',     desc:'Mede a proporção de predições corretas sobre o total.', tip:'A métrica mais simples: "de 100 previsões, quantas acertei?". Cuidado com dados desbalanceados!', ref:'sklearn.metrics.accuracy_score()', },
+    f1_score:          { label:'F1-Score',          short:'Precisão + recall',        desc:'Média harmônica entre precisão e recall. Útil quando ambas importam.', tip:'Use quando errar tanto falso-positivo quanto falso-negativo é igualmente ruim.', ref:'sklearn.metrics.f1_score()', },
+    confusion_matrix:  { label:'Matriz de Confusão',short:'Acertos × erros',          desc:'Tabela que mostra quantas predições foram corretas e incorretas para cada classe.', tip:'Como um boletim detalhado: mostra em quais "matérias" o modelo acertou e errou!', ref:'sklearn.metrics.confusion_matrix()', },
+    r2_score:          { label:'R² (R quadrado)',   short:'Qualidade da regressão',   desc:'Mede o quão bem o modelo de regressão explica os dados (1.0 = perfeito, 0 = fraco).', tip:'R² perto de 1 é ótimo: o modelo acerta quase tudo. Perto de 0 (ou negativo) é ruim.', ref:'sklearn.metrics.r2_score()', },
+    mse:               { label:'Erro Quadrático (MSE)', short:'Erro médio ao quad.',  desc:'Média dos erros ao quadrado entre o valor previsto e o real. Quanto menor, melhor.', tip:'Eleva os erros ao quadrado, então pune muito os erros grandes. Quanto mais perto de 0, melhor!', ref:'sklearn.metrics.mean_squared_error()', },
+    silhouette:        { label:'Silhueta',          short:'Qualidade dos grupos',     desc:'Mede o quão bem separados estão os clusters (de -1 a 1; quanto maior, melhor).', tip:'Silhueta perto de 1 significa grupos bem definidos. Perto de 0, grupos confusos.', ref:'sklearn.metrics.silhouette_score()', },
+    pred_vs_real:      { label:'Previsto × Real',   short:'Dispersão da regressão',   desc:'Gráfico de dispersão comparando os valores previstos com os reais. Pontos na diagonal = acertos.', tip:'Se os pontos ficam perto da linha diagonal, o modelo está prevendo bem!', ref:'matplotlib: plt.scatter(y_test, y_pred)', },
+    cluster_plot:      { label:'Mapa de Clusters',  short:'Grupos coloridos',         desc:'Gráfico de dispersão com cada cluster pintado de uma cor diferente.', tip:'Mostra visualmente como o K-Means separou os dados em grupos.', ref:'matplotlib: scatter colorido por cluster', },
+  };
+
+  scrollRef = React.createRef();
+  chatRef = React.createRef();
+
+  _default() {
+    return {
+      data:   [{ id:'b1', type:'iris' }, { id:'b2', type:'train_test_split' }],
+      featX:  [{ id:'b3', type:'minmax_scaler' }],
+      labelY: [{ id:'b4', type:'label_encoder' }],
+      model:  { id:'b5', type:'adaboost' },
+      evalM:  [{ id:'b6', type:'accuracy' }, { id:'b7', type:'confusion_matrix' }],
+      vizM:   [],
+    };
+  }
+
+  state = {
+    pipeline: this._default(),
+    nextId: 8,
+    selId: null,
+    execState: 'idle', execDone: [], runningId: null, execResults: {},
+    paramVals: {},
+    inspTab: 'basico',
+    picker: null,
+    ctxId: null,
+    chatOpen: false,
+    msgs: [{ id:0, role:'bot', text:'Oi! 👋 Sou seu tutor de ML. Monte sua trilha e me pergunte qualquer coisa!' }],
+    chatIn: '', typing: false, msgN: 1,
+  };
+
+  componentDidUpdate(pp, ps) {
+    if (ps && (this.state.msgs.length !== ps.msgs.length || this.state.typing !== ps.typing)) {
+      const el = this.chatRef?.current;
+      if (el) setTimeout(() => { el.scrollTop = el.scrollHeight; }, 60);
+    }
+  }
+
+  _flatOrder() {
+    const p = this.state.pipeline;
+    const o = [...p.data, ...p.featX, ...p.labelY];
+    if (p.model) o.push(p.model);
+    o.push(...p.evalM, ...p.vizM);
+    return o;
+  }
+
+  _pipelineTask() {
+    const m = this.state.pipeline.model;
+    return m ? (this.TASK_OF[m.type] || 'classification') : null;
+  }
+
+  _typeAllowed(tid, task) {
+    const ph = this.PHASE_OF[tid];
+    if (tid === 'label_encoder') return task !== 'regression' && task !== 'clustering';
+    if (ph === 'model') return task === null || this.TASK_OF[tid] === task;
+    if (ph === 'eval' || ph === 'viz') { const tt = this.TASK_OF[tid]; return tt ? (task !== null && tt === task) : true; }
+    return true;
+  }
+
+  _num(phase, idx, total) {
+    const pre = { data:'1', featX:'2a', labelY:'2b', model:'3', eval:'4', viz:'5' }[phase];
+    if (phase === 'model') return '3';
+    if (total > 1) return pre + '.' + (idx + 1);
+    return pre;
+  }
+
+  _datasetN() {
+    const b = this.state.pipeline.data.find(x => ['iris','wine','breast_cancer'].includes(x.type));
+    return ({ iris:150, wine:178, breast_cancer:569 })[b && b.type] || 150;
+  }
+
+  _bucketOf(phase) { return ({ data:'data', featX:'featX', labelY:'labelY', eval:'evalM', viz:'vizM' })[phase]; }
+
+  _openPicker(phase) { this.setState({ picker: { phase } }); }
+
+  _addBlock(type) {
+    const phase = this.state.picker && this.state.picker.phase;
+    if (!phase) return;
+    const id = 'b' + this.state.nextId;
+    this.setState(s => {
+      const p = { ...s.pipeline };
+      if (phase === 'model') { p.model = { id, type }; }
+      else { const bk = this._bucketOf(phase); p[bk] = [...p[bk], { id, type }]; }
+      return { pipeline: p, nextId: s.nextId + 1, picker: null, selId: id, inspTab: 'basico' };
+    });
+  }
+
+  _delBlock(bid) {
+    this.setState(s => {
+      const p = { ...s.pipeline };
+      p.data = p.data.filter(b => b.id !== bid);
+      p.featX = p.featX.filter(b => b.id !== bid);
+      p.labelY = p.labelY.filter(b => b.id !== bid);
+      p.evalM = p.evalM.filter(b => b.id !== bid);
+      p.vizM = p.vizM.filter(b => b.id !== bid);
+      if (p.model && p.model.id === bid) p.model = null;
+      return { pipeline: p, selId: s.selId === bid ? null : s.selId };
+    });
+  }
+
+  _setParam(bid, pid, v) { this.setState(s => ({ paramVals: { ...s.paramVals, [bid]: { ...s.paramVals[bid], [pid]: v } } })); }
+
+  async _exec() {
+    if (this.state.execState === 'running') return;
+    const order = this._flatOrder();
+    if (!order.length) return;
+    this.setState({ execState: 'running', execDone: [], execResults: {}, runningId: null });
+    for (const b of order) {
+      this.setState({ runningId: b.id });
+      await new Promise(r => setTimeout(r, 430));
+      this.setState(s => ({ execDone: [...s.execDone, b.id], runningId: null }));
+    }
+    await new Promise(r => setTimeout(r, 250));
+    const R = {
+      accuracy:{type:'metric',name:'Acurácia',display:'89.19%'},
+      f1_score:{type:'metric',name:'F1-Score',display:'94.29%'},
+      r2_score:{type:'metric',name:'R²',display:'0.87'},
+      mse:{type:'metric',name:'MSE',display:'0.21'},
+      silhouette:{type:'metric',name:'Silhueta',display:'0.62'},
+      confusion_matrix:{type:'matrix',labels:['setosa','versicolor','virginica'],matrix:[[15,0,0],[0,11,4],[0,0,7]]},
+      pred_vs_real:{type:'plot',name:'Previsto × Real'},
+      cluster_plot:{type:'plot',name:'Mapa de Clusters'},
+    };
+    const res = {};
+    order.forEach(b => { if (R[b.type]) res[b.id] = R[b.type]; });
+    this.setState({ execState: 'done', runningId: null, execResults: res });
+    setTimeout(() => { if (this.state.execState === 'done') this.setState({ execState: 'idle' }); }, 3200);
+  }
+
+  _toggleChat() { this.setState(s => ({ chatOpen: !s.chatOpen })); }
+  _askAboutBlock(id) { this.setState({ chatOpen: true, ctxId: id }, () => this._sendChat('Me explica esse bloco de um jeito bem simples?')); }
+
+  _blockContext(b) {
+    const td = this.TYPES[b.type]; const ph = this.PHASES[this.PHASE_OF[b.type]];
+    const ps = (td.params || []).map(p => { const v = (this.state.paramVals[b.id] && this.state.paramVals[b.id][p.id]) ?? p.def; return p.label + '=' + v; }).join(', ');
+    return 'Bloco que o aluno está vendo no painel: "' + td.label + '" (fase: ' + ph.label + '). O que faz: ' + td.desc + ' Referência scikit-learn: ' + td.ref + '.' + (ps ? (' Parâmetros atuais: ' + ps + '.') : '');
+  }
+  _fullContext() {
+    const order = this._flatOrder();
+    const task = this._pipelineTask();
+    const steps = order.map(b => this.TYPES[b.type].label).join(' → ');
+    let s = 'Trilha atual (tarefa: ' + (task ? ({classification:'classificação',regression:'regressão',clustering:'agrupamento'})[task] : 'nenhum modelo ainda') + '): ' + (steps || 'vazia') + '. O ramo das entradas (X) é sequencial e o do rótulo (y) corre em paralelo, indo direto ao modelo.';
+    const ctx = this.state.ctxId ? order.find(x => x.id === this.state.ctxId) : null;
+    if (ctx) s += '\n\n' + this._blockContext(ctx);
+    return s;
+  }
+  async _askLLM(question) {
+    if (!(window.claude && window.claude.complete)) return null;
+    const persona = 'Você é um tutor de Machine Learning para alunos de ensino fundamental e médio (olimpíadas de IA), muitos SEM base de programação ou matemática. Responda em português do Brasil, curtinho (2 a 4 frases), com linguagem simples e analogias do dia a dia. Evite fórmulas. Use o contexto da trilha quando ajudar.';
+    const out = await window.claude.complete({ messages: [{ role: 'user', content: persona + '\n\n[CONTEXTO]\n' + this._fullContext() + '\n\n[PERGUNTA DO ALUNO]\n' + question }] });
+    return (out || '').trim() || null;
+  }
+  async _sendChat(txt) {
+    if (!txt || !txt.trim()) return;
+    const t = txt.trim();
+    this.setState(s => ({ msgs: [...s.msgs, { id:s.msgN, role:'user', text:t }], chatIn:'', typing:true, msgN:s.msgN+1 }));
+    let reply = null;
+    try { reply = await this._askLLM(t); } catch (e) { reply = null; }
+    if (!reply) { await new Promise(r => setTimeout(r, 350)); reply = this._genResp(t); }
+    this.setState(s => ({ msgs: [...s.msgs, { id:s.msgN, role:'bot', text:reply }], typing:false, msgN:s.msgN+1 }));
+  }
+  _genResp(msg) {
+    const low = msg.toLowerCase();
+    const sel = this.state.selId ? this._flatOrder().find(b => b.id === this.state.selId) : null;
+    const td = sel ? this.TYPES[sel.type] : null;
+    if (td && (low.includes('este') || low.includes('isso') || low.includes('como funciona') || low.includes('que faz') || low.includes('que é') || low.includes('explica'))) return td.desc + ' ' + td.tip;
+    if (low.includes('machine learning') || low.includes('o que é ml')) return 'Machine Learning é ensinar o computador a aprender padrões a partir de exemplos, sem programar regras à mão.';
+    if (low.includes('paralelo') || low.includes('rótulo') || low.includes('rotulo') || low.includes('label')) return 'O rótulo (y) é o que queremos prever. Ele é tratado em paralelo às entradas (X) e vai direto ao modelo — por isso o LabelEncoder não passa pelos scalers.';
+    if (low.includes('overfitting')) return 'Overfitting é quando o modelo "decora" os dados de treino e vai mal em dados novos. Como decorar uma prova antiga!';
+    if (low.includes('normaliz') || low.includes('escala')) return 'Normalizar coloca todas as features na mesma escala. Modelos como k-NN e SVM precisam disso pra funcionar bem!';
+    if (low.includes('dica') || low.includes('ajud')) return td ? ('Sobre ' + td.label + ': ' + td.tip) : 'Comece com o Iris, divida treino/teste, normalize as entradas e teste um modelo. Depois veja a acurácia!';
+    return 'Posso explicar conceitos de ML, blocos da trilha, métricas ou dar dicas. Pode perguntar! 😊';
+  }
+  _getSugg() {
+    const sel = this.state.selId ? this._flatOrder().find(b => b.id === this.state.selId) : null;
+    const ph = sel ? this.PHASE_OF[sel.type] : null;
+    if (!ph) return ['O que é ML?', 'Por que X e y são separados?', 'O que é overfitting?'];
+    if (ph === 'data') return ['Por que dividir treino/teste?', 'O que são features?', 'Dica'];
+    if (ph === 'featX') return ['Por que normalizar?', 'O que é encoding?', 'Dica'];
+    if (ph === 'labelY') return ['O que é o rótulo (y)?', 'Por que vai direto ao modelo?', 'Dica'];
+    if (ph === 'model') return ['Como este funciona?', 'O que é overfitting?', 'Dica'];
+    return ['O que mede?', 'Como interpretar?', 'Dica'];
+  }
+
+  _previewEl(blk) {
+    const t = blk.type;
+    if (!['iris','wine','breast_cancer','train_test_split','label_encoder','standard_scaler','minmax_scaler','one_hot_encoder'].includes(t)) return null;
+    const th = (txt,k) => React.createElement('th',{key:k,style:{padding:'4px 7px',fontSize:8.5,fontWeight:800,color:'#A78BCA',textAlign:'center',textTransform:'uppercase',letterSpacing:'0.3px'}},txt);
+    const td = (v,k,st) => React.createElement('td',{key:k,style:Object.assign({padding:'5px 7px',fontSize:10.5,fontFamily:"'JetBrains Mono', monospace",color:'#5B4B78',textAlign:'center',borderTop:'1px solid #F0EBF8'},st||{})},String(v));
+    const table = (heads, rows) => React.createElement('table',{style:{borderCollapse:'collapse',width:'100%',background:'#FBF9FE',borderRadius:9,overflow:'hidden'}},[
+      React.createElement('tr',{key:'h'},heads.map((h,i)=>th(h,'h'+i))),
+      ...rows.map((r,ri)=>React.createElement('tr',{key:'r'+ri},r.map((c,ci)=>td(c.v,'c'+ri+'-'+ci,c.s)))),
+    ]);
+    const arrow = { color:'#A855F7' };
+    let inner = null, note = '';
+    if (t === 'iris') {
+      inner = table(['sépala C','sépala L','pétala C','pétala L','classe (y)'], [
+        [{v:5.1},{v:3.5},{v:1.4},{v:0.2},{v:'setosa',s:{color:'#16A34A',fontWeight:700}}],
+        [{v:7.0},{v:3.2},{v:4.7},{v:1.4},{v:'versicolor',s:{color:'#16A34A',fontWeight:700}}],
+        [{v:6.3},{v:3.3},{v:6.0},{v:2.5},{v:'virginica',s:{color:'#16A34A',fontWeight:700}}],
+      ]);
+      note = 'Primeiras linhas: 4 features numéricas (X) + a classe (y) que o modelo vai aprender a prever.';
+    } else if (t === 'wine' || t === 'breast_cancer') {
+      const info = t === 'wine' ? [178,13,3] : [569,30,2];
+      inner = table(['amostras','features','classes'], [[{v:info[0]},{v:info[1]},{v:info[2]}]]);
+      note = 'Cada linha é uma amostra; cada coluna (feature) descreve a amostra.';
+    } else if (t === 'train_test_split') {
+      const N = this._datasetN();
+      const ts = (this.state.paramVals[blk.id] && this.state.paramVals[blk.id].test_size) || 0.3;
+      const test = Math.round(N * ts), train = N - test, trainPct = Math.round((train / N) * 100);
+      inner = React.createElement('div',{style:{display:'flex',height:38,borderRadius:9,overflow:'hidden',border:'1px solid #F0EBF8'}},[
+        React.createElement('div',{key:'tr',style:{width:trainPct+'%',background:'#A855F7',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontWeight:800,fontSize:11,whiteSpace:'nowrap'}},'Treino · '+train),
+        React.createElement('div',{key:'te',style:{flex:1,background:'#F59E0B',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontWeight:800,fontSize:11,whiteSpace:'nowrap'}},'Teste · '+test),
+      ]);
+      note = N + ' amostras → ' + train + ' para treinar e ' + test + ' para testar (' + trainPct + '% / ' + (100 - trainPct) + '%).';
+    } else if (t === 'label_encoder') {
+      inner = table(['texto (y)','→ número'], [[{v:'setosa'},{v:0,s:arrow}],[{v:'versicolor'},{v:1,s:arrow}],[{v:'virginica'},{v:2,s:arrow}]]);
+      note = 'Cada categoria de texto do rótulo vira um número inteiro.';
+    } else if (t === 'standard_scaler') {
+      inner = table(['valor','→ z-score'], [[{v:5.1},{v:'−0.90',s:arrow}],[{v:4.9},{v:'−1.14',s:arrow}],[{v:6.3},{v:'+1.40',s:arrow}]]);
+      note = 'Cada feature passa a ter média 0 e desvio padrão 1.';
+    } else if (t === 'minmax_scaler') {
+      inner = table(['valor','→ [0, 1]'], [[{v:5.1},{v:'0.22',s:arrow}],[{v:4.9},{v:'0.17',s:arrow}],[{v:6.3},{v:'0.61',s:arrow}]]);
+      note = 'O menor valor vira 0, o maior vira 1, o resto fica no meio.';
+    } else if (t === 'one_hot_encoder') {
+      inner = table(['categoria','→ vetor'], [[{v:'vermelho'},{v:'[1, 0, 0]',s:arrow}],[{v:'azul'},{v:'[0, 1, 0]',s:arrow}],[{v:'verde'},{v:'[0, 0, 1]',s:arrow}]]);
+      note = 'Cada categoria vira uma coluna binária (0 ou 1), sem ordem entre elas.';
+    }
+    return React.createElement('div',{style:{padding:'16px 18px',borderBottom:'1px solid #F7F5FB'}},[
+      React.createElement('div',{key:'h',style:{display:'flex',alignItems:'center',gap:6,marginBottom:9}},[
+        React.createElement('span',{key:'i',style:{fontSize:13}},'🔎'),
+        React.createElement('span',{key:'t',style:{fontFamily:"'Baloo 2', sans-serif",fontWeight:700,fontSize:11,color:'#7C3AED',textTransform:'uppercase',letterSpacing:'0.3px'}},'Exemplo nos dados'),
+      ]),
+      React.createElement('div',{key:'b'},inner),
+      React.createElement('div',{key:'n',style:{fontSize:10,color:'#A78BCA',fontWeight:600,marginTop:8,lineHeight:1.45}},note),
+    ]);
+  }
+
+  _genNodeCode(type, params) {
+    const p = params || {};
+    const C = {
+      iris: { imp:'from sklearn.datasets import load_iris', code:'X, y = load_iris(return_X_y=True)', doc:'Carrega Iris: 150 amostras, 4 features, 3 classes.' },
+      wine: { imp:'from sklearn.datasets import load_wine', code:'X, y = load_wine(return_X_y=True)', doc:'Carrega Wine: 178 amostras, 13 features.' },
+      breast_cancer: { imp:'from sklearn.datasets import load_breast_cancer', code:'X, y = load_breast_cancer(return_X_y=True)', doc:'Carrega Breast Cancer: 569 amostras, binário.' },
+      train_test_split: { imp:'from sklearn.model_selection import train_test_split', code:`X_train, X_test, y_train, y_test = train_test_split(\n    X, y,\n    test_size=${p.test_size||0.3},\n    shuffle=${p.shuffle==='false'?'False':'True'},\n    stratify=${p.stratify==='true'?'y':'None'},\n    random_state=42\n)`, doc:`test_size=${((p.test_size||0.3)*100).toFixed(0)}% dos dados pro teste.` },
+      standard_scaler: { imp:'from sklearn.preprocessing import StandardScaler', code:'scaler = StandardScaler()\nX_train = scaler.fit_transform(X_train)\nX_test = scaler.transform(X_test)', doc:'⚠️ fit só no treino; no teste use transform.' },
+      minmax_scaler: { imp:'from sklearn.preprocessing import MinMaxScaler', code:'scaler = MinMaxScaler()\nX_train = scaler.fit_transform(X_train)\nX_test = scaler.transform(X_test)', doc:'Escala para [0, 1].' },
+      label_encoder: { imp:'from sklearn.preprocessing import LabelEncoder', code:'le = LabelEncoder()\ny_train = le.fit_transform(y_train)\ny_test = le.transform(y_test)', doc:'Trata o rótulo (y) — em paralelo ao X. Vai direto ao modelo.' },
+      one_hot_encoder: { imp:'from sklearn.preprocessing import OneHotEncoder', code:'ohe = OneHotEncoder(sparse_output=False)\nX_cat = ohe.fit_transform(X_categorical)', doc:'Uma coluna binária por categoria.' },
+      random_forest: { imp:'from sklearn.ensemble import RandomForestClassifier', code:`clf = RandomForestClassifier(\n    n_estimators=${p.n_estimators||100},\n    max_depth=${p.max_depth||5},\n    random_state=42\n)\nclf.fit(X_train, y_train)\ny_pred = clf.predict(X_test)`, doc:`${p.n_estimators||100} árvores, profundidade ${p.max_depth||5}.` },
+      decision_tree: { imp:'from sklearn.tree import DecisionTreeClassifier', code:`clf = DecisionTreeClassifier(\n    max_depth=${p.max_depth||5},\n    random_state=42\n)\nclf.fit(X_train, y_train)\ny_pred = clf.predict(X_test)`, doc:`Profundidade ${p.max_depth||5}. Muito alta → overfitting.` },
+      knn: { imp:'from sklearn.neighbors import KNeighborsClassifier', code:`clf = KNeighborsClassifier(n_neighbors=${p.n_neighbors||5})\nclf.fit(X_train, y_train)\ny_pred = clf.predict(X_test)`, doc:`K=${p.n_neighbors||5}. Normalize antes!` },
+      adaboost: { imp:'from sklearn.ensemble import AdaBoostClassifier', code:`clf = AdaBoostClassifier(\n    n_estimators=${p.n_estimators||50},\n    learning_rate=${p.learning_rate||1},\n    random_state=42\n)\nclf.fit(X_train, y_train)\ny_pred = clf.predict(X_test)`, doc:`${p.n_estimators||50} estimadores, lr=${p.learning_rate||1}.` },
+      svm: { imp:'from sklearn.svm import SVC', code:'clf = SVC(kernel="rbf", random_state=42)\nclf.fit(X_train, y_train)\ny_pred = clf.predict(X_test)', doc:'kernel=rbf. Normalize antes!' },
+      linear_regression: { imp:'from sklearn.linear_model import LinearRegression', code:'reg = LinearRegression()\nreg.fit(X_train, y_train)\ny_pred = reg.predict(X_test)', doc:'Prevê um número contínuo.' },
+      rf_regressor: { imp:'from sklearn.ensemble import RandomForestRegressor', code:`reg = RandomForestRegressor(\n    n_estimators=${p.n_estimators||100},\n    max_depth=${p.max_depth||5},\n    random_state=42\n)\nreg.fit(X_train, y_train)\ny_pred = reg.predict(X_test)`, doc:`Floresta para prever números.` },
+      kmeans: { imp:'from sklearn.cluster import KMeans', code:`km = KMeans(n_clusters=${p.n_clusters||3}, random_state=42)\nlabels = km.fit_predict(X)`, doc:`Agrupa em ${p.n_clusters||3} grupos, sem usar y.` },
+      accuracy: { imp:'from sklearn.metrics import accuracy_score', code:'acc = accuracy_score(y_test, y_pred)\nprint(f"Acurácia: {acc:.2%}")', doc:'Compara real vs. previsto.' },
+      f1_score: { imp:'from sklearn.metrics import f1_score', code:'f1 = f1_score(y_test, y_pred, average="weighted")\nprint(f"F1: {f1:.2%}")', doc:'average="weighted" pondera por classe.' },
+      confusion_matrix: { imp:'from sklearn.metrics import confusion_matrix\nimport seaborn as sns\nimport matplotlib.pyplot as plt', code:'cm = confusion_matrix(y_test, y_pred)\nsns.heatmap(cm, annot=True, fmt="d",\n    cmap="Purples")\nplt.xlabel("Previsto")\nplt.ylabel("Real")\nplt.show()', doc:'annot=True mostra os números nas células.' },
+      r2_score: { imp:'from sklearn.metrics import r2_score', code:'r2 = r2_score(y_test, y_pred)\nprint(f"R2: {r2:.3f}")', doc:'1.0 = perfeito; perto de 0 = fraco.' },
+      mse: { imp:'from sklearn.metrics import mean_squared_error', code:'mse = mean_squared_error(y_test, y_pred)\nprint(f"MSE: {mse:.3f}")', doc:'Quanto menor, melhor.' },
+      silhouette: { imp:'from sklearn.metrics import silhouette_score', code:'sil = silhouette_score(X, labels)\nprint(f"Silhueta: {sil:.3f}")', doc:'Perto de 1 = grupos bem separados.' },
+      pred_vs_real: { imp:'import matplotlib.pyplot as plt', code:'plt.scatter(y_test, y_pred)\nplt.xlabel("Real"); plt.ylabel("Previsto")\nplt.show()', doc:'Pontos na diagonal = boas previsões.' },
+      cluster_plot: { imp:'import matplotlib.pyplot as plt', code:'plt.scatter(X[:,0], X[:,1], c=labels)\nplt.show()', doc:'Cada cor é um cluster.' },
+    };
+    return C[type] || null;
+  }
+  _genPipelineCode() {
+    const order = this._flatOrder();
+    if (!order.length) return null;
+    const imps = new Set(); const lines = [];
+    order.forEach(b => {
+      const c = this._genNodeCode(b.type, this.state.paramVals[b.id] || {});
+      if (!c) return;
+      c.imp.split('\n').forEach(l => imps.add(l));
+      lines.push('# ' + (this.TYPES[b.type].label || b.type));
+      lines.push(c.code); lines.push('');
+    });
+    return [...imps].join('\n') + '\n\n' + lines.join('\n');
+  }
+
+  _cardVM(b, phase, idx, total) {
+    const td = this.TYPES[b.type];
+    const ph = this.PHASES[phase];
+    const col = ph.color;
+    const isSel = b.id === this.state.selId;
+    const isRun = this.state.runningId === b.id;
+    const isDone = this.state.execDone.includes(b.id) && !isRun;
+    const result = this.state.execResults[b.id];
+    let resultEl = null, resultStyle = {};
+    if (result) {
+      if (result.type === 'metric') { resultEl = result.display; resultStyle = { marginTop:8, display:'inline-flex', alignItems:'center', gap:5, background:'#ECFDF3', color:'#16A34A', fontWeight:800, fontSize:14, padding:'4px 10px', borderRadius:8, fontFamily:"'JetBrains Mono', monospace" }; }
+      else if (result.type === 'matrix') { resultEl = '📊 ver matriz →'; resultStyle = { marginTop:8, display:'inline-flex', alignItems:'center', gap:4, background:'#FCE7F3', color:'#DB2777', fontWeight:700, fontSize:11, padding:'4px 10px', borderRadius:8 }; }
+      else if (result.type === 'plot') { resultEl = '📈 ver gráfico →'; resultStyle = { marginTop:8, display:'inline-flex', alignItems:'center', gap:4, background:'#FCE7F3', color:'#DB2777', fontWeight:700, fontSize:11, padding:'4px 10px', borderRadius:8 }; }
+    }
+    return {
+      id: b.id,
+      number: this._num(phase, idx, total),
+      label: td.label, short: td.short,
+      iconEl: this.ICONS[ph.icon]('white', 15),
+      numChipStyle: { background:'rgba(255,255,255,0.92)', color: col, fontWeight:800, fontSize:9.5, fontFamily:"'JetBrains Mono', monospace", padding:'2px 6px', borderRadius:6, flexShrink:0, letterSpacing:'0.3px' },
+      cardStyle: { position:'relative', width: this.BW, background:'white', borderRadius:16, border:'2.5px solid ' + (isSel ? col : (isDone ? '#86EFAC' : '#F0EBF8')), boxShadow: isSel ? `0 6px 18px ${col}28` : '0 3px 10px rgba(124,58,237,0.07)', cursor:'pointer', overflow:'hidden', transition:'border-color 0.15s, box-shadow 0.15s, transform 0.15s', transform: isSel ? 'translateY(-2px)' : 'none' },
+      headerStyle: { display:'flex', alignItems:'center', gap:8, padding:'10px 12px', background: col },
+      running: isRun, done: isDone,
+      hasResult: !!result, resultEl, resultStyle,
+      onSelect: () => this.setState({ selId: b.id, inspTab: 'basico' }),
+      onDelete: (e) => { e.stopPropagation(); this._delBlock(b.id); },
+    };
+  }
+
+  renderVals() {
+    const p = this.state.pipeline;
+    const task = this._pipelineTask();
+    const order = this._flatOrder();
+    const selId = this.state.selId;
+    const paramVals = this.state.paramVals;
+    const execState = this.state.execState;
+    const execDone = this.state.execDone;
+
+    // phase guide
+    const guideRows = [
+      { key:'data', num:'1', label:'Dados', count:p.data.length, color:'#22C55E', lvl:0 },
+      { key:'prep', num:'2', label:'Pré-processamento', count:p.featX.length+p.labelY.length, color:'#A855F7', lvl:0 },
+      { key:'featX', num:'2a', label:'Entrada (X)', count:p.featX.length, color:'#A855F7', lvl:1 },
+      { key:'labelY', num:'2b', label:'Rótulo (y)', count:p.labelY.length, color:'#C026D3', lvl:1 },
+      { key:'model', num:'3', label:'Modelo', count:p.model?1:0, color:'#3B82F6', lvl:0 },
+      { key:'eval', num:'4', label:'Avaliação', count:p.evalM.length, color:'#F59E0B', lvl:0 },
+      { key:'viz', num:'5', label:'Visualização', count:p.vizM.length, color:'#EC4899', lvl:0 },
+    ];
+    const phaseGuide = guideRows.map(r => {
+      const present = r.count > 0;
+      return {
+        num: r.num, label: r.label, count: present ? String(r.count) : '–',
+        rowStyle: { display:'flex', alignItems:'center', gap:9, padding: r.lvl ? '4px 0 4px 16px' : '6px 0' },
+        numStyle: { width: r.lvl?20:24, height: r.lvl?20:24, borderRadius:'50%', background: present ? r.color : '#E0D3F2', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'JetBrains Mono', monospace", fontWeight:800, fontSize: r.lvl?8.5:9.5, flexShrink:0 },
+        labelStyle: { fontFamily:"'Baloo 2', sans-serif", fontWeight:700, fontSize: r.lvl?11:12.5, color: present ? '#4C1D95' : '#B8A8D0', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' },
+        countStyle: { fontSize:10, fontWeight:700, color:'#C4ABE8', fontFamily:"'JetBrains Mono', monospace", flexShrink:0 },
+      };
+    });
+    const progressPct = order.length ? Math.round((execState==='done' ? 100 : (execDone.length / order.length) * 100)) : 0;
+
+    // cards
+    const dataCards = p.data.map((b,i) => this._cardVM(b,'data',i,p.data.length));
+    const featCards = p.featX.map((b,i) => this._cardVM(b,'featX',i,p.featX.length));
+    const labelCards = p.labelY.map((b,i) => this._cardVM(b,'labelY',i,p.labelY.length));
+    const evalCards = p.evalM.map((b,i) => this._cardVM(b,'eval',i,p.evalM.length));
+    const vizCards = p.vizM.map((b,i) => this._cardVM(b,'viz',i,p.vizM.length));
+    const modelCard = p.model ? this._cardVM(p.model,'model',0,1) : null;
+
+    // inspector
+    let insp = null;
+    if (selId) {
+      const b = order.find(x => x.id === selId);
+      if (b) {
+        const phase = this.PHASE_OF[b.type]; const ph = this.PHASES[phase]; const td = this.TYPES[b.type];
+        const ps = (td.params || []).map(pr => {
+          const v = paramVals[b.id]?.[pr.id] ?? pr.def;
+          return { ...pr, value:v, display: pr.type==='slider'?String(v):(pr.opts?.find(o=>o.v===String(v))?.l||v), isSlider:pr.type==='slider', isSelect:pr.type==='select', options:pr.opts||[], onChange:(e)=>this._setParam(b.id, pr.id, pr.type==='slider'?parseFloat(e.target.value):e.target.value) };
+        });
+        insp = { id:b.id, type:b.type, label:td.label, cat:ph.label, color:ph.color, icon:ph.icon, desc:td.desc, tip:td.tip, ref:td.ref, params:ps };
+      }
+    }
+
+    const activeTab = this.state.inspTab;
+    const tabBase = { flex:1, padding:'12px 0', border:'none', background:'none', fontFamily:"'Baloo 2', sans-serif", fontWeight:700, fontSize:13, cursor:'pointer' };
+    const tabOn = { ...tabBase, borderBottom:'2.5px solid #7C3AED', color:'#7C3AED' };
+    const tabOff = { ...tabBase, borderBottom:'2.5px solid transparent', color:'#B8A8D0' };
+
+    // picker
+    const picker = this.state.picker;
+    const present = new Set(order.map(b => b.type));
+    let pickerItems = [];
+    if (picker) {
+      pickerItems = Object.keys(this.TYPES).filter(t => this.PHASE_OF[t] === picker.phase && this._typeAllowed(t, task) && (picker.phase === 'model' ? true : !present.has(t))).map(tid => {
+        const td = this.TYPES[tid]; const ph = this.PHASES[this.PHASE_OF[tid]]; const col = ph.color;
+        return { label: td.label, short: td.short, onClick: () => this._addBlock(tid), iconBg: { width:34, height:34, borderRadius:9, background:col+'1A', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }, iconEl: this.ICONS[ph.icon](col, 17) };
+      });
+    }
+    const pkTitles = { data:'Adicionar dados', featX:'Pré-processar entradas (X)', labelY:'Tratar o rótulo (y)', model:'Escolher modelo', eval:'Adicionar avaliação', viz:'Adicionar visualização' };
+    const pkHints = { data:'Carregue um dataset ou divida treino/teste', featX:'Aplicado em sequência sobre as colunas de entrada (X)', labelY:'Tratado em paralelo ao X — vai direto ao modelo', model:'Define o tipo de tarefa da trilha', eval:'Métricas rodam em paralelo sobre as predições', viz:'Gráficos da tarefa atual' };
+    const pkEmpty = { data:'A fase de dados já tem dataset e divisão.', featX:'Todos os pré-processadores de entrada já estão na trilha.', labelY: (task==='regression'||task==='clustering') ? 'LabelEncoder só vale para classificação.' : 'O rótulo já está sendo tratado.', model:'Nenhum modelo disponível.', eval: task===null ? 'Escolha um modelo primeiro.' : 'Todas as métricas desta tarefa já estão na trilha.', viz: task===null ? 'Escolha um modelo primeiro.' : 'Nenhuma visualização nova para esta tarefa.' };
+
+    return {
+      // top bar
+      hasTask: !!task,
+      taskPillLabel: task ? ({classification:'Classificação',regression:'Regressão',clustering:'Agrupamento'})[task] : 'Sem modelo',
+      taskPillStyle: { display:'flex', alignItems:'center', gap:6, padding:'6px 12px', borderRadius:10, fontSize:11, fontWeight:800, fontFamily:"'Nunito', sans-serif", marginRight:4, background: task ? (({classification:'#3B82F6',regression:'#14B8A6',clustering:'#F97316'})[task] + '1A') : '#F3EEFB', color: task ? (({classification:'#3B82F6',regression:'#14B8A6',clustering:'#F97316'})[task]) : '#A78BCA' },
+      progressLabel: progressPct + '%',
+      progressBarStyle: { width: progressPct + '%', height:'100%', background:'linear-gradient(90deg,#7C3AED,#A855F7)', borderRadius:3, transition:'width 0.4s ease' },
+      onClear: () => this.setState({ pipeline: this._default(), selId:null, execState:'idle', execDone:[], execResults:{}, runningId:null, nextId: 8 }),
+      onExecute: () => this._exec(),
+
+      phaseGuide,
+      scrollRef: this.scrollRef,
+
+      dataCards, featCards, labelCards, evalCards, vizCards, modelCard,
+      hasModel: !!modelCard, noModel: !modelCard,
+      canAddLabel: this._typeAllowed('label_encoder', task),
+      addData: () => this._openPicker('data'),
+      addFeat: () => this._openPicker('featX'),
+      addLabel: () => this._openPicker('labelY'),
+      chooseModel: () => this._openPicker('model'),
+      addEval: () => this._openPicker('eval'),
+      addViz: () => this._openPicker('viz'),
+
+      execRunning: execState === 'running',
+      execDoneOverlay: execState === 'done',
+      execMsg: 'Treinando a trilha…',
+
+      // inspector
+      showInsp: !!insp,
+      inspHeaderStyle: insp ? { padding:'16px 18px', background: insp.color, display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 } : {},
+      inspIconEl: insp ? this.ICONS[insp.icon]('white', 18) : null,
+      inspLabel: insp?.label || '', inspCat: insp?.cat || '', inspDesc: insp?.desc || '', inspTip: insp?.tip || '', inspRef: insp?.ref || '',
+      hasParams: insp?.params?.length > 0, inspParams: insp?.params || [], hasTip: !!insp?.tip,
+      hasTaskWarn: !!(insp && !this._typeAllowed(insp.type, task)),
+      taskWarnMsg: (insp && !this._typeAllowed(insp.type, task)) ? (insp.type==='label_encoder' ? ('O LabelEncoder trata rótulos de classificação. A tarefa atual é ' + (task==='regression'?'regressão':'agrupamento') + ' — remova este bloco ou troque o modelo.') : ('Este bloco não combina com a tarefa atual da trilha. Considere removê-lo.')) : '',
+      hasPreview: !!(insp && this._previewEl({ id: insp.id, type: insp.type })),
+      previewEl: insp ? this._previewEl({ id: insp.id, type: insp.type }) : null,
+      askAboutBlock: () => { if (insp) this._askAboutBlock(insp.id); },
+      closeInsp: () => this.setState({ selId: null }),
+      inspTab: activeTab, isBasico: activeTab === 'basico', isAvancado: activeTab === 'avancado',
+      setBasico: () => this.setState({ inspTab: 'basico' }), setAvancado: () => this.setState({ inspTab: 'avancado' }),
+      tabBasicoStyle: activeTab === 'basico' ? tabOn : tabOff, tabAvancadoStyle: activeTab === 'avancado' ? tabOn : tabOff,
+
+      hasInspResult: !!(insp && this.state.execResults[insp.id]),
+      inspResultEl: (() => {
+        if (!insp) return null; const r = this.state.execResults[insp.id]; if (!r) return null;
+        if (r.type === 'metric') return React.createElement('div',{style:{padding:'16px 18px',borderBottom:'1px solid #F7F5FB'}},[
+          React.createElement('div',{key:'h',style:{fontWeight:800,fontSize:9,color:'#C4ABE8',textTransform:'uppercase',letterSpacing:'0.8px',marginBottom:8}},'Resultado'),
+          React.createElement('div',{key:'c',style:{background:'#ECFDF3',border:'1px solid #A5D6A7',borderRadius:12,padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between'}},[
+            React.createElement('span',{key:'n',style:{fontSize:13,fontWeight:700,color:'#16A34A'}},r.name),
+            React.createElement('span',{key:'v',style:{fontSize:24,fontWeight:800,color:'#16A34A',fontFamily:"'JetBrains Mono', monospace"}},r.display),
+          ]),
+        ]);
+        if (r.type === 'plot') return React.createElement('div',{style:{padding:'16px 18px',borderBottom:'1px solid #F7F5FB'}},[
+          React.createElement('div',{key:'h',style:{fontWeight:800,fontSize:9,color:'#C4ABE8',textTransform:'uppercase',letterSpacing:'0.8px',marginBottom:8}},'Resultado'),
+          React.createElement('div',{key:'c',style:{background:'#FCE7F3',border:'1px solid #F7C2DD',borderRadius:12,padding:'18px 16px',textAlign:'center'}},[
+            React.createElement('div',{key:'i',style:{fontSize:26,marginBottom:6}},'📈'),
+            React.createElement('div',{key:'t',style:{fontSize:12,fontWeight:700,color:'#DB2777'}},r.name),
+            React.createElement('div',{key:'s',style:{fontSize:10,color:'#A78BCA',marginTop:3}},'Gráfico gerado (ilustrativo)'),
+          ]),
+        ]);
+        if (r.type === 'matrix') {
+          const lbs = r.labels, mx = r.matrix; const total = mx.flat().reduce((a,b)=>a+b,0); const correct = mx.reduce((a,row,i)=>a+row[i],0);
+          const rows = [];
+          rows.push(React.createElement('tr',{key:'h'},[React.createElement('th',{key:'e',style:{padding:'3px'}},''), React.createElement('th',{key:'p',colSpan:lbs.length,style:{padding:'4px',fontSize:8,color:'#7C3AED',fontWeight:800,textAlign:'center',textTransform:'uppercase',letterSpacing:'0.5px'}},'PREVISTO')]));
+          rows.push(React.createElement('tr',{key:'l'},[React.createElement('th',{key:'e',style:{padding:'3px'}},''), ...lbs.map((l,i)=>React.createElement('th',{key:i,style:{padding:'3px 5px',fontSize:8.5,color:'#A855F7',fontWeight:700}},l))]));
+          mx.forEach((row,ri)=>rows.push(React.createElement('tr',{key:'r'+ri},[React.createElement('td',{key:'l',style:{padding:'3px 6px',fontSize:8.5,color:'#A855F7',fontWeight:700,whiteSpace:'nowrap'}},lbs[ri]), ...row.map((val,ci)=>{const ok=ri===ci;return React.createElement('td',{key:ci,style:{padding:'7px 4px',textAlign:'center',fontWeight:800,fontSize:12,background:ok?(val>0?'#DCFCE7':'#F7F5FB'):(val>0?'#FEE2E2':'#F7F5FB'),color:ok?(val>0?'#16A34A':'#C4ABE8'):(val>0?'#DC2626':'#E0D3F2'),borderRadius:5,border:'2px solid white'}},String(val));})])));
+          return React.createElement('div',{style:{padding:'16px 18px',borderBottom:'1px solid #F7F5FB'}},[
+            React.createElement('div',{key:'h',style:{fontWeight:800,fontSize:9,color:'#C4ABE8',textTransform:'uppercase',letterSpacing:'0.8px',marginBottom:8}},'Resultado'),
+            React.createElement('div',{key:'a',style:{display:'flex',alignItems:'center',gap:8,marginBottom:10,background:'#ECFDF3',border:'1px solid #A5D6A7',borderRadius:8,padding:'7px 11px'}},[React.createElement('span',{key:'l',style:{fontSize:11,color:'#16A34A',fontWeight:700}},'Acertou'), React.createElement('span',{key:'v',style:{fontSize:15,color:'#16A34A',fontWeight:800,fontFamily:"'JetBrains Mono', monospace"}},correct+'/'+total), React.createElement('span',{key:'p',style:{fontSize:11,color:'#16A34A',fontWeight:700}},'('+(correct/total*100).toFixed(0)+'%)')]),
+            React.createElement('table',{key:'t',style:{borderCollapse:'collapse',width:'100%'}},rows),
+            React.createElement('div',{key:'leg',style:{display:'flex',gap:12,marginTop:9,justifyContent:'center'}},[React.createElement('span',{key:'1',style:{fontSize:9,color:'#16A34A',fontWeight:700}},'■ diagonal = acertos'), React.createElement('span',{key:'2',style:{fontSize:9,color:'#DC2626',fontWeight:700}},'■ fora = erros')]),
+          ]);
+        }
+        return null;
+      })(),
+
+      nodeCodeEl: (() => {
+        if (!insp) return null;
+        const c = this._genNodeCode(insp.type, paramVals[insp.id] || {}); if (!c) return null;
+        const mk = (label, code) => React.createElement('div',{key:label,style:{marginBottom:13}},[
+          React.createElement('div',{key:'l',style:{fontSize:9,fontWeight:800,color:'#C4ABE8',textTransform:'uppercase',letterSpacing:'0.6px',marginBottom:5}},label),
+          React.createElement('pre',{key:'c',style:{background:'#2D1B4E',color:'#E9D5FF',padding:'11px 13px',borderRadius:9,fontSize:10.5,lineHeight:'1.6',margin:0,overflowX:'auto',fontFamily:"'JetBrains Mono', monospace",whiteSpace:'pre-wrap',wordBreak:'break-word'}},code),
+        ]);
+        return React.createElement('div',{style:{padding:'16px 18px'}},[
+          mk('Import', c.imp), mk('Código', c.code),
+          React.createElement('div',{key:'d',style:{background:'linear-gradient(135deg,#F3EEFB,#EFE6FB)',borderRadius:10,padding:'10px 13px'}},[
+            React.createElement('div',{key:'h',style:{fontSize:9,fontWeight:800,color:'#7C3AED',textTransform:'uppercase',letterSpacing:'0.4px',marginBottom:4}},'O que esse código faz'),
+            React.createElement('div',{key:'t',style:{fontSize:11.5,color:'#4C1D95',lineHeight:'1.55',fontWeight:600}},c.doc),
+          ]),
+        ]);
+      })(),
+      pipelineCodeEl: (() => {
+        const code = this._genPipelineCode(); if (!code) return null;
+        return React.createElement('div',{style:{padding:'0 18px 16px'}},[
+          React.createElement('div',{key:'h',style:{display:'flex',alignItems:'center',gap:6,marginBottom:8}},[
+            React.createElement('svg',{key:'i',width:13,height:13,viewBox:'0 0 24 24',fill:'none',stroke:'#7C3AED',strokeWidth:2,strokeLinecap:'round'},[React.createElement('polyline',{key:'a',points:'16 18 22 12 16 6'}),React.createElement('polyline',{key:'b',points:'8 6 2 12 8 18'})]),
+            React.createElement('span',{key:'t',style:{fontSize:9,fontWeight:800,color:'#7C3AED',textTransform:'uppercase',letterSpacing:'0.4px'}},'Trilha completa em Python'),
+          ]),
+          React.createElement('pre',{key:'c',style:{background:'#2D1B4E',color:'#E9D5FF',padding:'13px',borderRadius:9,fontSize:10,lineHeight:'1.6',margin:0,overflowX:'auto',fontFamily:"'JetBrains Mono', monospace",whiteSpace:'pre-wrap',wordBreak:'break-word',maxHeight:360,overflowY:'auto'}},code),
+        ]);
+      })(),
+
+      // picker
+      pickerOpen: !!picker,
+      pickerTitle: picker ? pkTitles[picker.phase] : '',
+      pickerHint: picker ? pkHints[picker.phase] : '',
+      pickerEmpty: !!(picker && pickerItems.length === 0),
+      pickerEmptyMsg: picker ? pkEmpty[picker.phase] : '',
+      closePicker: () => this.setState({ picker: null }),
+      stopProp: (e) => e.stopPropagation(),
+      pickerItems,
+
+      // chat
+      chatOpen: this.state.chatOpen, chatClosed: !this.state.chatOpen,
+      toggleChat: () => this._toggleChat(),
+      chatScrollRef: this.chatRef,
+      hasChatCtx: !!this.state.ctxId,
+      chatCtxLabel: (() => { const b = order.find(x => x.id === this.state.ctxId); return b ? this.TYPES[b.type].label : ''; })(),
+      clearChatCtx: () => this.setState({ ctxId: null }),
+      chatMsgs: this.state.msgs.map(m => ({ text:m.text, wrapStyle:{display:'flex',justifyContent:m.role==='user'?'flex-end':'flex-start'}, bubbleStyle: m.role==='user' ? {background:'#7C3AED',color:'white',borderRadius:'12px 12px 3px 12px',padding:'9px 13px',fontSize:11.5,lineHeight:'1.5',maxWidth:'82%',whiteSpace:'pre-wrap',fontWeight:600} : {background:'white',border:'1px solid #ECE7F5',color:'#5B4B78',borderRadius:'12px 12px 12px 3px',padding:'9px 13px',fontSize:11.5,lineHeight:'1.5',maxWidth:'82%',whiteSpace:'pre-wrap',fontWeight:600} })),
+      typing: this.state.typing,
+      hasSugg: !this.state.typing && this.state.msgs.length < 8,
+      suggestions: this._getSugg().map(t => ({ text:t, onClick: () => this._sendChat(t) })),
+      chatInput: this.state.chatIn,
+      onChatInput: (e) => this.setState({ chatIn: e.target.value }),
+      onChatKey: (e) => { if (e.key === 'Enter') this._sendChat(this.state.chatIn); },
+      onChatSend: () => this._sendChat(this.state.chatIn),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

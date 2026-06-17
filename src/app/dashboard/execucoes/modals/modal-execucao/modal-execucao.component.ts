@@ -44,6 +44,10 @@ export class ModalExecucaoComponent implements OnInit {
   ordemEtapas = Object.keys(this.etapas);
   etapaAtual: string = COLETA_DADO;
 
+  // Modo "somente coleta": usado pela Trilha, que cuida de pré-proc/modelo/métricas
+  // por conta própria. O modal vira um carregador de dados — sem o wizard clássico.
+  somenteColeta = false;
+
   resultadoColetaDado?: ResultadoColetaDado | undefined;
   resultadoTreinamento?: any;
   modeloSelecionado?: ItemPipeline;
@@ -347,6 +351,7 @@ export class ModalExecucaoComponent implements OnInit {
 
   atualizarVariaveis(data: any) {
     let todosExistem = false
+    this.somenteColeta = !!data?.somenteColeta;
     if (data?.tipoArquivoSelecionado) {
       this.tipoArquivoSelecionado = data.tipoArquivoSelecionado;
     }
