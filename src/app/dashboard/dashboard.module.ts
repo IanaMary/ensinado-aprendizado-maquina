@@ -94,7 +94,7 @@ import { SessionService } from '../service/sessao-store.service';
     MatFormFieldModule,
     NgxMaskDirective
   ],
-  exports: [DashboardComponent],
+  exports: [DashboardComponent, TutorComponent, ChatTutorComponent],
   providers: [
     provideNgxMask()
   ]

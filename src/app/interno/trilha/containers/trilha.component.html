@@ -1,0 +1,354 @@
+<div class="trilha">
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo"><mat-icon>account_tree</mat-icon></div>
+      <div>
+        <div class="brand-title">Trilha de ML</div>
+        <div class="brand-sub">monte seu pipeline passo a passo</div>
+      </div>
+    </div>
+    <a class="btn-voltar" routerLink="/view-aluno" title="Voltar ao dashboard clássico">
+      <mat-icon>arrow_back</mat-icon> Clássico
+    </a>
+    <div class="spacer"></div>
+    <div class="task-pill" [class.vazio]="!tarefa" title="Tipo de tarefa, definido pelos dados">
+      <mat-icon>task_alt</mat-icon><span>{{ taskPillLabel }}</span>
+    </div>
+    <div class="progresso">
+      <span>{{ progresso }}%</span>
+      <div class="bar"><div class="fill" [style.width.%]="progresso"></div></div>
+    </div>
+    <button class="btn-ghost" [disabled]="!modelosTreinados.length" (click)="abrirExport()">Exportar</button>
+    <button class="btn-ghost" [disabled]="execRunning" (click)="recomecar()">Recomeçar</button>
+    <button class="btn-run" [class.stale]="desatualizado" [disabled]="!podeRodar()" (click)="rodarTrilha()">
+      <mat-icon>play_arrow</mat-icon> {{ desatualizado ? 'Rodar de novo' : 'Rodar Trilha' }}
+    </button>
+  </header>
+
+  <div class="main">
+    <!-- GUIA DE FASES -->
+    <aside class="guia">
+      <div class="guia-title">As Fases do ML</div>
+      <div class="guia-row" *ngFor="let ph of faseGuide">
+        <div class="guia-num">{{ ph.num }}</div>
+        <div class="guia-label">{{ ph.label }}</div>
+        <div class="guia-count">{{ ph.count }}</div>
+      </div>
+      <div class="guia-dica">💡 Os modelos correm em <b>ramos paralelos</b> sobre a <b>mesma</b> preparação de dados — assim a comparação é justa.</div>
+    </aside>
+
+    <!-- CANVAS / TRILHA -->
+    <section class="canvas">
+      <div class="trail">
+        <div class="start"><mat-icon>play_arrow</mat-icon> Início da Trilha</div>
+
+        <!-- FASE 1: DADOS -->
+        <ng-container *ngFor="let c of dataCards">
+          <div class="conn"></div>
+          <div class="card sel-able" [class.sel]="selecionado===c" (click)="selecionar(c)" [style.--cor]="cores['data']">
+            <div class="card-head">
+              <span class="numchip">1</span><mat-icon class="card-ic">database</mat-icon>
+              <span class="card-label">{{ c.label }}</span>
+              <span class="card-del" (click)="$event.stopPropagation(); remover(c)">✕</span>
+            </div>
+            <div class="card-body"><div class="card-short">{{ c.short }}</div></div>
+            <div class="badge done" *ngIf="c.status==='done'"><mat-icon>check</mat-icon></div>
+          </div>
+        </ng-container>
+        <div class="conn"></div>
+        <button class="add add-data" *ngIf="!dataCards.length" (click)="addData()">＋ dados</button>
+
+        <!-- FASE 2: DIVISÃO TREINO/TESTE (adaptativo) -->
+        <ng-container *ngIf="splitCard">
+          <div class="conn"></div>
+          <div class="card" [style.--cor]="cores['split']">
+            <div class="card-head">
+              <span class="numchip">2</span><mat-icon class="card-ic">call_split</mat-icon>
+              <span class="card-label">{{ splitCard.label }}</span>
+            </div>
+            <div class="card-body">
+              <div class="card-short">{{ splitCard.short }}</div>
+              <div class="tag-info" *ngIf="splitCard.resultado?.preDividido">já veio dividido</div>
+            </div>
+            <div class="badge done"><mat-icon>check</mat-icon></div>
+          </div>
+        </ng-container>
+
+        <!-- FASE 3/4: PRÉ-PROCESSAMENTO (ramos X | y) -->
+        <ng-container *ngIf="splitCard">
+          <div class="fork"></div>
+          <div class="lanes">
+            <div class="lane">
+              <div class="lane-tag tag-x">3 · Entrada (X)</div>
+              <ng-container *ngFor="let c of featCards">
+                <div class="conn sm"></div>
+                <div class="card sel-able" [class.sel]="selecionado===c" (click)="selecionar(c)" [style.--cor]="cores['featX']">
+                  <div class="card-head">
+                    <mat-icon class="card-ic">filter_alt</mat-icon>
+                    <span class="card-label">{{ c.label }}</span>
+                    <span class="card-del" (click)="$event.stopPropagation(); remover(c)">✕</span>
+                  </div>
+                  <div class="card-body"><div class="card-short">{{ c.colunas && c.colunas.length ? c.colunas.length + ' colunas' : 'todas as features' }}</div></div>
+                  <div class="badge done" *ngIf="c.status==='done'"><mat-icon>check</mat-icon></div>
+                </div>
+              </ng-container>
+              <div class="conn sm"></div>
+              <button class="add-mini tag-x" (click)="abrirPicker('featX')" title="Pré-processamento de entrada">＋</button>
+              <div class="lane-tail"></div>
+            </div>
+            <div class="lane">
+              <div class="lane-tag tag-y">4 · Rótulo (y)</div>
+              <ng-container *ngFor="let c of labelCards">
+                <div class="conn sm"></div>
+                <div class="card sel-able" [class.sel]="selecionado===c" (click)="selecionar(c)" [style.--cor]="cores['labelY']">
+                  <div class="card-head">
+                    <mat-icon class="card-ic">sell</mat-icon>
+                    <span class="card-label">{{ c.label }}</span>
+                    <span class="card-del" (click)="$event.stopPropagation(); remover(c)">✕</span>
+                  </div>
+                  <div class="card-body"><div class="card-short">{{ c.short }}</div></div>
+                  <div class="badge done" *ngIf="c.status==='done'"><mat-icon>check</mat-icon></div>
+                </div>
+              </ng-container>
+              <div class="conn sm"></div>
+              <button class="add-mini tag-y" *ngIf="!labelCards.length" (click)="abrirPicker('labelY')" title="Tratamento do rótulo">＋</button>
+              <div class="lane-tail"></div>
+            </div>
+          </div>
+          <div class="join"></div>
+
+          <!-- FASE 5: MODELOS (ramos paralelos) -->
+          <div class="fase-tag" [style.color]="cores['model']">5 · Modelos (ramos paralelos)</div>
+          <div class="row-cards">
+            <div class="card mini branch sel-able" [class.sel]="selecionado===c" (click)="selecionar(c)" *ngFor="let c of modelCards" [style.--cor]="cores['model']">
+              <div class="card-head">
+                <mat-icon class="card-ic">memory</mat-icon>
+                <span class="card-label">{{ c.label }}</span>
+                <span class="card-del" (click)="$event.stopPropagation(); remover(c)">✕</span>
+              </div>
+              <div class="card-body"><div class="card-short">{{ c.short || 'pronto p/ treinar' }}</div></div>
+              <div class="badge done" *ngIf="c.status==='done'"><mat-icon>check</mat-icon></div>
+              <div class="badge run" *ngIf="c.status==='running'"></div>
+              <div class="badge erro" *ngIf="c.status==='erro'"><mat-icon>close</mat-icon></div>
+            </div>
+            <button class="add-box tag-m" (click)="abrirPicker('model')" title="Adicionar modelo">＋</button>
+          </div>
+
+          <!-- FASE 6: AVALIAÇÃO (métricas compartilhadas) -->
+          <ng-container *ngIf="modelCards.length">
+            <div class="conn"></div>
+            <div class="fase-tag" [style.color]="cores['eval']">6 · Avaliação (métricas compartilhadas)</div>
+            <div class="row-cards">
+              <div class="card mini sel-able" [class.sel]="selecionado===c" (click)="selecionar(c)" *ngFor="let c of evalCards" [style.--cor]="cores['eval']">
+                <div class="card-head">
+                  <mat-icon class="card-ic">bar_chart</mat-icon>
+                  <span class="card-label">{{ c.label }}</span>
+                  <span class="card-del" (click)="$event.stopPropagation(); remover(c)">✕</span>
+                </div>
+                <div class="card-body"><div class="card-short">{{ c.status==='done' ? 'calculada' : 'métrica' }}</div></div>
+                <div class="badge done" *ngIf="c.status==='done'"><mat-icon>check</mat-icon></div>
+                <div class="badge run" *ngIf="c.status==='running'"></div>
+              </div>
+              <button class="add-box tag-e" (click)="abrirPicker('eval')" title="Adicionar métrica">＋</button>
+            </div>
+
+            <!-- COMPARAÇÃO métrica × modelo -->
+            <div class="comparacao" *ngIf="comparacaoMetricas.length && comparacaoModelos.length">
+              <div class="cmp-title">Comparação dos modelos</div>
+              <table>
+                <thead>
+                  <tr><th>Métrica</th><th *ngFor="let m of comparacaoModelos">{{ m }}</th></tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let met of comparacaoMetricas">
+                    <td class="cmp-met">{{ met }}</td>
+                    <td *ngFor="let m of comparacaoModelos">{{ valorComparacao(met, m) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- VISUALIZAÇÕES (Yellowbrick, por modelo) -->
+            <div class="viz-sec" *ngIf="modelosComViz.length">
+              <div class="conn"></div>
+              <div class="fase-tag" [style.color]="cores['viz']">Visualizações</div>
+              <div class="viz-modelo" *ngFor="let m of modelosComViz">
+                <div class="viz-modelo-nome">{{ m }}</div>
+                <div class="viz-grid">
+                  <figure *ngFor="let v of visualizacoesPorModelo[m]">
+                    <img [src]="imgViz(v)" [alt]="v.titulo" loading="lazy">
+                    <figcaption>{{ v.titulo }}</figcaption>
+                  </figure>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+
+      <!-- overlays -->
+      <div class="overlay run" *ngIf="execRunning"><span class="dot"></span>{{ execMsg }}</div>
+      <div class="overlay done" *ngIf="execDone"><mat-icon>check_circle</mat-icon> Trilha concluída! 🎉</div>
+      <div class="overlay warn" *ngIf="avisando"><mat-icon>warning</mat-icon> {{ execMsg }}</div>
+    </section>
+
+    <!-- INSPETOR -->
+    <aside class="inspetor" *ngIf="selecionado">
+      <div class="insp-head" [style.--cor]="cores[selecionado.fase]">
+        <div class="insp-id">
+          <span class="insp-label">{{ selecionado.label }}</span>
+          <span class="insp-cat">{{ selecionado.fase==='model' ? 'Modelo' : selecionado.fase==='featX' ? 'Entrada (X)' : selecionado.fase==='labelY' ? 'Rótulo (y)' : selecionado.fase==='eval' ? 'Métrica' : selecionado.fase==='data' ? 'Dados' : 'Divisão' }}</span>
+        </div>
+        <button class="insp-x" (click)="fecharInsp()">✕</button>
+      </div>
+      <div class="insp-tabs">
+        <button [class.ativo]="inspTab==='basico'" (click)="setTab('basico')">Básico</button>
+        <button [class.ativo]="inspTab==='codigo'" (click)="setTab('codigo')">Código</button>
+      </div>
+
+      <div class="insp-body">
+        <ng-container *ngIf="inspTab==='basico'">
+          <!-- Divisão treino/teste editável (origem única) ou informativa (pré-dividido) -->
+          <div class="insp-sec" *ngIf="selecionado.fase==='split'">
+            <div class="insp-sec-tit">Divisão treino/teste</div>
+            <ng-container *ngIf="!splitPreDividido">
+              <div class="hp">
+                <div class="hp-top"><span class="hp-nome">Proporção de teste</span><span class="hp-val">{{ (splitDraft.testSize*100) | number:'1.0-0' }}%</span></div>
+                <input type="range" min="0.1" max="0.5" step="0.05" [value]="splitDraft.testSize" (input)="splitDraft.testSize = +$any($event.target).value">
+              </div>
+              <div class="hp">
+                <div class="hp-top"><span class="hp-nome">Embaralhar</span></div>
+                <select [value]="splitDraft.shuffle ? 'true' : 'false'" (change)="splitDraft.shuffle = $any($event.target).value==='true'">
+                  <option value="true">Sim</option><option value="false">Não</option>
+                </select>
+              </div>
+              <div class="hp">
+                <div class="hp-top"><span class="hp-nome">Estratificar</span></div>
+                <select [value]="splitDraft.stratify ? 'true' : 'false'" (change)="splitDraft.stratify = $any($event.target).value==='true'">
+                  <option value="false">Não</option><option value="true">Sim</option>
+                </select>
+              </div>
+              <button class="ask-tutor" [disabled]="salvandoSplit" (click)="aplicarDivisao()">{{ salvandoSplit ? 'Aplicando…' : 'Aplicar divisão' }}</button>
+            </ng-container>
+            <div class="insp-hint" *ngIf="splitPreDividido">Os dados já vieram divididos (treino + teste). Não há re-divisão.</div>
+          </div>
+
+          <!-- Ajustes: hiperparâmetros do ramo de modelo -->
+          <div class="insp-sec" *ngIf="selecionado.fase==='model' && hiperDe(selecionado).length">
+            <div class="insp-sec-tit">Ajustes</div>
+            <div class="hp" *ngFor="let p of hiperDe(selecionado)">
+              <div class="hp-top"><span class="hp-nome">{{ p.nome || p.key }}</span><span class="hp-val">{{ p.valor }}</span></div>
+              <input *ngIf="(p.tipo==='int'||p.tipo==='float') && p.min!=null && p.max!=null"
+                     type="range" [min]="p.min" [max]="p.max" [step]="p.tipo==='int' ? 1 : 0.01"
+                     [value]="p.valor" (input)="setHiper(p, $any($event.target).value)">
+              <select *ngIf="p.opcoes?.length" [value]="p.valor" (change)="setHiper(p, $any($event.target).value)">
+                <option *ngFor="let o of p.opcoes" [value]="o">{{ o }}</option>
+              </select>
+              <input *ngIf="!(p.opcoes?.length) && !((p.tipo==='int'||p.tipo==='float') && p.min!=null && p.max!=null)"
+                     type="text" [value]="p.valor" (input)="setHiper(p, $any($event.target).value)">
+            </div>
+          </div>
+
+          <!-- Seleção de features (ramo X) -->
+          <div class="insp-sec" *ngIf="selecionado.fase==='featX'">
+            <div class="insp-sec-tit">Aplicar em quais colunas</div>
+            <div class="insp-hint">Sem seleção = todas as features.</div>
+            <div class="chips">
+              <button class="chip" *ngFor="let col of colunasFeatures"
+                      [class.on]="colunaAtiva(selecionado, col)" (click)="toggleColuna(selecionado, col)">{{ col }}</button>
+            </div>
+          </div>
+
+          <!-- Conteúdo didático (campo `conteudo` do elemento sklearn) -->
+          <app-tutor [tutorItemInfo]="inspInfo"></app-tutor>
+
+          <div class="insp-sec">
+            <button class="ask-tutor" (click)="perguntarTutor()">
+              🤖 Perguntar ao tutor sobre este bloco
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="inspTab==='codigo'">
+          <div *ngIf="selecionado.fase==='model'">
+            <div class="insp-hint">Pipeline completo deste ramo (dados → divisão → X|y → modelo → métricas).</div>
+            <pre class="codigo"><code>{{ inspScript }}</code></pre>
+          </div>
+          <div class="insp-hint" *ngIf="selecionado.fase!=='model'">Selecione um <b>modelo</b> para ver o pipeline completo do ramo.</div>
+        </ng-container>
+      </div>
+    </aside>
+  </div>
+
+  <!-- PICKER MODAL -->
+  <div class="picker-backdrop" *ngIf="pickerOpen" (click)="fecharPicker()">
+    <div class="picker" (click)="$event.stopPropagation()">
+      <div class="picker-head">
+        <div>
+          <div class="picker-title">{{ pickerTitle }}</div>
+          <div class="picker-hint">{{ pickerHint }}</div>
+        </div>
+        <button class="picker-x" (click)="fecharPicker()">✕</button>
+      </div>
+      <div class="picker-grid">
+        <div class="picker-empty" *ngIf="!pickerItems.length">Nada para adicionar aqui.</div>
+        <button class="picker-item" *ngFor="let it of pickerItems" (click)="escolher(it)">
+          <div class="pi-label">{{ it.label || it.valor }}</div>
+          <div class="pi-short">{{ it.resumo }}</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE EXPORTAÇÃO -->
+  <div class="picker-backdrop" *ngIf="exportOpen" (click)="fecharExport()">
+    <div class="picker export" (click)="$event.stopPropagation()">
+      <div class="picker-head">
+        <div>
+          <div class="picker-title">Exportar trilha</div>
+          <div class="picker-hint">Escolha o que baixar</div>
+        </div>
+        <button class="picker-x" (click)="fecharExport()">✕</button>
+      </div>
+      <div class="export-body">
+        <div class="exp-sec">
+          <div class="exp-tit">Formato</div>
+          <div class="seg">
+            <button [class.on]="exportFormato==='py'" (click)="exportFormato='py'">Script .py por modelo</button>
+            <button [class.on]="exportFormato==='ipynb'" (click)="exportFormato='ipynb'">Notebook .ipynb</button>
+          </div>
+        </div>
+        <div class="exp-sec">
+          <div class="exp-tit">Modelos</div>
+          <div class="seg wrap">
+            <button *ngFor="let c of modelosTreinados" [class.on]="exportSel[c.valor]" (click)="toggleExportModelo(c.valor)">{{ c.label }}</button>
+          </div>
+        </div>
+        <div class="exp-sec">
+          <div class="exp-tit">Comparativo</div>
+          <div class="seg">
+            <button [class.on]="exportComparativo" (click)="exportComparativo=true" [disabled]="!comparacaoMetricas.length">Incluir comparacao.csv</button>
+            <button [class.on]="!exportComparativo" (click)="exportComparativo=false">Não incluir</button>
+          </div>
+        </div>
+        <div class="exp-sec">
+          <div class="exp-tit">Arquivos do .zip</div>
+          <ul class="exp-preview"><li *ngFor="let a of exportArquivos">{{ a }}</li></ul>
+        </div>
+      </div>
+      <div class="export-actions">
+        <button class="btn-ghost" (click)="fecharExport()">Cancelar</button>
+        <button class="btn-run" (click)="exportar()"><mat-icon>download</mat-icon> Baixar .zip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT FAB + PAINEL (reusa app-chat-tutor) -->
+  <button class="chat-fab" (click)="toggleChat()" [class.aberto]="chatAberto" title="Tutor IA">
+    <mat-icon>{{ chatAberto ? 'close' : 'chat' }}</mat-icon>
+  </button>
+  <div class="chat-painel" *ngIf="chatAberto">
+    <app-chat-tutor [contexto]="chatContexto" [sugestoesCustom]="chatSugestoes"></app-chat-tutor>
+  </div>
+</div>

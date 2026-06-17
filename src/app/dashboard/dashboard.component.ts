@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { DashboardService } from './services/dashboard.service';
 import { ExecucoesComponent } from './execucoes/execucoes.component';
 
@@ -12,7 +13,11 @@ export class DashboardComponent implements OnInit {
 
   @ViewChild(ExecucoesComponent) execucoesComponent!: ExecucoesComponent;
 
-  constructor(private dashboardService: DashboardService) { }
+  constructor(private dashboardService: DashboardService, private router: Router) { }
+
+  irParaTrilha() {
+    this.router.navigate(['/trilha']);
+  }
 
   ngOnInit() {
     this.dashboardService.carregarDados();

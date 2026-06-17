@@ -16,6 +16,18 @@ const PRE_PROC_BUILTINS = new Set<string>([
 })
 export class ScriptGeneratorService {
 
+  /** Script Python completo de UM modelo (dados → split → X|y → modelo → métricas).
+   *  Usado para exibir o código de um ramo no inspetor da Trilha. */
+  gerarScriptModelo(
+    resultadoColetaDado: ResultadoColetaDado | undefined,
+    modelo: ItemPipeline | undefined,
+    metricas: ItemPipeline[],
+    hiperparametros: any,
+    preProcessamentoConfig?: any,
+  ): string {
+    return this.generatePythonScript(resultadoColetaDado, modelo, metricas, hiperparametros, preProcessamentoConfig);
+  }
+
   async generatePipelineBundle(
     resultadoColetaDado: ResultadoColetaDado | undefined,
     modeloSelecionado: ItemPipeline | undefined,

@@ -14,6 +14,9 @@
         <button mat-icon-button class="pipeline-action-btn" (click)="baixarPipeline()" [disabled]="!execucoesComponent?.modeloSelecionado" matTooltip="Baixar Pipeline">
           <mat-icon>download</mat-icon>
         </button>
+        <button mat-icon-button class="pipeline-action-btn" (click)="irParaTrilha()" matTooltip="Experimentar a Trilha (novo)">
+          <mat-icon>account_tree</mat-icon>
+        </button>
       </div>
     </div>
     <div class="pipeline-content">

@@ -248,6 +248,37 @@ python pipeline.py</code></pre>
               <li>O tutor mostra dicas contextuais durante a criação</li>
             </ul>
           `
+        },
+        {
+          id: 'trilha',
+          titulo: 'Trilha de ML (novo)',
+          icone: 'account_tree',
+          conteudo: `
+            <h2>Trilha de ML — a visualização em trilha</h2>
+            <p>A <strong>Trilha de ML</strong> é uma forma nova e mais visual de montar o mesmo pipeline,
+            como um caminho passo a passo. Ela <strong>coexiste</strong> com o dashboard clássico — você
+            abre pelo ícone <strong>account_tree</strong> ("Experimentar a Trilha") e volta pelo botão
+            <strong>Clássico</strong> no topo.</p>
+
+            <h3>As fases da trilha</h3>
+            <ol>
+              <li><strong>Dados:</strong> carregue um arquivo (CSV/Excel/JSON), um toy dataset ou um da UCI, e defina alvo e atributos.</li>
+              <li><strong>Divisão treino/teste:</strong> ajuste a proporção de teste, embaralhar e estratificar (ou veja "pré-dividido" quando os dados já vêm separados).</li>
+              <li><strong>Entrada (X) e Rótulo (y):</strong> o pré-processamento das features (X) corre em sequência; o tratamento do rótulo (y) corre em paralelo. As features de cada bloco X são selecionáveis no inspetor.</li>
+              <li><strong>Modelos (ramos paralelos):</strong> adicione um ou vários modelos — cada um vira um <strong>ramo</strong> treinado em paralelo, sobre a mesma preparação de dados.</li>
+              <li><strong>Avaliação:</strong> escolha as métricas uma vez; elas valem para todos os modelos, com uma <strong>tabela de comparação</strong> métrica × modelo.</li>
+              <li><strong>Visualizações:</strong> os gráficos (Yellowbrick) aparecem por modelo após rodar.</li>
+            </ol>
+
+            <h3>Como usar</h3>
+            <ul>
+              <li>Use os botões <strong>+</strong> de cada fase para adicionar blocos (abre um seletor).</li>
+              <li>Clique em um bloco para abrir o <strong>inspetor</strong> à direita: aba <strong>Básico</strong> (conteúdo didático do elemento, ajustes de hiperparâmetros por modelo, seleção de features) e aba <strong>Código</strong> (o script Python completo daquele ramo).</li>
+              <li>Clique em <strong>Rodar Trilha</strong> para treinar todos os modelos e avaliar de uma vez. O selo "desatualizado" indica quando algo mudou e é preciso rodar de novo.</li>
+              <li>Use o <strong>🤖 chat do tutor</strong> (canto inferior) ou "Perguntar ao tutor sobre este bloco" para tirar dúvidas com contexto.</li>
+              <li><strong>Exportar:</strong> baixe um <code>.zip</code> com um script <code>.py</code> por modelo (ou notebooks <code>.ipynb</code>) e o comparativo de métricas.</li>
+            </ul>
+          `
         }
       ]
     };

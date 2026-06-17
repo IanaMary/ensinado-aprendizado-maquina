@@ -18,6 +18,11 @@ const routes: Routes = [
     data: { breadcrumb: 'Administracao' }
   },
   {
+    path: 'trilha',
+    loadChildren: () => import('../interno/trilha/trilha.module').then(m => m.TrilhaModule),
+    data: { breadcrumb: 'Trilha de ML' }
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'view-aluno'
