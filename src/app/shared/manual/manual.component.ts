@@ -276,6 +276,8 @@ python pipeline.py</code></pre>
               <li>Clique em um bloco para abrir o <strong>inspetor</strong> à direita: aba <strong>Básico</strong> (conteúdo didático do elemento, ajustes de hiperparâmetros por modelo, seleção de features) e aba <strong>Código</strong> (o script Python completo daquele ramo).</li>
               <li>Clique em <strong>Rodar Trilha</strong> para treinar todos os modelos e avaliar de uma vez. O selo "desatualizado" indica quando algo mudou e é preciso rodar de novo.</li>
               <li>Use o <strong>🤖 chat do tutor</strong> (canto inferior) ou "Perguntar ao tutor sobre este bloco" para tirar dúvidas com contexto.</li>
+              <li><strong>Carregar de URL:</strong> na fase Dados, a aba <strong>URL</strong> permite colar o link direto de um arquivo (CSV/TSV/JSON/Excel) — o servidor baixa e valida com segurança.</li>
+              <li><strong>Salvar e reabrir:</strong> use <strong>Salvar</strong> e <strong>Meus projetos</strong>; o mesmo projeto pode ser aberto tanto na Trilha quanto no dashboard clássico.</li>
               <li><strong>Exportar:</strong> baixe um <code>.zip</code> com um script <code>.py</code> por modelo (ou notebooks <code>.ipynb</code>) e o comparativo de métricas.</li>
             </ul>
           `
