@@ -282,6 +282,8 @@ export class TreineRoboComponent implements OnInit {
   get maeFmt(): string { return this.mae == null ? '—' : (Math.abs(this.mae) >= 100 ? Math.round(this.mae).toString() : this.mae.toFixed(1)); }
   // agrupamento: quantos grupinhos
   get nGrupos(): number { return (this.cerebro?.hiper?.['n_clusters'] as number) || 0; }
+  CORES_GRUPO = ['#7C3AED', '#EC4899', '#F59E0B', '#22C55E', '#38BDF8'];
+  get gruposArr(): number[] { return Array.from({ length: this.nGrupos }, (_, i) => i); }
 
   // ---------- código (blocos + python por tarefa) ----------
   get scratchBlocks() {

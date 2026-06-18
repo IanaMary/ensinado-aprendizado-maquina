@@ -184,17 +184,23 @@
               </div>
               <div class="respostas-rodape">✓ = acertou. Ninguém acerta tudo de primeira — é assim que se aprende! 💪</div>
             </ng-container>
-            <!-- regressão: erro médio amigável -->
+            <!-- regressão: alvo + barra de pontaria -->
             <ng-container *ngIf="tarefa==='regressao'">
-              <div class="respostas-tit">O quanto o {{ robotName }} errou:</div>
-              <div class="resp-card">📉 Em média, ele erra por <b>~{{ maeFmt }}</b> pra mais ou pra menos. Quanto menor, melhor!</div>
-              <div class="respostas-rodape">Acertar o número exato é quase impossível — o robô chega pertinho! 💪</div>
+              <div class="respostas-tit">A pontaria do {{ robotName }}:</div>
+              <div class="alvo">
+                <div class="alvo-icone">🎯</div>
+                <div class="alvo-barra"><div class="alvo-fill" [style.width.%]="pct"><span class="alvo-robo">🤖</span></div></div>
+              </div>
+              <div class="respostas-rodape">Ele erra por <b>~{{ maeFmt }}</b> em média. Quanto mais perto do 🎯, melhor! 💪</div>
             </ng-container>
-            <!-- agrupamento: quantos grupinhos + qualidade -->
+            <!-- agrupamento: bolhas dos grupinhos + barra de qualidade -->
             <ng-container *ngIf="tarefa==='agrupamento'">
-              <div class="respostas-tit">Como o {{ robotName }} separou:</div>
-              <div class="resp-card">🧩 Ele separou tudo em <b>{{ nGrupos }} grupinhos</b>. Qualidade da separação: <b>{{ pct }}%</b>.</div>
-              <div class="respostas-rodape">Quanto mais "redondinhos" e separados os grupos, melhor! ✨</div>
+              <div class="respostas-tit">Os {{ nGrupos }} grupinhos do {{ robotName }}:</div>
+              <div class="grupinhos">
+                <div class="bolha" *ngFor="let g of gruposArr; let i = index" [style.background]="CORES_GRUPO[i % CORES_GRUPO.length]">{{ dataset?.emoji }}</div>
+              </div>
+              <div class="alvo-barra"><div class="alvo-fill" [style.width.%]="pct"></div></div>
+              <div class="respostas-rodape">Qualidade da separação: <b>{{ pct }}%</b>. Grupos mais separados = melhor! ✨</div>
             </ng-container>
           </div>
 
