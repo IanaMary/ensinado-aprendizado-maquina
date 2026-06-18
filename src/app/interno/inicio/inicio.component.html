@@ -1,0 +1,25 @@
+<div class="inicio">
+  <div class="deco d1">☁️</div>
+  <div class="deco d2">⭐</div>
+  <div class="deco d3">✨</div>
+
+  <header class="cabecalho">
+    <div class="logo"><mat-icon>school</mat-icon></div>
+    <div>
+      <div class="titulo">Olá{{ nome ? ', ' + nome : '' }}! 👋</div>
+      <div class="sub">Como você quer aprender hoje?</div>
+    </div>
+  </header>
+
+  <section class="cards">
+    <button class="card" *ngFor="let m of modos" [style.--cor]="m.cor" (click)="abrir(m)">
+      <span class="selo" *ngIf="m.selo">{{ m.selo }}</span>
+      <div class="emoji">{{ m.emoji }}</div>
+      <div class="card-titulo">{{ m.titulo }}</div>
+      <div class="card-desc">{{ m.descricao }}</div>
+      <div class="entrar">Entrar <mat-icon>arrow_forward</mat-icon></div>
+    </button>
+  </section>
+
+  <div class="rodape">Você pode trocar de modo quando quiser. ✨</div>
+</div>

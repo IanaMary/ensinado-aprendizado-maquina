@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; overflow: hidden; }
+    * { box-sizing: border-box; }
+    @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+    @keyframes glowPulse { 0%,100% { opacity: 0.9; } 50% { opacity: 0.25; } }
+    @keyframes spinGear { to { transform: rotate(360deg); } }
+    @keyframes confettiFall { 0% { transform: translateY(-30px) rotate(0deg); opacity: 1; } 100% { transform: translateY(460px) rotate(740deg); opacity: 0; } }
+    @keyframes starPop { 0% { transform: scale(0) rotate(-40deg); } 60% { transform: scale(1.25) rotate(8deg); } 100% { transform: scale(1) rotate(0deg); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes dotBounce { 0%,80%,100% { transform: scale(0.7); opacity: 0.5; } 40% { transform: scale(1.1); opacity: 1; } }
+    @keyframes tipWiggle { 0%,100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+    @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes blockIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb { background: #C9B6F0; border-radius: 6px; border: 2px solid transparent; background-clip: content-box; }
+  </style>
+</helmet>
+
+<div style="display: flex; flex-direction: column; height: 100vh; font-family: 'Nunito', sans-serif; overflow: hidden; background: linear-gradient(165deg, #EEF1FF 0%, #FBE9F4 55%, #FFF4E6 100%); position: relative;">
+
+  <!-- floating deco -->
+  <div style="position: absolute; top: 80px; left: 6%; font-size: 32px; opacity: 0.5; animation: floaty 5s ease-in-out infinite; pointer-events: none;">☁️</div>
+  <div style="position: absolute; top: 140px; right: 9%; font-size: 26px; opacity: 0.5; animation: floaty 6s ease-in-out infinite 0.6s; pointer-events: none;">⭐</div>
+  <div style="position: absolute; bottom: 80px; left: 12%; font-size: 24px; opacity: 0.45; animation: floaty 7s ease-in-out infinite 1.1s; pointer-events: none;">✨</div>
+
+  <!-- TOP BAR -->
+  <div style="height: 60px; display: flex; align-items: center; padding: 0 22px; gap: 12px; flex-shrink: 0; z-index: 20;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, #7C3AED, #A855F7); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124,58,237,0.35); font-size: 20px;">🤖</div>
+      <div>
+        <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px; color: #4C1D95; line-height: 1;">Treine o Robô {{ robotName }}</div>
+        <div style="font-size: 11px; color: #9B7FCB; font-weight: 700; margin-top: 1px;">uma aventura de inteligência artificial</div>
+      </div>
+    </div>
+    <div style="flex: 1;"></div>
+    <button onClick="{{ onRestart }}" style="height: 40px; padding: 0 18px; background: white; color: #7C3AED; border: 2px solid #E6DAF8; border-radius: 14px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.12s; display: flex; align-items: center; gap: 7px;" style-hover="border-color: #A855F7; transform: translateY(-1px);">🔄 Recomeçar</button>
+  </div>
+
+  <!-- ADVENTURE ISLANDS -->
+  <div style="display: flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 22px 10px; flex-shrink: 0; z-index: 20; flex-wrap: wrap;">
+    <sc-for list="{{ islands }}" as="il" hint-placeholder-count="4">
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <div style="{{ il.wrapStyle }}">
+          <div style="{{ il.dotStyle }}">{{ il.icon }}</div>
+          <span style="{{ il.labelStyle }}">{{ il.label }}</span>
+        </div>
+        <sc-if value="{{ il.hasArrow }}"><div style="{{ il.arrowStyle }}">→</div></sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- STAGE -->
+  <div style="flex: 1; min-height: 0; overflow-y: auto; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 8px 22px 28px;">
+    <div style="width: 100%; max-width: 920px; display: flex; gap: 34px; align-items: center; justify-content: center; flex-wrap: wrap;">
+
+      <!-- ROBOT -->
+      <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative;">
+        <div style="position: relative; animation: floaty 4s ease-in-out infinite;">
+          {{ robotEl }}
+          <!-- confetti -->
+          <sc-for list="{{ confetti }}" as="cf" hint-placeholder-count="0">
+            <div style="{{ cf.style }}"></div>
+          </sc-for>
+        </div>
+        <div style="{{ robotPedestalStyle }}"></div>
+      </div>
+
+      <!-- PANEL -->
+      <div style="flex: 1; min-width: 320px; max-width: 480px;">
+
+        <!-- speech bubble -->
+        <div style="position: relative; background: white; border: 3px solid #EADIFF; border-radius: 22px; padding: 18px 22px; box-shadow: 0 10px 34px rgba(124,58,237,0.12); margin-bottom: 18px; animation: popIn 0.25s ease;">
+          <div style="position: absolute; left: -14px; top: 34px; width: 0; height: 0; border-top: 11px solid transparent; border-bottom: 11px solid transparent; border-right: 14px solid white;"></div>
+          <div style="position: absolute; left: -18px; top: 32px; width: 0; height: 0; border-top: 13px solid transparent; border-bottom: 13px solid transparent; border-right: 14px solid #EADIFF; z-index: -1;"></div>
+          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 17px; color: #4C1D95; line-height: 1.4;">{{ sayText }}</div>
+          <sc-if value="{{ haveHint }}">
+            <div style="margin-top: 8px; font-size: 12.5px; color: #9B7FCB; font-weight: 600; line-height: 1.45;">{{ hintText }}</div>
+          </sc-if>
+        </div>
+
+        <!-- BUILD: choice cards -->
+        <sc-if value="{{ showOptions }}">
+          <div style="display: flex; flex-direction: column; gap: 11px;">
+            <sc-for list="{{ options }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.onClick }}" style="{{ o.style }}" style-hover="transform: translateY(-2px) scale(1.01); box-shadow: 0 8px 22px rgba(0,0,0,0.1);">
+                <div style="{{ o.emojiWrap }}">{{ o.emoji }}</div>
+                <div style="flex: 1; min-width: 0; text-align: left;">
+                  <div style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 16px; color: #2D2440;">{{ o.label }}</div>
+                  <div style="font-size: 12px; color: #8B7BA8; font-weight: 600; margin-top: 1px;">{{ o.hint }}</div>
+                </div>
+                <div style="{{ o.arrowStyle }}">›</div>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- READY: big train button -->
+        <sc-if value="{{ showReady }}">
+          <button onClick="{{ onTrain }}" style="width: 100%; padding: 20px; background: linear-gradient(135deg, #22C55E, #16A34A); color: white; border: none; border-radius: 22px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; cursor: pointer; box-shadow: 0 8px 26px rgba(34,197,94,0.4); transition: all 0.14s; display: flex; align-items: center; justify-content: center; gap: 10px;" style-hover="transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 32px rgba(34,197,94,0.5);" style-active="transform: scale(0.98);">
+            🚀 ME ENSINA!
+          </button>
+          <div style="text-align: center; margin-top: 12px; font-size: 12.5px; color: #9B7FCB; font-weight: 700;">Aperta o botão e o {{ robotName }} vai aprender! ✨</div>
+        </sc-if>
+
+        <!-- TRAINING -->
+        <sc-if value="{{ isTraining }}">
+          <div style="text-align: center; padding: 8px;">
+            <div style="display: flex; justify-content: center; gap: 9px; margin-bottom: 14px;">
+              <div style="width: 15px; height: 15px; border-radius: 50%; background: #7C3AED; animation: dotBounce 1.2s ease-in-out infinite;"></div>
+              <div style="width: 15px; height: 15px; border-radius: 50%; background: #A855F7; animation: dotBounce 1.2s ease-in-out infinite 0.2s;"></div>
+              <div style="width: 15px; height: 15px; border-radius: 50%; background: #C084FC; animation: dotBounce 1.2s ease-in-out infinite 0.4s;"></div>
+            </div>
+            <div style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 16px; color: #7C3AED;">{{ trainingMsg }}</div>
+          </div>
+        </sc-if>
+
+        <!-- DONE: score -->
+        <sc-if value="{{ isDone }}">
+          <div style="background: white; border: 3px solid #FFE8B0; border-radius: 22px; padding: 20px 22px; box-shadow: 0 10px 34px rgba(245,158,11,0.16); animation: popIn 0.3s ease;">
+            <div style="display: flex; justify-content: center; gap: 5px; margin-bottom: 12px;">
+              <sc-for list="{{ stars }}" as="s" hint-placeholder-count="5">
+                <div style="{{ s.style }}">{{ s.glyph }}</div>
+              </sc-for>
+            </div>
+            <div style="text-align: center; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #16A34A; line-height: 1;">{{ scorePct }}</div>
+            <div style="text-align: center; font-size: 13px; color: #8B7BA8; font-weight: 700; margin-top: 3px;">de acerto</div>
+            <div style="text-align: center; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 17px; color: #4C1D95; margin-top: 12px;">{{ scoreMsg }}</div>
+
+            <div style="display: flex; flex-direction: column; gap: 9px; margin-top: 18px;">
+              <button onClick="{{ toggleMistakes }}" style="width: 100%; padding: 12px; background: #F3EEFB; color: #7C3AED; border: none; border-radius: 14px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.12s;" style-hover="background: #E8DDF7;">🔍 {{ mistakesBtnLabel }}</button>
+              <div style="display: flex; gap: 9px;">
+                <button onClick="{{ onTrain }}" style="flex: 1; padding: 12px; background: white; color: #16A34A; border: 2px solid #BBE9C5; border-radius: 14px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.12s;" style-hover="border-color: #22C55E;">🔄 De novo</button>
+                <button onClick="{{ onRestart }}" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #7C3AED, #A855F7); color: white; border: none; border-radius: 14px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.12s;" style-hover="transform: translateY(-1px);">✨ Nova</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- mistakes reveal -->
+          <sc-if value="{{ showMistakes }}">
+            <div style="background: white; border: 3px solid #E6DAF8; border-radius: 20px; padding: 16px; margin-top: 14px; animation: popIn 0.25s ease;">
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; color: #4C1D95; margin-bottom: 11px;">Olha o que o {{ robotName }} respondeu:</div>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px;">
+                <sc-for list="{{ mistakes }}" as="m" hint-placeholder-count="6">
+                  <div style="{{ m.cardStyle }}">
+                    <div style="font-size: 26px;">{{ m.emoji }}</div>
+                    <div style="font-size: 10.5px; color: #6B5B88; font-weight: 700; margin-top: 3px;">{{ m.guess }}</div>
+                    <div style="{{ m.markStyle }}">{{ m.mark }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size: 11.5px; color: #9B7FCB; font-weight: 600; margin-top: 11px; line-height: 1.45; text-align: center;">✓ = acertou · ✗ = confundiu. Ninguém acerta tudo de primeira — é assim que se aprende! 💪</div>
+            </div>
+          </sc-if>
+
+          <!-- code peek -->
+          <sc-if value="{{ showCodePeek }}">
+            <button onClick="{{ toggleCode }}" style="width: 100%; padding: 11px; margin-top: 14px; background: transparent; color: #9B7FCB; border: 2px dashed #D8C9F0; border-radius: 14px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer;">🤓 {{ codeBtnLabel }}</button>
+          </sc-if>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SIDE PANEL: programa em blocos (estilo Scratch) -->
+<sc-if value="{{ showCode }}">
+  <div onClick="{{ toggleCode }}" style="position: fixed; inset: 0; background: rgba(45,36,64,0.4); z-index: 90; animation: popIn 0.18s ease;"></div>
+  <div style="position: fixed; top: 0; right: 0; bottom: 0; width: 384px; max-width: 92vw; background: #F4F1FB; z-index: 91; box-shadow: -10px 0 36px rgba(45,36,64,0.22); display: flex; flex-direction: column; animation: slideInRight 0.24s ease;">
+    <div style="padding: 18px 20px; background: white; border-bottom: 2px solid #ECE6F8; display: flex; align-items: center; gap: 11px; flex-shrink: 0;">
+      <div style="width: 36px; height: 36px; border-radius: 11px; background: linear-gradient(135deg, #7C3AED, #A855F7); display: flex; align-items: center; justify-content: center; font-size: 18px;">🧩</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 15px; color: #4C1D95;">O código em blocos</div>
+        <div style="font-size: 10.5px; color: #9B7FCB; font-weight: 700;">é assim que a gente grande monta, igual no Scratch!</div>
+      </div>
+      <button onClick="{{ toggleCode }}" style="width: 30px; height: 30px; border: none; background: #F3EEFB; color: #7C3AED; border-radius: 9px; cursor: pointer; font-size: 15px; flex-shrink: 0;">✕</button>
+    </div>
+    <div style="flex: 1; overflow-y: auto; padding: 24px 22px 40px;">
+      <div style="display: flex; flex-direction: column; align-items: flex-start;">
+        <div style="{{ hatStyle }}">
+          <span style="font-size: 16px;">🏁</span>
+          <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 14px; color: white;">quando o {{ robotName }} treinar</span>
+        </div>
+        <sc-for list="{{ scratchBlocks }}" as="b" hint-placeholder-count="4">
+          <div style="{{ b.shapeStyle }}">
+            <span style="font-size: 16px; flex-shrink: 0;">{{ b.emoji }}</span>
+            <span style="font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; color: white; white-space: nowrap;">{{ b.text }}</span>
+          </div>
+        </sc-for>
+        <div style="{{ endCapStyle }}"></div>
+      </div>
+
+      <div style="background: #2D2440; border-radius: 16px; padding: 16px 18px; margin-top: 24px;">
+        <div style="font-size: 10.5px; color: #C4B5FD; font-weight: 700; margin-bottom: 8px;">🐍 No Python (scikit-learn) isso vira:</div>
+        <sc-for list="{{ codeLines }}" as="cl" hint-placeholder-count="4">
+          <div style="font-family: monospace; font-size: 12px; color: #A7F3D0; line-height: 1.7; white-space: pre-wrap; word-break: break-word;">{{ cl }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</sc-if></x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;},&quot;robotName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Léo&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#7C3AED&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showCodePeek&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  DATASETS = {
+    flores:   { emoji:'🌸', name:'Flores', hint:'reconhecer 3 tipos de flor', color:'#EC4899', sk:'load_iris()', items:['🌸','🌼','🌺'], classes:['rosa','margarida','lírio'] },
+    pinguins: { emoji:'🐧', name:'Pinguins', hint:'descobrir a espécie do pinguim', color:'#38BDF8', sk:'load_penguins()', items:['🐧','🐤','🦆'], classes:['Adélia','Gentoo','Papua'] },
+    frutas:   { emoji:'🍓', name:'Frutas', hint:'doce, azeda ou no meio?', color:'#F97316', sk:'load_fruits()', items:['🍓','🍋','🍏'], classes:['doce','azeda','média'] },
+  };
+  BRAINS = {
+    floresta: { emoji:'🌳', name:'Floresta Mágica', hint:'muitas arvorezinhas votam juntas', color:'#22C55E', sk:'RandomForestClassifier()', base:0.94 },
+    arvore:   { emoji:'🌲', name:'Árvore de Perguntas', hint:'faz perguntas sim/não até decidir', color:'#14B8A6', sk:'DecisionTreeClassifier()', base:0.86 },
+    vizinhos: { emoji:'👯', name:'Os Vizinhos', hint:'olha quem é mais parecido', color:'#F59E0B', sk:'KNeighborsClassifier()', base:0.90 },
+  };
+
+  NOTCH = 'polygon(0 0, 16px 0, 20px 10px, 36px 10px, 40px 0, 100% 0, 100% 46px, 40px 46px, 36px 56px, 20px 56px, 16px 46px, 0 46px)';
+  HAT = 'polygon(0 12px, 8px 4px, 100% 4px, 100% 46px, 40px 46px, 36px 56px, 20px 56px, 16px 46px, 0 46px)';
+
+  state = { dataset:null, senses:null, brain:null, phase:'build', score:0, showMistakes:false, showCode:false };
+
+  _accent() { return this.props.accent || '#7C3AED'; }
+
+  _pick(field, val) {
+    this.setState({ [field]: val, showMistakes:false, showCode:false });
+  }
+  _restart() { this.setState({ dataset:null, senses:null, brain:null, phase:'build', score:0, showMistakes:false, showCode:false }); }
+
+  async _train() {
+    if (this.state.phase === 'training') return;
+    this.setState({ phase:'training', showMistakes:false, showCode:false });
+    await new Promise(r => setTimeout(r, 2200));
+    const b = this.BRAINS[this.state.brain];
+    let s = b.base + (this.state.senses === 'sharp' ? 0.03 : 0) + (Math.random()*0.04 - 0.02);
+    s = Math.max(0.74, Math.min(0.99, s));
+    this.setState({ phase:'done', score:s });
+  }
+
+  _step() {
+    const { dataset, senses, brain } = this.state;
+    const name = this.props.robotName || 'Léo';
+    if (!dataset) return { key:'mission', mood:'idle',
+      say:`Oi! Eu sou o robô ${name} 🤖 O que você quer me ensinar?`,
+      hint:'Toque numa missão pra começar a aventura!',
+      options: Object.entries(this.DATASETS).map(([id,d]) => ({ emoji:d.emoji, label:d.name, hint:d.hint, color:d.color, onClick:()=>this._pick('dataset', id) })) };
+    if (senses === null) return { key:'senses', mood:'happy',
+      say:`Boa escolha! Quer afinar meus sentidos antes?`,
+      hint:'Isso deixa tudo na mesma medida pra eu enxergar melhor (os robôs gostam disso!).',
+      options:[
+        { emoji:'✨', label:'Sim, afinar!', hint:'deixa tudo certinho na mesma escala', color:'#A855F7', onClick:()=>this._pick('senses','sharp') },
+        { emoji:'⏭️', label:'Pode pular', hint:'vamos direto pro treino', color:'#94A3B8', onClick:()=>this._pick('senses','skip') },
+      ] };
+    if (!brain) return { key:'brain', mood:'happy',
+      say:`Agora escolhe meu cérebro! Como eu devo pensar?`,
+      hint:'Cada cérebro aprende de um jeito diferente. Pode experimentar!',
+      options: Object.entries(this.BRAINS).map(([id,b]) => ({ emoji:b.emoji, label:b.name, hint:b.hint, color:b.color, onClick:()=>this._pick('brain', id) })) };
+    return { key:'ready', mood:'happy', ready:true,
+      say:`Tô prontíssimo pra aprender! 🎉`,
+      hint:null, options:[] };
+  }
+
+  _starPts(cx, cy, outer, inner) {
+    let p = '';
+    for (let i=0;i<10;i++){ const ang = Math.PI/5*i - Math.PI/2; const r = i%2===0?outer:inner; p += (cx+r*Math.cos(ang)).toFixed(1)+','+(cy+r*Math.sin(ang)).toFixed(1)+' '; }
+    return p.trim();
+  }
+
+  _robot(mood) {
+    const e = React.createElement;
+    const acc = this._accent();
+    const kids = [];
+    // antenna
+    kids.push(e('line',{key:'ant',x1:100,y1:42,x2:100,y2:22,stroke:acc,strokeWidth:4,strokeLinecap:'round'}));
+    kids.push(e('circle',{key:'glow',cx:100,cy:16,r:11,fill:'#FBBF24',opacity:0.5,style:{animation:'glowPulse '+(mood==='thinking'?'0.6s':'1.8s')+' ease-in-out infinite'}}));
+    kids.push(e('circle',{key:'bulb',cx:100,cy:16,r:7,fill:'#FBBF24',stroke:'#F59E0B',strokeWidth:2}));
+    // ears
+    kids.push(e('rect',{key:'el',x:34,y:74,width:13,height:30,rx:6,fill:acc}));
+    kids.push(e('rect',{key:'er',x:153,y:74,width:13,height:30,rx:6,fill:acc}));
+    // head
+    kids.push(e('rect',{key:'head',x:44,y:42,width:112,height:88,rx:28,fill:'#C9B6F5',stroke:acc,strokeWidth:4}));
+    // face screen
+    kids.push(e('rect',{key:'face',x:58,y:58,width:84,height:56,rx:18,fill:'#2D2440'}));
+    // eyes + mouth by mood
+    const eyeL=80, eyeR=120, eyeY=82;
+    if (mood==='celebrate') {
+      kids.push(e('polygon',{key:'sl',points:this._starPts(eyeL,eyeY,9,4),fill:'#FBBF24'}));
+      kids.push(e('polygon',{key:'sr',points:this._starPts(eyeR,eyeY,9,4),fill:'#FBBF24'}));
+      kids.push(e('path',{key:'m',d:'M82 98 Q100 118 118 98 Z',fill:'#FB7185'}));
+      kids.push(e('path',{key:'mt',d:'M82 98 Q100 118 118 98',fill:'none',stroke:'white',strokeWidth:3,strokeLinecap:'round'}));
+    } else if (mood==='thinking') {
+      kids.push(e('circle',{key:'il',cx:eyeL,cy:80,r:5,fill:'#A7F3D0'}));
+      kids.push(e('circle',{key:'ir',cx:eyeR,cy:80,r:5,fill:'#A7F3D0'}));
+      kids.push(e('circle',{key:'mo',cx:100,cy:100,r:5,fill:'white'}));
+      kids.push(e('g',{key:'gear',style:{transformOrigin:'150px 50px',animation:'spinGear 1.6s linear infinite'}},[
+        e('circle',{key:'gc',cx:150,cy:50,r:7,fill:'none',stroke:'#FBBF24',strokeWidth:3}),
+        e('circle',{key:'gd',cx:150,cy:50,r:2,fill:'#FBBF24'}),
+      ]));
+    } else if (mood==='happy') {
+      kids.push(e('path',{key:'el2',d:'M73 86 Q80 78 87 86',fill:'none',stroke:'#A7F3D0',strokeWidth:4,strokeLinecap:'round'}));
+      kids.push(e('path',{key:'er2',d:'M113 86 Q120 78 127 86',fill:'none',stroke:'#A7F3D0',strokeWidth:4,strokeLinecap:'round'}));
+      kids.push(e('path',{key:'m2',d:'M84 96 Q100 112 116 96',fill:'none',stroke:'white',strokeWidth:4,strokeLinecap:'round'}));
+    } else {
+      kids.push(e('circle',{key:'el3',cx:eyeL,cy:eyeY,r:7,fill:'white'}));
+      kids.push(e('circle',{key:'er3',cx:eyeR,cy:eyeY,r:7,fill:'white'}));
+      kids.push(e('circle',{key:'pl',cx:eyeL+1,cy:eyeY+1,r:3,fill:'#2D2440'}));
+      kids.push(e('circle',{key:'pr',cx:eyeR+1,cy:eyeY+1,r:3,fill:'#2D2440'}));
+      kids.push(e('path',{key:'m3',d:'M86 98 Q100 108 114 98',fill:'none',stroke:'white',strokeWidth:4,strokeLinecap:'round'}));
+    }
+    // cheeks
+    if (mood==='happy'||mood==='celebrate') {
+      kids.push(e('circle',{key:'cl',cx:66,cy:100,r:6,fill:'#FB7185',opacity:0.6}));
+      kids.push(e('circle',{key:'cr',cx:134,cy:100,r:6,fill:'#FB7185',opacity:0.6}));
+    }
+    // arms
+    const armAnim = mood==='celebrate' ? {animation:'bob 0.5s ease-in-out infinite'} : {};
+    kids.push(e('rect',{key:'al',x:34,y:140,width:15,height:46,rx:7,fill:'#C9B6F5',stroke:acc,strokeWidth:3,style:armAnim}));
+    kids.push(e('rect',{key:'ar',x:151,y:140,width:15,height:46,rx:7,fill:'#C9B6F5',stroke:acc,strokeWidth:3,style:armAnim}));
+    // body
+    kids.push(e('rect',{key:'body',x:56,y:132,width:88,height:66,rx:24,fill:'#B79AEF',stroke:acc,strokeWidth:4}));
+    kids.push(e('rect',{key:'chest',x:74,y:148,width:52,height:34,rx:12,fill:'#EDE4FF'}));
+    const chestGlyph = mood==='celebrate'?'⭐':(mood==='thinking'?'⚙️':'💜');
+    kids.push(e('text',{key:'cg',x:100,y:172,textAnchor:'middle',fontSize:20},chestGlyph));
+    // feet
+    kids.push(e('rect',{key:'fl',x:68,y:198,width:24,height:12,rx:6,fill:acc}));
+    kids.push(e('rect',{key:'fr',x:108,y:198,width:24,height:12,rx:6,fill:acc}));
+    return e('svg',{width:210,height:224,viewBox:'0 0 200 220',style:{overflow:'visible'}},kids);
+  }
+
+  renderVals() {
+    const { dataset, senses, brain, phase, score, showMistakes, showCode } = this.state;
+    const acc = this._accent();
+    const name = this.props.robotName || 'Léo';
+    const step = this._step();
+    const isTraining = phase==='training';
+    const isDone = phase==='done';
+    const mood = isTraining ? 'thinking' : (isDone ? 'celebrate' : step.mood);
+
+    // islands
+    const islDefs = [
+      { label:'Missão', icon:'🎯', done:!!dataset, cur:step.key==='mission' },
+      { label:'Sentidos', icon:'👀', done:senses!==null, cur:step.key==='senses' },
+      { label:'Cérebro', icon:'🧠', done:!!brain, cur:step.key==='brain' },
+      { label:'Treinar', icon:'🚀', done:isDone, cur:step.key==='ready'||isTraining },
+    ];
+    const islands = islDefs.map((il,i) => {
+      const active = il.done || il.cur;
+      return {
+        label: il.label, icon: il.done ? '✓' : il.icon, hasArrow: i < islDefs.length-1,
+        wrapStyle: { display:'flex', alignItems:'center', gap:7, padding:'6px 13px 6px 7px', borderRadius:999, background: il.cur ? acc : (il.done ? '#22C55E' : 'white'), border: il.done||il.cur ? '2px solid transparent' : '2px solid #E6DAF8', boxShadow: il.cur ? '0 4px 14px '+acc+'55' : 'none', transition:'all 0.2s' },
+        dotStyle: { width:24, height:24, borderRadius:'50%', background: active ? 'rgba(255,255,255,0.28)' : '#F3EEFB', display:'flex', alignItems:'center', justifyContent:'center', fontSize: il.done?13:14, fontWeight:800, color: active?'white':'#B7A3DB', flexShrink:0 },
+        labelStyle: { fontFamily:"'Baloo 2', sans-serif", fontWeight:700, fontSize:13, color: active ? 'white' : '#B7A3DB' },
+        arrowStyle: { color:'#D8C9F0', fontSize:16, fontWeight:800, margin:'0 2px' },
+      };
+    });
+
+    // options
+    const options = (step.options||[]).map(o => ({
+      emoji:o.emoji, label:o.label, hint:o.hint,
+      onClick:o.onClick,
+      style:{ display:'flex', alignItems:'center', gap:14, width:'100%', padding:'14px 16px', background:'white', border:'2.5px solid '+o.color+'33', borderRadius:18, cursor:'pointer', transition:'all 0.14s', boxShadow:'0 3px 10px rgba(0,0,0,0.04)' },
+      emojiWrap:{ width:48, height:48, borderRadius:14, background:o.color+'1A', display:'flex', alignItems:'center', justifyContent:'center', fontSize:26, flexShrink:0 },
+      arrowStyle:{ fontSize:24, color:o.color, fontWeight:800, flexShrink:0 },
+    }));
+
+    // confetti
+    const confetti = isDone ? Array.from({length:18}).map((_,i) => {
+      const cols=['#FB7185','#FBBF24','#34D399','#38BDF8','#A78BFA','#F472B6'];
+      const left = (i*5.4 + (i%3)*3) % 100;
+      return { style:{ position:'absolute', top:'10px', left: left+'%', width: (7+i%4)+'px', height:(11+i%5)+'px', background:cols[i%cols.length], borderRadius:'2px', animation:`confettiFall ${1.8+ (i%5)*0.25}s ease-in ${(i%6)*0.15}s infinite`, zIndex:5 } };
+    }) : [];
+
+    // stars
+    const nStars = Math.max(1, Math.round(score*5));
+    const stars = Array.from({length:5}).map((_,i) => ({
+      glyph: i < nStars ? '⭐' : '☆',
+      style:{ fontSize:30, animation: i<nStars ? `starPop 0.4s ease ${i*0.12}s both` : 'none', opacity: i<nStars?1:0.3 },
+    }));
+    const pct = Math.round(score*100);
+    const scoreMsg = pct>=92 ? `Uau! O ${name} ficou craque! 🏆` : pct>=82 ? `Muito bem! O ${name} aprendeu bastante! 🎉` : `Boa! Dá pra treinar mais e melhorar! 💪`;
+
+    // mistakes
+    const ds = dataset ? this.DATASETS[dataset] : null;
+    let mistakes = [];
+    if (isDone && ds && showMistakes) {
+      const wrongIdx = pct>=92 ? [4] : pct>=82 ? [2,5] : [1,3,5];
+      mistakes = Array.from({length:6}).map((_,i) => {
+        const real = i % ds.classes.length;
+        const wrong = wrongIdx.includes(i);
+        const guess = wrong ? ds.classes[(real+1)%ds.classes.length] : ds.classes[real];
+        return {
+          emoji: ds.items[real % ds.items.length], guess: guess,
+          cardStyle:{ position:'relative', background: wrong?'#FEF2F2':'#F0FDF4', border:'2px solid '+(wrong?'#FCA5A5':'#A7F3D0'), borderRadius:14, padding:'12px 6px', textAlign:'center' },
+          mark: wrong?'✗':'✓',
+          markStyle:{ position:'absolute', top:-8, right:-8, width:22, height:22, borderRadius:'50%', background: wrong?'#EF4444':'#22C55E', color:'white', fontSize:13, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center' },
+        };
+      });
+    }
+
+    // code peek (Python simplificado)
+    const codeLines = (isDone && ds && brain) ? [
+      'from sklearn import *',
+      'X, y = '+ds.sk,
+      (senses==='sharp' ? 'X = MinMaxScaler().fit_transform(X)' : '# (sem ajustar a escala)'),
+      'modelo = '+this.BRAINS[brain].sk,
+      'modelo.fit(X, y)   # treinar!',
+      'print(modelo.score(X, y))',
+    ] : [];
+
+    // programa em blocos estilo Scratch
+    const CAT = { event:'#FFBF00', data:'#4C97FF', prep:'#9966FF', model:'#59C059', show:'#FF8C1A' };
+    const mkShape = (color) => ({ position:'relative', display:'flex', alignItems:'center', gap:9, minWidth:210, maxWidth:320, height:56, paddingLeft:46, paddingRight:16, marginBottom:-10, background:color, clipPath:this.NOTCH, WebkitClipPath:this.NOTCH, boxShadow:'inset 0 -3px 0 rgba(0,0,0,0.13)', animation:'blockIn 0.25s ease' });
+    let scratchBlocks = [];
+    if (isDone && ds && brain) {
+      const bb = this.BRAINS[brain];
+      const defs = [ { emoji:ds.emoji, text:'usar dados de '+ds.name, color:CAT.data } ];
+      if (senses==='sharp') defs.push({ emoji:'📏', text:'deixar na mesma medida', color:CAT.prep });
+      defs.push({ emoji:bb.emoji, text:'treinar '+bb.name, color:CAT.model });
+      defs.push({ emoji:'🎯', text:'mostrar o acerto', color:CAT.show });
+      scratchBlocks = defs.map(d => ({ emoji:d.emoji, text:d.text, shapeStyle: mkShape(d.color) }));
+    }
+    const hatStyle = { position:'relative', display:'flex', alignItems:'center', gap:9, minWidth:210, height:56, paddingLeft:18, paddingRight:18, marginBottom:-10, background:CAT.event, clipPath:this.HAT, WebkitClipPath:this.HAT, boxShadow:'inset 0 -3px 0 rgba(0,0,0,0.13)' };
+    const endCapStyle = { width:60, height:16, background:'#C9B6F5', clipPath:'polygon(0 0, 16px 0, 20px 8px, 36px 8px, 40px 0, 100% 0, 100% 100%, 0 100%)', WebkitClipPath:'polygon(0 0, 16px 0, 20px 8px, 36px 8px, 40px 0, 100% 0, 100% 100%, 0 100%)', opacity:0.5 };
+
+    return {
+      robotName: name,
+      robotEl: this._robot(mood),
+      robotPedestalStyle: { width:140, height:18, borderRadius:'50%', background:'rgba(124,58,237,0.12)', filter:'blur(4px)' },
+      islands,
+      sayText: isTraining ? `Deixa comigo, tô aprendendo! 🧠` : (isDone ? scoreMsg : step.say),
+      haveHint: !isTraining && !isDone && !!step.hint,
+      hintText: step.hint || '',
+      showOptions: phase==='build' && !step.ready,
+      options,
+      showReady: phase==='build' && step.ready,
+      onTrain: () => this._train(),
+      isTraining,
+      trainingMsg: `O ${name} está estudando os exemplos...`,
+      isDone,
+      stars,
+      scorePct: pct + '%',
+      scoreMsg,
+      onRestart: () => this._restart(),
+      toggleMistakes: () => this.setState(s => ({ showMistakes: !s.showMistakes })),
+      mistakesBtnLabel: showMistakes ? 'Esconder respostas' : 'Ver o que ele respondeu',
+      showMistakes,
+      mistakes,
+      showCodePeek: this.props.showCodePeek !== false,
+      toggleCode: () => this.setState(s => ({ showCode: !s.showCode })),
+      codeBtnLabel: showCode ? 'Esconder o código' : 'Espiar o código de gente grande',
+      showCode,
+      codeLines,
+      scratchBlocks,
+      hatStyle,
+      endCapStyle,
+    };
+  }
+}
+</script>
+</body>
+</html>

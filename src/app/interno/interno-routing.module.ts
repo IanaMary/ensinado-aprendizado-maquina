@@ -23,6 +23,16 @@ const routes: Routes = [
     data: { breadcrumb: 'Trilha de ML' }
   },
   {
+    path: 'inicio',
+    loadComponent: () => import('../interno/inicio/inicio.component').then(m => m.InicioComponent),
+    data: { breadcrumb: 'Início' }
+  },
+  {
+    path: 'treine-robo',
+    loadComponent: () => import('../interno/treine-robo/treine-robo.component').then(m => m.TreineRoboComponent),
+    data: { breadcrumb: 'Treine seu Robô' }
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'view-aluno'

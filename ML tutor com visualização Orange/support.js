@@ -116,9 +116,10 @@
        in sync until dc-runtime regains a build step. */
     @media print {
       @page { margin: 0.5cm; }
-      html, body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
       section, article, figure, table { break-inside: avoid; }
       *, *::before, *::after {
+        print-color-adjust: exact; -webkit-print-color-adjust: exact;
+        backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
         animation-delay: -99s !important; animation-duration: .001s !important;
         animation-iteration-count: 1 !important; animation-fill-mode: both !important;
         animation-play-state: running !important; transition-duration: 0s !important;
