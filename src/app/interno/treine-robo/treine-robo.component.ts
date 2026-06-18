@@ -93,7 +93,11 @@ export class TreineRoboComponent implements OnInit {
   r2: number | null = null;    // regressão
   mae: number | null = null;   // regressão
   silhouette: number | null = null; // agrupamento
-  vizs: any[] = [];            // visualizações reais do modelo (_visualizacoes do backend)
+  // scatter próprio (lúdico) a partir dos dados reais do dataset
+  scatterPontos: { cx: number; cy: number; cor: string }[] = [];
+  scatterLinha: { x1: number; y1: number; x2: number; y2: number } | null = null;
+  readonly SVG_W = 320; readonly SVG_H = 188; readonly PAD = 18;
+  CORES_GRUPO = ['#7C3AED', '#EC4899', '#F59E0B', '#22C55E', '#38BDF8'];
 
   constructor(private dashboard: DashboardService, private router: Router) {}
 
@@ -138,7 +142,8 @@ export class TreineRoboComponent implements OnInit {
     const modeloItem = this.modelosCat.find(m => m.valor === this.cerebro!.valor);
     if (!modeloItem) { this.erro = 'Esse cérebro não está disponível agora. 🙈'; return; }
     this.fase = 'training'; this.showMistakes = false; this.showCode = false; this.erro = '';
-    this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null; this.vizs = [];
+    this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
+    this.scatterPontos = []; this.scatterLinha = null;
     const body = {
       tipo_arquivo: 'xlsx',
       arquivo_id: this.coleta.id_coleta,
@@ -168,20 +173,85 @@ export class TreineRoboComponent implements OnInit {
 
   private parseResultado(aval: any, nome: string): void {
     const num = (v: any) => (typeof v === 'number' && isFinite(v) ? v : null);
-    this.vizs = aval?.['_visualizacoes']?.[nome] || [];
     if (this.tarefa === 'regressao') {
       this.r2 = num(aval?.['r2']?.[nome]);
       this.mae = num(aval?.['mae']?.[nome]);
       this.score = Math.max(0, Math.min(1, this.r2 ?? 0));
+      this.montarScatter();
     } else if (this.tarefa === 'agrupamento') {
       this.silhouette = num(aval?.['sil']?.[nome]);
       this.score = Math.max(0, Math.min(1, ((this.silhouette ?? 0) + 1) / 2));
+      this.montarScatter();
     } else {
       const acc = num(aval?.['acuracia']?.[nome]);
       this.score = acc ?? 0;
       const mz = aval?.['matriz']?.[nome];
       this.matriz = mz && Array.isArray(mz.matriz) ? mz : null;
     }
+  }
+
+  /** Desenha um scatter lúdico a partir dos dados reais do dataset (preview).
+   *  Regressão: (feature × alvo) + a reta do padrão (mínimos quadrados).
+   *  Agrupamento: (feature1 × feature2) com os pontos coloridos por grupinho
+   *  (k-means leve no cliente só para colorir — a qualidade vem do backend). */
+  private montarScatter(): void {
+    this.scatterPontos = []; this.scatterLinha = null;
+    const linhas: any[] = this.coleta?.dados || [];
+    const cols: string[] = this.coleta?.colunas || [];
+    const target = this.coleta?.target;
+    let xKey: string | undefined, yKey: string | undefined;
+    if (this.tarefa === 'regressao') { yKey = target; xKey = cols.find(c => c !== target); }
+    else { const feats = cols.filter(c => c !== target); xKey = feats[0]; yKey = feats[1] || feats[0]; }
+    if (!xKey || !yKey) return;
+
+    const pts: number[][] = [];
+    for (const r of linhas) {
+      const x = Number(r[xKey]), y = Number(r[yKey]);
+      if (isFinite(x) && isFinite(y)) pts.push([x, y]);
+    }
+    if (pts.length < 2) return;
+
+    const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+    const xmin = Math.min(...xs), xmax = Math.max(...xs), ymin = Math.min(...ys), ymax = Math.max(...ys);
+    const W = this.SVG_W, H = this.SVG_H, P = this.PAD;
+    const sx = (x: number) => P + (xmax === xmin ? 0.5 : (x - xmin) / (xmax - xmin)) * (W - 2 * P);
+    const sy = (y: number) => H - P - (ymax === ymin ? 0.5 : (y - ymin) / (ymax - ymin)) * (H - 2 * P);
+
+    let labels: number[] = pts.map(() => 0);
+    if (this.tarefa === 'agrupamento') labels = this.kmeansLeve(pts, Math.max(2, this.nGrupos));
+
+    this.scatterPontos = pts.map((p, i) => ({
+      cx: sx(p[0]), cy: sy(p[1]),
+      cor: this.tarefa === 'agrupamento' ? this.CORES_GRUPO[labels[i] % this.CORES_GRUPO.length] : '#A855F7',
+    }));
+
+    if (this.tarefa === 'regressao') {
+      const n = pts.length; let sX = 0, sY = 0, sXY = 0, sXX = 0;
+      for (const [x, y] of pts) { sX += x; sY += y; sXY += x * y; sXX += x * x; }
+      const den = n * sXX - sX * sX;
+      if (den !== 0) {
+        const m = (n * sXY - sX * sY) / den, b = (sY - m * sX) / n;
+        this.scatterLinha = { x1: sx(xmin), y1: sy(m * xmin + b), x2: sx(xmax), y2: sy(m * xmax + b) };
+      }
+    }
+  }
+
+  /** k-means 2D leve e determinístico (centróides iniciais espalhados) — só p/ colorir. */
+  private kmeansLeve(pts: number[][], k: number, iters = 8): number[] {
+    if (pts.length <= k) return pts.map((_, i) => i % k);
+    const cents = Array.from({ length: k }, (_, i) => pts[Math.floor(i * (pts.length - 1) / (k - 1))].slice());
+    const labels = new Array(pts.length).fill(0);
+    for (let it = 0; it < iters; it++) {
+      for (let i = 0; i < pts.length; i++) {
+        let best = 0, bd = Infinity;
+        for (let c = 0; c < k; c++) { const dx = pts[i][0] - cents[c][0], dy = pts[i][1] - cents[c][1]; const d = dx * dx + dy * dy; if (d < bd) { bd = d; best = c; } }
+        labels[i] = best;
+      }
+      const acc = Array.from({ length: k }, () => [0, 0, 0]);
+      for (let i = 0; i < pts.length; i++) { const c = labels[i]; acc[c][0] += pts[i][0]; acc[c][1] += pts[i][1]; acc[c][2]++; }
+      for (let c = 0; c < k; c++) { if (acc[c][2]) { cents[c][0] = acc[c][0] / acc[c][2]; cents[c][1] = acc[c][1] / acc[c][2]; } }
+    }
+    return labels;
   }
 
   private falhaTreino(e: any): void {
@@ -191,7 +261,8 @@ export class TreineRoboComponent implements OnInit {
 
   recomecar(): void {
     this.datasetId = null; this.senses = null; this.brainId = null; this.fase = 'build';
-    this.score = 0; this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null; this.vizs = [];
+    this.score = 0; this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
+    this.scatterPontos = []; this.scatterLinha = null;
     this.showMistakes = false; this.showCode = false; this.erro = ''; this.coleta = null;
   }
 
@@ -284,27 +355,6 @@ export class TreineRoboComponent implements OnInit {
   get maeFmt(): string { return this.mae == null ? '—' : (Math.abs(this.mae) >= 100 ? Math.round(this.mae).toString() : this.mae.toFixed(1)); }
   // agrupamento: quantos grupinhos
   get nGrupos(): number { return (this.cerebro?.hiper?.['n_clusters'] as number) || 0; }
-
-  // visualização REAL do modelo (do backend) — descreve de fato a tarefa.
-  imgViz(v: any): string { return v ? `data:${v.mime};base64,${v.base64}` : ''; }
-  private vizPorTitulo(...frags: string[]): any {
-    for (const f of frags) {
-      const v = this.vizs.find(x => (x?.titulo || '').toLowerCase().includes(f));
-      if (v) return v;
-    }
-    return this.vizs[0] || null;
-  }
-  get vizPrincipal(): any {
-    if (!this.vizs?.length) return null;
-    if (this.tarefa === 'regressao') return this.vizPorTitulo('prediction error', 'residual');
-    if (this.tarefa === 'agrupamento') return this.vizPorTitulo('distância entre', 'distancia entre', 'silhouette');
-    return this.vizs[0];
-  }
-  get vizLegenda(): string {
-    if (this.tarefa === 'regressao') return 'Cada pontinho é um exemplo. Quanto mais perto da linha, mais o robô acertou o número.';
-    if (this.tarefa === 'agrupamento') return 'Cada bolha é um grupinho que o robô formou. Mais separadas = separação melhor!';
-    return '';
-  }
 
   // ---------- código (blocos + python por tarefa) ----------
   get scratchBlocks() {

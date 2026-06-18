@@ -184,17 +184,28 @@
               </div>
               <div class="respostas-rodape">✓ = acertou. Ninguém acerta tudo de primeira — é assim que se aprende! 💪</div>
             </ng-container>
-            <!-- regressão: figura real (previsto × real) -->
+            <!-- regressão: pontos reais + a linha do padrão -->
             <ng-container *ngIf="tarefa==='regressao'">
-              <div class="respostas-tit">Como o {{ robotName }} chutou os números:</div>
-              <div class="viz-card" *ngIf="vizPrincipal"><img [src]="imgViz(vizPrincipal)" [alt]="vizPrincipal.titulo" loading="lazy"></div>
-              <div class="respostas-rodape">{{ vizLegenda }} Erra por <b>~{{ maeFmt }}</b> em média. 💪</div>
+              <div class="respostas-tit">O padrão que o {{ robotName }} achou:</div>
+              <div class="scatter-card" *ngIf="scatterPontos.length">
+                <svg [attr.viewBox]="'0 0 ' + SVG_W + ' ' + SVG_H" class="scatter" preserveAspectRatio="xMidYMid meet">
+                  <line *ngIf="scatterLinha" [attr.x1]="scatterLinha.x1" [attr.y1]="scatterLinha.y1" [attr.x2]="scatterLinha.x2" [attr.y2]="scatterLinha.y2" stroke="#7C3AED" stroke-width="4" stroke-linecap="round"></line>
+                  <circle *ngFor="let p of scatterPontos" [attr.cx]="p.cx" [attr.cy]="p.cy" r="6" [attr.fill]="p.cor" opacity="0.85"></circle>
+                </svg>
+                <div class="scatter-legenda">cada 🔵 é um exemplo · a linha roxa é o padrão</div>
+              </div>
+              <div class="respostas-rodape">Quando um sobe, o outro acompanha — o robô achou esse padrão! Erra por <b>~{{ maeFmt }}</b> em média. 💪</div>
             </ng-container>
-            <!-- agrupamento: figura real (grupos formados) -->
+            <!-- agrupamento: pontos reais coloridos por grupinho -->
             <ng-container *ngIf="tarefa==='agrupamento'">
-              <div class="respostas-tit">Como o {{ robotName }} separou os grupinhos:</div>
-              <div class="viz-card" *ngIf="vizPrincipal"><img [src]="imgViz(vizPrincipal)" [alt]="vizPrincipal.titulo" loading="lazy"></div>
-              <div class="respostas-rodape">{{ vizLegenda }} Separou em <b>{{ nGrupos }}</b> grupinhos. ✨</div>
+              <div class="respostas-tit">Os {{ nGrupos }} grupinhos do {{ robotName }}:</div>
+              <div class="scatter-card" *ngIf="scatterPontos.length">
+                <svg [attr.viewBox]="'0 0 ' + SVG_W + ' ' + SVG_H" class="scatter" preserveAspectRatio="xMidYMid meet">
+                  <circle *ngFor="let p of scatterPontos" [attr.cx]="p.cx" [attr.cy]="p.cy" r="6.5" [attr.fill]="p.cor" opacity="0.85"></circle>
+                </svg>
+                <div class="scatter-legenda">cada cor é um grupinho de pontos parecidos</div>
+              </div>
+              <div class="respostas-rodape">O robô juntou os pontinhos parecidos! Qualidade da separação: <b>{{ pct }}%</b>. ✨</div>
             </ng-container>
           </div>
 
