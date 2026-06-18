@@ -69,6 +69,15 @@
 .opcao-dica { font-size: 12px; color: #8B7BA8; font-weight: 600; margin-top: 1px; }
 .opcao-seta { font-size: 24px; color: var(--cor); font-weight: 800; flex-shrink: 0; }
 
+/* grupos de missão (por tipo de tarefa) */
+.grupo { display: flex; flex-direction: column; gap: 9px; }
+.grupo + .grupo { margin-top: 12px; }
+.grupo-tit { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 11px; color: #9B7FCB; text-transform: uppercase; letter-spacing: .5px; margin: 2px 2px -2px; }
+
+/* card de detalhe (regressão/agrupamento) */
+.resp-card { background: #FBF7FF; border: 2px solid #EADCFF; border-radius: 14px; padding: 14px 16px; font-size: 14px; color: #4C1D95; font-weight: 600; line-height: 1.5;
+  b { color: #7C3AED; } }
+
 /* treinar */
 .btn-train { width: 100%; padding: 20px; background: linear-gradient(135deg, #22C55E, #16A34A); color: #fff; border: none; border-radius: 22px; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 22px; cursor: pointer; box-shadow: 0 8px 26px rgba(34,197,94,.4); transition: all .14s;
   &:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 32px rgba(34,197,94,.5); }

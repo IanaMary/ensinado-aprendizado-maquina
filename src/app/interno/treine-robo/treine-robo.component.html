@@ -110,14 +110,17 @@
 
         <!-- OPÇÕES -->
         <div class="opcoes" *ngIf="showOptions">
-          <!-- missão (datasets) -->
+          <!-- missão (datasets agrupados por tipo de tarefa) -->
           <ng-container *ngIf="step==='mission'">
-            <button class="opcao" *ngFor="let d of DATASETS" [style.--cor]="d.cor"
-                    [disabled]="carregandoDados" (click)="escolherDataset(d)">
-              <div class="opcao-emoji">{{ d.emoji }}</div>
-              <div class="opcao-txt"><div class="opcao-nome">{{ d.nome }}</div><div class="opcao-dica">{{ d.dica }}</div></div>
-              <div class="opcao-seta">{{ carregandoDados ? '⏳' : '›' }}</div>
-            </button>
+            <div class="grupo" *ngFor="let g of GRUPOS">
+              <div class="grupo-tit">{{ g.emoji }} {{ g.titulo }}</div>
+              <button class="opcao" *ngFor="let d of g.datasets" [style.--cor]="d.cor"
+                      [disabled]="carregandoDados" (click)="escolherDataset(d)">
+                <div class="opcao-emoji">{{ d.emoji }}</div>
+                <div class="opcao-txt"><div class="opcao-nome">{{ d.nome }}</div><div class="opcao-dica">{{ d.dica }}</div></div>
+                <div class="opcao-seta">{{ carregandoDados ? '⏳' : '›' }}</div>
+              </button>
+            </div>
           </ng-container>
           <!-- sentidos -->
           <ng-container *ngIf="step==='senses'">
@@ -127,9 +130,9 @@
               <div class="opcao-seta">›</div>
             </button>
           </ng-container>
-          <!-- cérebro -->
+          <!-- cérebro (depende da tarefa) -->
           <ng-container *ngIf="step==='brain'">
-            <button class="opcao" *ngFor="let c of CEREBROS" [style.--cor]="c.cor" (click)="escolherCerebro(c)">
+            <button class="opcao" *ngFor="let c of cerebrosDisponiveis" [style.--cor]="c.cor" (click)="escolherCerebro(c)">
               <div class="opcao-emoji">{{ c.emoji }}</div>
               <div class="opcao-txt"><div class="opcao-nome">{{ c.nome }}</div><div class="opcao-dica">{{ c.dica }}</div></div>
               <div class="opcao-seta">›</div>
@@ -154,11 +157,11 @@
           <div class="placar">
             <div class="estrelas"><span *ngFor="let s of stars" class="estrela">{{ s }}</span></div>
             <div class="placar-pct">{{ pct }}%</div>
-            <div class="placar-cap">de acerto</div>
+            <div class="placar-cap">{{ scoreCap }}</div>
             <div class="placar-msg">{{ scoreMsg }}</div>
 
             <div class="placar-acoes">
-              <button class="btn-soft" (click)="toggleMistakes()">🔍 {{ showMistakes ? 'Esconder respostas' : 'Ver o que ele respondeu' }}</button>
+              <button class="btn-soft" (click)="toggleMistakes()">🔍 {{ showMistakes ? 'Esconder detalhes' : 'Ver os detalhes' }}</button>
               <div class="acoes-row">
                 <button class="btn-again" (click)="treinar()">🔄 De novo</button>
                 <button class="btn-nova" (click)="recomecar()">✨ Nova</button>
@@ -166,18 +169,33 @@
             </div>
           </div>
 
-          <!-- o que ele respondeu (matriz real) -->
-          <div class="respostas" *ngIf="showMistakes && linhasMatriz.length">
-            <div class="respostas-tit">Olha como o {{ robotName }} se saiu:</div>
-            <div class="resp-linha" *ngFor="let l of linhasMatriz">
-              <div class="resp-classe">{{ l.classe }}</div>
-              <div class="resp-barra">
-                <div class="resp-certo" [style.flex]="l.certo"></div>
-                <div class="resp-errado" [style.flex]="l.errado"></div>
+          <!-- detalhes do resultado (adaptado ao tipo de tarefa) -->
+          <div class="respostas" *ngIf="showMistakes">
+            <!-- classificação: o que ele respondeu (matriz real) -->
+            <ng-container *ngIf="tarefa==='classificacao' && linhasMatriz.length">
+              <div class="respostas-tit">Olha como o {{ robotName }} se saiu:</div>
+              <div class="resp-linha" *ngFor="let l of linhasMatriz">
+                <div class="resp-classe">{{ l.classe }}</div>
+                <div class="resp-barra">
+                  <div class="resp-certo" [style.flex]="l.certo"></div>
+                  <div class="resp-errado" [style.flex]="l.errado"></div>
+                </div>
+                <div class="resp-num"><b>{{ l.certo }}</b>/{{ l.total }} ✓</div>
               </div>
-              <div class="resp-num"><b>{{ l.certo }}</b>/{{ l.total }} ✓</div>
-            </div>
-            <div class="respostas-rodape">✓ = acertou. Ninguém acerta tudo de primeira — é assim que se aprende! 💪</div>
+              <div class="respostas-rodape">✓ = acertou. Ninguém acerta tudo de primeira — é assim que se aprende! 💪</div>
+            </ng-container>
+            <!-- regressão: erro médio amigável -->
+            <ng-container *ngIf="tarefa==='regressao'">
+              <div class="respostas-tit">O quanto o {{ robotName }} errou:</div>
+              <div class="resp-card">📉 Em média, ele erra por <b>~{{ maeFmt }}</b> pra mais ou pra menos. Quanto menor, melhor!</div>
+              <div class="respostas-rodape">Acertar o número exato é quase impossível — o robô chega pertinho! 💪</div>
+            </ng-container>
+            <!-- agrupamento: quantos grupinhos + qualidade -->
+            <ng-container *ngIf="tarefa==='agrupamento'">
+              <div class="respostas-tit">Como o {{ robotName }} separou:</div>
+              <div class="resp-card">🧩 Ele separou tudo em <b>{{ nGrupos }} grupinhos</b>. Qualidade da separação: <b>{{ pct }}%</b>.</div>
+              <div class="respostas-rodape">Quanto mais "redondinhos" e separados os grupos, melhor! ✨</div>
+            </ng-container>
           </div>
 
           <!-- espiar o código -->

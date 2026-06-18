@@ -7,15 +7,17 @@ import { DashboardService } from '../../dashboard/services/dashboard.service';
 
 type Fase = 'build' | 'training' | 'done';
 type Sentido = 'sharp' | 'skip';
+type Tarefa = 'classificacao' | 'regressao' | 'agrupamento';
 
-interface DatasetLudico { id: string; toy: string; emoji: string; nome: string; dica: string; cor: string; sk: string; }
-interface CerebroLudico { id: string; valor: string; emoji: string; nome: string; dica: string; cor: string; sk: string; }
+interface DatasetLudico { id: string; toy: string; emoji: string; nome: string; dica: string; cor: string; sk: string; tipo: Tarefa; }
+interface CerebroLudico { id: string; valor: string; emoji: string; nome: string; dica: string; cor: string; sk: string; hiper?: Record<string, any>; }
 
 /**
- * "Treine seu Robô" — porta de entrada lúdica (ensino fundamental). Um assistente
- * guiado (Missão → Sentidos → Cérebro → Treinar) com mascote robô. O TREINO É REAL:
- * reusa o backend (carregarToyDataset → classificadorTreino → postMetricas). Fase A:
- * só missões de classificação (acurácia + matriz de confusão de verdade).
+ * "Treine seu Robô" — porta de entrada lúdica (ensino fundamental). Wizard guiado
+ * (Missão → Sentidos → Cérebro → Treinar) com mascote robô. TREINO REAL via backend.
+ * Cobre três tipos de tarefa: classificação (acertar a categoria), regressão
+ * (adivinhar um número) e agrupamento (separar em grupinhos) — o wizard se adapta
+ * ao tipo do dataset escolhido.
  */
 @Component({
   selector: 'app-treine-robo',
@@ -28,16 +30,50 @@ export class TreineRoboComponent implements OnInit {
   robotName = 'Léo';
   acc = '#7C3AED';
 
-  DATASETS: DatasetLudico[] = [
-    { id: 'flores', toy: 'iris', emoji: '🌸', nome: 'Flores', dica: 'reconhecer 3 tipos de flor', cor: '#EC4899', sk: 'load_iris()' },
-    { id: 'bebidas', toy: 'wine', emoji: '🍷', nome: 'Bebidas', dica: 'descobrir o tipo da bebida', cor: '#A855F7', sk: 'load_wine()' },
-    { id: 'exames', toy: 'breast_cancer', emoji: '🩺', nome: 'Exames', dica: 'separar exames em dois grupos', cor: '#38BDF8', sk: 'load_breast_cancer()' },
+  // missões agrupadas por tipo de tarefa
+  GRUPOS: { tarefa: Tarefa; titulo: string; emoji: string; datasets: DatasetLudico[] }[] = [
+    {
+      tarefa: 'classificacao', titulo: 'Adivinhar a categoria', emoji: '🎯',
+      datasets: [
+        { id: 'flores', toy: 'iris', emoji: '🌸', nome: 'Flores', dica: 'reconhecer 3 tipos de flor', cor: '#EC4899', sk: 'load_iris()', tipo: 'classificacao' },
+        { id: 'bebidas', toy: 'wine', emoji: '🍷', nome: 'Bebidas', dica: 'descobrir o tipo da bebida', cor: '#A855F7', sk: 'load_wine()', tipo: 'classificacao' },
+        { id: 'exames', toy: 'breast_cancer', emoji: '🩺', nome: 'Exames', dica: 'separar exames em dois grupos', cor: '#38BDF8', sk: 'load_breast_cancer()', tipo: 'classificacao' },
+      ],
+    },
+    {
+      tarefa: 'regressao', titulo: 'Adivinhar um número', emoji: '🔢',
+      datasets: [
+        { id: 'sorvete', toy: 'gen_sorvete', emoji: '🍦', nome: 'Sorvetes', dica: 'quantos sorvetes vão vender?', cor: '#F97316', sk: 'load_sorvete()', tipo: 'regressao' },
+        { id: 'crescimento', toy: 'gen_regression', emoji: '📈', nome: 'Crescimento', dica: 'prever um valor que sobe e desce', cor: '#0EA5E9', sk: 'make_regression()', tipo: 'regressao' },
+      ],
+    },
+    {
+      tarefa: 'agrupamento', titulo: 'Separar em grupinhos', emoji: '🧩',
+      datasets: [
+        { id: 'cardume', toy: 'gen_cardume', emoji: '🐠', nome: 'Cardume', dica: 'juntar peixinhos parecidos', cor: '#14B8A6', sk: 'load_cardume()', tipo: 'agrupamento' },
+        { id: 'baloes', toy: 'gen_blobs', emoji: '🎈', nome: 'Balões', dica: 'achar nuvens de pontos', cor: '#8B5CF6', sk: 'make_blobs()', tipo: 'agrupamento' },
+      ],
+    },
   ];
-  CEREBROS: CerebroLudico[] = [
-    { id: 'floresta', valor: 'random_forest', emoji: '🌳', nome: 'Floresta Mágica', dica: 'muitas arvorezinhas votam juntas', cor: '#22C55E', sk: 'RandomForestClassifier()' },
-    { id: 'arvore', valor: 'arvore_decisao', emoji: '🌲', nome: 'Árvore de Perguntas', dica: 'faz perguntas sim/não até decidir', cor: '#14B8A6', sk: 'DecisionTreeClassifier()' },
-    { id: 'vizinhos', valor: 'knn', emoji: '👯', nome: 'Os Vizinhos', dica: 'olha quem é mais parecido', cor: '#F59E0B', sk: 'KNeighborsClassifier()' },
-  ];
+
+  // cérebros (modelos) por tipo de tarefa
+  CEREBROS: Record<Tarefa, CerebroLudico[]> = {
+    classificacao: [
+      { id: 'floresta', valor: 'random_forest', emoji: '🌳', nome: 'Floresta Mágica', dica: 'muitas arvorezinhas votam juntas', cor: '#22C55E', sk: 'RandomForestClassifier()' },
+      { id: 'arvore', valor: 'arvore_decisao', emoji: '🌲', nome: 'Árvore de Perguntas', dica: 'faz perguntas sim/não até decidir', cor: '#14B8A6', sk: 'DecisionTreeClassifier()' },
+      { id: 'vizinhos', valor: 'knn', emoji: '👯', nome: 'Os Vizinhos', dica: 'olha quem é mais parecido', cor: '#F59E0B', sk: 'KNeighborsClassifier()' },
+    ],
+    regressao: [
+      { id: 'reta', valor: 'regressao_linear', emoji: '📏', nome: 'Reta Mágica', dica: 'traça uma linha pelo meio dos pontos', cor: '#3B82F6', sk: 'LinearRegression()' },
+      { id: 'vizinhos_r', valor: 'knn_regressor', emoji: '👯', nome: 'Os Vizinhos', dica: 'olha os pontos mais perto', cor: '#F59E0B', sk: 'KNeighborsRegressor()' },
+      { id: 'firme', valor: 'ridge', emoji: '🛡️', nome: 'Reta Firme', dica: 'uma reta que não exagera', cor: '#14B8A6', sk: 'Ridge()' },
+    ],
+    agrupamento: [
+      { id: 'g2', valor: 'k_means', emoji: '✌️', nome: '2 grupinhos', dica: 'separar em 2 turminhas', cor: '#22C55E', sk: 'KMeans(n_clusters=2)', hiper: { n_clusters: 2 } },
+      { id: 'g3', valor: 'k_means', emoji: '🖐️', nome: '3 grupinhos', dica: 'separar em 3 turminhas', cor: '#A855F7', sk: 'KMeans(n_clusters=3)', hiper: { n_clusters: 3 } },
+      { id: 'g4', valor: 'k_means', emoji: '✋', nome: '4 grupinhos', dica: 'separar em 4 turminhas', cor: '#F59E0B', sk: 'KMeans(n_clusters=4)', hiper: { n_clusters: 4 } },
+    ],
+  };
 
   // estado do wizard
   datasetId: string | null = null;
@@ -50,10 +86,13 @@ export class TreineRoboComponent implements OnInit {
   showCode = false;
 
   // dados/resultados reais
-  coleta: any = null;          // resposta de carregarToyDataset
-  modelosCat: any[] = [];      // catálogo de modelos (valor → id)
-  score = 0;                   // acurácia (0..1)
-  matriz: { matriz: number[][]; classes: string[]; total: number } | null = null;
+  coleta: any = null;
+  modelosCat: any[] = [];
+  score = 0;                   // 0..1 (define as estrelas)
+  matriz: { matriz: number[][]; classes: string[]; total: number } | null = null;  // classificação
+  r2: number | null = null;    // regressão
+  mae: number | null = null;   // regressão
+  silhouette: number | null = null; // agrupamento
 
   constructor(private dashboard: DashboardService, private router: Router) {}
 
@@ -66,8 +105,12 @@ export class TreineRoboComponent implements OnInit {
 
   voltarInicio(): void { this.router.navigate(['/inicio']); }
 
-  get dataset(): DatasetLudico | null { return this.DATASETS.find(d => d.id === this.datasetId) || null; }
-  get cerebro(): CerebroLudico | null { return this.CEREBROS.find(c => c.id === this.brainId) || null; }
+  // ---------- helpers de catálogo ----------
+  get todosDatasets(): DatasetLudico[] { return this.GRUPOS.flatMap(g => g.datasets); }
+  get dataset(): DatasetLudico | null { return this.todosDatasets.find(d => d.id === this.datasetId) || null; }
+  get tarefa(): Tarefa | null { return this.dataset?.tipo || null; }
+  get cerebrosDisponiveis(): CerebroLudico[] { return this.tarefa ? this.CEREBROS[this.tarefa] : []; }
+  get cerebro(): CerebroLudico | null { return this.cerebrosDisponiveis.find(c => c.id === this.brainId) || null; }
 
   get step(): 'mission' | 'senses' | 'brain' | 'ready' {
     if (!this.datasetId) return 'mission';
@@ -94,12 +137,13 @@ export class TreineRoboComponent implements OnInit {
     const modeloItem = this.modelosCat.find(m => m.valor === this.cerebro!.valor);
     if (!modeloItem) { this.erro = 'Esse cérebro não está disponível agora. 🙈'; return; }
     this.fase = 'training'; this.showMistakes = false; this.showCode = false; this.erro = '';
+    this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
     const body = {
       tipo_arquivo: 'xlsx',
       arquivo_id: this.coleta.id_coleta,
       configuracao_id: this.coleta.id_configuracoes_treinamento,
       modelo_id: modeloItem.id,
-      hiperparametros: {},
+      hiperparametros: this.cerebro.hiper || {},
       pre_processamento: this.senses === 'sharp' ? [{ valor: 'minmax_scaler' }] : [],
     };
     this.dashboard.classificadorTreino(this.cerebro.valor, body).subscribe({
@@ -109,23 +153,33 @@ export class TreineRoboComponent implements OnInit {
   }
 
   private avaliar(treino: any): void {
-    const body = {
-      modelos: [{ id: treino.id, label: treino.nome_modelo }],
-      metricas: [
-        { valor: 'accuracy_score', label: 'acuracia', average: 'weighted' },
-        { valor: 'confusion_matrix', label: 'matriz' },
-      ],
-    };
+    const t = this.tarefa;
+    const metricas =
+      t === 'regressao' ? [{ valor: 'r2_score', label: 'r2' }, { valor: 'mean_absolute_error', label: 'mae' }]
+      : t === 'agrupamento' ? [{ valor: 'silhouette_score', label: 'sil' }]
+      : [{ valor: 'accuracy_score', label: 'acuracia', average: 'weighted' }, { valor: 'confusion_matrix', label: 'matriz' }];
+    const body = { modelos: [{ id: treino.id, label: treino.nome_modelo }], metricas };
     this.dashboard.postMetricas(body).subscribe({
-      next: (aval: any) => {
-        const acc = aval?.['acuracia']?.[treino.nome_modelo];
-        this.score = typeof acc === 'number' ? acc : 0;
-        const mz = aval?.['matriz']?.[treino.nome_modelo];
-        this.matriz = mz && Array.isArray(mz.matriz) ? mz : null;
-        this.fase = 'done';
-      },
+      next: (aval: any) => { this.parseResultado(aval, treino.nome_modelo); this.fase = 'done'; },
       error: (e) => this.falhaTreino(e),
     });
+  }
+
+  private parseResultado(aval: any, nome: string): void {
+    const num = (v: any) => (typeof v === 'number' && isFinite(v) ? v : null);
+    if (this.tarefa === 'regressao') {
+      this.r2 = num(aval?.['r2']?.[nome]);
+      this.mae = num(aval?.['mae']?.[nome]);
+      this.score = Math.max(0, Math.min(1, this.r2 ?? 0));
+    } else if (this.tarefa === 'agrupamento') {
+      this.silhouette = num(aval?.['sil']?.[nome]);
+      this.score = Math.max(0, Math.min(1, ((this.silhouette ?? 0) + 1) / 2));
+    } else {
+      const acc = num(aval?.['acuracia']?.[nome]);
+      this.score = acc ?? 0;
+      const mz = aval?.['matriz']?.[nome];
+      this.matriz = mz && Array.isArray(mz.matriz) ? mz : null;
+    }
   }
 
   private falhaTreino(e: any): void {
@@ -135,7 +189,8 @@ export class TreineRoboComponent implements OnInit {
 
   recomecar(): void {
     this.datasetId = null; this.senses = null; this.brainId = null; this.fase = 'build';
-    this.score = 0; this.matriz = null; this.showMistakes = false; this.showCode = false; this.erro = ''; this.coleta = null;
+    this.score = 0; this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
+    this.showMistakes = false; this.showCode = false; this.erro = ''; this.coleta = null;
   }
 
   // ---------- humor / mascote ----------
@@ -167,9 +222,14 @@ export class TreineRoboComponent implements OnInit {
   get pct(): number { return Math.round(this.score * 100); }
   get nStars(): number { return Math.max(1, Math.round(this.score * 5)); }
   get stars(): string[] { return [0, 1, 2, 3, 4].map(i => (i < this.nStars ? '⭐' : '☆')); }
+  get scoreCap(): string {
+    return this.tarefa === 'regressao' ? 'de acerto no padrão'
+      : this.tarefa === 'agrupamento' ? 'de qualidade na separação'
+      : 'de acerto';
+  }
   get scoreMsg(): string {
     const p = this.pct, n = this.robotName;
-    return p >= 92 ? `Uau! O ${n} ficou craque! 🏆` : p >= 82 ? `Muito bem! O ${n} aprendeu bastante! 🎉` : `Boa! Dá pra treinar mais e melhorar! 💪`;
+    return p >= 90 ? `Uau! O ${n} ficou craque! 🏆` : p >= 75 ? `Muito bem! O ${n} aprendeu bastante! 🎉` : `Boa! Dá pra treinar mais e melhorar! 💪`;
   }
 
   // ---------- falas ----------
@@ -181,7 +241,10 @@ export class TreineRoboComponent implements OnInit {
     switch (this.step) {
       case 'mission': return `Oi! Eu sou o robô ${n} 🤖 O que você quer me ensinar?`;
       case 'senses': return 'Boa escolha! Quer afinar meus sentidos antes?';
-      case 'brain': return 'Agora escolhe meu cérebro! Como eu devo pensar?';
+      case 'brain':
+        return this.tarefa === 'agrupamento' ? 'Em quantos grupinhos eu separo?'
+          : this.tarefa === 'regressao' ? 'Como eu vou adivinhar o número?'
+          : 'Agora escolhe meu cérebro! Como eu devo pensar?';
       default: return 'Tô prontíssimo pra aprender! 🎉';
     }
   }
@@ -190,7 +253,7 @@ export class TreineRoboComponent implements OnInit {
     switch (this.step) {
       case 'mission': return 'Toque numa missão pra começar a aventura!';
       case 'senses': return 'Isso deixa tudo na mesma medida pra eu enxergar melhor (os robôs gostam disso!).';
-      case 'brain': return 'Cada cérebro aprende de um jeito diferente. Pode experimentar!';
+      case 'brain': return 'Cada jeito aprende diferente. Pode experimentar!';
       default: return '';
     }
   }
@@ -203,7 +266,8 @@ export class TreineRoboComponent implements OnInit {
     ];
   }
 
-  // ---------- "o que ele respondeu" (matriz de confusão real) ----------
+  // ---------- resultado adaptado por tarefa ----------
+  // classificação: "o que ele respondeu" a partir da matriz de confusão real
   get linhasMatriz() {
     if (!this.matriz) return [];
     const { matriz, classes } = this.matriz;
@@ -211,33 +275,53 @@ export class TreineRoboComponent implements OnInit {
       const linha = matriz[i] || [];
       const total = linha.reduce((a, b) => a + b, 0);
       const certo = linha[i] || 0;
-      const confusoes = classes
-        .map((cj, j) => ({ classe: cj, n: linha[j] || 0 }))
-        .filter((x, j) => j !== i && x.n > 0);
-      return { classe: c, total, certo, errado: total - certo, confusoes };
+      return { classe: c, total, certo, errado: total - certo };
     });
   }
+  // regressão: erro médio amigável
+  get maeFmt(): string { return this.mae == null ? '—' : (Math.abs(this.mae) >= 100 ? Math.round(this.mae).toString() : this.mae.toFixed(1)); }
+  // agrupamento: quantos grupinhos
+  get nGrupos(): number { return (this.cerebro?.hiper?.['n_clusters'] as number) || 0; }
 
-  // ---------- código (blocos + python simplificado) ----------
+  // ---------- código (blocos + python por tarefa) ----------
   get scratchBlocks() {
     const d = this.dataset, c = this.cerebro;
     if (this.fase !== 'done' || !d || !c) return [];
     const b: any[] = [{ emoji: d.emoji, text: 'usar dados de ' + d.nome, cor: '#4C97FF' }];
     if (this.senses === 'sharp') b.push({ emoji: '📏', text: 'deixar na mesma medida', cor: '#9966FF' });
-    b.push({ emoji: c.emoji, text: 'treinar ' + c.nome, cor: '#59C059' });
-    b.push({ emoji: '🎯', text: 'mostrar o acerto', cor: '#FF8C1A' });
+    if (this.tarefa === 'agrupamento') {
+      b.push({ emoji: c.emoji, text: 'separar em ' + this.nGrupos + ' grupinhos', cor: '#59C059' });
+      b.push({ emoji: '✨', text: 'mostrar a qualidade', cor: '#FF8C1A' });
+    } else if (this.tarefa === 'regressao') {
+      b.push({ emoji: c.emoji, text: 'treinar ' + c.nome, cor: '#59C059' });
+      b.push({ emoji: '🎯', text: 'ver o quão perto chegou', cor: '#FF8C1A' });
+    } else {
+      b.push({ emoji: c.emoji, text: 'treinar ' + c.nome, cor: '#59C059' });
+      b.push({ emoji: '🎯', text: 'mostrar o acerto', cor: '#FF8C1A' });
+    }
     return b;
   }
   get codeLines(): string[] {
     const d = this.dataset, c = this.cerebro;
     if (this.fase !== 'done' || !d || !c) return [];
+    const escala = this.senses === 'sharp' ? 'X = MinMaxScaler().fit_transform(X)' : '# (sem ajustar a escala)';
+    if (this.tarefa === 'agrupamento') {
+      return [
+        'from sklearn import *',
+        'X = ' + d.sk,
+        escala,
+        'modelo = ' + c.sk,
+        'modelo.fit(X)   # separar!',
+        'print(silhouette_score(X, modelo.labels_))',
+      ];
+    }
     return [
       'from sklearn import *',
       'X, y = ' + d.sk,
-      this.senses === 'sharp' ? 'X = MinMaxScaler().fit_transform(X)' : '# (sem ajustar a escala)',
+      escala,
       'modelo = ' + c.sk,
       'modelo.fit(X, y)   # treinar!',
-      'print(modelo.score(X, y))',
+      this.tarefa === 'regressao' ? 'print(r2_score(y, modelo.predict(X)))' : 'print(modelo.score(X, y))',
     ];
   }
 
