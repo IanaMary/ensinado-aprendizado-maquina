@@ -104,20 +104,23 @@
     <div class="yellowbrick-tipo" *ngFor="let grupo of getVisualizacoesPorTipo()">
       <h4>{{ grupo.titulo }}</h4>
       <div class="yellowbrick-grid">
-        <figure class="yellowbrick-card" *ngFor="let item of grupo.itens"
-          (click)="abrirZoomVisualizacao(item.visualizacao, item.modelo)"
-          [matTooltip]="'Ampliar — ' + item.modelo"
-          matTooltipPosition="above">
+        <figure class="yellowbrick-card" *ngFor="let item of grupo.itens">
           <figcaption>
             <span class="yellowbrick-modelo">{{ item.modelo }}</span>
             <span class="yellowbrick-acoes">
-              <a class="yellowbrick-doc-link" [href]="getLinkVisualizacao(grupo.titulo)" target="_blank" rel="noopener"
+              <button type="button" class="yellowbrick-acao"
+                [matTooltip]="'Ampliar — ' + item.modelo" matTooltipPosition="above"
+                [attr.aria-label]="'Ampliar ' + grupo.titulo"
+                (click)="$event.stopPropagation(); abrirZoomVisualizacao(item.visualizacao, item.modelo)">
+                <mat-icon class="btn-info">zoom_in</mat-icon>
+              </button>
+              <a class="yellowbrick-acao" [href]="getLinkVisualizacao(grupo.titulo)" target="_blank" rel="noopener"
                 (click)="$event.stopPropagation()"
                 [matTooltip]="'Abrir documentação de ' + grupo.titulo" matTooltipPosition="above"
                 [attr.aria-label]="'Documentação de ' + grupo.titulo">
                 <mat-icon class="btn-info">open_in_new</mat-icon>
               </a>
-              <button type="button" class="yellowbrick-info-button"
+              <button type="button" class="yellowbrick-acao"
                 [attr.aria-label]="'Ler dica sobre ' + grupo.titulo"
                 [matTooltip]="'Ler dica sobre ' + grupo.titulo"
                 matTooltipPosition="above"
@@ -126,7 +129,6 @@
               </button>
             </span>
           </figcaption>
-          <mat-icon class="zoom-icon">zoom_in</mat-icon>
           <img [src]="getImagemVisualizacao(item.visualizacao)" [alt]="grupo.titulo + ' — ' + item.modelo" />
         </figure>
       </div>

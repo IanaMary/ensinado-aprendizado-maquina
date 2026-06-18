@@ -304,13 +304,13 @@
   border-radius: 8px;
   padding: 10px;
   background: $cinza-claro;
-  cursor: zoom-in;
-  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  // o card não é mais clicável por inteiro (o zoom é um botão dedicado no cluster);
+  // sem cursor zoom-in para não sugerir/ interceptar clique sobre os botões.
+  transition: border-color 0.15s, box-shadow 0.15s;
 
   &:hover {
     border-color: $roxo-medio;
     box-shadow: 0 4px 14px rgba($roxo-escuro, 0.16);
-    transform: translateY(-1px);
   }
 
   figcaption {
@@ -319,9 +319,6 @@
     justify-content: space-between;
     gap: 8px;
     margin-bottom: 8px;
-    // libera o canto superior direito para o ícone de zoom, evitando que ele
-    // fique por cima do cluster de ações (doc + dica).
-    padding-right: 28px;
     color: $roxo-escuro;
     font-size: 12px;
     font-weight: 700;
@@ -335,17 +332,15 @@
     }
   }
 
-  // cluster agrupado das ações do gráfico (documentação + dica)
+  // cluster compacto das ações do gráfico (zoom + documentação + dica)
   .yellowbrick-acoes {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
+    gap: 1px;
     flex-shrink: 0;
-    padding: 2px;
-    border-radius: 8px;
-    background: rgba($roxo-medio, 0.08);
-    position: relative;   // fica acima do .zoom-icon (que é só decorativo)
-    z-index: 3;
+    padding: 1px;
+    border-radius: 7px;
+    background: rgba($roxo-medio, 0.06);
   }
 
   img {
@@ -356,53 +351,34 @@
     border-radius: 4px;
     background: $branco;
   }
-
-  .zoom-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 22px;
-    height: 22px;
-    padding: 3px;
-    border-radius: 50%;
-    background: rgba($branco, 0.95);
-    color: $roxo-escuro;
-    font-size: 16px;
-    box-shadow: 0 1px 5px rgba($preto, 0.18);
-    // dica visual apenas: o card inteiro abre o zoom. Não deve capturar cliques,
-    // senão bloqueia os ícones de ação do header.
-    pointer-events: none;
-  }
 }
 
-// Doc-link e botão de dica: caixas flex idênticas (alinhadas e com alvo de clique
-// confortável). O botão de dica é um <button> simples (não mat-icon-button) para
-// não herdar o alvo de 40px do Material que desalinhava o ícone.
-.yellowbrick-doc-link,
-.yellowbrick-info-button {
+// Botões de ação do gráfico (zoom, documentação, dica): caixas flex compactas e
+// idênticas. <button> simples (não mat-icon-button, que traria alvo de 40px).
+.yellowbrick-acao {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 22px;
+  height: 22px;
   padding: 0;
   border: none;
-  border-radius: 6px;
+  border-radius: 5px;
   background: transparent;
   color: $roxo-medio;
   text-decoration: none;
   cursor: pointer;
 
   .btn-info {
-    width: 18px;
-    height: 18px;
-    font-size: 18px;
-    line-height: 18px;
+    width: 15px;
+    height: 15px;
+    font-size: 15px;
+    line-height: 15px;
   }
 
   &:hover {
-    background: rgba($roxo-medio, 0.16);
+    background: rgba($roxo-medio, 0.18);
     color: $roxo-escuro;
   }
 }
