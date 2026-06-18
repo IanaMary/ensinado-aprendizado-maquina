@@ -32,7 +32,13 @@ export class AuthGuard implements CanLoad {
     const permitidas = ROTAS_POR_PAPEL[role]
       ?? ([roleMap[role]?.replace(/^\//, '')].filter(Boolean) as string[]);
 
-    if (firstSegment && permitidas.length && !permitidas.includes(firstSegment)) {
+    // Papel sem rotas conhecidas (ausente/inválido) → nega, mesmo autenticado.
+    if (!permitidas.length) {
+      this.router.navigate(['/autenticacao/login']);
+      return false;
+    }
+
+    if (firstSegment && !permitidas.includes(firstSegment)) {
       this.router.navigate(['/autenticacao/login']);
       return false;
     }
