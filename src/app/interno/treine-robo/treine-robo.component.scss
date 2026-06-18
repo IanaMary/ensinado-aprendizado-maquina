@@ -138,3 +138,20 @@
 .py { background: #2D2440; border-radius: 16px; padding: 16px 18px; margin-top: 24px; }
 .py-tit { font-size: 10.5px; color: #C4B5FD; font-weight: 700; margin-bottom: 8px; }
 .py-linha { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 12px; color: #A7F3D0; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+
+/* ---------- modo brincar (usar o robô) ---------- */
+.btn-brincar { width: 100%; padding: 13px; background: linear-gradient(135deg, #7C3AED, #A855F7); color: #fff; border: none; border-radius: 14px; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 14px rgba(124,58,237,.3);
+  &:hover { transform: translateY(-1px); } }
+.brincar { background: #fff; border: 3px solid #EADCFF; border-radius: 22px; padding: 18px; box-shadow: 0 10px 34px rgba(124,58,237,.12); animation: popInR .25s ease; }
+.brincar-tit { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 14px; color: #4C1D95; margin-bottom: 14px; text-align: center; }
+.bslider { margin-bottom: 12px; }
+.bslider-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.bslider-nome { font-size: 12.5px; font-weight: 700; color: #5B4B78; text-transform: capitalize; }
+.bslider-val { font-size: 11px; font-weight: 700; color: #7C3AED; background: #F3EEFB; padding: 2px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; }
+.bslider input[type="range"] { width: 100%; accent-color: #7C3AED; }
+.brincar-vazio { font-size: 13px; color: #9B7FCB; text-align: center; padding: 6px 0 14px; font-weight: 600; }
+.brincar-acoes { display: flex; gap: 10px; align-items: stretch; margin-top: 6px; }
+.brincar-acoes .btn-soft { width: auto; flex: 0 0 auto; padding: 0 16px; display: flex; align-items: center; }
+.brincar-train { flex: 1; padding: 14px; font-size: 18px; border-radius: 16px; }
+.btn-voltar-brincar { width: 100%; margin-top: 12px; padding: 10px; background: transparent; color: #9B7FCB; border: none; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer;
+  &:hover { color: #7C3AED; } }

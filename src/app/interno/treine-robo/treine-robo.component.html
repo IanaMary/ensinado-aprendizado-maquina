@@ -154,6 +154,7 @@
 
         <!-- CONCLUÍDO -->
         <ng-container *ngIf="fase==='done'">
+         <ng-container *ngIf="!brincando">
           <div class="placar">
             <div class="estrelas"><span *ngFor="let s of stars" class="estrela">{{ s }}</span></div>
             <div class="placar-pct">{{ pct }}%</div>
@@ -161,6 +162,7 @@
             <div class="placar-msg">{{ scoreMsg }}</div>
 
             <div class="placar-acoes">
+              <button class="btn-brincar" (click)="abrirBrincar()">🔮 Mostra que eu adivinho!</button>
               <button class="btn-soft" (click)="toggleMistakes()">🔍 {{ showMistakes ? 'Esconder detalhes' : 'Ver os detalhes' }}</button>
               <div class="acoes-row">
                 <button class="btn-again" (click)="treinar()">🔄 De novo</button>
@@ -211,6 +213,23 @@
 
           <!-- espiar o código -->
           <button class="btn-code" (click)="toggleCode()">🤓 {{ showCode ? 'Esconder o código' : 'Espiar o código de gente grande' }}</button>
+         </ng-container>
+
+         <!-- MODO BRINCAR: mostra um exemplo e o robô adivinha -->
+         <div class="brincar" *ngIf="brincando">
+           <div class="brincar-tit">🎛️ Monte um exemplo e clique em adivinhar!</div>
+           <div class="bslider" *ngFor="let f of features">
+             <div class="bslider-top"><span class="bslider-nome">{{ rotulo(f.col) }}</span><span class="bslider-val">{{ inputs[f.col] }}</span></div>
+             <input type="range" [min]="f.min" [max]="f.max" [step]="f.step" [value]="inputs[f.col]"
+                    (input)="inputs[f.col] = +$any($event.target).value" [disabled]="prevendo">
+           </div>
+           <div class="brincar-vazio" *ngIf="!features.length">Esse robô não tem controles para mexer. 🤷</div>
+           <div class="brincar-acoes">
+             <button class="btn-soft" (click)="surpresa()" [disabled]="prevendo">🎲 Surpresa</button>
+             <button class="btn-train brincar-train" (click)="adivinhar()" [disabled]="prevendo">🔮 {{ prevendo ? 'Pensando…' : 'Adivinha!' }}</button>
+           </div>
+           <button class="btn-voltar-brincar" (click)="fecharBrincar()">⬅ Voltar ao placar</button>
+         </div>
         </ng-container>
       </div>
     </div>

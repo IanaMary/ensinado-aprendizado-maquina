@@ -98,6 +98,16 @@ export class TreineRoboComponent implements OnInit {
   scatterLinha: { x1: number; y1: number; x2: number; y2: number } | null = null;
   readonly SVG_W = 320; readonly SVG_H = 188; readonly PAD = 18;
   CORES_GRUPO = ['#7C3AED', '#EC4899', '#F59E0B', '#22C55E', '#38BDF8'];
+  NOMES_GRUPO = ['roxo', 'rosa', 'laranja', 'verde', 'azul'];
+
+  // ---- "Mostra que eu adivinho!" (usar o robô depois de treinar) ----
+  modeloTreinadoId: string | null = null;
+  brincando = false;
+  prevendo = false;
+  previu = false;
+  features: { col: string; min: number; max: number; step: number }[] = [];
+  inputs: Record<string, number> = {};
+  predicao: any = null;
 
   constructor(private dashboard: DashboardService, private router: Router) {}
 
@@ -144,6 +154,7 @@ export class TreineRoboComponent implements OnInit {
     this.fase = 'training'; this.showMistakes = false; this.showCode = false; this.erro = '';
     this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
     this.scatterPontos = []; this.scatterLinha = null;
+    this.brincando = false; this.previu = false; this.predicao = null; this.modeloTreinadoId = null;
     const body = {
       tipo_arquivo: 'xlsx',
       arquivo_id: this.coleta.id_coleta,
@@ -159,6 +170,7 @@ export class TreineRoboComponent implements OnInit {
   }
 
   private avaliar(treino: any): void {
+    this.modeloTreinadoId = treino?.id || null;
     const t = this.tarefa;
     const metricas =
       t === 'regressao' ? [{ valor: 'r2_score', label: 'r2' }, { valor: 'mean_absolute_error', label: 'mae' }]
@@ -263,12 +275,14 @@ export class TreineRoboComponent implements OnInit {
     this.datasetId = null; this.senses = null; this.brainId = null; this.fase = 'build';
     this.score = 0; this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
     this.scatterPontos = []; this.scatterLinha = null;
+    this.brincando = false; this.previu = false; this.predicao = null; this.modeloTreinadoId = null;
     this.showMistakes = false; this.showCode = false; this.erro = ''; this.coleta = null;
   }
 
   // ---------- humor / mascote ----------
   get mood(): 'idle' | 'happy' | 'thinking' | 'celebrate' {
-    if (this.fase === 'training') return 'thinking';
+    if (this.fase === 'training' || this.prevendo) return 'thinking';
+    if (this.brincando) return this.previu ? 'celebrate' : 'happy';
     if (this.fase === 'done') return 'celebrate';
     if (this.datasetId) return 'happy';
     return 'idle';
@@ -308,6 +322,8 @@ export class TreineRoboComponent implements OnInit {
   // ---------- falas ----------
   get sayText(): string {
     const n = this.robotName;
+    if (this.prevendo) return 'Deixa eu pensar... 🤔';
+    if (this.brincando) return this.previu ? this.predicaoTexto : (this.erro || 'Me mostra um exemplo e eu adivinho! 🔮');
     if (this.fase === 'training') return 'Deixa comigo, tô aprendendo! 🧠';
     if (this.fase === 'done') return this.scoreMsg;
     if (this.erro) return this.erro;
@@ -355,6 +371,61 @@ export class TreineRoboComponent implements OnInit {
   get maeFmt(): string { return this.mae == null ? '—' : (Math.abs(this.mae) >= 100 ? Math.round(this.mae).toString() : this.mae.toFixed(1)); }
   // agrupamento: quantos grupinhos
   get nGrupos(): number { return (this.cerebro?.hiper?.['n_clusters'] as number) || 0; }
+
+  // ---------- "Mostra que eu adivinho!" ----------
+  rotulo(col: string): string { return (col || '').replace(/_/g, ' '); }
+
+  abrirBrincar(): void {
+    this.montarFeatures();
+    this.inputs = {}; this.predicao = null; this.previu = false;
+    this.semear();
+    this.brincando = true;
+  }
+  fecharBrincar(): void { this.brincando = false; this.predicao = null; this.previu = false; }
+  surpresa(): void { this.predicao = null; this.previu = false; this.semear(); }
+
+  adivinhar(): void {
+    if (this.prevendo || !this.modeloTreinadoId) return;
+    this.prevendo = true; this.previu = false; this.predicao = null; this.erro = '';
+    this.dashboard.classificadorPrever({ modelo_id: this.modeloTreinadoId, valores: this.inputs }).subscribe({
+      next: (res: any) => { this.predicao = res?.predicao; this.previu = true; this.prevendo = false; },
+      error: (e) => { this.prevendo = false; this.erro = e?.error?.detail || 'Não consegui adivinhar agora. Tenta de novo? 🙈'; },
+    });
+  }
+
+  private montarFeatures(): void {
+    this.features = [];
+    const linhas: any[] = this.coleta?.dados || [];
+    const cols: string[] = this.coleta?.colunas || [];
+    const target = this.coleta?.target;
+    for (const col of cols.filter(c => c !== target)) {
+      const vals = linhas.map(r => Number(r[col])).filter(v => isFinite(v));
+      if (!vals.length) continue;
+      let min = Math.min(...vals), max = Math.max(...vals);
+      if (min === max) { min -= 1; max += 1; }
+      const step = (max - min) / 100 || 0.1;
+      this.features.push({ col, min: +min.toFixed(2), max: +max.toFixed(2), step: +step.toFixed(3) });
+    }
+  }
+  private semear(): void {
+    const linhas: any[] = this.coleta?.dados || [];
+    const row = linhas.length ? linhas[Math.floor(Math.random() * linhas.length)] : null;
+    for (const f of this.features) {
+      const v = row ? Number(row[f.col]) : (f.min + f.max) / 2;
+      this.inputs[f.col] = isFinite(v) ? +v.toFixed(2) : +(((f.min + f.max) / 2)).toFixed(2);
+    }
+  }
+
+  get predicaoTexto(): string {
+    if (this.predicao == null) return '';
+    if (this.tarefa === 'regressao') return `Acho que vai dar ~${Math.round(Number(this.predicao))}! 🎉`;
+    if (this.tarefa === 'agrupamento') { const i = Number(this.predicao); return `Esse é do grupinho ${this.NOMES_GRUPO[i % this.NOMES_GRUPO.length]}! 🎉`; }
+    return `Acho que é ${this.predicao}! 🎉`;
+  }
+  get predicaoCor(): string {
+    const i = Number(this.predicao);
+    return this.tarefa === 'agrupamento' && isFinite(i) ? this.CORES_GRUPO[i % this.CORES_GRUPO.length] : '';
+  }
 
   // ---------- código (blocos + python por tarefa) ----------
   get scratchBlocks() {
