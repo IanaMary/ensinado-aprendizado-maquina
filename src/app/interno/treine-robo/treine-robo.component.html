@@ -184,23 +184,17 @@
               </div>
               <div class="respostas-rodape">✓ = acertou. Ninguém acerta tudo de primeira — é assim que se aprende! 💪</div>
             </ng-container>
-            <!-- regressão: alvo + barra de pontaria -->
+            <!-- regressão: figura real (previsto × real) -->
             <ng-container *ngIf="tarefa==='regressao'">
-              <div class="respostas-tit">A pontaria do {{ robotName }}:</div>
-              <div class="alvo">
-                <div class="alvo-icone">🎯</div>
-                <div class="alvo-barra"><div class="alvo-fill" [style.width.%]="pct"><span class="alvo-robo">🤖</span></div></div>
-              </div>
-              <div class="respostas-rodape">Ele erra por <b>~{{ maeFmt }}</b> em média. Quanto mais perto do 🎯, melhor! 💪</div>
+              <div class="respostas-tit">Como o {{ robotName }} chutou os números:</div>
+              <div class="viz-card" *ngIf="vizPrincipal"><img [src]="imgViz(vizPrincipal)" [alt]="vizPrincipal.titulo" loading="lazy"></div>
+              <div class="respostas-rodape">{{ vizLegenda }} Erra por <b>~{{ maeFmt }}</b> em média. 💪</div>
             </ng-container>
-            <!-- agrupamento: bolhas dos grupinhos + barra de qualidade -->
+            <!-- agrupamento: figura real (grupos formados) -->
             <ng-container *ngIf="tarefa==='agrupamento'">
-              <div class="respostas-tit">Os {{ nGrupos }} grupinhos do {{ robotName }}:</div>
-              <div class="grupinhos">
-                <div class="bolha" *ngFor="let g of gruposArr; let i = index" [style.background]="CORES_GRUPO[i % CORES_GRUPO.length]">{{ dataset?.emoji }}</div>
-              </div>
-              <div class="alvo-barra"><div class="alvo-fill" [style.width.%]="pct"></div></div>
-              <div class="respostas-rodape">Qualidade da separação: <b>{{ pct }}%</b>. Grupos mais separados = melhor! ✨</div>
+              <div class="respostas-tit">Como o {{ robotName }} separou os grupinhos:</div>
+              <div class="viz-card" *ngIf="vizPrincipal"><img [src]="imgViz(vizPrincipal)" [alt]="vizPrincipal.titulo" loading="lazy"></div>
+              <div class="respostas-rodape">{{ vizLegenda }} Separou em <b>{{ nGrupos }}</b> grupinhos. ✨</div>
             </ng-container>
           </div>
 

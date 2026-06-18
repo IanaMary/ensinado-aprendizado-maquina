@@ -75,17 +75,9 @@
 .grupo + .grupo { margin-top: 12px; }
 .grupo-tit { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 11px; color: #9B7FCB; text-transform: uppercase; letter-spacing: .5px; margin: 2px 2px -2px; }
 
-/* regressão: alvo + barra de pontaria */
-.alvo { display: flex; align-items: center; gap: 12px; margin: 4px 0 10px; }
-.alvo-icone { font-size: 34px; flex-shrink: 0; }
-.alvo-barra { flex: 1; height: 22px; border-radius: 11px; background: #F0ECF8; overflow: hidden; }
-.alvo-fill { height: 100%; min-width: 26px; border-radius: 11px; background: linear-gradient(90deg, #22C55E, #16A34A); display: flex; align-items: center; justify-content: flex-end; transition: width .5s ease; }
-.alvo-robo { font-size: 14px; margin-right: 3px; }
-
-/* agrupamento: bolhas dos grupinhos */
-.grupinhos { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 8px 0 12px; }
-.bolha { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.12); animation: starPopR .35s ease both;
-  &:nth-child(2) { animation-delay: .08s; } &:nth-child(3) { animation-delay: .16s; } &:nth-child(4) { animation-delay: .24s; } &:nth-child(5) { animation-delay: .32s; } }
+/* figura real do modelo (regressão/agrupamento) — descreve de fato a tarefa */
+.viz-card { background: #fff; border: 2px solid #EADCFF; border-radius: 14px; padding: 8px; margin: 4px 0 10px; animation: popInR .25s ease;
+  img { width: 100%; height: auto; display: block; border-radius: 8px; } }
 
 /* treinar */
 .btn-train { width: 100%; padding: 20px; background: linear-gradient(135deg, #22C55E, #16A34A); color: #fff; border: none; border-radius: 22px; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 22px; cursor: pointer; box-shadow: 0 8px 26px rgba(34,197,94,.4); transition: all .14s;

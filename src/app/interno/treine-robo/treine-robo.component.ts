@@ -93,6 +93,7 @@ export class TreineRoboComponent implements OnInit {
   r2: number | null = null;    // regressão
   mae: number | null = null;   // regressão
   silhouette: number | null = null; // agrupamento
+  vizs: any[] = [];            // visualizações reais do modelo (_visualizacoes do backend)
 
   constructor(private dashboard: DashboardService, private router: Router) {}
 
@@ -137,7 +138,7 @@ export class TreineRoboComponent implements OnInit {
     const modeloItem = this.modelosCat.find(m => m.valor === this.cerebro!.valor);
     if (!modeloItem) { this.erro = 'Esse cérebro não está disponível agora. 🙈'; return; }
     this.fase = 'training'; this.showMistakes = false; this.showCode = false; this.erro = '';
-    this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
+    this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null; this.vizs = [];
     const body = {
       tipo_arquivo: 'xlsx',
       arquivo_id: this.coleta.id_coleta,
@@ -167,6 +168,7 @@ export class TreineRoboComponent implements OnInit {
 
   private parseResultado(aval: any, nome: string): void {
     const num = (v: any) => (typeof v === 'number' && isFinite(v) ? v : null);
+    this.vizs = aval?.['_visualizacoes']?.[nome] || [];
     if (this.tarefa === 'regressao') {
       this.r2 = num(aval?.['r2']?.[nome]);
       this.mae = num(aval?.['mae']?.[nome]);
@@ -189,7 +191,7 @@ export class TreineRoboComponent implements OnInit {
 
   recomecar(): void {
     this.datasetId = null; this.senses = null; this.brainId = null; this.fase = 'build';
-    this.score = 0; this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
+    this.score = 0; this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null; this.vizs = [];
     this.showMistakes = false; this.showCode = false; this.erro = ''; this.coleta = null;
   }
 
@@ -282,8 +284,27 @@ export class TreineRoboComponent implements OnInit {
   get maeFmt(): string { return this.mae == null ? '—' : (Math.abs(this.mae) >= 100 ? Math.round(this.mae).toString() : this.mae.toFixed(1)); }
   // agrupamento: quantos grupinhos
   get nGrupos(): number { return (this.cerebro?.hiper?.['n_clusters'] as number) || 0; }
-  CORES_GRUPO = ['#7C3AED', '#EC4899', '#F59E0B', '#22C55E', '#38BDF8'];
-  get gruposArr(): number[] { return Array.from({ length: this.nGrupos }, (_, i) => i); }
+
+  // visualização REAL do modelo (do backend) — descreve de fato a tarefa.
+  imgViz(v: any): string { return v ? `data:${v.mime};base64,${v.base64}` : ''; }
+  private vizPorTitulo(...frags: string[]): any {
+    for (const f of frags) {
+      const v = this.vizs.find(x => (x?.titulo || '').toLowerCase().includes(f));
+      if (v) return v;
+    }
+    return this.vizs[0] || null;
+  }
+  get vizPrincipal(): any {
+    if (!this.vizs?.length) return null;
+    if (this.tarefa === 'regressao') return this.vizPorTitulo('prediction error', 'residual');
+    if (this.tarefa === 'agrupamento') return this.vizPorTitulo('distância entre', 'distancia entre', 'silhouette');
+    return this.vizs[0];
+  }
+  get vizLegenda(): string {
+    if (this.tarefa === 'regressao') return 'Cada pontinho é um exemplo. Quanto mais perto da linha, mais o robô acertou o número.';
+    if (this.tarefa === 'agrupamento') return 'Cada bolha é um grupinho que o robô formou. Mais separadas = separação melhor!';
+    return '';
+  }
 
   // ---------- código (blocos + python por tarefa) ----------
   get scratchBlocks() {
