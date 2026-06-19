@@ -607,25 +607,9 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       };
     }
 
-    // Info para modelos de treinamento
+    // Modelos: o conteúdo educacional vem do DB (campo `conteudo`, tratado no início).
+    // Todos os modelos do catálogo já têm `conteudo`; sem ele, só uma info mínima.
     if (tipo === 'treino-validacao-teste') {
-      const modelos = this.tutorRef.modelos as any;
-      const modeloInfo = modelos?.[valor];
-      if (modeloInfo) {
-        return {
-          titulo: modeloInfo.nome,
-          descricao: modeloInfo.descricao,
-          dicas: modeloInfo.quandoUsar?.slice(0, 4) || [],
-          conceitos: [
-            { nome: 'Tipo', desc: modeloInfo.tipo || 'Classificador' },
-            { nome: 'Hiperparametros', desc: Object.keys(modeloInfo.hiperparametros || {}).length + ' configuraveis' },
-            { nome: 'Complexidade', desc: modeloInfo.complexidade || 'Variavel' }
-          ],
-          hiperparametros: modeloInfo.hiperparametros,
-          vantagens: modeloInfo.vantagens,
-          desvantagens: modeloInfo.desvantagens
-        };
-      }
       return {
         titulo: item.label,
         descricao: item.resumo || 'Modelo de machine learning para treinamento.',
@@ -633,25 +617,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       };
     }
 
-    // Info para metricas
+    // Métricas: idem — conteúdo vem do DB; sem ele, info mínima.
     if (tipo === 'metrica') {
-      const metricas = this.tutorRef.metricas as any;
-      const metricaInfo = metricas?.[valor];
-      if (metricaInfo) {
-        return {
-          titulo: metricaInfo.nome,
-          descricao: metricaInfo.descricao,
-          dicas: metricaInfo.quandoUsar?.slice(0, 4) || [],
-          conceitos: [
-            { nome: 'Formula', desc: metricaInfo.formula },
-            { nome: 'Intervalo', desc: metricaInfo.intervalo },
-            { nome: 'Interpretacao', desc: metricaInfo.interpretacao }
-          ],
-          formula: metricaInfo.formula,
-          intuicao: metricaInfo.intuicao,
-          exemplo: metricaInfo.exemploReal
-        };
-      }
       return {
         titulo: item.label,
         descricao: item.resumo || 'Metrica de avaliacao do modelo.',
