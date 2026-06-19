@@ -28,6 +28,8 @@ export interface TutorMidia {
 export interface TutorItemInfo {
   titulo: string;
   descricao: string;
+  /** Explicação em linguagem simples, exibida apenas no modo Básico. */
+  resumo_basico?: string;
   dicas?: string[];
   conceitos?: { nome: string; desc: string }[];
   hiperparametros?: any;

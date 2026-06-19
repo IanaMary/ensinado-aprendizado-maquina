@@ -20,7 +20,7 @@
       </button>
     </div>
 
-    <div *ngIf="getExplicacaoBasica() && !modoAvancado" class="section basic-section">
+    <div *ngIf="getExplicacaoBasica() && !modoAvancado && !tutorItemInfo" class="section basic-section">
       <div class="section-header">
         <mat-icon>lightbulb</mat-icon>
         <span>{{ getTituloBasico() }}</span>
@@ -38,7 +38,11 @@
         </a>
       </div>
 
-      <div class="section">
+      <!-- Descrição: simples no Básico, técnica no Avançado -->
+      <div class="section" *ngIf="!modoAvancado">
+        <p class="desc-text" [innerHTML]="(tutorItemInfo.resumo_basico || tutorItemInfo.descricao) | markdown"></p>
+      </div>
+      <div class="section" *ngIf="modoAvancado && tutorItemInfo.descricao">
         <p class="desc-text">{{ tutorItemInfo.descricao }}</p>
       </div>
 

@@ -351,6 +351,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     return {
       titulo: conteudo.titulo || item.label,
       descricao: conteudo.descricao || '',
+      resumo_basico: conteudo.resumo_basico || '',
       dicas: conteudo.dicas,
       conceitos: conteudo.conceitos,
       quandoUsar: conteudo.quandoUsar,

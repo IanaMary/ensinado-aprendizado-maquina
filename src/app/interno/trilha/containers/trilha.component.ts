@@ -314,6 +314,7 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     }
     return {
       titulo: c.titulo || card.label, descricao: c.descricao || item?.resumo || '',
+      resumo_basico: c.resumo_basico || '',
       dicas: c.dicas, conceitos: c.conceitos, quandoUsar: c.quandoUsar, naoUsarQuando: c.naoUsarQuando,
       vantagens: c.vantagens, desvantagens: c.desvantagens, formula: c.formula, intuicao: c.intuicao,
       exemplo: c.exemplo, exemplo_codigo: c.exemplo_codigo, link_sklearn: c.link_sklearn,
