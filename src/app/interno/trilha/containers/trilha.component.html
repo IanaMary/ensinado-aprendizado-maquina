@@ -265,7 +265,7 @@
             <div class="hp" *ngFor="let p of hiperDe(selecionado)">
               <div class="hp-top"><span class="hp-nome">{{ p.nome || p.key }}</span><span class="hp-val">{{ p.valor }}</span></div>
               <input *ngIf="(p.tipo==='int'||p.tipo==='float') && p.min!=null && p.max!=null"
-                     type="range" [min]="p.min" [max]="p.max" [step]="p.tipo==='int' ? 1 : 0.01"
+                     type="range" [min]="p.min" [max]="p.max" [step]="p.step != null ? p.step : (p.tipo==='int' ? 1 : 0.01)"
                      [value]="p.valor" (input)="setHiper(p, $any($event.target).value)">
               <select *ngIf="p.opcoes?.length" [value]="p.valor" (change)="setHiper(p, $any($event.target).value)">
                 <option *ngFor="let o of p.opcoes" [value]="o">{{ o }}</option>

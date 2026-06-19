@@ -347,7 +347,41 @@ export class TrilhaComponent implements OnInit, OnDestroy {
         if (typeof p.valor === 'boolean') p.valor = String(p.valor);
       }
     }
+    // Faixa para slider: hiperparâmetro numérico sem min/max no catálogo recebe uma
+    // faixa sensata (por nome conhecido ou derivada do valor), p/ mostrar slider de
+    // verdade em vez de cair em campo de texto.
+    for (const p of params) {
+      const tipo = String(p.tipo || '').toLowerCase();
+      const valorNum = Number(p.valor);
+      const ehBool = tipo === 'bool' || (p.opcoes && p.opcoes.length);
+      const ehNum = !ehBool && (tipo.includes('int') || tipo.includes('float') || tipo.includes('num')
+        || (p.valor != null && p.valor !== '' && typeof p.valor !== 'boolean' && isFinite(valorNum)));
+      if (ehNum && (p.min == null || p.max == null)) {
+        const f = this.faixaHiper(p.sklearn || p.key, tipo, p.valor);
+        if (f) { p.min = f.min; p.max = f.max; p.step = f.step; p.tipo = f.tipo; }
+      }
+    }
     this.hiperParams[card.uid] = params;
+  }
+
+  /** Faixa (min/max/step) para o slider de um hiperparâmetro numérico sem faixa no catálogo. */
+  private faixaHiper(nome: string, tipo: string, valor: any): { min: number; max: number; step: number; tipo: string } | null {
+    const FAIXAS: Record<string, [number, number, number, string]> = {
+      n_neighbors: [1, 50, 1, 'int'], n_estimators: [10, 500, 10, 'int'], max_depth: [1, 50, 1, 'int'],
+      min_samples_split: [2, 20, 1, 'int'], min_samples_leaf: [1, 20, 1, 'int'], max_iter: [50, 2000, 50, 'int'],
+      n_clusters: [2, 10, 1, 'int'], degree: [1, 6, 1, 'int'], random_state: [0, 100, 1, 'int'],
+      C: [0.01, 100, 0.01, 'float'], alpha: [0.0001, 10, 0.0001, 'float'], learning_rate: [0.001, 1, 0.001, 'float'],
+      gamma: [0.001, 10, 0.001, 'float'], tol: [0.00001, 0.1, 0.00001, 'float'], l1_ratio: [0, 1, 0.05, 'float'],
+    };
+    const f = FAIXAS[nome];
+    if (f) return { min: f[0], max: f[1], step: f[2], tipo: f[3] };
+    const v = Number(valor);
+    if (!isFinite(v)) return null;
+    if (tipo.includes('int') || Number.isInteger(v)) {
+      return { min: 0, max: Math.max(10, Math.ceil(Math.abs(v) * 5) || 10), step: 1, tipo: 'int' };
+    }
+    const max = Math.max(1, Math.abs(v) * 5 || 1);
+    return { min: 0, max: +max.toFixed(4), step: +(max / 100).toFixed(4), tipo: 'float' };
   }
   hiperDe(card: TrilhaCard): any[] { return this.hiperParams[card.uid] || []; }
   setHiper(p: any, valor: any): void { p.valor = valor; this.marcarDesatualizado(); }

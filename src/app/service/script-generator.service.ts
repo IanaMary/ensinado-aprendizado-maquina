@@ -172,6 +172,9 @@ export class ScriptGeneratorService {
       }
     }
     lines.push('    X_train, X_test = aplicar_preprocessamento(X_train, X_test)');
+    if (!isClustering && this.temLabelEncoderAlvo(preProcessamentoConfig, resultadoColetaDado?.target)) {
+      lines.push(...this.linhasLabelEncoderAlvo());
+    }
     lines.push('');
     lines.push('    resultados = {}');
     lines.push('    for nome, modelo in MODELOS.items():');
@@ -357,6 +360,9 @@ export class ScriptGeneratorService {
     }
     lines.push('    # 3. Pré-processamento');
     lines.push('    X_train, X_test = aplicar_preprocessamento(X_train, X_test)');
+    if (!isClustering && this.temLabelEncoderAlvo(preProcessamentoConfig, resultadoColetaDado?.target)) {
+      lines.push(...this.linhasLabelEncoderAlvo());
+    }
     lines.push('');
     if (isClustering) {
       lines.push('    # 4. Treinar modelo');
@@ -681,6 +687,24 @@ export class ScriptGeneratorService {
     ].join('\n');
   }
 
+  /** Há um LabelEncoder mirando o ALVO? (colunas vazias = alvo, ou colunas incluem o target) */
+  private temLabelEncoderAlvo(preProcessamentoConfig: any, targetCol?: string): boolean {
+    const itens = preProcessamentoConfig?.itens as any[] | undefined;
+    if (!itens?.length) return false;
+    return itens.some((it: any) => it.valor === 'label_encoder'
+      && (!it.colunas?.length || (!!targetCol && it.colunas.includes(targetCol))));
+  }
+
+  /** Linhas que codificam o rótulo (y_train/y_test) com LabelEncoder no fluxo principal. */
+  private linhasLabelEncoderAlvo(): string[] {
+    return [
+      '    # Codificar o rótulo (LabelEncoder no alvo)',
+      '    le_alvo = LabelEncoder()',
+      '    y_train = le_alvo.fit_transform(y_train)',
+      '    y_test = le_alvo.transform(y_test)',
+    ];
+  }
+
   private generatePreprocessingFunction(resultadoColetaDado: ResultadoColetaDado | undefined, preProcessamentoConfig?: any): string {
     const lines: string[] = [];
     lines.push('# ============================================');
@@ -778,19 +802,22 @@ export class ScriptGeneratorService {
           }
           break;
 
-        case 'label_encoder':
-          lines.push(`    # ${item.label}: Codifica rótulos categóricos (target)`);
-          lines.push('    le = LabelEncoder()');
-          for (const col of colunas) {
-            if (col === targetCol) {
-              lines.push(`    y_train = le.fit_transform(y_train)`);
-              lines.push(`    y_test = le.transform(y_test)`);
-            } else {
-              lines.push(`    X_train["${col}"] = le.fit_transform(X_train["${col}"])`);
-              lines.push(`    X_test["${col}"] = le.transform(X_test["${col}"])`);
+        case 'label_encoder': {
+          // O LabelEncoder do ALVO é aplicado no fluxo principal (sobre y_train/y_test),
+          // fora desta função que recebe apenas X. Aqui só codificamos colunas de X.
+          const colsX = colunas.filter((c: string) => c !== targetCol);
+          lines.push(`    # ${item.label}: codifica rótulos categóricos`);
+          if (colsX.length > 0) {
+            for (const col of colsX) {
+              lines.push(`    le_${col} = LabelEncoder()`);
+              lines.push(`    X_train["${col}"] = le_${col}.fit_transform(X_train["${col}"])`);
+              lines.push(`    X_test["${col}"] = le_${col}.transform(X_test["${col}"])`);
             }
+          } else {
+            lines.push('    # (o alvo é codificado no fluxo principal, após o split)');
           }
           break;
+        }
 
         case 'simple_imputer':
           lines.push(`    # ${item.label}: Preenche valores ausentes`);
