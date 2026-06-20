@@ -13,6 +13,7 @@
       </div>
     </div>
     <div class="spacer"></div>
+    <span class="motor-chip" *ngIf="motorLabel && !carregandoModelo" title="Motor de visão (GPU) em uso">{{ motorLabel }}</span>
     <button class="btn-ghost" (click)="voltarInicio()">⬅ Início</button>
     <button class="btn-ghost" (click)="recomecar()">🔄 Recomeçar</button>
   </header>

@@ -61,6 +61,12 @@ export class LeoMundoRealComponent implements OnInit, OnDestroy {
 
   voltarInicio(): void { this.router.navigate(['/inicio']); }
 
+  /** Motor de visão ativo, para o chip da topbar. */
+  get motorLabel(): string {
+    const b = this.leoVisao.backendAtivo;
+    return b === 'webgpu' ? '⚡ WebGPU' : b === 'webgl' ? 'WebGL' : b ? b.toUpperCase() : '';
+  }
+
   private carregarModelo(): void {
     this.carregandoModelo = true; this.erroModelo = '';
     this.leoVisao.carregar()
