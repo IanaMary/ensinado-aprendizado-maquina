@@ -42,6 +42,11 @@ export class InicioComponent {
       rota: '/treine-robo', cor: '#7C3AED', selo: 'Para começar',
     },
     {
+      id: 'leo', emoji: '📸', titulo: 'Léo no Mundo Real',
+      descricao: 'Tire fotos das suas coisas e ensine a IA a reconhecê-las de verdade.',
+      rota: '/leo-mundo-real', cor: '#F59E0B', selo: 'Com a câmera',
+    },
+    {
       id: 'trilha', emoji: '🧭', titulo: 'Trilha de ML',
       descricao: 'Monte seu pipeline de machine learning em uma trilha visual.',
       rota: '/trilha', cor: '#3B82F6',

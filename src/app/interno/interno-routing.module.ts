@@ -33,6 +33,11 @@ const routes: Routes = [
     data: { breadcrumb: 'Treine seu Robô' }
   },
   {
+    path: 'leo-mundo-real',
+    loadComponent: () => import('../interno/leo-mundo-real/leo-mundo-real.component').then(m => m.LeoMundoRealComponent),
+    data: { breadcrumb: 'Léo no Mundo Real' }
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'view-aluno'
