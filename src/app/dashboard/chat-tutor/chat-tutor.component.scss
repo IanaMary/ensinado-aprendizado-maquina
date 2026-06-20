@@ -7,8 +7,10 @@
   border-radius: 10px;
   background: $branco;
   overflow: hidden;
-  margin-top: 12px;
-  max-height: 460px;
+  // Compacto: fica ao final do conteúdo sem dominar o painel. Cresce conforme
+  // a conversa (corpo rola internamente) até um teto modesto.
+  margin-top: 0;
+  max-height: 300px;
 }
 
 .chat-header {
@@ -68,7 +70,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 120px;
+  min-height: 56px;
 }
 
 .chat-intro {

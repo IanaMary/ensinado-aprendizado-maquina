@@ -640,15 +640,14 @@ $metrica-cor-escuro: #E65100;
   &.theme-treino { border-color: rgba($treino-cor, 0.5); }
   &.theme-metrica { border-color: rgba($metrica-cor, 0.5); }
 
-  // O app-tutor embutido fica num cartao branco compacto acima do chat
+  // O app-tutor e o chat compartilham o scroll do painel: o aluno lê o
+  // conteúdo e o chat fica logo ao final do mesmo bloco (sem scroll próprio).
   app-tutor {
     display: block;
     background: $branco;
     border: 1px solid $roxo-claro;
     border-radius: 12px;
     padding: 12px 14px;
-    max-height: 50vh;
-    overflow-y: auto;
   }
 
   .pipeline-info {
