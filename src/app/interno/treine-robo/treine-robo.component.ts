@@ -9,7 +9,7 @@ type Fase = 'build' | 'training' | 'done';
 type Sentido = 'sharp' | 'skip';
 type Tarefa = 'classificacao' | 'regressao' | 'agrupamento';
 
-interface DatasetLudico { id: string; toy: string; emoji: string; nome: string; dica: string; cor: string; sk: string; tipo: Tarefa; }
+interface DatasetLudico { id: string; toy: string; emoji: string; nome: string; dica: string; cor: string; sk: string; tipo: Tarefa; pontoEmoji?: string; }
 interface CerebroLudico { id: string; valor: string; emoji: string; nome: string; dica: string; cor: string; sk: string; hiper?: Record<string, any>; }
 
 /**
@@ -43,6 +43,7 @@ export class TreineRoboComponent implements OnInit {
     {
       tarefa: 'regressao', titulo: 'Adivinhar um número', emoji: '🔢',
       datasets: [
+        { id: 'cachorro', toy: 'gen_cachorro', emoji: '🐶', nome: 'Cachorros', dica: 'descobrir o peso do cachorro pela altura dele', cor: '#A16207', sk: 'load_cachorro()', tipo: 'regressao', pontoEmoji: '🐶' },
         { id: 'sorvete', toy: 'gen_sorvete', emoji: '🍦', nome: 'Sorvetes', dica: 'quantos sorvetes vão vender?', cor: '#F97316', sk: 'load_sorvete()', tipo: 'regressao' },
         { id: 'crescimento', toy: 'gen_regression', emoji: '📈', nome: 'Crescimento', dica: 'prever um valor que sobe e desce', cor: '#0EA5E9', sk: 'make_regression()', tipo: 'regressao' },
       ],
@@ -94,7 +95,7 @@ export class TreineRoboComponent implements OnInit {
   mae: number | null = null;   // regressão
   silhouette: number | null = null; // agrupamento
   // scatter próprio (lúdico) a partir dos dados reais do dataset
-  scatterPontos: { cx: number; cy: number; cor: string }[] = [];
+  scatterPontos: { cx: number; cy: number; cor: string; emoji?: string; tam?: number }[] = [];
   scatterLinha: { x1: number; y1: number; x2: number; y2: number } | null = null;
   readonly SVG_W = 320; readonly SVG_H = 188; readonly PAD = 18;
   CORES_GRUPO = ['#7C3AED', '#EC4899', '#F59E0B', '#22C55E', '#38BDF8'];
@@ -243,10 +244,20 @@ export class TreineRoboComponent implements OnInit {
     let labels: number[] = pts.map(() => 0);
     if (this.tarefa === 'agrupamento') labels = this.kmeansLeve(pts, Math.max(2, this.nGrupos));
 
-    this.scatterPontos = pts.map((p, i) => ({
-      cx: sx(p[0]), cy: sy(p[1]),
-      cor: this.tarefa === 'agrupamento' ? this.CORES_GRUPO[labels[i] % this.CORES_GRUPO.length] : '#A855F7',
-    }));
+    // Regressão temática: figuras (ex.: 🐶) que crescem conforme o valor (eixo y) sobe.
+    const pe = this.tarefa === 'regressao' ? this.dataset?.pontoEmoji : undefined;
+    this.scatterPontos = pts.map((p, i) => {
+      const ponto: { cx: number; cy: number; cor: string; emoji?: string; tam?: number } = {
+        cx: sx(p[0]), cy: sy(p[1]),
+        cor: this.tarefa === 'agrupamento' ? this.CORES_GRUPO[labels[i] % this.CORES_GRUPO.length] : '#A855F7',
+      };
+      if (pe) {
+        const norm = ymax === ymin ? 0.5 : (p[1] - ymin) / (ymax - ymin);
+        ponto.emoji = pe;
+        ponto.tam = 13 + 26 * norm;   // pequeno embaixo, grande no alto da linha
+      }
+      return ponto;
+    });
 
     if (this.tarefa === 'regressao') {
       const n = pts.length; let sX = 0, sY = 0, sXY = 0, sXX = 0;

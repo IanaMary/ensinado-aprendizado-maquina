@@ -192,10 +192,14 @@
               <div class="respostas-tit">O padrão que o {{ robotName }} achou:</div>
               <div class="scatter-card" *ngIf="scatterPontos.length">
                 <svg [attr.viewBox]="'0 0 ' + SVG_W + ' ' + SVG_H" class="scatter" preserveAspectRatio="xMidYMid meet">
+                  <ng-container *ngFor="let p of scatterPontos">
+                    <text *ngIf="p.emoji" [attr.x]="p.cx" [attr.y]="p.cy" [attr.font-size]="p.tam" text-anchor="middle" dominant-baseline="central">{{ p.emoji }}</text>
+                    <circle *ngIf="!p.emoji" [attr.cx]="p.cx" [attr.cy]="p.cy" r="6" [attr.fill]="p.cor" opacity="0.85"></circle>
+                  </ng-container>
+                  <!-- a reta vem por último: fica SOBRE os cachorrinhos -->
                   <line *ngIf="scatterLinha" [attr.x1]="scatterLinha.x1" [attr.y1]="scatterLinha.y1" [attr.x2]="scatterLinha.x2" [attr.y2]="scatterLinha.y2" stroke="#7C3AED" stroke-width="4" stroke-linecap="round"></line>
-                  <circle *ngFor="let p of scatterPontos" [attr.cx]="p.cx" [attr.cy]="p.cy" r="6" [attr.fill]="p.cor" opacity="0.85"></circle>
                 </svg>
-                <div class="scatter-legenda">cada 🔵 é um exemplo · a linha roxa é o padrão</div>
+                <div class="scatter-legenda">cada {{ dataset?.pontoEmoji || '🔵' }} é um exemplo · a linha roxa é o padrão (quanto mais alto, mais pesado)</div>
               </div>
               <div class="respostas-rodape">Quando um sobe, o outro acompanha — o robô achou esse padrão! Erra por <b>~{{ maeFmt }}</b> em média. 💪</div>
             </ng-container>
