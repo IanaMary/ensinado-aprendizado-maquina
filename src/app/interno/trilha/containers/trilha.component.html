@@ -136,7 +136,6 @@
           <div class="bus" *ngIf="modelCards.length">
             <span class="bus-up"></span><span class="bus-bar"></span>
             <div class="bus-slot" *ngFor="let c of modelCards"><span class="bus-drop"></span></div>
-            <span class="bus-slot add"></span>
           </div>
           <div class="row-cards">
             <div class="card mini branch sel-able" [class.sel]="selecionado===c" (click)="selecionar(c)" *ngFor="let c of modelCards" [style.--cor]="cores['model']">
@@ -160,7 +159,6 @@
             <div class="bus" *ngIf="evalCards.length">
               <span class="bus-up"></span><span class="bus-bar"></span>
               <div class="bus-slot" *ngFor="let c of evalCards"><span class="bus-drop"></span></div>
-              <span class="bus-slot add"></span>
             </div>
             <div class="row-cards">
               <div class="card mini sel-able" [class.sel]="selecionado===c" (click)="selecionar(c)" *ngFor="let c of evalCards" [style.--cor]="cores['eval']">

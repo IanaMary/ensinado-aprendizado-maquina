@@ -168,8 +168,11 @@ $addbox-w: 44px;
   position: relative; display: flex; gap: $row-gap; justify-content: center; height: 16px; margin-bottom: 2px;
   .bus-bar { position: absolute; top: 0; left: calc(#{$mini-card-w} / 2); right: calc(#{$addbox-w} + #{$row-gap} + #{$mini-card-w} / 2); height: 2px; background: $conn-cor; }
   .bus-up { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 2px; height: 12px; background: $conn-cor; }
-  .bus-slot { width: $mini-card-w; display: flex; justify-content: center; &.add { width: $addbox-w; } }
+  .bus-slot { width: $mini-card-w; display: flex; justify-content: center; }
   .bus-drop { width: 2px; height: 100%; background: $conn-cor; }
+  /* Espaçador no lugar do "+": reserva a largura do add-box para as descidas
+     alinharem sobre os cards — feito por pseudo-elemento (sem <span> vazio no DOM). */
+  &::after { content: ''; flex: 0 0 auto; width: $addbox-w; }
 }
 
 /* ---------- overlays ---------- */
