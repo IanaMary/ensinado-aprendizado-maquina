@@ -155,3 +155,38 @@
 .brincar-train { flex: 1; padding: 14px; font-size: 18px; border-radius: 16px; }
 .btn-voltar-brincar { width: 100%; margin-top: 12px; padding: 10px; background: transparent; color: #9B7FCB; border: none; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer;
   &:hover { color: #7C3AED; } }
+
+/* ---------- desafio: criança × robô ---------- */
+.btn-desafio { width: 100%; padding: 13px; background: linear-gradient(135deg, #EC4899, #F97316); color: #fff; border: none; border-radius: 14px; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 14px rgba(236,72,153,.32);
+  &:hover { transform: translateY(-1px); } }
+.desafio { background: #fff; border: 3px solid #FBD0E4; border-radius: 22px; padding: 18px; box-shadow: 0 10px 34px rgba(236,72,153,.14); animation: popInR .25s ease; }
+.desafio-placar { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 14px; }
+.placar-pill { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 17px; padding: 6px 16px; border-radius: 999px; }
+.placar-pill.kid { background: #E0F2FE; color: #0369A1; }
+.placar-pill.leo { background: #F3EEFB; color: #7C3AED; }
+.placar-vs { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 16px; color: #B7A3DB; }
+.desafio-prog { text-align: center; font-size: 12px; font-weight: 700; color: #9B7FCB; margin-bottom: 10px; }
+.carta { background: linear-gradient(165deg, #FBF7FF, #FDEFF7); border: 2px solid #FBD0E4; border-radius: 18px; padding: 16px; text-align: center; animation: popInR .22s ease; }
+.carta-emoji { font-size: 46px; line-height: 1; }
+.carta-tit { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 16px; color: #4C1D95; margin: 8px 0 12px; }
+.pistas { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.pista { display: flex; gap: 5px; align-items: baseline; background: #fff; border: 1.5px solid #EADCFF; border-radius: 10px; padding: 4px 9px; }
+.pista-nome { font-size: 11px; font-weight: 700; color: #8B7BA8; text-transform: capitalize; }
+.pista-val { font-size: 12px; font-weight: 800; color: #7C3AED; font-family: 'JetBrains Mono', monospace; }
+.classes { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; margin-top: 14px; }
+.classe-btn { flex: 1 1 auto; min-width: 96px; padding: 13px 14px; background: #fff; color: #4C1D95; border: 2.5px solid #E6DAF8; border-radius: 16px; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 15px; cursor: pointer; transition: all .12s; text-transform: capitalize;
+  &:hover:not(:disabled) { transform: translateY(-2px); border-color: #A855F7; }
+  &:disabled { cursor: default; }
+  &.escolhida { border-color: #7C3AED; background: #F3EEFB; }
+  &.certa { border-color: #22C55E; background: #DCFCE7; color: #15803D; }
+  &.errada { border-color: #FCA5A5; background: #FEE2E2; color: #B91C1C; } }
+.leo-pensando { text-align: center; margin-top: 14px; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 14px; color: #7C3AED; }
+.reveal { margin-top: 16px; background: #FAF7FE; border: 2px solid #EADCFF; border-radius: 16px; padding: 14px; animation: popInR .22s ease; }
+.reveal-linha { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #4C1D95; margin-bottom: 6px;
+  b { text-transform: capitalize; } }
+.mark { margin-left: auto; font-weight: 800; color: #B91C1C; &.ok { color: #15803D; } }
+.reveal-certo { font-size: 12.5px; font-weight: 700; color: #8B7BA8; margin: 4px 0 12px; b { color: #4C1D95; text-transform: capitalize; } }
+.desafio-fim { text-align: center; animation: popInR .3s ease; }
+.desafio-fim-placar { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 30px; color: #4C1D95; }
+.desafio-fim-msg { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 18px; color: #EC4899; margin-top: 8px; }
+.desafio-fim-nota { font-size: 12.5px; font-weight: 600; color: #9B7FCB; line-height: 1.45; margin: 12px 6px 16px; }

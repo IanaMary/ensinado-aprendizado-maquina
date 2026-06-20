@@ -154,7 +154,7 @@
 
         <!-- CONCLUÍDO -->
         <ng-container *ngIf="fase==='done'">
-         <ng-container *ngIf="!brincando">
+         <ng-container *ngIf="!brincando && !desafiando">
           <div class="placar">
             <div class="estrelas"><span *ngFor="let s of stars" class="estrela">{{ s }}</span></div>
             <div class="placar-pct">{{ pct }}%</div>
@@ -163,6 +163,7 @@
 
             <div class="placar-acoes">
               <button class="btn-brincar" (click)="abrirBrincar()">🔮 Mostra que eu adivinho!</button>
+              <button class="btn-desafio" *ngIf="podeDesafiar" (click)="abrirDesafio()">🎲 Desafiar o {{ robotName }}!</button>
               <button class="btn-soft" (click)="toggleMistakes()">🔍 {{ showMistakes ? 'Esconder detalhes' : 'Ver os detalhes' }}</button>
               <div class="acoes-row">
                 <button class="btn-again" (click)="treinar()">🔄 De novo</button>
@@ -229,6 +230,60 @@
              <button class="btn-train brincar-train" (click)="adivinhar()" [disabled]="prevendo">🔮 {{ prevendo ? 'Pensando…' : 'Adivinha!' }}</button>
            </div>
            <button class="btn-voltar-brincar" (click)="fecharBrincar()">⬅ Voltar ao placar</button>
+         </div>
+
+         <!-- MODO DESAFIO: criança × robô -->
+         <div class="desafio" *ngIf="desafiando">
+           <div class="desafio-placar">
+             <span class="placar-pill kid">🧒 {{ kidScore }}</span>
+             <span class="placar-vs">×</span>
+             <span class="placar-pill leo">{{ leoScore }} 🤖</span>
+           </div>
+
+           <ng-container *ngIf="!desafioFim && cartaAtual">
+             <div class="desafio-prog">Carta {{ cartaIdx + 1 }} de {{ deck.length }}</div>
+             <div class="carta">
+               <div class="carta-emoji">{{ dataset?.emoji }}</div>
+               <div class="carta-tit">Que categoria é essa?</div>
+               <div class="pistas">
+                 <div class="pista" *ngFor="let p of cartaPistas">
+                   <span class="pista-nome">{{ p.rotulo }}</span><span class="pista-val">{{ p.valor }}</span>
+                 </div>
+               </div>
+             </div>
+
+             <div class="classes">
+               <button class="classe-btn" *ngFor="let cl of classesDesafio"
+                       [disabled]="cartaAtual.kid !== null || aguardandoLeo"
+                       [class.escolhida]="cartaAtual.kid === cl"
+                       [class.certa]="cartaRevelada && cl === cartaAtual.verdadeiro"
+                       [class.errada]="cartaRevelada && cartaAtual.kid === cl && cl !== cartaAtual.verdadeiro"
+                       (click)="palpitarCrianca(cl)">{{ cl }}</button>
+             </div>
+
+             <div class="leo-pensando" *ngIf="aguardandoLeo">O {{ robotName }} está pensando… ⚙️</div>
+
+             <div class="reveal" *ngIf="cartaRevelada">
+               <div class="reveal-linha">🧒 Você: <b>{{ cartaAtual.kid }}</b>
+                 <span class="mark" [class.ok]="cartaAtual.kid === cartaAtual.verdadeiro">{{ cartaAtual.kid === cartaAtual.verdadeiro ? '✓' : '✗' }}</span></div>
+               <div class="reveal-linha">🤖 {{ robotName }}: <b>{{ cartaAtual.leo }}</b>
+                 <span class="mark" [class.ok]="cartaAtual.leo === cartaAtual.verdadeiro">{{ cartaAtual.leo === cartaAtual.verdadeiro ? '✓' : '✗' }}</span></div>
+               <div class="reveal-certo">Resposta certa: <b>{{ cartaAtual.verdadeiro }}</b></div>
+               <button class="btn-train" (click)="proximaCarta()">{{ (cartaIdx + 1) < deck.length ? 'Próxima ›' : 'Ver o resultado 🏁' }}</button>
+             </div>
+           </ng-container>
+
+           <div class="desafio-fim" *ngIf="desafioFim">
+             <div class="desafio-fim-placar">🧒 {{ kidScore }} × {{ leoScore }} 🤖</div>
+             <div class="desafio-fim-msg">{{ desafioMsgFinal }}</div>
+             <div class="desafio-fim-nota">Viu? Até eu, que sou robô, erro às vezes! O segredo é continuar aprendendo. 💜</div>
+             <div class="acoes-row">
+               <button class="btn-again" (click)="jogarDeNovo()">🔄 Jogar de novo</button>
+               <button class="btn-nova" (click)="fecharDesafio()">⬅ Voltar ao placar</button>
+             </div>
+           </div>
+
+           <button class="btn-voltar-brincar" *ngIf="!desafioFim" (click)="fecharDesafio()">⬅ Voltar ao placar</button>
          </div>
         </ng-container>
       </div>

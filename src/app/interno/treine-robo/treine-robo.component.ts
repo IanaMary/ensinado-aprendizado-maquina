@@ -109,6 +109,16 @@ export class TreineRoboComponent implements OnInit {
   inputs: Record<string, number> = {};
   predicao: any = null;
 
+  // ---- "Desafiar o Léo!" (criança × robô) — só classificação ----
+  desafiando = false;
+  desafioFim = false;
+  aguardandoLeo = false;
+  readonly N_CARTAS = 5;
+  deck: { valores: Record<string, number>; verdadeiro: string; kid: string | null; leo: string | null }[] = [];
+  cartaIdx = 0;
+  kidScore = 0;
+  leoScore = 0;
+
   constructor(private dashboard: DashboardService, private router: Router) {}
 
   ngOnInit(): void {
@@ -155,6 +165,7 @@ export class TreineRoboComponent implements OnInit {
     this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
     this.scatterPontos = []; this.scatterLinha = null;
     this.brincando = false; this.previu = false; this.predicao = null; this.modeloTreinadoId = null;
+    this.desafiando = false; this.desafioFim = false; this.aguardandoLeo = false; this.deck = []; this.cartaIdx = 0; this.kidScore = 0; this.leoScore = 0;
     const body = {
       tipo_arquivo: 'xlsx',
       arquivo_id: this.coleta.id_coleta,
@@ -276,12 +287,14 @@ export class TreineRoboComponent implements OnInit {
     this.score = 0; this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
     this.scatterPontos = []; this.scatterLinha = null;
     this.brincando = false; this.previu = false; this.predicao = null; this.modeloTreinadoId = null;
+    this.desafiando = false; this.desafioFim = false; this.aguardandoLeo = false; this.deck = []; this.cartaIdx = 0; this.kidScore = 0; this.leoScore = 0;
     this.showMistakes = false; this.showCode = false; this.erro = ''; this.coleta = null;
   }
 
   // ---------- humor / mascote ----------
   get mood(): 'idle' | 'happy' | 'thinking' | 'celebrate' {
-    if (this.fase === 'training' || this.prevendo) return 'thinking';
+    if (this.fase === 'training' || this.prevendo || this.aguardandoLeo) return 'thinking';
+    if (this.desafiando) return this.desafioFim ? 'celebrate' : 'happy';
     if (this.brincando) return this.previu ? 'celebrate' : 'happy';
     if (this.fase === 'done') return 'celebrate';
     if (this.datasetId) return 'happy';
@@ -322,6 +335,12 @@ export class TreineRoboComponent implements OnInit {
   // ---------- falas ----------
   get sayText(): string {
     const n = this.robotName;
+    if (this.desafiando) {
+      if (this.aguardandoLeo) return 'Hmm, deixa eu adivinhar... 🤔';
+      if (this.desafioFim) return this.desafioMsgFinal;
+      if (this.cartaRevelada) return 'E aí, quem acertou? 👀';
+      return 'Sua vez! Qual a categoria desse exemplo? 🎲';
+    }
     if (this.prevendo) return 'Deixa eu pensar... 🤔';
     if (this.brincando) return this.previu ? this.predicaoTexto : (this.erro || 'Me mostra um exemplo e eu adivinho! 🔮');
     if (this.fase === 'training') return 'Deixa comigo, tô aprendendo! 🧠';
@@ -425,6 +444,84 @@ export class TreineRoboComponent implements OnInit {
   get predicaoCor(): string {
     const i = Number(this.predicao);
     return this.tarefa === 'agrupamento' && isFinite(i) ? this.CORES_GRUPO[i % this.CORES_GRUPO.length] : '';
+  }
+
+  // ---------- "Desafiar o Léo!" (criança × robô) ----------
+  /** Normaliza um valor para o espaço de rótulos reais do modelo (matriz.classes). */
+  private aClasse(v: any): string {
+    const classes = this.matriz?.classes || [];
+    if (v === null || v === undefined) return '';
+    const s = String(v).trim();
+    if (classes.includes(s)) return s;
+    const n = Number(v);
+    if (Number.isInteger(n) && n >= 0 && n < classes.length) return classes[n];
+    return s;
+  }
+
+  get podeDesafiar(): boolean {
+    return this.fase === 'done' && this.tarefa === 'classificacao'
+      && !!this.modeloTreinadoId && (this.matriz?.classes?.length || 0) > 1
+      && (this.coleta?.dados?.length || 0) > 0;
+  }
+
+  abrirDesafio(): void {
+    if (!this.podeDesafiar) return;
+    const linhas: any[] = this.coleta?.dados || [];
+    const cols: string[] = this.coleta?.colunas || [];
+    const target = this.coleta?.target;
+    const feats = cols.filter(c => c !== target);
+    // sorteia até N linhas reais distintas (embaralha índices)
+    const idxs = linhas.map((_, i) => i);
+    for (let i = idxs.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idxs[i], idxs[j]] = [idxs[j], idxs[i]]; }
+    this.deck = idxs.slice(0, Math.min(this.N_CARTAS, linhas.length)).map(i => {
+      const r = linhas[i];
+      const valores: Record<string, number> = {};
+      for (const c of feats) { const v = Number(r[c]); if (isFinite(v)) valores[c] = +v.toFixed(2); }
+      return { valores, verdadeiro: this.aClasse(r[target]), kid: null, leo: null };
+    });
+    this.cartaIdx = 0; this.kidScore = 0; this.leoScore = 0;
+    this.desafioFim = false; this.aguardandoLeo = false;
+    this.brincando = false; this.previu = false; this.predicao = null; this.erro = '';
+    this.desafiando = true;
+  }
+
+  fecharDesafio(): void { this.desafiando = false; this.desafioFim = false; this.aguardandoLeo = false; }
+  jogarDeNovo(): void { this.abrirDesafio(); }
+
+  palpitarCrianca(classe: string): void {
+    const carta = this.cartaAtual;
+    if (!carta || carta.kid !== null || this.aguardandoLeo || !this.modeloTreinadoId) return;
+    carta.kid = classe;
+    if (classe === carta.verdadeiro) this.kidScore++;
+    this.aguardandoLeo = true;
+    this.dashboard.classificadorPrever({ modelo_id: this.modeloTreinadoId, valores: carta.valores }).subscribe({
+      next: (res: any) => {
+        carta.leo = this.aClasse(res?.predicao);
+        if (carta.leo === carta.verdadeiro) this.leoScore++;
+        this.aguardandoLeo = false;
+      },
+      error: () => { carta.leo = '?'; this.aguardandoLeo = false; },
+    });
+  }
+
+  proximaCarta(): void {
+    if (this.aguardandoLeo) return;
+    this.cartaIdx++;
+    if (this.cartaIdx >= this.deck.length) this.desafioFim = true;
+  }
+
+  get cartaAtual() { return this.deck[this.cartaIdx] || null; }
+  get classesDesafio(): string[] { return this.matriz?.classes || []; }
+  get cartaPistas(): { rotulo: string; valor: number }[] {
+    const c = this.cartaAtual; if (!c) return [];
+    return Object.keys(c.valores).map(k => ({ rotulo: this.rotulo(k), valor: c.valores[k] }));
+  }
+  get cartaRevelada(): boolean { return !!this.cartaAtual && this.cartaAtual.leo !== null; }
+  get desafioMsgFinal(): string {
+    const k = this.kidScore, l = this.leoScore, n = this.robotName;
+    if (k > l) return `Você venceu o ${n}! 🏆 Mandou muito bem!`;
+    if (l > k) return `O ${n} levou essa! 🤖 Treina mais e desafia de novo!`;
+    return `Empate! Você e o ${n} ficaram igualzinhos! 🤝`;
   }
 
   // ---------- código (blocos + python por tarefa) ----------
