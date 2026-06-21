@@ -32,10 +32,11 @@ com um tutor (cards didáticos + chatbot com LLM) durante todo o caminho.
 
 **Produção (Oracle Cloud):** frontend em `https://absapt.tk/h2ia/tutor/`, API em `https://absapt.tk/h2ia/api/`.
 
-O aluno tem **três interfaces** sobre o mesmo backend:
+O aluno tem **quatro entradas** (escolhidas no seletor `/inicio` após o login):
 - **Dashboard clássico** (`/view-aluno`) — editor de pipeline tradicional;
 - **Trilha** (`/trilha`) — visualização em trilha com **ramos paralelos** (compara vários modelos ao mesmo tempo);
-- **Treine seu Robô** (`/treine-robo`) — wizard lúdico para os mais novos.
+- **Treine seu Robô** (`/treine-robo`) — wizard lúdico (classificação/regressão/agrupamento) com treino real no backend, modo "🔮 adivinha" e "🎲 Desafiar o Léo" (criança × robô);
+- **Léo no Mundo Real** (`/leo-mundo-real`) — classificação de **imagens** com fotos do aluno, rodando **100% no navegador** (TF.js: MobileNet + KNN); não usa o backend.
 
 ---
 
@@ -46,7 +47,8 @@ O aluno tem **três interfaces** sobre o mesmo backend:
 ```mermaid
 flowchart TB
   subgraph Cliente["Navegador (aluno / professor / admin)"]
-    SPA["Angular 19 SPA<br/>(3 UIs do aluno + telas de admin/prof)"]
+    SPA["Angular 19 SPA<br/>(4 entradas do aluno + telas de admin/prof)"]
+    TFJS["ML no navegador (TF.js)<br/>MobileNet + KNN<br/>— Léo no Mundo Real"]
   end
 
   subgraph Edge["Servidor (Oracle VM) — nginx"]
@@ -83,6 +85,7 @@ flowchart TB
 - **Execução (sandbox):** o treino roda em **subprocesso isolado** com limites de CPU/RAM/tempo e uma _allowlist_ de módulos Python.
 - **Persistência (MongoDB):** catálogo, datasets enviados, configurações, modelos treinados (binário joblib), pipelines salvos, usuários, histórico de chat.
 - **Serviços externos:** API da NVIDIA para o LLM do chatbot (a chave nunca chega ao frontend).
+- **ML no navegador (sem backend):** o "Léo no Mundo Real" faz **transfer learning client-side** com TF.js (MobileNet + KNN, backend WebGPU com fallback WebGL/CPU). As fotos do aluno **não saem do navegador**.
 
 ### 2.3 Deploy
 
@@ -191,31 +194,34 @@ Pontos-chave:
 
 ### 4.1 Rotas e controle de acesso
 - App routes (lazy): `autenticacao` (login/cadastro), `ativar-conta`, `manual`, e `''` → `InternoModule` com `canLoad: [AuthGuard]`.
-- Internas (lazy): `inicio`, `treine-robo`, `trilha`, `view-aluno`, `view-professor`, `view-admin`.
+- Internas (lazy): `inicio`, `treine-robo`, `leo-mundo-real`, `trilha`, `view-aluno`, `view-professor`, `view-admin`.
 - **`AuthGuard`** valida o JWT e checa o papel contra `ROTAS_POR_PAPEL`:
-  - `aluno → [inicio, treine-robo, trilha, view-aluno]`
+  - `aluno → [inicio, treine-robo, leo-mundo-real, trilha, view-aluno]`
   - `professor → [view-professor]`
   - `admin → [view-admin]`
   - Papel desconhecido ou rota fora da lista → volta para o login.
-- Após o login, o aluno cai no **seletor `/inicio`** (escolhe Robô / Trilha / Clássico).
+- Após o login, o aluno cai no **seletor `/inicio`** (escolhe Robô / Léo no Mundo Real / Trilha / Clássico).
 
-### 4.2 As três UIs do aluno
+### 4.2 As quatro entradas do aluno
 
 ```mermaid
 flowchart LR
   LOGIN["/autenticacao/login"] --> INICIO["/inicio (seletor)"]
   INICIO --> ROBO["/treine-robo<br/>wizard lúdico"]
+  INICIO --> LEO["/leo-mundo-real<br/>imagens (TF.js)"]
   INICIO --> TRILHA["/trilha<br/>ramos paralelos"]
   INICIO --> CLASSICO["/view-aluno<br/>dashboard clássico"]
   ROBO -.compartilham.- SHARED
   TRILHA -.compartilham.- SHARED
   CLASSICO -.compartilham.- SHARED
   SHARED["DashboardService · PipelineService · ScriptGeneratorService<br/>app-tutor · app-chat-tutor · modal de coleta · backend"]
+  LEO -.->|sem backend| BROWSER["ML no navegador (TF.js)"]
 ```
 
 - **Clássico (`/view-aluno`)**: editor de pipeline + "meus projetos" + galeria de modelos públicos do professor.
 - **Trilha (`/trilha`)**: fases (dados → split → X → y → modelo → métricas → viz) com **ramos paralelos** (vários modelos comparados ao mesmo tempo); inspetor com aba Básico (tutor) e aba Código (Python gerado).
-- **Treine seu Robô (`/treine-robo`)**: mascote e wizard de 4 passos (Missão → Sentidos → Cérebro → Treinar), ciente do tipo de tarefa (classificação/regressão/agrupamento), com treino **real** no backend e modo "🔮 adivinha".
+- **Treine seu Robô (`/treine-robo`)**: mascote e wizard de 4 passos (Missão → Sentidos → Cérebro → Treinar), ciente do tipo de tarefa (classificação/regressão/agrupamento), com treino **real** no backend, datasets lúdicos (🌸 Flores, 🍦 Sorvetes, 🐶 Cachorros, 🐠 Cardume…), modo "🔮 adivinha" e **"🎲 Desafiar o Léo"** (criança × robô usando o modelo real via `/classificador/prever`).
+- **Léo no Mundo Real (`/leo-mundo-real`)**: classificação de **imagens** com fotos do aluno (câmera ou galeria), **100% no navegador** — ver 4.7.
 
 ### 4.3 Serviços principais
 
@@ -239,6 +245,15 @@ flowchart LR
 - `environment.ts` (dev): `apiUrl: 'http://127.0.0.1:8000/'`.
 - `environment.prod.ts`: `apiUrl: '/h2ia/api/'` (atrás do nginx).
 - `environment.docker.ts` (branch docker): `apiUrl: '/api/'`.
+
+### 4.7 Léo no Mundo Real — visão no navegador (TF.js)
+Componente standalone `interno/leo-mundo-real/` + serviço `leo-visao.service.ts`. **Não usa o backend** (só o login, para chegar à rota). Faz **transfer learning client-side**:
+- **MobilenNet** (`@tensorflow-models/mobilenet`) extrai um *embedding* de cada imagem; um **KNN** (`@tensorflow-models/knn-classifier`) classifica a partir dos poucos exemplos do aluno.
+- **Backend de GPU:** tenta **WebGPU** (`@tensorflow/tfjs-backend-webgpu`) e cai para **WebGL/CPU** automaticamente; um chip na topbar mostra o motor ativo.
+- **Entrada de imagem:** botão **📷 Tirar foto** (câmera ao vivo via `getUserMedia`, funciona em desktop e celular; exige HTTPS) e **🖼️ Da galeria** (upload de arquivo). Demo "exemplos de cores" como início rápido.
+- **Fluxo (state machine):** `setup` (criar categorias + fotos) → `training` (monta o KNN) → `ready` → `testing` (mostra predição + barras de confiança + 👍/👎 + placar e a lição "a IA só sabe o que ensinamos").
+- **Memória:** embeddings guardados como `Float32Array` (tensores de vida curta, `dispose`); KNN e câmera liberados ao recomeçar/sair.
+- **Bundle:** TF.js fica **isolado no chunk lazy** da rota (não pesa no inicial); o modelo MobileNet (~16 MB) é baixado em runtime na 1ª visita (precisa de internet).
 
 ---
 
@@ -446,7 +461,8 @@ sequenceDiagram
 ### 6.3 Variações por interface
 - **Clássico:** um modelo por vez; foco no editor e nos "meus projetos".
 - **Trilha:** vários modelos em ramos paralelos; compara métricas e visualizações lado a lado; aba Código por ramo.
-- **Treine seu Robô:** o mesmo backend, embrulhado num wizard lúdico (missões/cérebros) e com o modo "adivinha" (`/classificador/prever`).
+- **Treine seu Robô:** o mesmo backend, embrulhado num wizard lúdico (missões/cérebros), com o modo "🔮 adivinha" e o "🎲 Desafiar o Léo" (ambos via `/classificador/prever`).
+- **Léo no Mundo Real:** fluxo próprio, **sem backend** — coleta de fotos → treino (KNN sobre embeddings do MobileNet) → predição, tudo no navegador (ver 4.7).
 
 ---
 
@@ -506,4 +522,4 @@ sequenceDiagram
 
 ---
 
-_Documento gerado a partir de inspeção do banco em produção e leitura do código-fonte dos dois repositórios._
+_Documento gerado a partir de inspeção do banco em produção e leitura do código-fonte dos dois repositórios. Atualizado em 2026-06-21 (inclui "Léo no Mundo Real", "Desafiar o Léo", missão Cachorros e WebGPU/câmera)._
