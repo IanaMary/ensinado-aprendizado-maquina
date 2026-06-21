@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -54,10 +54,19 @@ export class LeoMundoRealComponent implements OnInit, OnDestroy {
   veredicto: 'right' | 'wrong' | null = null;
   score = { right: 0, total: 0 };
 
+  // ---- câmera (getUserMedia) ----
+  @ViewChild('camVideo') camVideo?: ElementRef<HTMLVideoElement>;
+  cameraAberta = false;
+  cameraTeste = false;          // captura para teste (vs. adicionar a uma categoria)
+  cameraAlvoCat: number | null = null;
+  cameraErro = '';
+  facing: 'environment' | 'user' = 'environment';
+  private stream: MediaStream | null = null;
+
   constructor(private leoVisao: LeoVisaoService, private router: Router) {}
 
   ngOnInit(): void { this.carregarModelo(); }
-  ngOnDestroy(): void { this.leoVisao.limpar(); }
+  ngOnDestroy(): void { this.pararStream(); this.leoVisao.limpar(); }
 
   voltarInicio(): void { this.router.navigate(['/inicio']); }
 
@@ -192,7 +201,56 @@ export class LeoMundoRealComponent implements OnInit, OnDestroy {
     ];
     this.fase = 'setup'; this.test = null; this.veredicto = null;
     this.score = { right: 0, total: 0 }; this.erro = '';
+    this.fecharCamera();
   }
+
+  // ---------- câmera ao vivo (getUserMedia) ----------
+  abrirCameraCategoria(i: number): void { this.cameraTeste = false; this.cameraAlvoCat = i; this.iniciarCamera(); }
+  abrirCameraTeste(): void { this.cameraTeste = true; this.cameraAlvoCat = null; this.iniciarCamera(); }
+
+  private async iniciarCamera(): Promise<void> {
+    this.cameraErro = ''; this.erro = ''; this.cameraAberta = true;
+    if (!navigator.mediaDevices?.getUserMedia) {
+      this.cameraErro = 'Este navegador não dá acesso à câmera. Use “Da galeria”. 🙈';
+      return;
+    }
+    try {
+      this.pararStream();
+      this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: this.facing }, audio: false });
+      // o <video> só existe depois que o overlay renderiza
+      setTimeout(() => {
+        const v = this.camVideo?.nativeElement;
+        if (v && this.stream) { v.srcObject = this.stream; v.play().catch(() => {}); }
+      }, 0);
+    } catch {
+      this.cameraErro = 'Não consegui abrir a câmera (permissão negada?). Você pode usar “Da galeria”. 🙈';
+    }
+  }
+
+  async capturar(): Promise<void> {
+    const v = this.camVideo?.nativeElement;
+    if (!v || !v.videoWidth || this.busy) return;
+    this.busy = true; this.cameraErro = '';
+    try {
+      const T = Math.min(v.videoWidth, v.videoHeight);
+      const ox = (v.videoWidth - T) / 2, oy = (v.videoHeight - T) / 2;
+      const cv = document.createElement('canvas'); cv.width = T; cv.height = T;
+      cv.getContext('2d')!.drawImage(v, ox, oy, T, T, 0, 0, T, T);
+      const foto: Foto = { thumb: this.miniatura(cv), feat: await this.leoVisao.embed(cv) };
+      if (this.cameraTeste) { this.fecharCamera(); await this.prever(foto); }
+      else if (this.cameraAlvoCat != null && this.cats[this.cameraAlvoCat].fotos.length < this.MAX_FOTOS) {
+        this.cats[this.cameraAlvoCat].fotos.push(foto); // mantém aberta p/ tirar várias
+      }
+    } catch { this.cameraErro = 'Não consegui capturar. Tenta de novo. 🙈'; }
+    finally { this.busy = false; }
+  }
+
+  trocarCamera(): void { this.facing = this.facing === 'environment' ? 'user' : 'environment'; this.iniciarCamera(); }
+
+  fecharCamera(): void { this.pararStream(); this.cameraAberta = false; this.cameraTeste = false; this.cameraAlvoCat = null; this.cameraErro = ''; }
+  private pararStream(): void { this.stream?.getTracks().forEach(t => t.stop()); this.stream = null; }
+
+  get fotosCatCamera(): number { return this.cameraAlvoCat != null ? this.cats[this.cameraAlvoCat]?.fotos.length || 0 : 0; }
 
   // ---------- imagem → thumb + embedding ----------
   private lerArquivo(file: File): Promise<Foto> {

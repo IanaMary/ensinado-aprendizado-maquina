@@ -117,11 +117,14 @@
                 </div>
                 <div class="thumbs-vazio" *ngIf="!c.fotos.length">👆 adicione fotos aqui</div>
               </div>
-              <label class="add-foto" [class.cheio]="c.fotos.length>=MAX_FOTOS">
-                {{ c.fotos.length>=MAX_FOTOS ? '✓ cheio' : '📸 Adicionar foto' }}
-                <input type="file" accept="image/*" capture="environment" multiple hidden
-                       [disabled]="busy || c.fotos.length>=MAX_FOTOS" (change)="onArquivos(i,$event)">
-              </label>
+              <div class="foto-acoes" *ngIf="c.fotos.length<MAX_FOTOS">
+                <button class="add-foto cam" (click)="abrirCameraCategoria(i)" [disabled]="busy">📷 Tirar foto</button>
+                <label class="add-foto file">
+                  🖼️ Da galeria
+                  <input type="file" accept="image/*" multiple hidden [disabled]="busy" (change)="onArquivos(i,$event)">
+                </label>
+              </div>
+              <div class="add-foto cheio" *ngIf="c.fotos.length>=MAX_FOTOS">✓ cheio</div>
               <div class="cat-cont">{{ c.fotos.length }} foto(s)<span *ngIf="c.fotos.length===1"> · precisa de +1</span><span *ngIf="c.fotos.length>=2"> ✓</span></div>
             </div>
 
@@ -145,9 +148,9 @@
           <div class="placar-msg">Aprendi! 🎉</div>
           <div class="placar-cap">Aprendi {{ catsComFotos }} categorias com {{ totalFotos }} fotos suas.</div>
           <div class="placar-acoes">
-            <label class="btn-brincar">
-              📸 Me mostre uma coisa nova!
-              <input type="file" accept="image/*" capture="environment" hidden [disabled]="busy" (change)="onTeste($event)">
+            <button class="btn-brincar" (click)="abrirCameraTeste()" [disabled]="busy">📷 Me mostre uma coisa nova!</button>
+            <label class="btn-link">🖼️ ou enviar da galeria
+              <input type="file" accept="image/*" hidden [disabled]="busy" (change)="onTeste($event)">
             </label>
             <div class="acoes-row">
               <button class="btn-again" (click)="ensinarMais()">➕ Ensinar mais</button>
@@ -188,9 +191,9 @@
             </div>
             <div class="aviso-edu">🧠 Lembra: o {{ robotName }} só conhece as categorias que <b>você</b> criou. Mostre algo bem diferente e veja ele se confundir — a IA só sabe o que a gente ensina!</div>
             <div class="placar-mini">Segundo você, o {{ robotName }} já acertou <b>{{ score.right }}</b> de <b>{{ score.total }}</b> 👀</div>
-            <label class="btn-brincar">
-              📸 Próxima coisa
-              <input type="file" accept="image/*" capture="environment" hidden [disabled]="busy" (change)="onTeste($event)">
+            <button class="btn-brincar" (click)="abrirCameraTeste()" [disabled]="busy">📷 Próxima coisa</button>
+            <label class="btn-link">🖼️ ou enviar da galeria
+              <input type="file" accept="image/*" hidden [disabled]="busy" (change)="onTeste($event)">
             </label>
             <div class="acoes-row">
               <button class="btn-again" (click)="ensinarMais()">➕ Ensinar mais</button>
@@ -198,6 +201,24 @@
             </div>
           </ng-container>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CÂMERA (getUserMedia) -->
+  <div class="cam-overlay" *ngIf="cameraAberta">
+    <div class="cam-box">
+      <div class="cam-titulo">{{ cameraTeste ? ('Mostre uma coisa para o ' + robotName + ' 📷') : ('Fotos de: ' + nomeCat(cameraAlvoCat ?? 0)) }}</div>
+      <div class="cam-erro" *ngIf="cameraErro">{{ cameraErro }}</div>
+      <div class="cam-palco" *ngIf="!cameraErro">
+        <video #camVideo class="cam-video" autoplay playsinline muted></video>
+        <div class="cam-mira"></div>
+      </div>
+      <div class="cam-cont" *ngIf="!cameraTeste && !cameraErro">{{ fotosCatCamera }} foto(s) nesta categoria</div>
+      <div class="cam-acoes">
+        <button class="cam-btn captura" *ngIf="!cameraErro" (click)="capturar()" [disabled]="busy">📸 {{ busy ? '...' : 'Capturar' }}</button>
+        <button class="cam-btn trocar" *ngIf="!cameraErro" (click)="trocarCamera()" [disabled]="busy" title="Trocar câmera">🔄</button>
+        <button class="cam-btn fechar" (click)="fecharCamera()">{{ cameraErro ? 'Fechar' : (cameraTeste ? 'Cancelar' : (fotosCatCamera>0 ? 'Pronto ✓' : 'Fechar')) }}</button>
       </div>
     </div>
   </div>
