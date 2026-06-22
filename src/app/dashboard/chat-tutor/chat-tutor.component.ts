@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DashboardService } from '../services/dashboard.service';
+import { AtividadeService } from '../../service/atividade/atividade.service';
 
 interface MensagemChat {
   role: 'user' | 'assistant';
@@ -51,7 +52,10 @@ export class ChatTutorComponent implements OnInit, OnDestroy, OnChanges {
     return this.sugestoesCustom?.length ? this.sugestoesCustom : this.sugestoesPadrao;
   }
 
-  constructor(private dashboardService: DashboardService) { }
+  constructor(
+    private dashboardService: DashboardService,
+    private atividade: AtividadeService,
+  ) { }
 
   ngOnInit(): void {
     // Mostra qual LLM está respondendo no chat (apenas informativo).
@@ -139,6 +143,11 @@ export class ChatTutorComponent implements OnInit, OnDestroy, OnChanges {
     this.erro = '';
     this.respostaStream = '';
     this.carregando = true;
+
+    // Só a "pergunta" é registrada no cliente. A "resposta" (conteúdo, duração,
+    // status sucesso/erro/interrompido) é registrada de forma canônica no backend
+    // (chat_tutor.py), evitando duplicar o evento por turno.
+    this.atividade.registrar('chat', 'enviou_mensagem', { tamanho: texto.length }, { pipeline_id: this.pipelineId });
 
     this.streamSub = this.dashboardService.chatTutorStream(this.mensagens, this.contexto).subscribe({
       next: (token) => {

@@ -8,8 +8,8 @@ import { roleMap } from '../../../app/models/item-coleta-dado.model';
 // faz o refresh funcionar em qualquer uma delas.
 const ROTAS_POR_PAPEL: Record<string, string[]> = {
   aluno: ['inicio', 'treine-robo', 'leo-mundo-real', 'trilha', 'view-aluno'],
-  professor: ['view-professor'],
-  admin: ['view-admin'],
+  professor: ['view-professor', 'atividades'],
+  admin: ['view-admin', 'atividades'],
 };
 
 @Injectable({

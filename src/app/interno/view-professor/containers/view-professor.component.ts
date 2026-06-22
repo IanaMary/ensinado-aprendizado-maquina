@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-view-professor',
@@ -8,4 +9,9 @@ import { Component } from '@angular/core';
 })
 export class ViewProfessorComponent {
 
+  constructor(private router: Router) { }
+
+  irAtividades() {
+    this.router.navigate(['/atividades']);
+  }
 }

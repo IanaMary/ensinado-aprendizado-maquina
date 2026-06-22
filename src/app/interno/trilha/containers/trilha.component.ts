@@ -6,6 +6,7 @@ import { DashboardService } from '../../../dashboard/services/dashboard.service'
 import { SessionService } from '../../../service/sessao-store.service';
 import { ScriptGeneratorService } from '../../../service/script-generator.service';
 import { PipelineService, PipelineState } from '../../../service/pipeline.service';
+import { AtividadeService } from '../../../service/atividade/atividade.service';
 import { ItemPipeline, ResultadoColetaDado } from '../../../models/item-coleta-dado.model';
 import { TutorItemInfo } from '../../../dashboard/tutor/tutor.component';
 import { ModalExecucaoComponent } from '../../../dashboard/execucoes/modals/modal-execucao/modal-execucao.component';
@@ -85,6 +86,7 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private scriptGen: ScriptGeneratorService,
     private pipelineSvc: PipelineService,
+    private atividade: AtividadeService,
   ) {}
 
   ngOnInit(): void {
@@ -244,6 +246,7 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     } else if (fase === 'eval') {
       if (!this.evalCards.some(c => c.valor === item.valor)) this.evalCards.push(card);
     }
+    this.atividade.registrar('pipeline', 'adicionou_bloco', { contexto: 'trilha', fase, valor: item.valor });
     this.marcarDesatualizado();
     this.fecharPicker();
     this.selecionar(card);  // abre o inspetor no bloco recém-adicionado
@@ -481,6 +484,7 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     const configId = this.session.getConfigurcaoTreinamento()!;
     const preProc = this.preProcParaTreino();
 
+    this.atividade.iniciarAcao('trilha_treino');
     this.execRunning = true; this.execDone = false; this.desatualizado = false;
     this.execMsg = `Treinando ${this.modelCards.length} modelo(s) em paralelo…`;
     this.modelCards.forEach(c => c.status = 'running');
@@ -511,6 +515,10 @@ export class TrilhaComponent implements OnInit, OnDestroy {
       });
       this.featCards.forEach(c => c.status = 'done');
       this.labelCards.forEach(c => c.status = 'done');
+      const erros = lista.filter((r: any) => r?.__erro).length;
+      this.atividade.finalizarAcao('trilha_treino',
+        { contexto: 'trilha', modelos: this.modelCards.map(c => c.valor), treinados: treinados.length, erros },
+        { acao: 'rodou_trilha', status: erros ? 'erro' : 'sucesso', erro: erros ? `${erros} modelo(s) falharam` : undefined });
       if (this.evalCards.length && treinados.length) this.avaliar(treinados);
       else { this.execRunning = false; this.concluir(); }
     });
@@ -704,7 +712,7 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     this.salvandoProj = true;
     const estado = this.montarEstado(); estado.nome = nome;
     this.pipelineSvc.salvarPipeline(estado).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (saved: any) => { this.projetoId = saved?.id || this.projetoId; this.salvandoProj = false; this.salvarOpen = false; this.flash('Projeto salvo.'); },
+      next: (saved: any) => { this.projetoId = saved?.id || this.projetoId; this.salvandoProj = false; this.salvarOpen = false; this.atividade.registrar('pipeline', 'salvou_projeto', { contexto: 'trilha', nome }); this.flash('Projeto salvo.'); },
       error: (err) => { this.salvandoProj = false; this.flash(err?.error?.detail || 'Falha ao salvar.'); },
     });
   }

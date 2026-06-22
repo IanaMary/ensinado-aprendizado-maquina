@@ -31,6 +31,8 @@ const routes: Routes = [
     loadChildren: () => import('./gerenciar-usuarios/gerenciar-usuarios.module').then(m => m.GerenciarUsuariosModule),
     data: { breadcrumb: 'Gerenciar Usuários' }
   }
+  // A tela de Atividades é uma rota compartilhada top-level (/atividades),
+  // acessível por admin e professor — ver interno-routing.module.ts.
 ];
 
 @NgModule({

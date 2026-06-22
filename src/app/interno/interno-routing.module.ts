@@ -18,6 +18,12 @@ const routes: Routes = [
     data: { breadcrumb: 'Administracao' }
   },
   {
+    // Rota compartilhada admin/professor (a API autoriza ambos os papéis).
+    path: 'atividades',
+    loadChildren: () => import('../interno/view-admin/atividades/atividades.module').then(m => m.AtividadesModule),
+    data: { breadcrumb: 'Atividades' }
+  },
+  {
     path: 'trilha',
     loadChildren: () => import('../interno/trilha/trilha.module').then(m => m.TrilhaModule),
     data: { breadcrumb: 'Trilha de ML' }

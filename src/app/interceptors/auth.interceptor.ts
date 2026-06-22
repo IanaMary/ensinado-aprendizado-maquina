@@ -28,10 +28,13 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(req).pipe(
       catchError(err => {
-        // Não redirecionar para login em endpoints públicos
-        const isPublicEndpoint = req.url.includes('/convite/') || 
+        // Não redirecionar para login em endpoints públicos. /atividades é
+        // telemetria fire-and-forget (flush em background): um 401 nela não deve
+        // deslogar o usuário no meio de uma tarefa.
+        const isPublicEndpoint = req.url.includes('/convite/') ||
                                   req.url.includes('/login') ||
-                                  req.url.includes('/ativar-conta');
+                                  req.url.includes('/ativar-conta') ||
+                                  req.url.includes('/atividades');
         
         if (err.status === 401 && !isPublicEndpoint) {
           this.authService.logout();

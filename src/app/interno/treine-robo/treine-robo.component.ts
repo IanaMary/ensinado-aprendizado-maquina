@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { DashboardService } from '../../dashboard/services/dashboard.service';
+import { AtividadeService } from '../../service/atividade/atividade.service';
 
 type Fase = 'build' | 'training' | 'done';
 type Sentido = 'sharp' | 'skip';
@@ -120,7 +121,11 @@ export class TreineRoboComponent implements OnInit {
   kidScore = 0;
   leoScore = 0;
 
-  constructor(private dashboard: DashboardService, private router: Router) {}
+  constructor(
+    private dashboard: DashboardService,
+    private router: Router,
+    private atividade: AtividadeService,
+  ) {}
 
   ngOnInit(): void {
     this.dashboard.fetchItensModelos().subscribe({
@@ -148,6 +153,7 @@ export class TreineRoboComponent implements OnInit {
   // ---------- escolhas ----------
   escolherDataset(d: DatasetLudico): void {
     if (this.carregandoDados) return;
+    this.atividade.registrar('pipeline', 'escolheu_dataset', { contexto: 'treine-robo', dataset: d.id, toy: d.toy });
     this.carregandoDados = true; this.erro = ''; this.coleta = null;
     this.dashboard.carregarToyDataset(d.toy).subscribe({
       next: (res: any) => { this.coleta = res; this.datasetId = d.id; this.carregandoDados = false; },
@@ -162,6 +168,7 @@ export class TreineRoboComponent implements OnInit {
     if (this.fase === 'training' || !this.coleta || !this.cerebro) return;
     const modeloItem = this.modelosCat.find(m => m.valor === this.cerebro!.valor);
     if (!modeloItem) { this.erro = 'Esse cérebro não está disponível agora. 🙈'; return; }
+    this.atividade.iniciarAcao('robo_treino');
     this.fase = 'training'; this.showMistakes = false; this.showCode = false; this.erro = '';
     this.matriz = null; this.r2 = null; this.mae = null; this.silhouette = null;
     this.scatterPontos = []; this.scatterLinha = null;
@@ -190,7 +197,13 @@ export class TreineRoboComponent implements OnInit {
       : [{ valor: 'accuracy_score', label: 'acuracia', average: 'weighted' }, { valor: 'confusion_matrix', label: 'matriz' }];
     const body = { modelos: [{ id: treino.id, label: treino.nome_modelo }], metricas };
     this.dashboard.postMetricas(body).subscribe({
-      next: (aval: any) => { this.parseResultado(aval, treino.nome_modelo); this.fase = 'done'; },
+      next: (aval: any) => {
+        this.parseResultado(aval, treino.nome_modelo);
+        this.fase = 'done';
+        this.atividade.finalizarAcao('robo_treino',
+          { contexto: 'treine-robo', cerebro: this.cerebro?.valor, tarefa: this.tarefa, score: this.score },
+          { acao: 'treinou_modelo' });
+      },
       error: (e) => this.falhaTreino(e),
     });
   }
@@ -291,6 +304,8 @@ export class TreineRoboComponent implements OnInit {
   private falhaTreino(e: any): void {
     this.fase = 'build';
     this.erro = e?.error?.detail || 'O robô ficou confuso no treino. Tenta de novo! 🙈';
+    this.atividade.finalizarAcao('robo_treino', { contexto: 'treine-robo' },
+      { acao: 'treinou_modelo', status: 'erro', erro: e?.error?.detail || 'falha no treino' });
   }
 
   recomecar(): void {

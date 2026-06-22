@@ -12,6 +12,7 @@ import { SessionService } from '../../service/sessao-store.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NomearPipelineDialogComponent } from './modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
 import { AuthService } from '../../service/auth/auth.service';
+import { AtividadeService } from '../../service/atividade/atividade.service';
 
 const TIPOS_ARQUIVO_DADOS = ['csv', 'tsv', 'json', 'excel', 'xlxs'];
 
@@ -65,7 +66,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     private sessionService: SessionService,
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private atividade: AtividadeService
   ) { }
 
   ngOnInit(): void {
@@ -210,6 +212,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     if (this.modalAberto) return;
     this.modalAberto = true;
 
+    this.atividade.registrar('ui', 'abriu_etapa', { contexto: 'classico', etapa: item.tipoItem, item: item.valor });
+
     const dialogRef = this.dialog.open(ModalExecucaoComponent, {
       maxWidth: 'none',
       width: 'auto',
@@ -247,6 +251,13 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
 
         this.dashboardService.moverItensEmExecucao();
         this.atualizarTutorContexto();
+        this.atividade.registrar('pipeline', 'concluiu_etapa', {
+          contexto: 'classico',
+          etapa: item.tipoItem,
+          modelo: resultado.modeloSelecionado?.valor,
+          treinou: !!resultado.resultadoTreinamento,
+          avaliou: !!resultado.resultadosDasAvaliacoes,
+        });
       }
     });
   }
@@ -678,6 +689,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   }
 
   async baixarPipeline(): Promise<void> {
+    this.atividade.registrar('pipeline', 'exportou_script', { contexto: 'classico', modelo: this.modeloSelecionado?.valor });
     await this.scriptGenerator.generatePipelineBundle(
       this.resultadoColetaDado,
       this.modeloSelecionado,
@@ -730,7 +742,9 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
       };
 
-      this.pipelineService.salvarPipeline(state).pipe(takeUntil(this.destroy$)).subscribe(() => {});
+      this.pipelineService.salvarPipeline(state).pipe(takeUntil(this.destroy$)).subscribe(() => {
+        this.atividade.registrar('pipeline', 'salvou_projeto', { contexto: 'classico', nome });
+      });
     });
   }
 

@@ -1,0 +1,103 @@
+<div class="atividades-container">
+  <h1>Atividades dos Usuários</h1>
+  <p class="sub">Telemetria da jornada dos alunos: ações do pipeline, navegação, chamadas, erros e uso do tutor.</p>
+
+  <!-- Cards de resumo -->
+  <div class="cards-resumo" *ngIf="resumo">
+    <div class="card-resumo">
+      <span class="num">{{ resumo.total }}</span>
+      <span class="rotulo">Eventos</span>
+    </div>
+    <div class="card-resumo erro">
+      <span class="num">{{ resumo.total_erros }}</span>
+      <span class="rotulo">Erros</span>
+    </div>
+    <div class="card-resumo">
+      <span class="num">{{ resumo.usuarios_ativos }}</span>
+      <span class="rotulo">Usuários ativos</span>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros">
+    <label>
+      Tipo
+      <select [(ngModel)]="filtros.tipo">
+        <option *ngFor="let t of tipos" [value]="t">{{ t || 'todos' }}</option>
+      </select>
+    </label>
+    <label>
+      Status
+      <select [(ngModel)]="filtros.status">
+        <option *ngFor="let s of status" [value]="s">{{ s || 'todos' }}</option>
+      </select>
+    </label>
+    <label>
+      Ação
+      <input type="text" [(ngModel)]="filtros.acao" placeholder="ex.: treinou_modelo" />
+    </label>
+    <label>
+      Usuário (id)
+      <input type="text" [(ngModel)]="filtros.usuario_id" placeholder="ObjectId" />
+    </label>
+    <label>
+      De
+      <input type="datetime-local" [(ngModel)]="filtros.data_inicio" />
+    </label>
+    <label>
+      Até
+      <input type="datetime-local" [(ngModel)]="filtros.data_fim" />
+    </label>
+    <div class="acoes">
+      <button class="btn" (click)="aplicarFiltros()">Filtrar</button>
+      <button class="btn secundario" (click)="limparFiltros()">Limpar</button>
+    </div>
+  </div>
+
+  <div class="erro-msg" *ngIf="erro">{{ erro }}</div>
+
+  <!-- Tabela -->
+  <div class="tabela-wrap">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Usuário</th>
+          <th>Papel</th>
+          <th>Tipo</th>
+          <th>Ação</th>
+          <th>Status</th>
+          <th>Duração</th>
+          <th>Detalhes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of itens" [class.linha-erro]="a.status === 'erro'">
+          <td>{{ formatarData(a.timestamp) }}</td>
+          <td>{{ a.usuario_nome || a.usuario_email }}</td>
+          <td>{{ a.usuario_role }}</td>
+          <td>{{ a.tipo }}</td>
+          <td>{{ a.acao }}</td>
+          <td>
+            <span class="badge" [class.ok]="a.status === 'sucesso'" [class.bad]="a.status === 'erro'">{{ a.status }}</span>
+          </td>
+          <td>{{ a.duracao_ms != null ? a.duracao_ms + ' ms' : '—' }}</td>
+          <td class="detalhes" [title]="a.erro || resumoDetalhes(a.detalhes)">
+            {{ a.erro || resumoDetalhes(a.detalhes) }}
+          </td>
+        </tr>
+        <tr *ngIf="!itens.length && !carregando">
+          <td colspan="8" class="vazio">Nenhuma atividade encontrada.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="carregando" *ngIf="carregando">Carregando…</div>
+  </div>
+
+  <!-- Paginação -->
+  <div class="paginacao" *ngIf="total > 0">
+    <button class="btn secundario" (click)="paginaAnterior()" [disabled]="skip <= 0">Anterior</button>
+    <span>Página {{ paginaAtual }} de {{ totalPaginas }} · {{ total }} eventos</span>
+    <button class="btn secundario" (click)="proximaPagina()" [disabled]="skip + limit >= total">Próxima</button>
+  </div>
+</div>
