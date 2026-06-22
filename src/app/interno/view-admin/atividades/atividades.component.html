@@ -3,7 +3,7 @@
   <p class="sub">Telemetria da jornada dos alunos: ações do pipeline, navegação, chamadas, erros e uso do tutor.</p>
 
   <!-- Cards de resumo -->
-  <div class="cards-resumo" *ngIf="resumo">
+  <div class="cards-resumo" *ngIf="resumo" aria-live="polite">
     <div class="card-resumo">
       <span class="num">{{ resumo.total }}</span>
       <span class="rotulo">Eventos</span>
@@ -16,6 +16,35 @@
       <span class="num">{{ resumo.usuarios_ativos }}</span>
       <span class="rotulo">Usuários ativos</span>
     </div>
+  </div>
+
+  <!-- Tempo preso: ranking de ações por duração média / taxa de erro -->
+  <div class="tempo-preso" *ngIf="tempoPreso.length">
+    <button class="toggle" type="button" (click)="mostrarTempoPreso = !mostrarTempoPreso"
+            [attr.aria-expanded]="mostrarTempoPreso">
+      {{ mostrarTempoPreso ? '▾' : '▸' }} Onde os alunos demoram / travam (tempo médio por ação)
+    </button>
+    <table class="tabela" *ngIf="mostrarTempoPreso">
+      <caption class="sr-only">Ranking de ações por duração média e taxa de erro</caption>
+      <thead>
+        <tr>
+          <th scope="col">Ação</th>
+          <th scope="col">Ocorrências</th>
+          <th scope="col">Duração média</th>
+          <th scope="col">Duração máx.</th>
+          <th scope="col">Taxa de erro</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of tempoPreso" [class.linha-erro]="t.taxa_erro >= 0.3">
+          <td>{{ t.acao }}</td>
+          <td>{{ t.total }}</td>
+          <td>{{ (t.duracao_media_ms || 0) | number:'1.0-0' }} ms</td>
+          <td>{{ t.duracao_max_ms || 0 }} ms</td>
+          <td>{{ (t.taxa_erro * 100) | number:'1.0-0' }}%</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <!-- Filtros -->
@@ -37,8 +66,11 @@
       <input type="text" [(ngModel)]="filtros.acao" placeholder="ex.: treinou_modelo" />
     </label>
     <label>
-      Usuário (id)
-      <input type="text" [(ngModel)]="filtros.usuario_id" placeholder="ObjectId" />
+      Usuário
+      <select [(ngModel)]="filtros.usuario_id">
+        <option value="">todos</option>
+        <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nome }} ({{ u.email }})</option>
+      </select>
     </label>
     <label>
       De
@@ -51,35 +83,46 @@
     <div class="acoes">
       <button class="btn" (click)="aplicarFiltros()">Filtrar</button>
       <button class="btn secundario" (click)="limparFiltros()">Limpar</button>
+      <button class="btn secundario" (click)="exportarCsv()" [disabled]="exportando">
+        {{ exportando ? 'Exportando…' : 'Exportar CSV' }}
+      </button>
+      <button class="btn secundario" (click)="toggleAutoRefresh()" [attr.aria-pressed]="autoRefresh">
+        {{ autoRefresh ? '⏸ Parar auto-atualização' : '▶ Auto-atualizar (30s)' }}
+      </button>
     </div>
   </div>
 
-  <div class="erro-msg" *ngIf="erro">{{ erro }}</div>
+  <div class="erro-msg" *ngIf="erro" role="alert" aria-live="assertive">{{ erro }}</div>
 
   <!-- Tabela -->
   <div class="tabela-wrap">
     <table class="tabela">
+      <caption class="sr-only">Lista de atividades dos usuários com data, usuário, tipo, ação, status, duração e detalhes</caption>
       <thead>
         <tr>
-          <th>Data</th>
-          <th>Usuário</th>
-          <th>Papel</th>
-          <th>Tipo</th>
-          <th>Ação</th>
-          <th>Status</th>
-          <th>Duração</th>
-          <th>Detalhes</th>
+          <th scope="col">Data</th>
+          <th scope="col">Usuário</th>
+          <th scope="col">Papel</th>
+          <th scope="col">Tipo</th>
+          <th scope="col">Ação</th>
+          <th scope="col">Status</th>
+          <th scope="col">Duração</th>
+          <th scope="col">Detalhes</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let a of itens" [class.linha-erro]="a.status === 'erro'">
           <td>{{ formatarData(a.timestamp) }}</td>
-          <td>{{ a.usuario_nome || a.usuario_email }}</td>
+          <td>
+            <button type="button" class="link-jornada" (click)="verJornada(a.usuario_id)"
+                    title="Ver a jornada deste usuário">{{ a.usuario_nome || a.usuario_email }}</button>
+          </td>
           <td>{{ a.usuario_role }}</td>
           <td>{{ a.tipo }}</td>
           <td>{{ a.acao }}</td>
           <td>
-            <span class="badge" [class.ok]="a.status === 'sucesso'" [class.bad]="a.status === 'erro'">{{ a.status }}</span>
+            <span class="badge" [class.ok]="a.status === 'sucesso'" [class.bad]="a.status === 'erro'"
+                  [attr.aria-label]="'status: ' + a.status">{{ a.status }}</span>
           </td>
           <td>{{ a.duracao_ms != null ? a.duracao_ms + ' ms' : '—' }}</td>
           <td class="detalhes" [title]="a.erro || resumoDetalhes(a.detalhes)">
@@ -91,7 +134,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="carregando" *ngIf="carregando">Carregando…</div>
+    <div class="carregando" *ngIf="carregando" role="status" aria-live="polite">Carregando…</div>
   </div>
 
   <!-- Paginação -->

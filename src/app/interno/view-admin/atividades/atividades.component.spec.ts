@@ -4,22 +4,30 @@ import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { AtividadesComponent } from './atividades.component';
 import { AtividadeService } from '../../../service/atividade/atividade.service';
+import { DashboardService } from '../../../dashboard/services/dashboard.service';
 
 describe('AtividadesComponent', () => {
   let fixture: ComponentFixture<AtividadesComponent>;
   let comp: AtividadesComponent;
   let svc: jasmine.SpyObj<AtividadeService>;
+  let dash: jasmine.SpyObj<DashboardService>;
 
   beforeEach(async () => {
-    svc = jasmine.createSpyObj('AtividadeService', ['listar', 'resumo']);
+    svc = jasmine.createSpyObj('AtividadeService', ['listar', 'resumo', 'tempoPreso']);
     svc.listar.and.returnValue(of({ total: 0, itens: [] }));
     svc.resumo.and.returnValue(
       of({ total: 0, total_erros: 0, usuarios_ativos: 0, por_tipo: [], por_acao: [] }),
     );
+    svc.tempoPreso.and.returnValue(of({ itens: [] }));
+    dash = jasmine.createSpyObj('DashboardService', ['listarUsuarios']);
+    dash.listarUsuarios.and.returnValue(of([]));
     await TestBed.configureTestingModule({
       declarations: [AtividadesComponent],
       imports: [CommonModule, FormsModule],
-      providers: [{ provide: AtividadeService, useValue: svc }],
+      providers: [
+        { provide: AtividadeService, useValue: svc },
+        { provide: DashboardService, useValue: dash },
+      ],
     }).compileComponents();
     fixture = TestBed.createComponent(AtividadesComponent);
     comp = fixture.componentInstance;

@@ -178,24 +178,26 @@ export class AtividadeService {
 
   // ---- Consulta (tela admin) ----
   listar(filtros: { [k: string]: any } = {}) {
-    const params = new URLSearchParams();
-    Object.entries(filtros).forEach(([k, v]) => {
-      if (v !== undefined && v !== null && v !== '') {
-        params.set(k, String(v));
-      }
-    });
-    const qs = params.toString();
-    return this.http.get<any>(`${this.endpoint}${qs ? '?' + qs : ''}`);
+    return this.http.get<any>(`${this.endpoint}${this.qs(filtros)}`);
   }
 
   resumo(filtros: { [k: string]: any } = {}) {
+    return this.http.get<any>(`${this.endpoint}/resumo${this.qs(filtros)}`);
+  }
+
+  tempoPreso(filtros: { [k: string]: any } = {}) {
+    return this.http.get<any>(`${this.endpoint}/tempo-preso${this.qs(filtros)}`);
+  }
+
+  /** Monta a querystring ignorando valores vazios/nulos. */
+  private qs(filtros: { [k: string]: any }): string {
     const params = new URLSearchParams();
     Object.entries(filtros).forEach(([k, v]) => {
       if (v !== undefined && v !== null && v !== '') {
         params.set(k, String(v));
       }
     });
-    const qs = params.toString();
-    return this.http.get<any>(`${this.endpoint}/resumo${qs ? '?' + qs : ''}`);
+    const s = params.toString();
+    return s ? '?' + s : '';
   }
 }
