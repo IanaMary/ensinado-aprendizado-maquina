@@ -30,6 +30,7 @@ export class AtividadeService {
   private readonly MAX_BUFFER = 200;            // teto p/ não crescer sem limite (re-enfileiramento)
   private readonly KEEPALIVE_MAX_BYTES = 50000; // < 64KB do fetch keepalive
   private readonly acoesEmCurso = new Map<string, number>();
+  private ultimaNavegacao: string | null = null;
 
   constructor(
     private http: HttpClient,
@@ -53,7 +54,12 @@ export class AtividadeService {
     // serviço resiliente a um Router sem `events` (stubs de teste / SSR).
     this.router.events
       ?.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      ?.subscribe((e) => this.registrar('navegacao', 'trocou_pagina', { url: e.urlAfterRedirects }));
+      ?.subscribe((e) => {
+        const url = e.urlAfterRedirects;
+        if (url === this.ultimaNavegacao) return; // dedup de navegação repetida
+        this.ultimaNavegacao = url;
+        this.registrar('navegacao', 'trocou_pagina', { url });
+      });
   }
 
   /** Enfileira um evento. */
@@ -115,10 +121,13 @@ export class AtividadeService {
     const eventos = this.buffer;
     this.buffer = [];
     this.http.post(`${this.endpoint}/lote`, { eventos }).subscribe({
-      error: () => {
-        // Falha transitória: devolve os eventos ao início do buffer (cap em MAX_BUFFER,
-        // mantendo os mais recentes) para tentar de novo no próximo flush.
-        this.buffer = [...eventos, ...this.buffer].slice(-this.MAX_BUFFER);
+      error: (err) => {
+        // Re-enfileira só em erro transitório (rede/5xx). Em 4xx (ex.: 413/422) o
+        // payload foi rejeitado — descarta para não repetir em loop.
+        const transitorio = !err?.status || err.status >= 500;
+        if (transitorio) {
+          this.buffer = [...eventos, ...this.buffer].slice(-this.MAX_BUFFER);
+        }
       },
     });
   }

@@ -24,7 +24,8 @@ describe('AtividadeInterceptor', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('registra http com sucesso e normaliza ids na rota', () => {
+  it('registra GET 2xx (amostrado) e normaliza ids na rota', () => {
+    spyOn(Math, 'random').and.returnValue(0); // < SAMPLE_GET → registra
     http.get('http://x/api/usuario/507f1f77bcf86cd799439011').subscribe();
     httpMock.expectOne('http://x/api/usuario/507f1f77bcf86cd799439011').flush({});
     expect(svc.registrar).toHaveBeenCalled();
@@ -32,6 +33,21 @@ describe('AtividadeInterceptor', () => {
     expect(args[0]).toBe('http');
     expect(args[1]).toContain(':id'); // ObjectId vira :id
     expect((args[3] as any).status).toBe('sucesso');
+  });
+
+  it('amostra: GET 2xx fora da amostra não registra', () => {
+    spyOn(Math, 'random').and.returnValue(0.99); // >= SAMPLE_GET → pula
+    http.get('http://x/api/coleta').subscribe();
+    httpMock.expectOne('http://x/api/coleta').flush({});
+    expect(svc.registrar).not.toHaveBeenCalled();
+  });
+
+  it('mutação (POST) 2xx sempre registra, mesmo fora da amostra', () => {
+    spyOn(Math, 'random').and.returnValue(0.99);
+    http.post('http://x/api/coleta', {}).subscribe();
+    httpMock.expectOne('http://x/api/coleta').flush({});
+    expect(svc.registrar).toHaveBeenCalled();
+    expect((svc.registrar.calls.mostRecent().args[3] as any).status).toBe('sucesso');
   });
 
   it('registra erro http com status erro', () => {

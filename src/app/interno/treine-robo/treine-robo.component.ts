@@ -433,7 +433,10 @@ export class TreineRoboComponent implements OnInit {
     if (this.prevendo || !this.modeloTreinadoId) return;
     this.prevendo = true; this.previu = false; this.predicao = null; this.erro = '';
     this.dashboard.classificadorPrever({ modelo_id: this.modeloTreinadoId, valores: this.inputs }).subscribe({
-      next: (res: any) => { this.predicao = res?.predicao; this.previu = true; this.prevendo = false; },
+      next: (res: any) => {
+        this.predicao = res?.predicao; this.previu = true; this.prevendo = false;
+        this.atividade.registrar('pipeline', 'previu', { contexto: 'treine-robo', tarefa: this.tarefa, predicao: res?.predicao });
+      },
       error: (e) => { this.prevendo = false; this.erro = e?.error?.detail || 'Não consegui adivinhar agora. Tenta de novo? 🙈'; },
     });
   }
@@ -525,6 +528,11 @@ export class TreineRoboComponent implements OnInit {
         carta.leo = this.aClasse(res?.predicao);
         if (carta.leo === carta.verdadeiro) this.leoScore++;
         this.aguardandoLeo = false;
+        this.atividade.registrar('pipeline', 'desafio_palpite', {
+          contexto: 'treine-robo',
+          acertou_crianca: classe === carta.verdadeiro,
+          acertou_leo: carta.leo === carta.verdadeiro,
+        });
       },
       error: () => { carta.leo = '?'; this.aguardandoLeo = false; },
     });

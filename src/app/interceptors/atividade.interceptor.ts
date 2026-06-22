@@ -25,6 +25,8 @@ export class AtividadeInterceptor implements HttpInterceptor {
   // Rotas ignoradas: a própria telemetria (evita laço) e pollers ruidosos de alta
   // frequência (ex.: health-check de modelos do tutor) que não têm valor pedagógico.
   private readonly IGNORAR = ['/atividades', '/tutor/modelos/saude'];
+  // Amostragem de GETs 2xx (reduz volume). Mutações e erros são sempre registrados.
+  private readonly SAMPLE_GET = 0.25;
 
   constructor(private injector: Injector) {}
 
@@ -47,6 +49,10 @@ export class AtividadeInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       tap((event) => {
         if (event instanceof HttpResponse) {
+          // GET 2xx é amostrado; mutações (POST/PUT/PATCH/DELETE) sempre registram.
+          if (req.method === 'GET' && Math.random() >= this.SAMPLE_GET) {
+            return;
+          }
           this.svc.registrar('http', `${req.method} ${this.rotaCurta(req.url)}`, {
             ...base,
             status_http: event.status,

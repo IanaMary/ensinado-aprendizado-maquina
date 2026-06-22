@@ -68,13 +68,16 @@ export class AtividadesComponent implements OnInit {
     this.aplicarFiltros();
   }
 
-  buscar(): void {
+  buscar(incluirTotal: boolean = true): void {
     this.carregando = true;
     this.erro = '';
-    this.atividade.listar(this.montarFiltros()).subscribe({
+    this.atividade.listar(this.montarFiltros({ incluir_total: incluirTotal })).subscribe({
       next: (res) => {
         this.itens = res?.itens || [];
-        this.total = res?.total || 0;
+        // total só vem quando pedido (1ª página/filtro); ao paginar, mantém o anterior.
+        if (res?.total !== null && res?.total !== undefined) {
+          this.total = res.total;
+        }
         this.carregando = false;
       },
       error: (e) => {
@@ -96,13 +99,13 @@ export class AtividadesComponent implements OnInit {
   paginaAnterior(): void {
     if (this.skip <= 0) return;
     this.skip = Math.max(0, this.skip - this.limit);
-    this.buscar();
+    this.buscar(false); // reaproveita o total já conhecido
   }
 
   proximaPagina(): void {
     if (this.skip + this.limit >= this.total) return;
     this.skip += this.limit;
-    this.buscar();
+    this.buscar(false);
   }
 
   get paginaAtual(): number {

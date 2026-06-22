@@ -75,6 +75,16 @@ describe('AtividadeService', () => {
     req2.flush({});
   });
 
+  it('NÃO re-enfileira em erro 4xx (payload rejeitado)', () => {
+    sessionStorage.setItem('token', 'tok');
+    service.registrar('ui', 'a');
+    service.flush();
+    httpMock.expectOne(loteUrl).flush('rejeitado', { status: 422, statusText: 'Unprocessable' });
+    // 4xx: descartado — um novo flush não envia nada
+    service.flush();
+    httpMock.expectNone(loteUrl);
+  });
+
   it('listar() monta a querystring ignorando vazios', () => {
     sessionStorage.setItem('token', 'tok');
     service.listar({ tipo: 'chat', skip: 0, limit: 50, acao: '' }).subscribe();
