@@ -16,6 +16,9 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 ### Limpeza — `exigir_admin_ou_professor` consolidado (backend-only). Back `28b413c`
 - As 3 cópias idênticas do gate (em `conf_pipeline`/`atividade`/`tutor`) foram unificadas num único helper em `app/security.py`. Comportamento inalterado (282 passed). Sem mudança de frontend.
 
+### Enhancement — Modelos logados no resumo de artefatos (backend-only). Back `85d1e8d`
+- `GET /tutor/artefatos/{run_id}` agora inclui uma chave **`models`** com os modelos logados da run (no MLflow 3.x os modelos viraram entidades `LoggedModel` e não aparecem mais em `list_artifacts`). Busca via `search_logged_models` (filtro `source_run_id`, com fallback + filtro em Python) e degradação graciosa. **Suíte: 285 passed.** Sem mudança de frontend.
+
 ---
 
 ## 2026-06-22
