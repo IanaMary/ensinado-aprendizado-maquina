@@ -16,6 +16,13 @@ export class PreProcessamentoConfigComponent implements OnInit {
   @Input() resultadoColetaDado?: ResultadoColetaDado;
   @Input() preProcessamentoConfig?: PreProcessamentoConfig;
   @Output() preProcessamentoModificado = new EventEmitter<PreProcessamentoConfig>();
+  /** Pedido de ajuda contextual sobre uma transformação → o modal abre no tutor/chatbot. */
+  @Output() ajudaItem = new EventEmitter<any>();
+
+  pedirAjuda(event: Event, item: any) {
+    event.stopPropagation();
+    this.ajudaItem.emit(item);
+  }
 
   itensDisponiveis: any[] = [];
   itensSelecionados: any[] = [];

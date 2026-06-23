@@ -101,50 +101,48 @@
   }
 }
 
-.metrica-item {
-  padding: 2px 0;
-  border-radius: 6px;
-  transition: background 0.15s;
+// Métricas em DUAS COLUNAS de subcards (cada um agrupa checkbox+rótulo e o ℹ️).
+.metricas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
 
-  &.expandida {
+@media (max-width: 560px) {
+  .metricas-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metrica-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid $roxo-claro;
+  border-radius: 8px;
+  background: $branco;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover {
     background: $roxo-fundo;
+  }
+
+  // checkbox + rótulo ocupam a esquerda; o ℹ️ é empurrado para a direita.
+  .metrica-check {
+    flex: 1;
+    min-width: 0;
   }
 
   &.metrica-desabilitada {
     opacity: 0.5;
+    background: #fafafa;
 
     .metrica-label {
       color: #999;
     }
-
     .btn-info-metrica {
       opacity: 0.3;
-    }
-  }
-}
-
-.metrica-linha {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-
-  .btn-info-metrica {
-    width: 24px;
-    height: 24px;
-    flex-shrink: 0;
-    color: $roxo-medio;
-    opacity: 0.6;
-    transition: all 0.2s;
-
-    &:hover {
-      opacity: 1;
-      background: rgba($roxo-medio, 0.1);
-    }
-
-    mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
     }
   }
 }
@@ -154,33 +152,35 @@
   font-weight: 500;
 }
 
-.metrica-explicacao {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 8px 10px;
-  margin: 4px 0 4px 28px;
-  background: rgba($roxo-medio, 0.06);
-  border-left: 3px solid $roxo-medio;
-  border-radius: 0 6px 6px 0;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: #555;
-  animation: fadeIn 0.2s ease;
+// Botão simples (sem mat-icon-button) → sem ripple/sombra desalinhada.
+.btn-info-metrica {
+  flex-shrink: 0;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: $roxo-medio;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: background 0.15s, opacity 0.15s;
 
-  .explicacao-icon {
-    flex-shrink: 0;
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    color: $roxo-medio;
-    margin-top: 1px;
+  &:hover {
+    opacity: 1;
+    background: rgba($roxo-medio, 0.12);
   }
-}
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+  }
 }
 
 .media-config {

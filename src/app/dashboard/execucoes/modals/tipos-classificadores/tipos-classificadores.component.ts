@@ -16,6 +16,13 @@ export class TiposClassificadoresComponent implements OnChanges {
   @Input() modelosAgrupados: { tipo: string; titulo: string; modelos: any[] }[] = [];
   @Output() selecaoModelo = new EventEmitter<ItemPipeline>();
   @Output() hiperparametrosModificados = new EventEmitter<Record<string, any>>();
+  /** Pedido de ajuda contextual sobre um modelo → o modal abre no tutor/chatbot. */
+  @Output() ajudaItem = new EventEmitter<any>();
+
+  pedirAjuda(event: Event, model: any) {
+    event.stopPropagation();
+    this.ajudaItem.emit(model);
+  }
 
   modelo!: ItemPipeline | undefined;
   modeloValor: string | undefined;

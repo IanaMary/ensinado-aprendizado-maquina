@@ -1,101 +1,134 @@
 <div class="artefatos-container">
   <h1>Artefatos de Runs (MLflow)</h1>
-  <p class="sub">Consulte o resumo de uma run: parâmetros, métricas, tags, artefatos e modelos logados.</p>
+  <p class="sub">Runs de treino associadas aos usuários. Filtre por usuário e período; clique numa run para ver parâmetros, métricas, tags, artefatos e modelos.</p>
 
-  <!-- Busca -->
-  <div class="busca">
-    <label class="campo">
-      run_id
-      <input type="text" [(ngModel)]="runId" placeholder="ex.: 8f3c... (32 caracteres)"
-             (keyup.enter)="buscar()" />
+  <!-- Filtros -->
+  <div class="filtros">
+    <label>
+      Usuário
+      <select [(ngModel)]="filtros.usuario_id">
+        <option value="">todos</option>
+        <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nome }} ({{ u.email }})</option>
+      </select>
     </label>
-    <button class="btn" (click)="buscar()" [disabled]="carregando">
-      {{ carregando ? 'Buscando…' : 'Buscar' }}
-    </button>
+    <label>
+      De
+      <input type="datetime-local" [(ngModel)]="filtros.data_inicio" />
+    </label>
+    <label>
+      Até
+      <input type="datetime-local" [(ngModel)]="filtros.data_fim" />
+    </label>
+    <div class="acoes">
+      <button class="btn" (click)="aplicarFiltros()">Filtrar</button>
+      <button class="btn secundario" (click)="limparFiltros()">Limpar</button>
+    </div>
   </div>
 
   <div class="erro-msg" *ngIf="erro" role="alert" aria-live="assertive">{{ erro }}</div>
   <div class="carregando" *ngIf="carregando" role="status" aria-live="polite">Carregando…</div>
 
-  <!-- Resumo -->
-  <div class="resumo" *ngIf="resumo && !carregando">
-    <div class="cabecalho">
-      <span class="badge">{{ resumo.status || '—' }}</span>
-      <code class="rid">{{ resumo.run_id }}</code>
-      <span class="periodo">{{ formatarData(resumo.start_time) }} → {{ formatarData(resumo.end_time) }}</span>
+  <!-- Tabela de runs -->
+  <div class="tabela-wrap" *ngIf="!carregando">
+    <table class="tabela">
+      <caption class="sr-only">Runs do MLflow por usuário e data</caption>
+      <thead>
+        <tr>
+          <th scope="col">Data</th>
+          <th scope="col">Usuário</th>
+          <th scope="col">Modelo</th>
+          <th scope="col">run_id</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of itens" [class.sel]="r.run_id === runSelecionada">
+          <td>{{ formatarData(r.criado_em) }}</td>
+          <td>{{ r.usuario_nome || r.usuario_email }}</td>
+          <td>{{ r.modelo || '—' }}</td>
+          <td><code class="rid">{{ r.run_id }}</code></td>
+          <td><button class="btn secundario sm" (click)="verDetalhe(r.run_id)">Ver</button></td>
+        </tr>
+        <tr *ngIf="!itens.length">
+          <td colspan="5" class="vazio">Nenhuma run encontrada. (As runs aparecem após treinos com o MLflow configurado.)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginação -->
+  <div class="paginacao" *ngIf="total > 0">
+    <button class="btn secundario" (click)="paginaAnterior()" [disabled]="skip <= 0">Anterior</button>
+    <span>Página {{ paginaAtual }} de {{ totalPaginas }} · {{ total }} runs</span>
+    <button class="btn secundario" (click)="proximaPagina()" [disabled]="skip + limit >= total">Próxima</button>
+  </div>
+
+  <!-- Detalhe da run -->
+  <div class="detalhe" *ngIf="runSelecionada">
+    <div class="detalhe-head">
+      <h2>Resumo da run</h2>
+      <code class="rid">{{ runSelecionada }}</code>
+      <button class="btn secundario sm" (click)="fecharDetalhe()">Fechar</button>
     </div>
 
-    <!-- Parâmetros -->
-    <section>
-      <h2>Parâmetros</h2>
-      <table class="kv" *ngIf="entries(resumo.params).length; else vazioParams">
-        <tbody>
-          <tr *ngFor="let p of entries(resumo.params)"><th scope="row">{{ p.chave }}</th><td>{{ p.valor }}</td></tr>
-        </tbody>
-      </table>
-      <ng-template #vazioParams><p class="vazio">Sem parâmetros.</p></ng-template>
-    </section>
+    <div class="erro-msg" *ngIf="erroDetalhe" role="alert">{{ erroDetalhe }}</div>
+    <div class="carregando" *ngIf="carregandoDetalhe" role="status" aria-live="polite">Carregando resumo…</div>
 
-    <!-- Métricas -->
-    <section>
-      <h2>Métricas</h2>
-      <table class="kv" *ngIf="entries(resumo.metrics).length; else vazioMetrics">
-        <tbody>
-          <tr *ngFor="let m of entries(resumo.metrics)"><th scope="row">{{ m.chave }}</th><td>{{ m.valor }}</td></tr>
-        </tbody>
-      </table>
-      <ng-template #vazioMetrics><p class="vazio">Sem métricas.</p></ng-template>
-    </section>
+    <div class="resumo" *ngIf="resumo && !carregandoDetalhe">
+      <div class="cabecalho">
+        <span class="badge">{{ resumo.status || '—' }}</span>
+        <span class="periodo">{{ formatarData(resumo.start_time) }} → {{ formatarData(resumo.end_time) }}</span>
+      </div>
 
-    <!-- Tags -->
-    <section>
-      <h2>Tags</h2>
-      <table class="kv" *ngIf="entries(resumo.tags).length; else vazioTags">
-        <tbody>
-          <tr *ngFor="let t of entries(resumo.tags)"><th scope="row">{{ t.chave }}</th><td>{{ t.valor }}</td></tr>
-        </tbody>
-      </table>
-      <ng-template #vazioTags><p class="vazio">Sem tags.</p></ng-template>
-    </section>
+      <section>
+        <h3>Parâmetros</h3>
+        <table class="kv" *ngIf="entries(resumo.params).length; else vazioP">
+          <tbody><tr *ngFor="let p of entries(resumo.params)"><th scope="row">{{ p.chave }}</th><td>{{ p.valor }}</td></tr></tbody>
+        </table>
+        <ng-template #vazioP><p class="vazio">Sem parâmetros.</p></ng-template>
+      </section>
 
-    <!-- Artefatos -->
-    <section>
-      <h2>Artefatos ({{ (resumo.artifacts || []).length }})</h2>
-      <table class="tabela" *ngIf="(resumo.artifacts || []).length; else vazioArt">
-        <caption class="sr-only">Artefatos da run com caminho, tipo e tamanho</caption>
-        <thead><tr><th scope="col">Caminho</th><th scope="col">Tipo</th><th scope="col">Tamanho</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let a of resumo.artifacts">
-            <td>{{ a.path }}</td>
-            <td>{{ a.is_dir ? 'pasta' : 'arquivo' }}</td>
-            <td>{{ formatarTamanho(a.file_size) }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <ng-template #vazioArt><p class="vazio">Sem artefatos de run.</p></ng-template>
-    </section>
+      <section>
+        <h3>Métricas</h3>
+        <table class="kv" *ngIf="entries(resumo.metrics).length; else vazioM">
+          <tbody><tr *ngFor="let m of entries(resumo.metrics)"><th scope="row">{{ m.chave }}</th><td>{{ m.valor }}</td></tr></tbody>
+        </table>
+        <ng-template #vazioM><p class="vazio">Sem métricas.</p></ng-template>
+      </section>
 
-    <!-- Modelos logados -->
-    <section>
-      <h2>Modelos logados ({{ (resumo.models || []).length }})</h2>
-      <div class="modelo" *ngFor="let mod of resumo.models">
-        <div class="modelo-head">
-          <strong>{{ mod.name || mod.model_id }}</strong>
-          <span class="badge" *ngIf="mod.status">{{ mod.status }}</span>
-          <span class="tipo" *ngIf="mod.model_type">{{ mod.model_type }}</span>
-        </div>
-        <code class="uri" *ngIf="mod.model_uri">{{ mod.model_uri }}</code>
-        <table class="tabela" *ngIf="(mod.artifacts || []).length">
+      <section>
+        <h3>Tags</h3>
+        <table class="kv" *ngIf="entries(resumo.tags).length; else vazioT">
+          <tbody><tr *ngFor="let t of entries(resumo.tags)"><th scope="row">{{ t.chave }}</th><td>{{ t.valor }}</td></tr></tbody>
+        </table>
+        <ng-template #vazioT><p class="vazio">Sem tags.</p></ng-template>
+      </section>
+
+      <section>
+        <h3>Artefatos ({{ (resumo.artifacts || []).length }})</h3>
+        <table class="tabela" *ngIf="(resumo.artifacts || []).length; else vazioA">
+          <thead><tr><th scope="col">Caminho</th><th scope="col">Tipo</th><th scope="col">Tamanho</th></tr></thead>
           <tbody>
-            <tr *ngFor="let a of mod.artifacts">
-              <td>{{ a.path }}</td>
-              <td>{{ a.is_dir ? 'pasta' : 'arquivo' }}</td>
-              <td>{{ formatarTamanho(a.file_size) }}</td>
+            <tr *ngFor="let a of resumo.artifacts">
+              <td>{{ a.path }}</td><td>{{ a.is_dir ? 'pasta' : 'arquivo' }}</td><td>{{ formatarTamanho(a.file_size) }}</td>
             </tr>
           </tbody>
         </table>
-      </div>
-      <p class="vazio" *ngIf="!(resumo.models || []).length">Sem modelos logados.</p>
-    </section>
+        <ng-template #vazioA><p class="vazio">Sem artefatos de run.</p></ng-template>
+      </section>
+
+      <section>
+        <h3>Modelos logados ({{ (resumo.models || []).length }})</h3>
+        <div class="modelo" *ngFor="let mod of resumo.models">
+          <div class="modelo-head">
+            <strong>{{ mod.name || mod.model_id }}</strong>
+            <span class="badge" *ngIf="mod.status">{{ mod.status }}</span>
+            <span class="tipo" *ngIf="mod.model_type">{{ mod.model_type }}</span>
+          </div>
+          <code class="uri" *ngIf="mod.model_uri">{{ mod.model_uri }}</code>
+        </div>
+        <p class="vazio" *ngIf="!(resumo.models || []).length">Sem modelos logados.</p>
+      </section>
+    </div>
   </div>
 </div>

@@ -334,8 +334,19 @@ small {
 
 .thead {
   position: sticky;
+  top: 0;
+  z-index: 10;
   background-color: $roxo-fundo;
   box-shadow: 0 1px 3px rgba($roxo-escuro, 0.05);
+}
+
+// As células do cabeçalho precisam de fundo opaco próprio (senão as linhas
+// aparecem por baixo ao rolar) e do mesmo z-index do sticky.
+.thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: $roxo-fundo;
 }
 
 .erro {

@@ -28,7 +28,7 @@
       <mat-divider></mat-divider>
     </nav>
 
-    <section class="modal-conteudo">
+    <section class="modal-conteudo" #modalConteudo>
       <ng-container [ngSwitch]="etapas[etapaAtual].indice">
 
         <ng-container *ngSwitchCase="0">
@@ -42,7 +42,8 @@
           <app-pre-processamento-config
             [resultadoColetaDado]="resultadoColetaDado"
             [preProcessamentoConfig]="preProcessamentoConfig"
-            (preProcessamentoModificado)="atualizarPreProcessamento($event)">
+            (preProcessamentoModificado)="atualizarPreProcessamento($event)"
+            (ajudaItem)="abrirAjudaItem($event)">
           </app-pre-processamento-config>
         </ng-container>
 
@@ -50,7 +51,8 @@
           <app-tipos-classificadores [modelosDisponiveis]="modelosDisponiveis" [modelosAgrupados]="modelosAgrupados"
             [modeloSelecionado]="modeloSelecionado"
             (selecaoModelo)="atualizarModelo($event)"
-            (hiperparametrosModificados)="atualizarHiperparametros($event)">
+            (hiperparametrosModificados)="atualizarHiperparametros($event)"
+            (ajudaItem)="abrirAjudaItem($event)">
           </app-tipos-classificadores>
         </ng-container>
 
@@ -65,7 +67,8 @@
         <ng-container *ngSwitchCase="4">
           <app-selecao-metricas [metricasDisponiveis]="metricasDisponiveis"
             [mediaMetricas]="mediaMetricas"
-            (selecaoMetricas)="atualizarMetricasSelecionadas($event)">
+            (selecaoMetricas)="atualizarMetricasSelecionadas($event)"
+            (ajudaItem)="abrirAjudaItem($event)">
           </app-selecao-metricas>
         </ng-container>
 
@@ -112,26 +115,27 @@
     <mat-icon>{{ drawerOpen ? 'close' : 'smart_toy' }}</mat-icon>
   </button>
 
-  <!-- Painel flutuante do tutor -->
-  <div class="tutor-floating-panel" *ngIf="drawerOpen">
-    <!-- Info da etapa atual -->
-    <div *ngIf="tutorPipelineInfo" class="pipeline-info">
-      <h4>{{ tutorPipelineInfo.titulo }}</h4>
-      <p>{{ tutorPipelineInfo.descricao }}</p>
-      <ul *ngIf="tutorPipelineInfo.dicas?.length">
-        <li *ngFor="let dica of tutorPipelineInfo.dicas">{{ dica }}</li>
-      </ul>
+  <!-- Painel lateral do tutor (drawer que desliza da direita) -->
+  <aside class="tutor-drawer" [class.open]="drawerOpen" [attr.aria-hidden]="!drawerOpen">
+    <!-- Conteúdo (em cima): o aluno lê primeiro -->
+    <div class="tutor-conteudo">
+      <div *ngIf="tutorPipelineInfo" class="pipeline-info">
+        <h4>{{ tutorPipelineInfo.titulo }}</h4>
+        <p>{{ tutorPipelineInfo.descricao }}</p>
+        <ul *ngIf="tutorPipelineInfo.dicas?.length">
+          <li *ngFor="let dica of tutorPipelineInfo.dicas">{{ dica }}</li>
+        </ul>
+      </div>
+
+      <app-tutor
+        [contexto]="tutorContexto"
+        [explicacao]="explicacaoAgregacaoMetricas"
+        [modeloSelecionado]="modeloSelecionado"
+        [metricaSelecionada]="metricasSelecionadas[0]">
+      </app-tutor>
     </div>
 
-    <!-- Tutor com contexto -->
-    <app-tutor
-      [contexto]="tutorContexto"
-      [explicacao]="explicacaoAgregacaoMetricas"
-      [modeloSelecionado]="modeloSelecionado"
-      [metricaSelecionada]="metricasSelecionadas[0]">
-    </app-tutor>
-
-    <!-- Chatbot tutor (NVIDIA via backend) -->
-    <app-chat-tutor [contexto]="getContextoChat()"></app-chat-tutor>
-  </div>
+    <!-- Chatbot (embaixo): perguntas frequentes do conteúdo + pergunta livre -->
+    <app-chat-tutor *ngIf="drawerOpen" class="tutor-chat" [contexto]="getContextoChat()"></app-chat-tutor>
+  </aside>
 </div>

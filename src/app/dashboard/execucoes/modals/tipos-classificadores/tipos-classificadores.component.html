@@ -15,6 +15,12 @@
         <div class="modelo-header">
           <mat-icon class="modelo-icon">memory</mat-icon>
           <span class="modelo-label">{{ model.label }}</span>
+          <button type="button" class="btn-info-item"
+            [matTooltip]="'Ver explicação no tutor'" matTooltipPosition="above"
+            aria-label="Ver explicação no tutor"
+            (click)="pedirAjuda($event, model)">
+            <mat-icon>info_outline</mat-icon>
+          </button>
         </div>
         <p class="modelo-resumo">{{ model.resumo }}</p>
       </div>

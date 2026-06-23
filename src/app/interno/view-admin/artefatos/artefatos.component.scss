@@ -12,39 +12,41 @@
 
 .artefatos-container {
   padding: 24px;
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
 
   h1 { margin: 0 0 4px; color: #4a148c; }
   .sub { color: #666; margin: 0 0 20px; }
-  h2 { font-size: 16px; color: #4a148c; margin: 20px 0 8px; }
+  h2 { font-size: 16px; color: #4a148c; margin: 0; }
+  h3 { font-size: 14px; color: #4a148c; margin: 16px 0 6px; }
 }
 
-.busca {
+.filtros {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: flex-end;
   background: #fafafa;
   border: 1px solid #eee;
   border-radius: 12px;
   padding: 16px;
+  margin-bottom: 16px;
 
-  .campo {
-    flex: 1;
+  label {
     display: flex;
     flex-direction: column;
     font-size: 12px;
     color: #555;
     gap: 4px;
 
-    input {
-      padding: 8px 10px;
+    select, input {
+      padding: 6px 8px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      font-size: 14px;
-      font-family: monospace;
+      font-size: 13px;
     }
   }
+  .acoes { display: flex; gap: 8px; }
 }
 
 .btn {
@@ -52,9 +54,12 @@
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 9px 18px;
+  padding: 8px 16px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
+
+  &.secundario { background: #ede7f6; color: #4a148c; }
+  &.sm { padding: 4px 10px; font-size: 12px; }
   &:disabled { opacity: 0.5; cursor: default; }
 }
 
@@ -63,26 +68,70 @@
   color: #c62828;
   padding: 10px 14px;
   border-radius: 8px;
-  margin-top: 12px;
+  margin: 8px 0;
 }
 .carregando { padding: 12px 0; color: #777; }
 
-.resumo {
-  margin-top: 16px;
+.tabela-wrap {
+  overflow-x: auto;
+  border: 1px solid #eee;
+  border-radius: 12px;
+}
 
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    white-space: nowrap;
+  }
+  th { background: #f3e5f5; color: #4a148c; position: sticky; top: 0; }
+  tr.sel { background: #f3e5f5; }
+  .vazio { text-align: center; color: #999; padding: 20px; white-space: normal; }
+}
+
+.rid { font-family: monospace; color: #333; }
+
+.paginacao {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  color: #666;
+  font-size: 13px;
+}
+
+.detalhe {
+  margin-top: 24px;
+  border: 1px solid #e6dcf5;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fcfaff;
+
+  .detalhe-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+}
+
+.resumo {
   .cabecalho {
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
-    padding: 12px 0;
+    padding: 10px 0;
     border-bottom: 1px solid #eee;
-
-    .rid { font-family: monospace; color: #333; }
     .periodo { color: #777; font-size: 13px; }
   }
-
-  section { margin-top: 8px; }
+  section { margin-top: 4px; }
 }
 
 .badge {
@@ -94,25 +143,12 @@
   text-transform: uppercase;
 }
 
-.kv,
-.tabela {
+.kv {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-
-  th, td {
-    text-align: left;
-    padding: 7px 12px;
-    border-bottom: 1px solid #f0f0f0;
-    vertical-align: top;
-  }
-  thead th { background: #f3e5f5; color: #4a148c; }
-}
-.kv th[scope="row"] {
-  width: 30%;
-  color: #555;
-  font-weight: 600;
-  background: #fafafa;
+  th, td { text-align: left; padding: 7px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+  th[scope="row"] { width: 30%; color: #555; font-weight: 600; background: #fafafa; }
 }
 
 .vazio { color: #999; font-size: 13px; margin: 4px 0; }
@@ -120,21 +156,9 @@
 .modelo {
   border: 1px solid #eee;
   border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 10px;
+  padding: 10px;
+  margin-bottom: 8px;
 
-  .modelo-head {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    .tipo { color: #777; font-size: 12px; }
-  }
-  .uri {
-    display: block;
-    font-family: monospace;
-    font-size: 12px;
-    color: #6a1b9a;
-    margin: 6px 0;
-  }
+  .modelo-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; .tipo { color: #777; font-size: 12px; } }
+  .uri { display: block; font-family: monospace; font-size: 12px; color: #6a1b9a; margin-top: 6px; }
 }

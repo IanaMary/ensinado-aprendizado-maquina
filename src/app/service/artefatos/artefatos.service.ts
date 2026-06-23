@@ -2,12 +2,27 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
-/** Consome o endpoint de resumo de run do MLflow (GET /tutor/artefatos/{run_id}). */
+/** Consome os endpoints de artefatos do MLflow. */
 @Injectable({ providedIn: 'root' })
 export class ArtefatosService {
+  private readonly endpoint = `${environment.apiUrl}tutor/artefatos`;
+
   constructor(private http: HttpClient) {}
 
+  /** Lista runs associadas a usuários (filtro por usuário e data). */
+  listar(filtros: { [k: string]: any } = {}) {
+    const params = new URLSearchParams();
+    Object.entries(filtros).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') {
+        params.set(k, String(v));
+      }
+    });
+    const qs = params.toString();
+    return this.http.get<any>(`${this.endpoint}${qs ? '?' + qs : ''}`);
+  }
+
+  /** Resumo detalhado de uma run específica. */
   obterRun(runId: string) {
-    return this.http.get<any>(`${environment.apiUrl}tutor/artefatos/${encodeURIComponent(runId)}`);
+    return this.http.get<any>(`${this.endpoint}/${encodeURIComponent(runId)}`);
   }
 }

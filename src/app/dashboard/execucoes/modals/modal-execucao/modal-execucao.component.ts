@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { BodyTutor, ItemPipeline, MediaMetrica, ResultadoColetaDado, TipoArquivoDados } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
@@ -22,6 +22,9 @@ const AVALIACAO = 'avaliacao'
 })
 
 export class ModalExecucaoComponent implements OnInit {
+
+  // Container rolável do corpo do modal — usado para voltar ao topo ao trocar de etapa.
+  @ViewChild('modalConteudo') modalConteudo?: ElementRef<HTMLElement>;
 
   tutor = tutor;
 
@@ -68,6 +71,8 @@ export class ModalExecucaoComponent implements OnInit {
   // Contexto do tutor por etapa
   tutorContexto: TutorContexto | null = null;
   tutorPipelineInfo: any = null;
+  // Item em foco quando o aluno pede ajuda por item (ℹ️) — torna o chat ciente dele.
+  itemFoco: ItemPipeline | null = null;
 
   constructor(
     private dashboardService: DashboardService,
@@ -93,6 +98,7 @@ export class ModalExecucaoComponent implements OnInit {
       h: this.hiperparametrosAtuais,
       mt: this.metricasSelecionadas.map(m => m.valor),
       av: Object.keys(this.resultadosDasAvaliacoes || {}),
+      if: this.itemFoco?.valor,
     });
     if (assinatura === this.contextoChatAssinatura && this.contextoChatCache) {
       return this.contextoChatCache;
@@ -127,6 +133,11 @@ export class ModalExecucaoComponent implements OnInit {
       metricas: this.metricasSelecionadas.map(m => ({ valor: m.valor, label: m.label })),
       avaliacoes: this.resultadosDasAvaliacoes,
       codigoPython,
+      itemFoco: this.itemFoco ? {
+        tipo: (this.itemFoco as any).tipoItem,
+        valor: this.itemFoco.valor,
+        label: this.itemFoco.label,
+      } : null,
     };
     this.contextoChatAssinatura = assinatura;
     return this.contextoChatCache;
@@ -142,7 +153,7 @@ export class ModalExecucaoComponent implements OnInit {
     this.validarProximaEtapa();
     this.atualizarTutorContexto();
     this.autoGerarMetricas();
-
+    this.resetarScroll();
   }
 
   anterior(): void {
@@ -154,6 +165,7 @@ export class ModalExecucaoComponent implements OnInit {
 
     this.validarProximaEtapa();
     this.atualizarTutorContexto();
+    this.resetarScroll();
   }
 
   irParaEtapa(idx: number): void {
@@ -164,6 +176,16 @@ export class ModalExecucaoComponent implements OnInit {
     this.validarProximaEtapa();
     this.atualizarTutorContexto();
     this.autoGerarMetricas();
+    this.resetarScroll();
+  }
+
+  /** Volta o corpo do modal ao topo ao trocar de etapa (após o novo conteúdo renderizar). */
+  private resetarScroll(): void {
+    setTimeout(() => {
+      if (this.modalConteudo) {
+        this.modalConteudo.nativeElement.scrollTop = 0;
+      }
+    }, 0);
   }
 
   autoGerarMetricas(): void {
@@ -199,6 +221,9 @@ export class ModalExecucaoComponent implements OnInit {
     const idx = this.etapas[this.etapaAtual].indice;
     const pipeline = this.tutor.pipeline as any;
     this.tutorPipelineInfo = pipeline?.[this.getPipelineKey(idx)] || null;
+
+    // Foco por item é transitório: limpa ao trocar de etapa.
+    this.itemFoco = null;
 
     // Reset contexto quando muda de etapa
     if (idx !== 1 && idx !== 3) {
@@ -482,6 +507,30 @@ export class ModalExecucaoComponent implements OnInit {
         metrica: metricaInfo
       };
     }
+  }
+
+  /** Ajuda contextual por item (ℹ️ de qualquer etapa): mostra o conteúdo do item no
+   * tutor e abre o painel; o item também entra no contexto do chat. */
+  abrirAjudaItem(item: ItemPipeline): void {
+    if (!item) return;
+    this.itemFoco = item;
+    const c: any = (item as any)?.conteudo;
+    if (c) {
+      this.tutorContexto = {
+        titulo: c.titulo || item.label || item.valor,
+        descricao: c.descricao || c.resumo_basico || c.intuicao || '',
+        itens: c.quandoUsar || c.dicas || c.conceitos || [],
+      } as TutorContexto;
+    } else {
+      // fallback: tenta o catálogo estático do tutor.json (modelos/métricas)
+      const cat = ((this.tutor.modelos as any)?.[item.valor]) || ((this.tutor.metricas as any)?.[item.valor]);
+      this.tutorContexto = {
+        titulo: cat?.nome || item.label || item.valor,
+        descricao: cat?.descricao || '',
+        itens: cat?.quandoUsar || cat?.comoLer || [],
+      } as TutorContexto;
+    }
+    this.drawerOpen = true;
   }
 
   get explicacaoAgregacaoMetricas(): string[] {

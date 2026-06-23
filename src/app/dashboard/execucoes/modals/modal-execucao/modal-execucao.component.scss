@@ -202,10 +202,12 @@
 }
 
 // FAB do tutor — fixo no canto inferior direito da janela (fora do modal)
+// FAB do robô — centralizado verticalmente na borda direita da tela.
 ::ng-deep .tutor-fab {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -218,19 +220,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition: right 0.25s ease, transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    transform: scale(1.06);
+    transform: translateY(-50%) scale(1.06);
     box-shadow: 0 8px 24px rgba($roxo-escuro, 0.4);
   }
 
   &:active {
-    transform: scale(0.96);
+    transform: translateY(-50%) scale(0.96);
   }
 
+  // Aberto: vira a "alça" à esquerda do drawer (que tem 420px).
   &.active {
     background: $roxo-escuro;
+    right: 436px;
   }
 
   mat-icon {
@@ -240,25 +244,48 @@
   }
 }
 
-// Painel flutuante do tutor — ancorado acima do FAB
-::ng-deep .tutor-floating-panel {
+@media (max-width: 520px) {
+  ::ng-deep .tutor-fab.active {
+    right: 16px; // drawer ocupa quase tudo; FAB sobre a borda direita
+  }
+}
+
+// Painel lateral do tutor — drawer que desliza da direita; conteúdo em cima,
+// chatbot embaixo (o aluno lê primeiro, depois conversa). Rola o conjunto.
+::ng-deep .tutor-drawer {
   position: fixed;
-  right: 24px;
-  bottom: 96px;
-  width: 380px;
-  max-width: calc(100vw - 48px);
-  max-height: calc(100vh - 140px);
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 420px;
+  max-width: 92vw;
   background: $roxo-fundo;
-  border: 1px solid $roxo-claro;
-  border-radius: 14px;
-  box-shadow: 0 12px 36px rgba($roxo-escuro, 0.22);
+  border-left: 1px solid $roxo-claro;
+  box-shadow: -12px 0 36px rgba($roxo-escuro, 0.20);
   z-index: 2090;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   padding: 16px;
   gap: 12px;
-  animation: tutorPanelIn 0.18s ease-out;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+
+  &.open {
+    transform: translateX(0);
+  }
+
+  .tutor-conteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .tutor-chat {
+    display: block;
+    flex-shrink: 0;
+  }
 
   .pipeline-info {
     background: $branco;

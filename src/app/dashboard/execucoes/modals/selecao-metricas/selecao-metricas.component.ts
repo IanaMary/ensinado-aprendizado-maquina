@@ -19,12 +19,13 @@ export class SelecaoMetricasComponent implements OnChanges {
   @Input() metricasDisponiveis: ItemPipeline[] = [];
   @Input() mediaMetricas: MediaMetrica = 'weighted';
   @Output() selecaoMetricas = new EventEmitter<{ metricas: ItemPipeline[]; media: MediaMetrica }>();
+  /** Pedido de ajuda contextual sobre uma métrica → o modal abre no tutor/chatbot. */
+  @Output() ajudaItem = new EventEmitter<ItemPipeline>();
 
   metricasSelecionadas: ItemPipeline[] = [];
   todasMarcadas: boolean = false;
   grupos: GrupoMetricas[] = [];
   temClassificacao: boolean = false;
-  metricaExpandida: ItemPipeline | null = null;
 
   private nomesGrupos: Record<string, { nome: string; icone: string }> = {
     classificacao: { nome: 'Classificação', icone: 'category' },
@@ -95,10 +96,10 @@ export class SelecaoMetricasComponent implements OnChanges {
     this.emitSelecaoMetricas();
   }
 
-  toggleExplicacao(event: Event, metrica: ItemPipeline) {
+  pedirAjuda(event: Event, metrica: ItemPipeline) {
     event.stopPropagation();
     event.preventDefault();
-    this.metricaExpandida = this.metricaExpandida === metrica ? null : metrica;
+    this.ajudaItem.emit(metrica);
   }
 
   grupoTemHabilitada(grupo: GrupoMetricas): boolean {
