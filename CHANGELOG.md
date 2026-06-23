@@ -10,6 +10,11 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### Remover preditor da comparação. Front `6db26b2` (bundle `main-6GMZWT4I.js`) · só frontend
+- Botão **"×"** em cada card da lane de treino: remove o resultado do modelo, tira o card da lane
+  (devolvendo o preditor à barra lateral) e **recalcula a comparação** com os modelos restantes.
+  Novo `DashboardService.removerItemExecucao`. Build OK + 106/106 testes.
+
 ### Comparação de múltiplos preditores na janela principal. Front `7e35c63` (bundle `main-GASKTKNH.js`) · só frontend
 - Na área de trabalho clássica, depois de treinar um preditor é possível **arrastar outro da mesma
   categoria** (classificação/regressão/agrupamento) para a lane de treino: abre o modal como **cópia
