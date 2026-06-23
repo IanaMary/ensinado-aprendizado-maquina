@@ -575,8 +575,9 @@ $metrica-cor-escuro: #E65100;
 // FAB do tutor — fixo no canto inferior direito da janela
 .tutor-fab {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -589,19 +590,21 @@ $metrica-cor-escuro: #E65100;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition: right 0.25s ease, transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    transform: scale(1.06);
+    transform: translateY(-50%) scale(1.06);
     box-shadow: 0 8px 24px rgba($roxo-escuro, 0.4);
   }
 
   &:active {
-    transform: scale(0.96);
+    transform: translateY(-50%) scale(0.96);
   }
 
+  // Aberto: vira a "alça" à esquerda do drawer (que tem 420px).
   &.active {
     background: $roxo-escuro;
+    right: 436px;
   }
 
   &.theme-coleta { background: $coleta-cor; }
@@ -615,39 +618,58 @@ $metrica-cor-escuro: #E65100;
   }
 }
 
-// Painel flutuante do tutor (conteudo + chatbot) — ancorado acima do FAB
-.tutor-floating-panel {
+@media (max-width: 520px) {
+  .tutor-fab.active { right: 16px; }
+}
+
+// Painel lateral do tutor — drawer que desliza da direita; conteúdo em cima,
+// chatbot embaixo (o aluno lê primeiro). Rola o conjunto.
+.tutor-drawer {
   position: fixed;
-  right: 24px;
-  bottom: 96px;
+  top: 0;
+  right: 0;
+  height: 100vh;
   width: 420px;
-  max-width: calc(100vw - 48px);
-  max-height: calc(100vh - 140px);
+  max-width: 92vw;
   background: $roxo-fundo;
-  border: 1px solid $roxo-claro;
-  border-radius: 14px;
-  box-shadow: 0 12px 36px rgba($roxo-escuro, 0.22);
+  border-left: 1px solid $roxo-claro;
+  box-shadow: -12px 0 36px rgba($roxo-escuro, 0.20);
   z-index: 2090;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   padding: 16px;
   gap: 12px;
-  animation: tutorPanelIn 0.18s ease-out;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+
+  &.open {
+    transform: translateX(0);
+  }
 
   // Cor da borda segue o tema do item clicado
-  &.theme-coleta { border-color: rgba($coleta-cor, 0.5); }
-  &.theme-treino { border-color: rgba($treino-cor, 0.5); }
-  &.theme-metrica { border-color: rgba($metrica-cor, 0.5); }
+  &.theme-coleta { border-left-color: rgba($coleta-cor, 0.5); }
+  &.theme-treino { border-left-color: rgba($treino-cor, 0.5); }
+  &.theme-metrica { border-left-color: rgba($metrica-cor, 0.5); }
 
-  // O app-tutor e o chat compartilham o scroll do painel: o aluno lê o
-  // conteúdo e o chat fica logo ao final do mesmo bloco (sem scroll próprio).
+  // Conteúdo e chat fluem no scroll do drawer (sem scroll próprio que colapsa
+  // e causa sobreposição). O chat cresce naturalmente abaixo do conteúdo.
   app-tutor {
     display: block;
+    flex-shrink: 0;
     background: $branco;
     border: 1px solid $roxo-claro;
     border-radius: 12px;
     padding: 12px 14px;
+
+    ::ng-deep .tutor-painel { overflow: visible; }
+  }
+
+  app-chat-tutor {
+    display: block;
+    flex-shrink: 0;
+
+    ::ng-deep .chat-tutor { max-height: none; }
   }
 
   .pipeline-info {

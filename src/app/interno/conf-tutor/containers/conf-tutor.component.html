@@ -66,22 +66,9 @@
             <span>Carregando modelos disponíveis...</span>
           </div>
 
-          <div class="saude-barra" *ngIf="!carregandoModelos && modelosLLM.length">
-            <span class="saude-status" *ngIf="saudeEmAndamento">
-              <mat-spinner diameter="14"></mat-spinner>
-              Testando modelos… {{ saudeProgresso.concluidos }}/{{ saudeProgresso.total }}
-            </span>
-            <span class="saude-status" *ngIf="!saudeEmAndamento && saudeProgresso.total">
-              <mat-icon>verified</mat-icon> Teste concluído ({{ saudeProgresso.total }} modelos)
-            </span>
-            <button mat-stroked-button class="saude-retestar" (click)="retestarModelos()" [disabled]="saudeEmAndamento">
-              <mat-icon>refresh</mat-icon> Re-testar
-            </button>
-          </div>
-
-          <div class="lista-modelos" *ngIf="!carregandoModelos && modelosLLM.length">
+          <!-- Item de modelo reutilizado nas listas Ativos e Inativos -->
+          <ng-template #modeloItemTpl let-m>
             <div class="modelo-item"
-                 *ngFor="let m of modelosLLM"
                  [class.ativo]="m.id === modeloLLMAtual"
                  (click)="selecionarModeloLLM(m.id)">
               <div class="modelo-info">
@@ -93,7 +80,7 @@
               </div>
               <div class="modelo-direita">
                 <span class="saude-chip" [ngClass]="statusModelo(m.id)"
-                  [matTooltip]="saudeModelos[m.id]?.erro || (saudeModelos[m.id]?.latencia_ms ? saudeModelos[m.id]?.latencia_ms + ' ms' : 'Testando…')">
+                  [matTooltip]="saudeModelos[m.id]?.erro || (saudeModelos[m.id]?.latencia_ms ? saudeModelos[m.id]?.latencia_ms + ' ms' : '')">
                   <ng-container [ngSwitch]="statusModelo(m.id)">
                     <ng-container *ngSwitchCase="'responde'"><mat-icon>check_circle</mat-icon> responde</ng-container>
                     <ng-container *ngSwitchCase="'sem-resposta'"><mat-icon>cancel</mat-icon> sem resposta</ng-container>
@@ -103,7 +90,52 @@
                 <mat-spinner diameter="16" *ngIf="salvandoModelo && m.id === modeloLLMAtual"></mat-spinner>
               </div>
             </div>
+          </ng-template>
+
+          <!-- Verificando quais modelos respondem: bloqueia a seleção com um progresso -->
+          <div class="verificando-modelos" *ngIf="!carregandoModelos && modelosLLM.length && verificandoSaude">
+            <div class="verificando-topo">
+              <mat-spinner diameter="18"></mat-spinner>
+              <span>Verificando quais modelos estão ativos… {{ saudeProgresso.concluidos }}/{{ saudeProgresso.total }}</span>
+            </div>
+            <mat-progress-bar mode="determinate" [value]="progressoPct"></mat-progress-bar>
+            <p class="verificando-aviso">A seleção fica disponível assim que o teste terminar.</p>
           </div>
+
+          <!-- Teste concluído: Ativos (selecionáveis) + Inativos (recolhidos) -->
+          <ng-container *ngIf="!carregandoModelos && modelosLLM.length && verificacaoConcluida">
+            <div class="saude-barra">
+              <span class="saude-status">
+                <mat-icon>verified</mat-icon>
+                {{ modelosAtivos.length }} ativos · {{ modelosInativos.length }} inativos
+              </span>
+              <button mat-stroked-button class="saude-retestar" (click)="retestarModelos()">
+                <mat-icon>refresh</mat-icon> Re-testar
+              </button>
+            </div>
+
+            <h4 class="grupo-modelos-titulo ativos">
+              <mat-icon>check_circle</mat-icon> Ativos ({{ modelosAtivos.length }})
+            </h4>
+            <div class="lista-modelos" *ngIf="modelosAtivos.length">
+              <ng-container *ngFor="let m of modelosAtivos">
+                <ng-container *ngTemplateOutlet="modeloItemTpl; context: { $implicit: m }"></ng-container>
+              </ng-container>
+            </div>
+            <p class="vazio-grupo" *ngIf="!modelosAtivos.length">Nenhum modelo respondeu ao teste.</p>
+
+            <div class="grupo-inativos" *ngIf="modelosInativos.length">
+              <button type="button" class="grupo-modelos-titulo inativos toggle" (click)="toggleInativos()">
+                <mat-icon class="caret">{{ inativosAberto ? 'expand_less' : 'expand_more' }}</mat-icon>
+                <mat-icon>cancel</mat-icon> Inativos ({{ modelosInativos.length }})
+              </button>
+              <div class="lista-modelos" *ngIf="inativosAberto">
+                <ng-container *ngFor="let m of modelosInativos">
+                  <ng-container *ngTemplateOutlet="modeloItemTpl; context: { $implicit: m }"></ng-container>
+                </ng-container>
+              </div>
+            </div>
+          </ng-container>
 
           <div class="vazio-modelos" *ngIf="!carregandoModelos && !modelosLLM.length">
             <mat-icon>cloud_off</mat-icon>

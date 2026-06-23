@@ -1,5 +1,11 @@
 @use '../../../styles/colores.scss' as *;
 
+// Sem isto, o host renderiza como inline e o painel se sobrepõe ao conteúdo
+// acima (textos sobreescritos no drawer do tutor).
+:host {
+  display: block;
+}
+
 .chat-tutor {
   display: flex;
   flex-direction: column;

@@ -11,6 +11,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { QuillModule } from 'ngx-quill';
@@ -54,6 +55,7 @@ import { TutorElementosCatalogoComponent } from './components/tutor-elementos-ca
     MatButtonModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
+    MatProgressBarModule,
     MatSlideToggleModule,
     MatSelectModule,
     QuillModule.forRoot(),

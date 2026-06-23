@@ -188,7 +188,7 @@
 
   </div>
 
-  <!-- FAB do tutor — fixo no canto inferior direito -->
+  <!-- FAB do robô — centralizado verticalmente na borda direita da tela -->
   <button type="button" class="tutor-fab"
     [class.active]="chatAberto"
     [ngClass]="tutorThemeClass"
@@ -199,9 +199,11 @@
     <mat-icon>{{ chatAberto ? 'close' : 'smart_toy' }}</mat-icon>
   </button>
 
-  <!-- Painel flutuante do tutor (conteudo educacional + chatbot) -->
-  <div class="tutor-floating-panel" *ngIf="chatAberto" [ngClass]="tutorThemeClass">
-    <!-- Conteudo educacional do item clicado (mesmo do antigo painel) -->
+  <!-- Painel lateral do tutor (drawer que desliza da direita):
+       conteúdo educacional em cima, chatbot embaixo (o aluno lê primeiro). -->
+  <aside class="tutor-drawer" [class.open]="chatAberto" [ngClass]="tutorThemeClass"
+    [attr.aria-hidden]="!chatAberto">
+    <!-- Conteudo educacional do item clicado -->
     <app-tutor *ngIf="tutorItemInfo || tutorPipelineInfo"
       [tutorGeral]="tutor"
       [modeloSelecionado]="modeloSelecionado"
@@ -211,10 +213,10 @@
       [tutorTheme]="tutorTheme">
     </app-tutor>
 
-    <!-- Chatbot ciente do contexto -->
-    <app-chat-tutor
+    <!-- Chatbot ciente do contexto (perguntas frequentes do conteúdo + livre) -->
+    <app-chat-tutor *ngIf="chatAberto"
       [contexto]="chatContexto"
       [sugestoesCustom]="chatSugestoes">
     </app-chat-tutor>
-  </div>
+  </aside>
 </div>

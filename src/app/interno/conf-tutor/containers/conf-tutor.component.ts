@@ -61,6 +61,8 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   saudeModelos: Record<string, { responde: boolean; latencia_ms?: number; erro?: string }> = {};
   saudeEmAndamento = false;
   saudeProgresso = { concluidos: 0, total: 0 };
+  // A lista de inativos fica recolhida por padrão (o foco é escolher um que responde).
+  inativosAberto = false;
   private saudeTimer: any = null;
   private destruido = false;
 
@@ -178,6 +180,9 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
 
   retestarModelos() {
     this.saudeModelos = {};
+    // Bloqueia a seleção imediatamente (sem flicker) enquanto o backend re-testa.
+    this.saudeEmAndamento = true;
+    this.saudeProgresso = { concluidos: 0, total: this.modelosLLM.length };
     this.verificarSaudeModelos(true);
   }
 
@@ -188,13 +193,44 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     return s.responde ? 'responde' : 'sem-resposta';
   }
 
+  // Enquanto o teste roda, a seleção fica bloqueada e mostramos um progresso.
+  get verificandoSaude(): boolean {
+    return this.saudeEmAndamento;
+  }
+
+  // Teste concluído: já dá para separar ativos/inativos e permitir a seleção.
+  get verificacaoConcluida(): boolean {
+    return !this.saudeEmAndamento && this.saudeProgresso.total > 0;
+  }
+
+  get progressoPct(): number {
+    const { concluidos, total } = this.saudeProgresso;
+    return total > 0 ? Math.round((concluidos / total) * 100) : 0;
+  }
+
+  get modelosAtivos(): { id: string; owned_by: string }[] {
+    return this.modelosLLM.filter((m) => this.saudeModelos[m.id]?.responde);
+  }
+
+  get modelosInativos(): { id: string; owned_by: string }[] {
+    return this.modelosLLM.filter((m) => {
+      const s = this.saudeModelos[m.id];
+      return s && !s.responde;
+    });
+  }
+
+  toggleInativos(): void {
+    this.inativosAberto = !this.inativosAberto;
+  }
+
   ngOnDestroy(): void {
     this.destruido = true;
     if (this.saudeTimer) clearTimeout(this.saudeTimer);
   }
 
   selecionarModeloLLM(modeloId: string) {
-    if (this.salvandoModelo || modeloId === this.modeloLLMAtual) return;
+    // Bloqueia a troca enquanto o teste de saúde está em andamento.
+    if (this.salvandoModelo || this.saudeEmAndamento || modeloId === this.modeloLLMAtual) return;
     this.salvandoModelo = true;
     this.dashboardService.definirModeloLLM(modeloId).subscribe({
       next: (res) => {
