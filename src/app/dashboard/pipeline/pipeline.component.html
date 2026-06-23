@@ -1,16 +1,4 @@
 <div class="pipeline-container">
-  <!-- Ações (topo) -->
-  <div class="pipeline-actions">
-    <button (click)="navegar(true)" class="btn-secondary" *ngIf="role !== 'aluno'">
-      <mat-icon>arrow_back</mat-icon>
-      Voltar
-    </button>
-    <button (click)="navegar(false)" class="btn-danger">
-      <mat-icon>logout</mat-icon>
-      Sair
-    </button>
-  </div>
-
   <!-- Dados -->
   <div class="pipeline-section" [class.collapsed]="isCollapsed('dados')">
     <div class="section-label" (click)="toggleSection('dados')">

@@ -31,6 +31,34 @@ $metrica-cor-escuro: #E65100;
   justify-content: space-between;
   align-items: center;
 
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  // Botão Voltar no topo da página (volta ao painel de entrada).
+  .btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border: 1px solid $roxo-claro;
+    border-radius: 10px;
+    background: $branco;
+    color: $roxo-medio;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+    &:hover { background: $roxo-fundo; border-color: $roxo-medio; }
+  }
+
   .header-info {
     h2 {
       margin: 0;

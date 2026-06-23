@@ -890,6 +890,11 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     this.usuarioMenuAberto = !this.usuarioMenuAberto;
   }
 
+  // Voltar para o painel de entrada do aluno.
+  voltar(): void {
+    this.router.navigate(['/inicio']);
+  }
+
   navegarParaProjetos(): void {
     this.usuarioMenuAberto = false;
     this.router.navigate(['/view-aluno/projetos']);
