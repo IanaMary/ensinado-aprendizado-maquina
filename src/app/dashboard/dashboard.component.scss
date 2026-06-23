@@ -21,17 +21,33 @@
   .pipeline-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     padding: 16px 12px;
     border-bottom: 1px solid rgba($roxo-claro, 0.4);
     overflow: hidden; // nada vaza do cabeçalho
 
-    > mat-icon {
-      color: $roxo-medio;
-      font-size: 22px;
-      width: 22px;
-      height: 22px;
+    // Seta de voltar (só ícone) antes do título "Pipeline".
+    .pipeline-back-btn {
+      width: 30px;
+      height: 30px;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: $roxo-medio;
+      }
+
+      &:hover { background: rgba($roxo-medio, 0.1); }
     }
 
     span {
@@ -53,8 +69,8 @@
       flex-shrink: 0;
 
       .pipeline-action-btn {
-        width: 30px;
-        height: 30px;
+        width: 28px;
+        height: 28px;
         display: flex;
         align-items: center;
         justify-content: center;

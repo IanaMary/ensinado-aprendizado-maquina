@@ -19,6 +19,11 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/trilha']);
   }
 
+  // Volta ao painel de entrada do aluno.
+  voltar() {
+    this.router.navigate(['/inicio']);
+  }
+
   ngOnInit() {
     this.dashboardService.carregarDados();
   }

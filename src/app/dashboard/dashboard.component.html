@@ -2,7 +2,9 @@
   <!-- Pipeline sidebar -->
   <aside class="dashboard-pipeline">
     <div class="pipeline-header">
-      <mat-icon>account_tree</mat-icon>
+      <button class="pipeline-back-btn" (click)="voltar()" matTooltip="Voltar" aria-label="Voltar">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
       <span>Pipeline</span>
       <div class="pipeline-actions">
         <button mat-icon-button class="pipeline-action-btn" (click)="salvarPipeline()" matTooltip="Salvar">
