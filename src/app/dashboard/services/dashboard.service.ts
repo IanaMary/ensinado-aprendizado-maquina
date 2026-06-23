@@ -641,6 +641,16 @@ export class DashboardService {
     return this.itemsEmExecucao.value.some(i => i.label === item.label);
   }
 
+  // Tira um item da lane de execução e devolve o preditor à barra lateral
+  // (re-habilita o arrasto), usado ao remover um modelo da comparação.
+  removerItemExecucao(item: ItemPipeline) {
+    this.itemsEmExecucao.next(this.itemsEmExecucao.value.filter(i => i.valor !== item.valor));
+    const modelos = this.itensModelos.value.map(i =>
+      i.valor === item.valor ? { ...i, movido: false } : i
+    );
+    this.itensModelos.next(modelos);
+  }
+
   habilitadarModelos(tipoTargetSelecionado: any, habilitado: boolean) {
     const itensAtualizados = this.itensModelos.value.map(item => ({
       ...item,

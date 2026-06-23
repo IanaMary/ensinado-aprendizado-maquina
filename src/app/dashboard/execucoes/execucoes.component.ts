@@ -335,6 +335,28 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Remove um preditor da comparação: tira o resultado, o card da lane (devolvendo-o
+  // à barra) e zera a avaliação para recalcular com os modelos restantes.
+  removerModeloComparacao(item: ItemPipeline, event: Event): void {
+    event.stopPropagation();
+    if (this.resultadoTreinamento) {
+      const chaveBackend = item.valor.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '_').toLowerCase();
+      delete this.resultadoTreinamento[item.valor];
+      delete this.resultadoTreinamento[chaveBackend];
+    }
+    this.modelosSelecionados = this.modelosSelecionados.filter(m => m.valor !== item.valor);
+    this.treinoVistos.delete(item.valor);
+    // Avaliação/comparação será recalculada com os modelos restantes ao reabrir.
+    this.resultadosDasAvaliacoes = {};
+    if (this.modeloSelecionado?.valor === item.valor) {
+      this.modeloSelecionado = this.modelosSelecionados[0];
+    }
+    this.dashboardService.removerItemExecucao(item);
+    this.atualizarTutorContexto();
+    this.atividade.registrar('pipeline', 'removeu_modelo_comparacao', { contexto: 'classico', modelo: item.valor });
+    this.notificacao.sucesso(`"${item.label}" removido da comparação.`);
+  }
+
   mostrarInfoItem(item: ItemPipeline, event: Event): void {
     event.stopPropagation();
 

@@ -546,6 +546,13 @@ $metrica-cor-escuro: #E65100;
     line-height: 1;
   }
 
+  .item-acoes {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
   .btn-info {
     font-size: 18px;
     width: 18px;
@@ -562,11 +569,29 @@ $metrica-cor-escuro: #E65100;
     }
   }
 
+  // Remover da comparação — revelado no hover do card, igual ao info.
+  .btn-remover {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: $cinza-medio;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    opacity: 0;
+
+    &:hover {
+      color: $erro;
+      transform: scale(1.15);
+    }
+  }
+
   &:hover {
     border-color: $roxo-medio;
     box-shadow: 0 2px 8px rgba($roxo-escuro, 0.08);
 
-    .btn-info {
+    .btn-info,
+    .btn-remover {
       opacity: 1;
     }
   }
