@@ -10,6 +10,15 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### Correções da comparação de preditores (review adversarial). Front `2efff9b` (bundle `main-PZEUSF3L.js`) · só frontend
+- Review multi-agente da feature de comparação encontrou e corrigiu: **cancelar (X)** a adição de
+  um 2º preditor não polui mais o estado (commit passa a depender do que foi **treinado**, não do
+  fechamento; modelo/avaliações anteriores preservados; card não treinado descartado); o
+  **`modeloSelecionado`** só aponta para modelos treinados (sem "modelo fantasma" no tutor/export/chat);
+  arrastar um preditor de **categoria incompatível** remove o card órfão da lane; o **"×"** só aparece
+  com 2+ modelos; `removerItemExecucao` casa por `valor`+`tipoItem`; chat do drawer não corta o input
+  em telas baixas; telemetria coerente. Build OK + 106/106 testes.
+
 ### Remover preditor da comparação. Front `6db26b2` (bundle `main-6GMZWT4I.js`) · só frontend
 - Botão **"×"** em cada card da lane de treino: remove o resultado do modelo, tira o card da lane
   (devolvendo o preditor à barra lateral) e **recalcula a comparação** com os modelos restantes.
