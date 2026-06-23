@@ -71,6 +71,8 @@
       .pipeline-action-btn {
         width: 28px;
         height: 28px;
+        padding: 0;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -84,15 +86,24 @@
           font-size: 18px;
           width: 18px;
           height: 18px;
+          line-height: 18px;
           color: $cinza-medio;
         }
 
-        &:hover {
+        &:hover:not(:disabled) {
           background: rgba($roxo-medio, 0.08);
 
           mat-icon {
             color: $roxo-medio;
           }
+        }
+
+        &:disabled {
+          cursor: default;
+          opacity: 0.4;
+          // Anula o estilo global button[disabled] (borda/fundo cinza com !important).
+          background: transparent !important;
+          border: none !important;
         }
       }
     }

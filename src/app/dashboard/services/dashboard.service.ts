@@ -656,11 +656,15 @@ export class DashboardService {
   }
 
   habilitadarModelos(tipoTargetSelecionado: any, habilitado: boolean) {
-    const itensAtualizados = this.itensModelos.value.map(item => ({
+    const itens = this.itensModelos.value;
+    // Fail-open: se NENHUM modelo casa com o tipo do target (gate mal configurado ou
+    // dado divergente), não desabilita tudo — mantém todos arrastáveis. A
+    // compatibilidade ainda é reforçada na etapa de seleção do modelo (incompatíveis
+    // ficam desabilitados lá). Sem target definido também não bloqueia.
+    const algumCompativel = !!tipoTargetSelecionado && itens.some(i => i.tipo === tipoTargetSelecionado);
+    const itensAtualizados = itens.map(item => ({
       ...item,
-      // Sem target definido ainda (ex.: dados não carregados) não desabilita tudo,
-      // senão nenhum preditor fica arrastável; com target, casa pelo tipo.
-      habilitado: !tipoTargetSelecionado ? true : item.tipo === tipoTargetSelecionado
+      habilitado: !tipoTargetSelecionado || !algumCompativel ? true : item.tipo === tipoTargetSelecionado
     }));
     this.itensModelos.next(itensAtualizados);
   }

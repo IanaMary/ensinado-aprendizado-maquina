@@ -7,16 +7,16 @@
       </button>
       <span>Pipeline</span>
       <div class="pipeline-actions">
-        <button mat-icon-button class="pipeline-action-btn" (click)="salvarPipeline()" matTooltip="Salvar">
+        <button type="button" class="pipeline-action-btn" (click)="salvarPipeline()" matTooltip="Salvar">
           <mat-icon>save</mat-icon>
         </button>
-        <button mat-icon-button class="pipeline-action-btn" (click)="limparSessao()" matTooltip="Limpar">
+        <button type="button" class="pipeline-action-btn" (click)="limparSessao()" matTooltip="Limpar">
           <mat-icon>cleaning_services</mat-icon>
         </button>
-        <button mat-icon-button class="pipeline-action-btn" (click)="baixarPipeline()" [disabled]="!execucoesComponent?.modeloSelecionado" matTooltip="Baixar Pipeline">
+        <button type="button" class="pipeline-action-btn" (click)="baixarPipeline()" [disabled]="!execucoesComponent?.modeloSelecionado" matTooltip="Baixar Pipeline">
           <mat-icon>download</mat-icon>
         </button>
-        <button mat-icon-button class="pipeline-action-btn" (click)="irParaTrilha()" matTooltip="Experimentar a Trilha (novo)">
+        <button type="button" class="pipeline-action-btn" (click)="irParaTrilha()" matTooltip="Experimentar a Trilha (novo)">
           <mat-icon>account_tree</mat-icon>
         </button>
       </div>
