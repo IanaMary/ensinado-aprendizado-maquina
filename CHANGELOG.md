@@ -10,6 +10,17 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### Barra do pipeline (overflow/cabeçalho/Voltar-Sair) + painel de entrada do aluno. Front `ccb9ce9` (bundle `main-GDRJBBKX.js`) · só frontend
+- **Barra do pipeline (modo clássico):** os cards das etapas **não vazam mais** para fora da barra
+  (`flex-wrap:nowrap` no override de `.opcoesPipeline` + `overflow-x:hidden` em `.pipeline-content`)
+  e o cabeçalho "Pipeline" acomoda os 4 ícones de ação sem cortar (padding/gap menores, rótulo
+  trunca). **Voltar/Sair** movidos para o **topo** da barra.
+- **Preditores arrastáveis:** `habilitadarModelos` não desabilita mais **todos** os modelos quando
+  ainda não há target definido — destrava o arrasto do preditor.
+- **Painel de entrada do aluno (`/inicio`):** **menu do usuário** (avatar + sair) e **listagem dos
+  projetos salvos** (abrir no modo clássico via `?pipeline=`, excluir). Diagnóstico de overflow/drag
+  por review multi-agente. Build OK + 106/106 testes.
+
 ### Correções da comparação de preditores (review adversarial). Front `2efff9b` (bundle `main-PZEUSF3L.js`) · só frontend
 - Review multi-agente da feature de comparação encontrou e corrigiu: **cancelar (X)** a adição de
   um 2º preditor não polui mais o estado (commit passa a depender do que foi **treinado**, não do
