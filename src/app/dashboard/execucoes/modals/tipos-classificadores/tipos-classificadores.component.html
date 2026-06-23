@@ -1,54 +1,59 @@
 <div class="modal-container">
-  <!-- Selecao do modelo: secoes por tipo de tarefa (incompativeis desabilitados) -->
-  <div class="tipo-secao" *ngFor="let grupo of modelosAgrupados">
-    <div class="tipo-header">
+  <!-- Selecao do modelo: secoes por tipo de tarefa (colapsaveis; incompativeis desabilitados) -->
+  <div class="tipo-secao" *ngFor="let grupo of modelosAgrupados" [class.colapsado]="isColapsado(grupo.tipo)">
+    <div class="tipo-header" (click)="toggleGrupo(grupo.tipo)">
       <span class="tipo-titulo">{{ grupo.titulo }}</span>
+      <mat-icon class="toggle-grupo">{{ isColapsado(grupo.tipo) ? 'expand_more' : 'expand_less' }}</mat-icon>
     </div>
-    <div class="modelos-grid">
-      <div *ngFor="let model of grupo.modelos"
-           class="modelo-card"
-           [class.selected]="modeloValor === model.valor"
-           [class.desabilitado]="model.compativel === false"
-           [matTooltip]="model.compativel === false ? 'Indisponível para este dataset (tipo de alvo diferente)' : ''"
-           matTooltipPosition="above"
-           (click)="selecionarModelo(model)">
-        <div class="modelo-header">
-          <mat-icon class="modelo-icon">memory</mat-icon>
-          <span class="modelo-label">{{ model.label }}</span>
-          <button type="button" class="btn-info-item"
-            [matTooltip]="'Ver explicação no tutor'" matTooltipPosition="above"
-            aria-label="Ver explicação no tutor"
-            (click)="pedirAjuda($event, model)">
-            <mat-icon>info_outline</mat-icon>
-          </button>
+
+    <ng-container *ngIf="!isColapsado(grupo.tipo)">
+      <div class="modelos-grid">
+        <div *ngFor="let model of grupo.modelos"
+             class="modelo-card"
+             [class.selected]="modeloValor === model.valor"
+             [class.desabilitado]="model.compativel === false"
+             [matTooltip]="model.compativel === false ? 'Indisponível para este dataset (tipo de alvo diferente)' : ''"
+             matTooltipPosition="above"
+             (click)="selecionarModelo(model)">
+          <div class="modelo-header">
+            <mat-icon class="modelo-icon">memory</mat-icon>
+            <span class="modelo-label">{{ model.label }}</span>
+            <button type="button" class="btn-info-item"
+              [matTooltip]="'Ver explicação no tutor'" matTooltipPosition="above"
+              aria-label="Ver explicação no tutor"
+              (click)="pedirAjuda($event, model)">
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </div>
+          <p class="modelo-resumo">{{ model.resumo }}</p>
         </div>
-        <p class="modelo-resumo">{{ model.resumo }}</p>
       </div>
-    </div>
-  </div>
 
-  <!-- Hiperparametros do modelo selecionado -->
-  <div class="hiperparametros-section" *ngIf="hiperparametrosArray.length || hiperparametrosAvancados.length">
-    <div class="section-header">
-      <mat-icon>tune</mat-icon>
-      <span>Hiperparâmetros</span>
-    </div>
+      <!-- Hiperparametros logo abaixo do grupo que contem o modelo selecionado -->
+      <div class="hiperparametros-section"
+           *ngIf="grupoContemSelecionado(grupo) && (hiperparametrosArray.length || hiperparametrosAvancados.length)">
+        <div class="section-header">
+          <mat-icon>tune</mat-icon>
+          <span>Hiperparâmetros</span>
+        </div>
 
-    <div class="hiperparametros-grid">
-      <ng-container *ngFor="let param of hiperparametrosArray">
-        <ng-container *ngTemplateOutlet="campoParam; context: { $implicit: param }"></ng-container>
-      </ng-container>
-    </div>
+        <div class="hiperparametros-grid">
+          <ng-container *ngFor="let param of hiperparametrosArray">
+            <ng-container *ngTemplateOutlet="campoParam; context: { $implicit: param }"></ng-container>
+          </ng-container>
+        </div>
 
-    <!-- Avancados recolhidos -->
-    <details class="avancados" *ngIf="hiperparametrosAvancados.length" [open]="mostrarAvancados">
-      <summary>Avançado ({{ hiperparametrosAvancados.length }})</summary>
-      <div class="hiperparametros-grid">
-        <ng-container *ngFor="let param of hiperparametrosAvancados">
-          <ng-container *ngTemplateOutlet="campoParam; context: { $implicit: param }"></ng-container>
-        </ng-container>
+        <!-- Avancados recolhidos -->
+        <details class="avancados" *ngIf="hiperparametrosAvancados.length" [open]="mostrarAvancados">
+          <summary>Avançado ({{ hiperparametrosAvancados.length }})</summary>
+          <div class="hiperparametros-grid">
+            <ng-container *ngFor="let param of hiperparametrosAvancados">
+              <ng-container *ngTemplateOutlet="campoParam; context: { $implicit: param }"></ng-container>
+            </ng-container>
+          </div>
+        </details>
       </div>
-    </details>
+    </ng-container>
   </div>
 </div>
 

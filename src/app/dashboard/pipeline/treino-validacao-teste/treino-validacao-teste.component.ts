@@ -13,6 +13,8 @@ export class TreinoValidacaoTesteComponent {
   classificadores: ItemPipeline[] = [];
   regressores: ItemPipeline[] = [];
   modelosNaoSupervisionado: ItemPipeline[] = [];
+  // Grupos colapsáveis (abertos por padrão; auto-colapsa os totalmente desabilitados).
+  gruposColapsados: Record<string, boolean> = {};
 
   constructor(private dashboardService: DashboardService) { }
 
@@ -33,7 +35,21 @@ export class TreinoValidacaoTesteComponent {
 
         // Não Supervisionado
         this.modelosNaoSupervisionado = itens.filter(i => i.dadosRotulados === false);
+
+        // Auto-colapsa grupos cujos itens estão todos desabilitados.
+        const sup = [...this.classificadores, ...this.regressores];
+        this.gruposColapsados['supervisionado'] = sup.length > 0 && sup.every(i => !i.habilitado);
+        this.gruposColapsados['naoSupervisionado'] =
+          this.modelosNaoSupervisionado.length > 0 && this.modelosNaoSupervisionado.every(i => !i.habilitado);
       });
+  }
+
+  toggleGrupo(nome: string) {
+    this.gruposColapsados[nome] = !this.gruposColapsados[nome];
+  }
+
+  isColapsado(nome: string): boolean {
+    return !!this.gruposColapsados[nome];
   }
 
   onItemDropped(event: any) {

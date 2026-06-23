@@ -635,7 +635,7 @@ $metrica-cor-escuro: #E65100;
   border-left: 1px solid $roxo-claro;
   box-shadow: -12px 0 36px rgba($roxo-escuro, 0.20);
   z-index: 2090;
-  overflow-y: auto;
+  overflow: hidden; // quem rola é a região de conteúdo, não a gaveta inteira
   display: flex;
   flex-direction: column;
   padding: 16px;
@@ -652,11 +652,18 @@ $metrica-cor-escuro: #E65100;
   &.theme-treino { border-left-color: rgba($treino-cor, 0.5); }
   &.theme-metrica { border-left-color: rgba($metrica-cor, 0.5); }
 
-  // Conteúdo e chat fluem no scroll do drawer (sem scroll próprio que colapsa
-  // e causa sobreposição). O chat cresce naturalmente abaixo do conteúdo.
+  // Conteúdo contextual: ocupa o espaço disponível e rola quando estoura a tela.
+  .tutor-conteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
   app-tutor {
     display: block;
-    flex-shrink: 0;
     background: $branco;
     border: 1px solid $roxo-claro;
     border-radius: 12px;
@@ -665,11 +672,12 @@ $metrica-cor-escuro: #E65100;
     ::ng-deep .tutor-painel { overflow: visible; }
   }
 
+  // Chat fixo na base da gaveta; mensagens rolam dentro dele.
   app-chat-tutor {
     display: block;
-    flex-shrink: 0;
+    flex: 0 0 auto;
 
-    ::ng-deep .chat-tutor { max-height: none; }
+    ::ng-deep .chat-tutor { max-height: 45vh; }
   }
 
   .pipeline-info {

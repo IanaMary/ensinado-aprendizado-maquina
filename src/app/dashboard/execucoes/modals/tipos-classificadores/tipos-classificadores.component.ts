@@ -29,12 +29,33 @@ export class TiposClassificadoresComponent implements OnChanges {
   hiperparametrosArray: any[] = [];
   hiperparametrosAvancados: any[] = [];
   mostrarAvancados = false;
+  // Grupos de preditores colapsáveis (auto-colapsa os totalmente incompatíveis).
+  gruposColapsados: Record<string, boolean> = {};
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['modeloSelecionado'] && this.modeloSelecionado?.valor) {
       this.modeloValor = this.modeloSelecionado.valor;
       this.carregarHiperparametros();
     }
+    if (changes['modelosAgrupados'] && this.modelosAgrupados?.length) {
+      // Colapsa de início os grupos cujos modelos são todos incompatíveis.
+      for (const g of this.modelosAgrupados) {
+        this.gruposColapsados[g.tipo] = g.modelos.length > 0 && g.modelos.every(m => m.compativel === false);
+      }
+    }
+  }
+
+  toggleGrupo(tipo: string) {
+    this.gruposColapsados[tipo] = !this.gruposColapsados[tipo];
+  }
+
+  isColapsado(tipo: string): boolean {
+    return !!this.gruposColapsados[tipo];
+  }
+
+  // O bloco de hiperparâmetros aparece logo abaixo do grupo que contém o selecionado.
+  grupoContemSelecionado(grupo: { modelos: any[] }): boolean {
+    return !!this.modeloValor && grupo.modelos.some(m => m.valor === this.modeloValor);
   }
 
   // Modelos de tipo incompativel com o target ficam desabilitados (nao selecionaveis).

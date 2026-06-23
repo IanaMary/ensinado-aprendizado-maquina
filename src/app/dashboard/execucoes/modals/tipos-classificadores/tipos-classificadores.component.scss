@@ -16,12 +16,30 @@
   flex-direction: column;
   gap: 8px;
 
-  .tipo-header .tipo-titulo {
-    font-size: 12px;
-    font-weight: 700;
-    color: $roxo-escuro;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  .tipo-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+
+    .tipo-titulo {
+      font-size: 12px;
+      font-weight: 700;
+      color: $roxo-escuro;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .toggle-grupo {
+      margin-left: auto;
+      color: $cinza-medio;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover .tipo-titulo { color: $roxo-medio; }
   }
 }
 

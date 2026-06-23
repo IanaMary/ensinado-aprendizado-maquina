@@ -79,6 +79,15 @@ h2 {
   }
 }
 
+// Dentro da barra da trilha (.pipeline-container é ancestral de todos os filhos),
+// os itens empilham em coluna ocupando a largura toda — anula o flex-wrap acima
+// (que deixava Dados/Modelos/Métricas menores que a barra). Seletor global de
+// propósito: atravessa o encapsulation para alcançar os componentes-filhos.
+.pipeline-container .opcoesPipeline {
+  flex-direction: column;
+  gap: 6px;
+}
+
 button[disabled],
 button[mat-raised-button][disabled],
 .mat-button[disabled] {
@@ -142,6 +151,8 @@ button[mat-raised-button] {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
   padding: 8px 10px;
   background: $branco;
   border: 1px solid rgba($roxo-claro, 0.6);

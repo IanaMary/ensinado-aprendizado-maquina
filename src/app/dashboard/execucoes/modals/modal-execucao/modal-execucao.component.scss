@@ -263,7 +263,7 @@
   border-left: 1px solid $roxo-claro;
   box-shadow: -12px 0 36px rgba($roxo-escuro, 0.20);
   z-index: 2090;
-  overflow-y: auto;
+  overflow: hidden; // quem rola é a região de conteúdo, não a gaveta inteira
   display: flex;
   flex-direction: column;
   padding: 16px;
@@ -275,16 +275,22 @@
     transform: translateX(0);
   }
 
+  // Conteúdo contextual: ocupa o espaço disponível e rola quando estoura a tela.
   .tutor-conteudo {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    flex-shrink: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
   }
 
+  // Chat fixo na base da gaveta; mensagens rolam dentro dele.
   .tutor-chat {
     display: block;
-    flex-shrink: 0;
+    flex: 0 0 auto;
+
+    ::ng-deep .chat-tutor { max-height: 45vh; }
   }
 
   .pipeline-info {

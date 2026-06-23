@@ -203,17 +203,19 @@
        conteúdo educacional em cima, chatbot embaixo (o aluno lê primeiro). -->
   <aside class="tutor-drawer" [class.open]="chatAberto" [ngClass]="tutorThemeClass"
     [attr.aria-hidden]="!chatAberto">
-    <!-- Conteudo educacional do item clicado -->
-    <app-tutor *ngIf="tutorItemInfo || tutorPipelineInfo"
-      [tutorGeral]="tutor"
-      [modeloSelecionado]="modeloSelecionado"
-      [metricaSelecionada]="metricasSelecionadas[0]"
-      [tutorPipelineInfo]="tutorPipelineInfo"
-      [tutorItemInfo]="tutorItemInfo"
-      [tutorTheme]="tutorTheme">
-    </app-tutor>
+    <!-- Conteúdo educacional (em cima): rola quando estoura a tela -->
+    <div class="tutor-conteudo">
+      <app-tutor *ngIf="tutorItemInfo || tutorPipelineInfo"
+        [tutorGeral]="tutor"
+        [modeloSelecionado]="modeloSelecionado"
+        [metricaSelecionada]="metricasSelecionadas[0]"
+        [tutorPipelineInfo]="tutorPipelineInfo"
+        [tutorItemInfo]="tutorItemInfo"
+        [tutorTheme]="tutorTheme">
+      </app-tutor>
+    </div>
 
-    <!-- Chatbot ciente do contexto (perguntas frequentes do conteúdo + livre) -->
+    <!-- Chatbot ciente do contexto (fixo na base; perguntas frequentes + livre) -->
     <app-chat-tutor *ngIf="chatAberto"
       [contexto]="chatContexto"
       [sugestoesCustom]="chatSugestoes">

@@ -21,6 +21,8 @@
     color: $cinza-medio;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    cursor: pointer;
+    user-select: none;
 
     mat-icon {
       font-size: 14px;
@@ -28,5 +30,9 @@
       height: 14px;
       color: $cinza-medio;
     }
+
+    .toggle-grupo { margin-left: auto; }
+
+    &:hover { color: $roxo-medio; }
   }
 }

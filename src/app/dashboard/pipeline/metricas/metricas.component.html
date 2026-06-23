@@ -1,10 +1,12 @@
 <div class="metricas-container">
-  <div class="metrica-grupo" *ngFor="let grupo of grupos">
-    <div class="grupo-header">
+  <div class="metrica-grupo" *ngFor="let grupo of grupos" [class.colapsado]="isColapsado(grupo.nome)">
+    <div class="grupo-header" (click)="toggleGrupo(grupo.nome)">
       <mat-icon>{{ grupo.icone }}</mat-icon>
       <span>{{ grupo.nome }}</span>
+      <mat-icon class="toggle-grupo">{{ isColapsado(grupo.nome) ? 'expand_more' : 'expand_less' }}</mat-icon>
     </div>
-    <nav cdkDropList [cdkDropListData]="grupo.itens" (cdkDropListDropped)="onItemDropped($event)"
+    <nav *ngIf="!isColapsado(grupo.nome)"
+         cdkDropList [cdkDropListData]="grupo.itens" (cdkDropListDropped)="onItemDropped($event)"
          [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
       <nav *ngFor="let item of grupo.itens" class="pipeline-item"
            cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"

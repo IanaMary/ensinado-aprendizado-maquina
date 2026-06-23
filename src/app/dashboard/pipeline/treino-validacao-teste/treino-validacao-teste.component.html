@@ -1,11 +1,14 @@
 <div class="modelos-container">
   <!-- Supervisionado -->
-  <div class="modelo-grupo" *ngIf="classificadores.length > 0 || regressores.length > 0">
-    <div class="grupo-header">
+  <div class="modelo-grupo" *ngIf="classificadores.length > 0 || regressores.length > 0"
+       [class.colapsado]="isColapsado('supervisionado')">
+    <div class="grupo-header" (click)="toggleGrupo('supervisionado')">
       <mat-icon>school</mat-icon>
       <span>Supervisionado</span>
+      <mat-icon class="toggle-grupo">{{ isColapsado('supervisionado') ? 'expand_more' : 'expand_less' }}</mat-icon>
     </div>
 
+    <ng-container *ngIf="!isColapsado('supervisionado')">
     <!-- Classificadores -->
     <div class="sub-grupo" *ngIf="classificadores.length > 0">
       <div class="sub-grupo-header">
@@ -51,15 +54,19 @@
         </nav>
       </nav>
     </div>
+    </ng-container>
   </div>
 
   <!-- Não Supervisionado -->
-  <div class="modelo-grupo" *ngIf="modelosNaoSupervisionado.length > 0">
-    <div class="grupo-header">
+  <div class="modelo-grupo" *ngIf="modelosNaoSupervisionado.length > 0"
+       [class.colapsado]="isColapsado('naoSupervisionado')">
+    <div class="grupo-header" (click)="toggleGrupo('naoSupervisionado')">
       <mat-icon>explore</mat-icon>
       <span>Não Supervisionado</span>
+      <mat-icon class="toggle-grupo">{{ isColapsado('naoSupervisionado') ? 'expand_more' : 'expand_less' }}</mat-icon>
     </div>
-    <nav cdkDropList [cdkDropListData]="modelosNaoSupervisionado" (cdkDropListDropped)="onItemDropped($event)"
+    <nav *ngIf="!isColapsado('naoSupervisionado')"
+         cdkDropList [cdkDropListData]="modelosNaoSupervisionado" (cdkDropListDropped)="onItemDropped($event)"
          [cdkDropListSortingDisabled]="true" class="opcoesPipeline">
       <nav *ngFor="let item of modelosNaoSupervisionado" class="pipeline-item"
            cdkDrag [cdkDragData]="item" [cdkDragDisabled]="item.movido || !item.habilitado"

@@ -16,6 +16,8 @@ interface GrupoMetricas {
 })
 export class MetricasComponent {
   grupos: GrupoMetricas[] = [];
+  // Grupos colapsáveis (abertos por padrão; auto-colapsa os totalmente desabilitados).
+  gruposColapsados: Record<string, boolean> = {};
 
   private nomesGrupos: Record<string, { nome: string; icone: string }> = {
     classificacao: { nome: 'Classificação', icone: 'category' },
@@ -41,10 +43,20 @@ export class MetricasComponent {
       for (const key of ordem) {
         if (mapa.has(key)) {
           const meta = this.nomesGrupos[key] || { nome: key, icone: 'help' };
-          this.grupos.push({ nome: meta.nome, icone: meta.icone, itens: mapa.get(key)! });
+          const itens = mapa.get(key)!;
+          this.grupos.push({ nome: meta.nome, icone: meta.icone, itens });
+          this.gruposColapsados[meta.nome] = itens.length > 0 && itens.every(i => !i.habilitado);
         }
       }
     });
+  }
+
+  toggleGrupo(nome: string) {
+    this.gruposColapsados[nome] = !this.gruposColapsados[nome];
+  }
+
+  isColapsado(nome: string): boolean {
+    return !!this.gruposColapsados[nome];
   }
 
   onItemDropped(event: any) {

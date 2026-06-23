@@ -21,6 +21,9 @@
   font-size: 12px;
   font-weight: 700;
   color: $roxo-escuro;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
 
   mat-icon {
     font-size: 16px;
@@ -28,6 +31,14 @@
     height: 16px;
     color: $roxo-medio;
   }
+
+  // Empurra a seta de colapso para a direita.
+  .toggle-grupo {
+    margin-left: auto;
+    color: $cinza-medio;
+  }
+
+  &:hover { color: $roxo-medio; }
 }
 
 .grupo-items {

@@ -1,11 +1,13 @@
 <div class="pre-processamento-container">
-  <div *ngFor="let grupo of grupos" class="grupo-section">
-    <div class="grupo-header">
+  <div *ngFor="let grupo of grupos" class="grupo-section" [class.colapsado]="isColapsado(grupo.nome)">
+    <div class="grupo-header" (click)="toggleGrupo(grupo.nome)">
       <mat-icon>{{ grupo.icon }}</mat-icon>
       <span>{{ grupo.label }}</span>
+      <mat-icon class="toggle-grupo">{{ isColapsado(grupo.nome) ? 'expand_more' : 'expand_less' }}</mat-icon>
     </div>
 
-    <div class="grupo-items" cdkDropList [cdkDropListData]="grupo.itens"
+    <div class="grupo-items" *ngIf="!isColapsado(grupo.nome)"
+         cdkDropList [cdkDropListData]="grupo.itens"
          [cdkDropListSortingDisabled]="true"
          [cdkDropListConnectedTo]="['preprocessamentoList']">
       <div *ngFor="let item of grupo.itens"

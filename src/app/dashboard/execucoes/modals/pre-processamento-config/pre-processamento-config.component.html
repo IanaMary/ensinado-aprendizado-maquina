@@ -62,9 +62,8 @@
            [class.disabled]="!podeAdicionar(item)"
            [matTooltip]="!podeAdicionar(item) ? getMensagemIndisponivel(item) : ''"
            (click)="podeAdicionar(item) && adicionarItem(item)">
-        <mat-icon>{{ podeAdicionar(item) ? 'add_circle_outline' : 'block' }}</mat-icon>
-        <span>{{ item.label }}</span>
-        <span class="item-tipo" *ngIf="!podeAdicionar(item)">(indisponível)</span>
+        <mat-icon class="item-option-icon">{{ podeAdicionar(item) ? 'add_circle_outline' : 'block' }}</mat-icon>
+        <span class="item-option-label">{{ item.label }}</span>
         <button type="button" class="btn-info-item"
           [matTooltip]="'Ver explicação no tutor'" matTooltipPosition="above"
           aria-label="Ver explicação no tutor"

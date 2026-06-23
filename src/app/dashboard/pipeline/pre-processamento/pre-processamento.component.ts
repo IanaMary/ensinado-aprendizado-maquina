@@ -13,6 +13,8 @@ import { PreProcessamentoDialogComponent } from './pre-processamento-dialog/pre-
 export class PreProcessamentoComponent {
   itens: ItemPipeline[] = [];
   grupos: { nome: string; label: string; icon: string; itens: ItemPipeline[] }[] = [];
+  // Sub-grupos colapsáveis (abertos por padrão; auto-colapsa os totalmente desabilitados).
+  gruposColapsados: Record<string, boolean> = {};
 
   private grupoConfig: Record<string, { label: string; icon: string }> = {
     'scalers': { label: 'Scalers', icon: 'scale' },
@@ -50,6 +52,19 @@ export class PreProcessamentoComponent {
       icon: this.grupoConfig[key]?.icon || 'settings',
       itens
     }));
+
+    // Colapsa de início os grupos cujos itens estão todos desabilitados.
+    for (const g of this.grupos) {
+      this.gruposColapsados[g.nome] = g.itens.length > 0 && g.itens.every(i => !i.habilitado);
+    }
+  }
+
+  toggleGrupo(nome: string) {
+    this.gruposColapsados[nome] = !this.gruposColapsados[nome];
+  }
+
+  isColapsado(nome: string): boolean {
+    return !!this.gruposColapsados[nome];
   }
 
   onItemDropped(event: any) {
