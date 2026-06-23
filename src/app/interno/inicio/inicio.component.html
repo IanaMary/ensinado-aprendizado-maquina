@@ -5,9 +5,24 @@
 
   <header class="cabecalho">
     <div class="logo"><mat-icon>school</mat-icon></div>
-    <div>
+    <div class="cabecalho-texto">
       <div class="titulo">Olá{{ nome ? ', ' + nome : '' }}! 👋</div>
       <div class="sub">Como você quer aprender hoje?</div>
+    </div>
+
+    <!-- Menu do usuário -->
+    <div class="usuario-menu">
+      <button class="usuario-avatar" (click)="toggleMenu($event)" matTooltip="Menu do usuário"
+        aria-label="Menu do usuário">{{ iniciais }}</button>
+      <div class="usuario-dropdown" *ngIf="menuAberto" (click)="$event.stopPropagation()">
+        <div class="usuario-id">
+          <div class="usuario-nome">{{ nome || 'Aluno' }}</div>
+          <div class="usuario-email" *ngIf="email">{{ email }}</div>
+        </div>
+        <button class="usuario-opcao sair" (click)="sair()">
+          <mat-icon>logout</mat-icon> Sair
+        </button>
+      </div>
     </div>
   </header>
 
@@ -19,6 +34,33 @@
       <div class="card-desc">{{ m.descricao }}</div>
       <div class="entrar">Entrar <mat-icon>arrow_forward</mat-icon></div>
     </button>
+  </section>
+
+  <!-- Projetos salvos -->
+  <section class="projetos">
+    <div class="projetos-titulo">
+      <mat-icon>folder</mat-icon> Meus projetos salvos
+    </div>
+
+    <div class="projetos-carregando" *ngIf="carregandoProjetos">Carregando…</div>
+
+    <div class="projetos-vazio" *ngIf="!carregandoProjetos && projetos.length === 0">
+      Você ainda não salvou nenhum projeto. Crie um no Modo Clássico ou na Trilha. ✨
+    </div>
+
+    <div class="projetos-lista" *ngIf="!carregandoProjetos && projetos.length">
+      <button class="projeto" *ngFor="let p of projetos" (click)="abrirProjeto(p)">
+        <mat-icon class="projeto-icone">account_tree</mat-icon>
+        <div class="projeto-texto">
+          <span class="projeto-nome">{{ p.nome }}</span>
+          <span class="projeto-data" *ngIf="p.dataModificacao || p.dataCriacao">
+            {{ formatarData(p.dataModificacao || p.dataCriacao) }}
+          </span>
+        </div>
+        <mat-icon class="projeto-remover" (click)="excluirProjeto(p, $event)"
+          matTooltip="Excluir projeto">close</mat-icon>
+      </button>
+    </div>
   </section>
 
   <div class="rodape">Você pode trocar de modo quando quiser. ✨</div>

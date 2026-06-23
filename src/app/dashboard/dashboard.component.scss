@@ -21,15 +21,17 @@
   .pipeline-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 20px 20px 16px;
+    gap: 8px;
+    padding: 16px 12px;
     border-bottom: 1px solid rgba($roxo-claro, 0.4);
+    overflow: hidden; // nada vaza do cabeçalho
 
-    mat-icon {
+    > mat-icon {
       color: $roxo-medio;
       font-size: 22px;
       width: 22px;
       height: 22px;
+      flex-shrink: 0;
     }
 
     span {
@@ -37,17 +39,22 @@
       font-weight: 700;
       color: $roxo-escuro;
       letter-spacing: 0.3px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .pipeline-actions {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
       margin-left: auto;
+      flex-shrink: 0;
 
       .pipeline-action-btn {
-        width: 32px;
-        height: 32px;
+        width: 30px;
+        height: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -78,6 +85,7 @@
   .pipeline-content {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden; // os cards nunca vazam para a área de trabalho
     padding: 12px;
 
     &::-webkit-scrollbar {

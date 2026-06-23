@@ -658,7 +658,9 @@ export class DashboardService {
   habilitadarModelos(tipoTargetSelecionado: any, habilitado: boolean) {
     const itensAtualizados = this.itensModelos.value.map(item => ({
       ...item,
-      habilitado: item.tipo === tipoTargetSelecionado
+      // Sem target definido ainda (ex.: dados não carregados) não desabilita tudo,
+      // senão nenhum preditor fica arrastável; com target, casa pelo tipo.
+      habilitado: !tipoTargetSelecionado ? true : item.tipo === tipoTargetSelecionado
     }));
     this.itensModelos.next(itensAtualizados);
   }

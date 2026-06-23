@@ -85,6 +85,7 @@ h2 {
 // propósito: atravessa o encapsulation para alcançar os componentes-filhos.
 .pipeline-container .opcoesPipeline {
   flex-direction: column;
+  flex-wrap: nowrap; // sem isto herda o flex-wrap:wrap global → itens vazam p/ uma 2ª coluna
   gap: 6px;
 }
 

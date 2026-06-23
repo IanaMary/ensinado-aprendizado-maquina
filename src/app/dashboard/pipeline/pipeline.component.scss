@@ -88,9 +88,10 @@
 }
 
 .pipeline-actions {
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid rgba($roxo-claro, 0.5);
+  // No topo da barra (não mais no rodapé): sem margin-top:auto.
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba($roxo-claro, 0.5);
   display: flex;
   gap: 8px;
 
