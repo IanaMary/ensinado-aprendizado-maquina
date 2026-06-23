@@ -10,6 +10,15 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### Barra presa à viewport + gate de preditores por categoria da lane. Front `5913237` (bundle `main-WDLGRJP4.js`) · só frontend
+- A barra do pipeline **não cresce mais até o fim da página** — fica presa à viewport
+  (`align-self:flex-start` + `position:sticky` + `max-height: calc(100vh - topbar)`) e rola
+  internamente.
+- **Gate de preditores por categoria da lane**: com um preditor na lane de treino, só ficam
+  habilitados os da **mesma categoria** (classificador↔classificador etc., para comparação); lane
+  vazia → todos habilitados; **"Limpar" reseta** (todos voltam). Substitui o gate por tipo do alvo do
+  dataset. Build OK + 106/106.
+
 ### Ícones de ação do cabeçalho + preditores arrastáveis (fail-open). Front `b0ec8c5` (bundle `main-QZSPO2VL.js`) · só frontend
 - Os 4 ícones de ação do cabeçalho da barra deixaram de ser `mat-icon-button` (a 28px o padding
   interno do Material cortava o glifo → "quebrados") e viraram `<button>` simples com sizing próprio.
