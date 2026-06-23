@@ -89,6 +89,31 @@ h2 {
   gap: 6px;
 }
 
+// Os hosts dos componentes-filhos da barra são inline por padrão (Angular), o que
+// permite que o conteúdo (rótulos sem quebra) defina a largura e ULTRAPASSE a barra.
+// Força bloco + permite encolher em toda a cadeia de containers flex.
+.pipeline-container app-coleta-de-dados,
+.pipeline-container app-pre-processamento,
+.pipeline-container app-treino-validacao-teste,
+.pipeline-container app-metricas {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+.pipeline-container .opcoesPipeline,
+.pipeline-container .grupo-items,
+.pipeline-container .grupo-section,
+.pipeline-container .metrica-grupo,
+.pipeline-container .modelo-grupo,
+.pipeline-container .sub-grupo,
+.pipeline-container .metricas-container,
+.pipeline-container .modelos-container,
+.pipeline-container .pre-processamento-container {
+  min-width: 0;
+  max-width: 100%;
+}
+.pipeline-container .pipeline-item { max-width: 100%; }
+
 button[disabled],
 button[mat-raised-button][disabled],
 .mat-button[disabled] {
