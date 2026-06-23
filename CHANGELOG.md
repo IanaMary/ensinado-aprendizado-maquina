@@ -10,6 +10,11 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### Voltar como seta antes de "Pipeline". Front `76ae8ef` (bundle `main-CT6QRDG6.js`) · só frontend
+- A seta de **Voltar** (só ícone) substitui o `account_tree` do cabeçalho da barra, **antes** do
+  título "Pipeline" (→ `/inicio`); removida do cabeçalho da área de trabalho. Cabeçalho ajustado
+  para caber seta + título + 4 ações em 260px. Build OK + 106/106.
+
 ### Voltar no topo da página; Sair só no menu do usuário. Front `9db1772` (bundle `main-P3H2XFKI.js`) · só frontend
 - Botão **Voltar** removido da barra lateral e colocado no **cabeçalho da área de trabalho** (topo
   da página), indo para o painel de entrada (`/inicio`). **Sair** fica só no menu do usuário (sem
