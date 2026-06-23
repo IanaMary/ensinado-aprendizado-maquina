@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NomearPipelineDialogComponent } from './modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
 import { AuthService } from '../../service/auth/auth.service';
 import { AtividadeService } from '../../service/atividade/atividade.service';
+import { NotificacaoService } from '../../service/notificacao.service';
 
 const TIPOS_ARQUIVO_DADOS = ['csv', 'tsv', 'json', 'excel', 'xlxs'];
 
@@ -27,6 +28,10 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private modalAberto = false;
   private tutorRef = tutor;
+  // Evita auto-abrir o modal ao restaurar um projeto salvo; rastreia os modelos
+  // já vistos na lane para detectar um preditor recém-arrastado.
+  private carregandoProjeto = false;
+  private treinoVistos = new Set<string>();
 
   tutor: any;
   tutorPipelineInfo: any = null;
@@ -51,6 +56,9 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
 
   resultadoColetaDado?: ResultadoColetaDado;
   modeloSelecionado?: ItemPipeline;
+  // Preditores treinados para comparação (mesma categoria). O clássico passa a
+  // acumular vários modelos; a avaliação/painel já compara N modelos.
+  modelosSelecionados: ItemPipeline[] = [];
   resultadoTreinamento?: any;
   metricasSelecionadas: ItemPipeline[] = [];
   mediaMetricas: MediaMetrica = 'weighted';
@@ -67,7 +75,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
-    private atividade: AtividadeService
+    private atividade: AtividadeService,
+    private notificacao: NotificacaoService
   ) { }
 
   ngOnInit(): void {
@@ -83,6 +92,16 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       this.colunaTreino = itens.filter(i => i.tipoItem === 'treino-validacao-teste');
       this.colunaMetrica = itens.filter(i => i.tipoItem === 'metrica');
       this.metricasSelecionadas = this.colunaMetrica.filter(i => i.movido);
+
+      // Preditor recém-arrastado para a lane de treino. Se já há um modelo
+      // treinado, abre o modal de comparação direto na seleção (ajuste de
+      // hiperparâmetros). O 1º modelo segue clicável (comportamento atual).
+      const novoTreino = this.colunaTreino.find(m => !this.treinoVistos.has(m.valor));
+      this.colunaTreino.forEach(m => this.treinoVistos.add(m.valor));
+      if (novoTreino && !this.carregandoProjeto && !this.modalAberto
+          && this.temModeloTreinado() && !this.modeloJaTreinado(novoTreino)) {
+        this.abrirModalExecucao(novoTreino);
+      }
     });
     this.dashboardService.proximaEtapaPipe$
       .pipe(takeUntil(this.destroy$))
@@ -210,9 +229,25 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
 
   abrirModalExecucao(item: ItemPipeline): void {
     if (this.modalAberto) return;
+
+    // Comparação: adicionar um preditor quando já existe outro treinado.
+    const ehComparacao = item.tipoItem === 'treino-validacao-teste'
+      && this.temModeloTreinado() && !this.modeloJaTreinado(item);
+    if (ehComparacao && !this.mesmaCategoriaDosTreinados(item)) {
+      this.notificacao.aviso('Só dá para comparar preditores da mesma categoria (classificação, regressão ou agrupamento).');
+      return;
+    }
+
     this.modalAberto = true;
 
-    this.atividade.registrar('ui', 'abriu_etapa', { contexto: 'classico', etapa: item.tipoItem, item: item.valor });
+    // Modelo de comparação entra direto na seleção (ajuste de hiperparâmetros do
+    // novo preditor); o 1º modelo mantém o fluxo atual (treinamento).
+    const etapa = ehComparacao ? 'selecao-modelo'
+      : item.tipoItem === 'metrica' ? 'avaliacao'
+        : item.tipoItem === 'treino-validacao-teste' ? 'treinamento'
+          : item.tipoItem === 'pre-processamento' ? 'pre-processamento' : item.tipoItem;
+
+    this.atividade.registrar('ui', 'abriu_etapa', { contexto: 'classico', etapa, item: item.valor });
 
     const dialogRef = this.dialog.open(ModalExecucaoComponent, {
       maxWidth: 'none',
@@ -220,14 +255,16 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       disableClose: true,
       hasBackdrop: false,
       data: {
-        etapa: item.tipoItem === 'metrica' ? 'avaliacao' : item.tipoItem === 'treino-validacao-teste' ? 'treinamento' : item.tipoItem === 'pre-processamento' ? 'pre-processamento' : item.tipoItem,
+        etapa,
         tipoArquivoSelecionado: item.tipoItem === 'coleta-dado' && TIPOS_ARQUIVO_DADOS.includes(item.valor) ? item.valor : undefined,
         resultadoColetaDado: this.resultadoColetaDado,
         modeloSelecionado: item.tipoItem === 'treino-validacao-teste' ? item : this.modeloSelecionado,
         resultadoTreinamento: this.resultadoTreinamento,
         metricasSelecionadas: this.metricasSelecionadas,
         mediaMetricas: this.mediaMetricas,
-        resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
+        // Ao adicionar um modelo novo, não reaproveita a avaliação antiga: a etapa
+        // de avaliação re-roda para comparar TODOS os modelos com as métricas atuais.
+        resultadosDasAvaliacoes: ehComparacao ? {} : this.resultadosDasAvaliacoes,
         preProcessamentoConfig: this.preProcessamentoConfig
       }
     });
@@ -237,7 +274,9 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       if (resultado) {
         this.resultadoColetaDado = resultado.resultadoColetaDado
         this.modeloSelecionado = resultado.modeloSelecionado
-        this.resultadoTreinamento = resultado.resultadoTreinamento;
+        // Acumula os preditores treinados (comparação) em vez de sobrescrever.
+        this.resultadoTreinamento = { ...(this.resultadoTreinamento || {}), ...(resultado.resultadoTreinamento || {}) };
+        this.registrarModeloSelecionado(resultado.modeloSelecionado);
         this.metricasSelecionadas = resultado.metricasSelecionadas;
         this.mediaMetricas = resultado.mediaMetricas || this.mediaMetricas;
         this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
@@ -260,6 +299,40 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  // === Comparação de múltiplos preditores ===
+  private temModeloTreinado(): boolean {
+    return !!this.resultadoTreinamento && Object.keys(this.resultadoTreinamento).length > 0;
+  }
+
+  // O backend devolve a chave do modelo normalizada (sem acento, com "_"); confere as duas formas.
+  private modeloJaTreinado(item: ItemPipeline): boolean {
+    if (!this.resultadoTreinamento || !item?.valor) return false;
+    const chaveBackend = item.valor.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '_').toLowerCase();
+    return this.resultadoTreinamento.hasOwnProperty(item.valor) || this.resultadoTreinamento.hasOwnProperty(chaveBackend);
+  }
+
+  private categoriaDe(item: ItemPipeline | undefined): 'classificacao' | 'regressao' | 'agrupamento' | undefined {
+    if (!item) return undefined;
+    if (item.dadosRotulados === false) return 'agrupamento';
+    if (item.dadosRotulados === true && item.preverCategoria === true) return 'classificacao';
+    if (item.dadosRotulados === true && item.preverCategoria === false) return 'regressao';
+    return undefined;
+  }
+
+  private mesmaCategoriaDosTreinados(item: ItemPipeline): boolean {
+    const ref = this.modelosSelecionados[0] || this.modeloSelecionado;
+    const catRef = this.categoriaDe(ref);
+    if (!catRef) return true; // sem referência confiável → não bloqueia
+    return this.categoriaDe(item) === catRef;
+  }
+
+  private registrarModeloSelecionado(modelo: ItemPipeline | undefined): void {
+    if (!modelo?.valor) return;
+    if (!this.modelosSelecionados.some(m => m.valor === modelo.valor)) {
+      this.modelosSelecionados.push(modelo);
+    }
   }
 
   mostrarInfoItem(item: ItemPipeline, event: Event): void {
@@ -700,10 +773,16 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   }
 
   carregarPipeline(id: string): void {
+    this.carregandoProjeto = true; // não auto-abrir o modal de comparação ao restaurar
     this.pipelineService.carregarPipeline(id).pipe(takeUntil(this.destroy$)).subscribe(pipeline => {
       if (pipeline) {
         this.resultadoColetaDado = pipeline.resultadoColetaDado;
         this.modeloSelecionado = pipeline.modeloSelecionado;
+        // Restaura os preditores da comparação (compat.: cai no modeloSelecionado).
+        this.modelosSelecionados = (pipeline.modelosSelecionados && pipeline.modelosSelecionados.length)
+          ? pipeline.modelosSelecionados
+          : (pipeline.modeloSelecionado ? [pipeline.modeloSelecionado] : []);
+        this.modelosSelecionados.forEach(m => m?.valor && this.treinoVistos.add(m.valor));
         this.mediaMetricas = pipeline.mediaMetricas || 'weighted';
         this.metricasSelecionadas = (pipeline.metricasSelecionadas || []).map((metrica: ItemPipeline) => ({
           ...metrica,
@@ -715,6 +794,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         this.resultadosDasAvaliacoes = pipeline.resultadosDasAvaliacoes;
         this.atualizarTutorContexto();
       }
+      this.carregandoProjeto = false;
     });
   }
 
@@ -735,6 +815,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         nome,
         resultadoColetaDado: this.resultadoColetaDado,
         modeloSelecionado: this.modeloSelecionado,
+        modelosSelecionados: this.modelosSelecionados,
         metricasSelecionadas: this.metricasSelecionadas,
         mediaMetricas: this.mediaMetricas,
         preProcessamentoConfig: this.preProcessamentoConfig,
