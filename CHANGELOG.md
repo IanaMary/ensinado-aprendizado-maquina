@@ -22,6 +22,9 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 ### UI — Tela admin de artefatos do MLflow (frontend). Front `09055c9` (bundle `main-VEB2T2R6.js`)
 - Nova tela admin **`/view-admin/artefatos`** (card no painel) que consome `GET /tutor/artefatos/{run_id}`: busca por `run_id` e exibe status/período, parâmetros, métricas, tags, artefatos e **modelos logados** (com seus artefatos). Trata 503 (MLflow não configurado), 404 e 400 com mensagens amigáveis. `ArtefatosService` dedicado + specs. Frontend **104/104**.
 
+### Configuração de produção — MLflow ativado (não-código)
+- Definido `MLFLOW_TRACKING_URI=sqlite:////home/ubuntu/mlflow/mlflow.db` no `.env` do backend da VM; experimento **`iana-treinamento`** com artefatos em `file:///home/ubuntu/mlflow/artifacts`; serviço reiniciado. Treino/avaliação agora **logam runs no MLflow** e o endpoint/tela de artefatos ficam funcionais (não mais 503). Validado ponta a ponta. Store SQLite local, sem porta exposta. (Configuração de servidor; sem mudança de código.)
+
 ---
 
 ## 2026-06-22
