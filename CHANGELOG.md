@@ -10,6 +10,12 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### Itens da barra não vazam mais a largura (host inline + min-width). Front `2bac8e7` (bundle `main-2VELERHM.js`) · só frontend
+- Os hosts dos componentes-filhos da barra eram `display:inline` (padrão Angular), deixando os
+  rótulos (sem quebra) definirem a largura e **vazarem para fora da barra**. Forçado `display:block`
+  + `min-width:0` + `max-width:100%` nesses hosts e em toda a cadeia de containers flex, e
+  `max-width:100%` no `.pipeline-item` — os rótulos truncam dentro da barra. Build OK + 106/106.
+
 ### Barra presa à viewport + gate de preditores por categoria da lane. Front `5913237` (bundle `main-WDLGRJP4.js`) · só frontend
 - A barra do pipeline **não cresce mais até o fim da página** — fica presa à viewport
   (`align-self:flex-start` + `position:sticky` + `max-height: calc(100vh - topbar)`) e rola
