@@ -10,6 +10,18 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### Comparação de múltiplos preditores na janela principal. Front `7e35c63` (bundle `main-GASKTKNH.js`) · só frontend
+- Na área de trabalho clássica, depois de treinar um preditor é possível **arrastar outro da mesma
+  categoria** (classificação/regressão/agrupamento) para a lane de treino: abre o modal como **cópia
+  do pipeline** na etapa de seleção (ajusta os hiperparâmetros do novo; incompatíveis desabilitados)
+  → treina → métricas (as **mesmas já marcadas**, editáveis) → a **comparação aparece no painel de
+  métricas e gráficos** (tabela métrica×modelo + gráficos lado a lado). Suporta **N modelos**.
+- Implementação **só de orquestração** (`execucoes.component.ts`): acumula modelos em
+  `resultadoTreinamento` (merge) + `modelosSelecionados`, abre o 2º+ em `selecao-modelo` e re-roda a
+  avaliação para todos os modelos, auto-abre ao arrastar, guarda de mesma categoria, persistência.
+  Reusa `tipos-classificadores`, `classificador`, `metrica-avaliacao` (já multi-modelo) e o endpoint
+  `avaliar_modelos`. **Backend inalterado.** Verificação: build de produção OK + **106/106** testes.
+
 ### Refino de layout: barra da trilha, gaveta do tutor e etapas do modal. Front `6c5fc53` (bundle `main-PT65DMTB.js`) · só frontend
 - **Barra esquerda (trilha):** itens de todas as etapas ficam **uniformes e ocupam a largura
   toda** (sem estouro; botão de info contido) — `.pipeline-item` com `width:100%`+`box-sizing`
