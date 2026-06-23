@@ -17,6 +17,12 @@
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 12px rgba($roxo-escuro, 0.04);
+  // Não estica até a altura da área de trabalho: fica presa à viewport e rola
+  // internamente (antes a barra crescia com todo o conteúdo, indo até embaixo).
+  align-self: flex-start;
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - #{$topbar-height});
 
   .pipeline-header {
     display: flex;

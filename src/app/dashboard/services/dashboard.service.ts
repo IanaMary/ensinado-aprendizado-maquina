@@ -527,10 +527,11 @@ export class DashboardService {
     }));
     this.itensPreProcessamento.next(resetPre);
 
+    // Limpar reseta o "tipo travado": preditores voltam todos arrastáveis.
     const resetModelos = this.itensModelos.value.map(i => ({
       ...i,
       movido: false,
-      habilitado: false,
+      habilitado: true,
     }));
     this.itensModelos.next(resetModelos);
 
@@ -610,18 +611,8 @@ export class DashboardService {
     }));
     this.itensColetasDados.next(itensAtualizados);
 
-    const modelosAtualizados = this.itensModelos.value.map(i => ({
-      ...i,
-      // habilitado: false
-    }));
-
-    this.itensModelos.next(modelosAtualizados);
-
-    const itenssMetricaAtualizados = this.itensMetricas.value.map(i => ({
-      ...i,
-      // habilitado: false
-    }));
-    this.itensMetricas.next(itenssMetricaAtualizados);
+    // Preditores: habilita só os da mesma categoria do que entrou na lane.
+    this.atualizarPreditoresHabilitados();
   }
 
   moverItensEmExecucao() {
@@ -635,6 +626,7 @@ export class DashboardService {
     ];
 
     this.itemsEmExecucao.next(itensMovidos);
+    this.atualizarPreditoresHabilitados();
   }
 
   jaFoiMovido(item: ItemPipeline): boolean {
@@ -653,20 +645,35 @@ export class DashboardService {
       i.valor === item.valor && i.tipoItem === item.tipoItem ? { ...i, movido: false } : i
     );
     this.itensModelos.next(modelos);
+    // Re-avalia o gate: se a lane ficou sem preditor, todos voltam a ser arrastáveis.
+    this.atualizarPreditoresHabilitados();
   }
 
   habilitadarModelos(tipoTargetSelecionado: any, habilitado: boolean) {
-    const itens = this.itensModelos.value;
-    // Fail-open: se NENHUM modelo casa com o tipo do target (gate mal configurado ou
-    // dado divergente), não desabilita tudo — mantém todos arrastáveis. A
-    // compatibilidade ainda é reforçada na etapa de seleção do modelo (incompatíveis
-    // ficam desabilitados lá). Sem target definido também não bloqueia.
-    const algumCompativel = !!tipoTargetSelecionado && itens.some(i => i.tipo === tipoTargetSelecionado);
-    const itensAtualizados = itens.map(item => ({
-      ...item,
-      habilitado: !tipoTargetSelecionado || !algumCompativel ? true : item.tipo === tipoTargetSelecionado
+    // O gate de preditores passou a ser pela CATEGORIA do(s) preditor(es) já na lane
+    // de treino (mesmo tipo, para comparação), não pelo tipo do alvo do dataset.
+    this.atualizarPreditoresHabilitados();
+  }
+
+  // Categoria de um modelo (mesma lógica do agrupamento do sidebar).
+  private categoriaModelo(m: any): string {
+    if (!m) return '';
+    if (m.dadosRotulados === false) return 'agrupamento';
+    if (m.dadosRotulados === true && m.preverCategoria === true) return 'classificacao';
+    if (m.dadosRotulados === true && m.preverCategoria === false) return 'regressao';
+    return '';
+  }
+
+  // Habilita só os preditores da MESMA categoria do(s) que já estão na lane de
+  // treino. Lane vazia → todos habilitados. Chamado ao mover/remover/limpar.
+  private atualizarPreditoresHabilitados(): void {
+    const naLane = this.itemsEmExecucao.value.filter(i => i.tipoItem === 'treino-validacao-teste');
+    const cat = naLane.length ? this.categoriaModelo(naLane[0]) : '';
+    const itens = this.itensModelos.value.map(m => ({
+      ...m,
+      habilitado: !cat ? true : this.categoriaModelo(m) === cat,
     }));
-    this.itensModelos.next(itensAtualizados);
+    this.itensModelos.next(itens);
   }
 
   selecionarModelo(modeloSelecionado: any) {
