@@ -161,7 +161,8 @@
           </div>
           <div class="item-acoes">
             <mat-icon class="btn-info" (click)="mostrarInfoItem(item, $event)">info_outline</mat-icon>
-            <mat-icon class="btn-remover" (click)="removerModeloComparacao(item, $event)"
+            <mat-icon *ngIf="colunaTreino.length > 1" class="btn-remover"
+              (click)="removerModeloComparacao(item, $event)"
               matTooltip="Remover da comparação" matTooltipPosition="left">close</mat-icon>
           </div>
         </div>

@@ -290,7 +290,11 @@
     display: block;
     flex: 0 0 auto;
 
-    ::ng-deep .chat-tutor { max-height: 45vh; }
+    // Em telas muito baixas, o corpo encolhe para o campo de entrada não ser cortado.
+    ::ng-deep .chat-tutor {
+      max-height: 45vh;
+      .chat-corpo { min-height: 0; }
+    }
   }
 
   .pipeline-info {

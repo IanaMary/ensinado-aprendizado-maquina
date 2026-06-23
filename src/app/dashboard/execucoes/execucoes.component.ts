@@ -235,6 +235,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       && this.temModeloTreinado() && !this.modeloJaTreinado(item);
     if (ehComparacao && !this.mesmaCategoriaDosTreinados(item)) {
       this.notificacao.aviso('Só dá para comparar preditores da mesma categoria (classificação, regressão ou agrupamento).');
+      // O item já entrou na lane pelo drop; remove o card órfão e devolve à barra.
+      this.descartarPreditorNaoTreinado(item);
       return;
     }
 
@@ -271,34 +273,62 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((resultado: any) => {
       this.modalAberto = false;
-      if (resultado) {
-        this.resultadoColetaDado = resultado.resultadoColetaDado
-        this.modeloSelecionado = resultado.modeloSelecionado
-        // Acumula os preditores treinados (comparação) em vez de sobrescrever.
-        this.resultadoTreinamento = { ...(this.resultadoTreinamento || {}), ...(resultado.resultadoTreinamento || {}) };
-        this.registrarModeloSelecionado(resultado.modeloSelecionado);
-        this.metricasSelecionadas = resultado.metricasSelecionadas;
-        this.mediaMetricas = resultado.mediaMetricas || this.mediaMetricas;
-        this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
-        this.preProcessamentoConfig = resultado.preProcessamentoConfig;
-        this.hiperparametrosAtuais = resultado.hiperparametrosAtuais || {};
+      if (!resultado) return;
 
-        // Processar itens de pre-processamento
-        if (resultado.preProcessamentoConfig?.itens) {
-          this.processarItensPreProcessamento(resultado.preProcessamentoConfig.itens);
-        }
+      // O modal só fecha via fechar() (disableClose), que SEMPRE devolve estado —
+      // inclusive ao cancelar (X). Por isso a decisão é baseada no que foi de fato
+      // TREINADO, não no simples fechamento.
+      const merged = { ...(this.resultadoTreinamento || {}), ...(resultado.resultadoTreinamento || {}) };
+      const itemTreinado = this.estaNoResultado(merged, item);
+      const modeloDoModal: ItemPipeline | undefined = resultado.modeloSelecionado;
+      const modeloDoModalTreinado = this.estaNoResultado(merged, modeloDoModal);
 
-        this.dashboardService.moverItensEmExecucao();
-        this.atualizarTutorContexto();
-        this.atividade.registrar('pipeline', 'concluiu_etapa', {
-          contexto: 'classico',
-          etapa: item.tipoItem,
-          modelo: resultado.modeloSelecionado?.valor,
-          treinou: !!resultado.resultadoTreinamento,
-          avaliou: !!resultado.resultadosDasAvaliacoes,
-        });
+      // Adição de comparação cancelada/incompleta (preditor arrastado não treinou):
+      // remove o card órfão e PRESERVA o estado anterior (modelo, avaliações, etc.).
+      if (ehComparacao && !itemTreinado) {
+        this.descartarPreditorNaoTreinado(item);
+        return;
       }
+
+      this.resultadoColetaDado = resultado.resultadoColetaDado;
+      this.resultadoTreinamento = merged;
+      // Só seleciona/registra modelos efetivamente treinados (evita modelo fantasma).
+      if (modeloDoModalTreinado) {
+        this.modeloSelecionado = modeloDoModal;
+        this.registrarModeloSelecionado(modeloDoModal);
+      } else if (itemTreinado) {
+        this.modeloSelecionado = item;
+      }
+      if (itemTreinado) this.registrarModeloSelecionado(item);
+      this.metricasSelecionadas = resultado.metricasSelecionadas;
+      this.mediaMetricas = resultado.mediaMetricas || this.mediaMetricas;
+      this.resultadosDasAvaliacoes = resultado.resultadosDasAvaliacoes;
+      this.preProcessamentoConfig = resultado.preProcessamentoConfig;
+      this.hiperparametrosAtuais = resultado.hiperparametrosAtuais || {};
+
+      // Processar itens de pre-processamento
+      if (resultado.preProcessamentoConfig?.itens) {
+        this.processarItensPreProcessamento(resultado.preProcessamentoConfig.itens);
+      }
+
+      this.dashboardService.moverItensEmExecucao();
+      this.atualizarTutorContexto();
+      this.atividade.registrar('pipeline', 'concluiu_etapa', {
+        contexto: 'classico',
+        etapa,
+        modelo: resultado.modeloSelecionado?.valor,
+        treinou: !!resultado.resultadoTreinamento,
+        avaliou: !!(resultado.resultadosDasAvaliacoes && Object.keys(resultado.resultadosDasAvaliacoes).length),
+      });
     });
+  }
+
+  // Descarta um preditor arrastado que não chegou a ser treinado: tira o card da
+  // lane, devolve à barra lateral e libera para ser re-adicionado depois.
+  private descartarPreditorNaoTreinado(item: ItemPipeline): void {
+    this.treinoVistos.delete(item.valor);
+    this.dashboardService.removerItemExecucao(item);
+    this.dashboardService.moverItensEmExecucao();
   }
 
   // === Comparação de múltiplos preditores ===
@@ -307,10 +337,14 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   }
 
   // O backend devolve a chave do modelo normalizada (sem acento, com "_"); confere as duas formas.
-  private modeloJaTreinado(item: ItemPipeline): boolean {
-    if (!this.resultadoTreinamento || !item?.valor) return false;
+  private estaNoResultado(resultado: any, item: ItemPipeline | undefined): boolean {
+    if (!resultado || !item?.valor) return false;
     const chaveBackend = item.valor.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '_').toLowerCase();
-    return this.resultadoTreinamento.hasOwnProperty(item.valor) || this.resultadoTreinamento.hasOwnProperty(chaveBackend);
+    return resultado.hasOwnProperty(item.valor) || resultado.hasOwnProperty(chaveBackend);
+  }
+
+  private modeloJaTreinado(item: ItemPipeline): boolean {
+    return this.estaNoResultado(this.resultadoTreinamento, item);
   }
 
   private categoriaDe(item: ItemPipeline | undefined): 'classificacao' | 'regressao' | 'agrupamento' | undefined {

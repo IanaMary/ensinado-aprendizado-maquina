@@ -644,9 +644,13 @@ export class DashboardService {
   // Tira um item da lane de execução e devolve o preditor à barra lateral
   // (re-habilita o arrasto), usado ao remover um modelo da comparação.
   removerItemExecucao(item: ItemPipeline) {
-    this.itemsEmExecucao.next(this.itemsEmExecucao.value.filter(i => i.valor !== item.valor));
+    // Casa por valor E tipoItem: a lane mistura coleta/pré-proc/modelos/métricas,
+    // que podem compartilhar a mesma string de valor.
+    this.itemsEmExecucao.next(
+      this.itemsEmExecucao.value.filter(i => !(i.valor === item.valor && i.tipoItem === item.tipoItem))
+    );
     const modelos = this.itensModelos.value.map(i =>
-      i.valor === item.valor ? { ...i, movido: false } : i
+      i.valor === item.valor && i.tipoItem === item.tipoItem ? { ...i, movido: false } : i
     );
     this.itensModelos.next(modelos);
   }
