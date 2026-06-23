@@ -10,6 +10,21 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### Refino de layout: barra da trilha, gaveta do tutor e etapas do modal. Front `6c5fc53` (bundle `main-PT65DMTB.js`) · só frontend
+- **Barra esquerda (trilha):** itens de todas as etapas ficam **uniformes e ocupam a largura
+  toda** (sem estouro; botão de info contido) — `.pipeline-item` com `width:100%`+`box-sizing`
+  e `.pipeline-container .opcoesPipeline` em coluna (corrige Dados/Modelos/Métricas menores que
+  a barra). **Sub-grupos colapsáveis** (pré-proc, métricas, supervisionado/não-supervisionado),
+  auto-colapsando grupos com todos os itens desabilitados.
+- **Gaveta do tutor (modal + área de trabalho):** o **chat fica fixo na base**; o conteúdo
+  contextual rola e, se estourar a tela, fica acessível por **barra de rolagem**.
+- **Modal pré-processamento:** removido o texto "(indisponível)" (estado já indicado por
+  desabilitado/ícone/tooltip); ícone de adição com largura fixa e rótulo truncado → **texto não
+  sobrepõe mais o botão**.
+- **Modal de modelos:** **hiperparâmetros aparecem logo abaixo do grupo do modelo selecionado**;
+  **grupos de preditores colapsáveis**, auto-colapsando os totalmente incompatíveis.
+- Verificação: build de produção OK + **106/106** testes.
+
 ### Tutor drawer na área de trabalho, itens da trilha e correção do seletor de LLM. Front `1697078` (bundle `main-4XBKEVN2.js`) · Back `9b3bac5`
 - **Workspace:** o painel do tutor da área de trabalho (`execucoes`) virou **drawer lateral** que desliza da direita (FAB centralizado na altura, conteúdo em cima, chatbot embaixo), espelhando o modal. Corrigida a **sobreposição de textos no chat** (`app-chat-tutor` renderizava o host como `inline` → `:host { display: block }`).
 - **Seletor de LLM (conf-tutor):** corrigido o **422 ao trocar o modelo** — era colisão de rota (`PUT /tutor/{id}` de `tutor.py` capturava `PUT /tutor/modelo`); `chat_tutor.router` passou a ser registrado **antes** de `tutor.router` (+ teste de regressão). UX: enquanto o teste de saúde roda, a seleção fica **bloqueada com barra de progresso**; concluído, os modelos aparecem em **Ativos** e **Inativos** (recolhido).
