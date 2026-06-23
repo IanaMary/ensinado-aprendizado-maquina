@@ -10,6 +10,11 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### Voltar no topo da página; Sair só no menu do usuário. Front `9db1772` (bundle `main-P3H2XFKI.js`) · só frontend
+- Botão **Voltar** removido da barra lateral e colocado no **cabeçalho da área de trabalho** (topo
+  da página), indo para o painel de entrada (`/inicio`). **Sair** fica só no menu do usuário (sem
+  duplicar). Build OK + 106/106.
+
 ### Barra do pipeline (overflow/cabeçalho/Voltar-Sair) + painel de entrada do aluno. Front `ccb9ce9` (bundle `main-GDRJBBKX.js`) · só frontend
 - **Barra do pipeline (modo clássico):** os cards das etapas **não vazam mais** para fora da barra
   (`flex-wrap:nowrap` no override de `.opcoesPipeline` + `overflow-x:hidden` em `.pipeline-content`)
