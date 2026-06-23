@@ -10,6 +10,13 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### Ícones de ação do cabeçalho + preditores arrastáveis (fail-open). Front `b0ec8c5` (bundle `main-QZSPO2VL.js`) · só frontend
+- Os 4 ícones de ação do cabeçalho da barra deixaram de ser `mat-icon-button` (a 28px o padding
+  interno do Material cortava o glifo → "quebrados") e viraram `<button>` simples com sizing próprio.
+- `habilitadarModelos` virou **fail-open**: quando nenhum modelo casa com o tipo do target (gate mal
+  configurado/dado divergente), **não desabilita todos** — os preditores ficam arrastáveis; a
+  compatibilidade segue reforçada na etapa de seleção do modelo. Build OK + 106/106.
+
 ### Voltar como seta antes de "Pipeline". Front `76ae8ef` (bundle `main-CT6QRDG6.js`) · só frontend
 - A seta de **Voltar** (só ícone) substitui o `account_tree` do cabeçalho da barra, **antes** do
   título "Pipeline" (→ `/inicio`); removida do cabeçalho da área de trabalho. Cabeçalho ajustado
