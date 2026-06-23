@@ -30,6 +30,11 @@ const routes: Routes = [
     path: 'usuarios',
     loadChildren: () => import('./gerenciar-usuarios/gerenciar-usuarios.module').then(m => m.GerenciarUsuariosModule),
     data: { breadcrumb: 'Gerenciar Usuários' }
+  },
+  {
+    path: 'artefatos',
+    loadChildren: () => import('./artefatos/artefatos.module').then(m => m.ArtefatosModule),
+    data: { breadcrumb: 'Artefatos' }
   }
   // A tela de Atividades é uma rota compartilhada top-level (/atividades),
   // acessível por admin e professor — ver interno-routing.module.ts.
