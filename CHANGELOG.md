@@ -10,6 +10,12 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-06-23
 
+### `:host{display:block}` nos componentes da barra (overflow cross-browser). Front `7480e32` (bundle `main-R3EI5OEE.js`) · só frontend
+- O host do `app-pipeline` e dos 4 filhos era `display:inline` (padrão). Fora do Chrome, host
+  inline com filho flex em bloco encolhe ao conteúdo (rótulos longos) e **estoura a barra**. Adicionado
+  `:host{display:block;min-width:0;max-width:100%}` aos 5 componentes. Verificado por medição headless:
+  item mais longo 205px dentro da barra de 236px, rótulo truncando. Build OK + 106/106.
+
 ### Itens da barra não vazam mais a largura (host inline + min-width). Front `2bac8e7` (bundle `main-2VELERHM.js`) · só frontend
 - Os hosts dos componentes-filhos da barra eram `display:inline` (padrão Angular), deixando os
   rótulos (sem quebra) definirem a largura e **vazarem para fora da barra**. Forçado `display:block`
