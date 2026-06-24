@@ -1,5 +1,9 @@
 @use '../dashboard.component' as *;
 
+// Host em bloco (default é inline): evita que o conteúdo (rótulos longos) defina a
+// largura e estoure a barra em navegadores que não sejam o Chrome.
+:host { display: block; min-width: 0; max-width: 100%; }
+
 .pipeline-container {
   display: flex;
   flex-direction: column;

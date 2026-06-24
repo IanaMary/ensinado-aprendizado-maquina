@@ -1,5 +1,7 @@
 @use '../../../../styles/colores.scss' as *;
 
+:host { display: block; min-width: 0; max-width: 100%; }
+
 // O layout dos itens (.pipeline-item) vive no styles.scss global (compartilhado
 // pelas etapas). Aqui só os grupos (Scalers, Encoders, Imputers, Transformers).
 .pre-processamento-container {

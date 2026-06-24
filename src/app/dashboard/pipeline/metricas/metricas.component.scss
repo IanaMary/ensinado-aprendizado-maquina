@@ -1,5 +1,7 @@
 @use '../../../../styles/colores.scss' as *;
 
+:host { display: block; min-width: 0; max-width: 100%; }
+
 .metricas-container {
   display: flex;
   flex-direction: column;
