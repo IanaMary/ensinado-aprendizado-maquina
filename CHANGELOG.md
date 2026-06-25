@@ -8,6 +8,26 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-06-25 (split — branch `sistema-completo`/master)
+
+### Branch `sistema-completo` (vira master) — Admin + 3 modos do aluno. Front `0fbf3a1`
+- **Split do repositório em duas bases de código:**
+  - `master` = **sistema-completo** (admin + Treine seu Robô + Léo no Mundo Real + Trilha de ML).
+  - `mestrado-iana` = Modo Clássico (`/view-aluno`) + admin dashboard; modos lúdicos removidos.
+  - `desenvolvimento` = versão combinada original (snapshot, preserva todos os modos).
+- **Removido** `/view-aluno` (dashboard clássico) desta branch; `meus-projetos` e `galeria-pipelines`
+  **relocados** para rotas top-level `/projetos` e `/galeria` (um nível acima, `interno/projetos/`
+  e `interno/galeria/`). Imports TS/SCSS ajustados à nova profundidade.
+- `interno-routing`: default redirect `''` → `/inicio`; removida rota `view-aluno`.
+- `AuthGuard ROTAS_POR_PAPEL.aluno`: `['inicio','treine-robo','leo-mundo-real','trilha','projetos','galeria']`.
+- `shell.component`: Home → `/inicio` (aluno) / `/view-admin` (admin); Meus Projetos → `/projetos`;
+  Galeria → `/galeria`; removidos Pipeline/Resultados (eram `/view-aluno`).
+- `inicio.component`: card "Modo Clássico" removido (3 cards: Robô/Léo/Trilha); `abrirProjeto`
+  leva a `/trilha` em vez de `/view-aluno`.
+- `trilha.component.html`: "Voltar ao dashboard clássico" → "Voltar ao início" (`/inicio`).
+- Specs: `auth.guard.spec` usa segmento `inicio` (aluno); `execucoes.component.spec` espera `/projetos`.
+- Backup não-destrutivo (sem deploy). Build prod OK + 108/108 testes.
+
 ## 2026-06-25
 
 ### Menu do usuário (avatar + Sair) no `/view-admin` + ajustes de UX no modal de métricas. Front `7ec88d1` (bundle `main-RVMAUYPM.js`) · só frontend
