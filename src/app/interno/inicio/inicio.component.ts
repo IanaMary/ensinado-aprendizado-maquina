@@ -18,8 +18,8 @@ interface ModoEntrada {
 
 /**
  * Seletor de entrada (logo após o login do aluno): escolhe entre as três
- * experiências — Treine seu Robô (fundamental/lúdico), Trilha de ML e o
- * dashboard clássico. Mostra também o menu do usuário e os projetos salvos.
+ * experiências — Treine seu Robô (fundamental/lúdico), Léo no Mundo Real
+ * (câmera) e Trilha de ML. Mostra também o menu do usuário e os projetos salvos.
  */
 @Component({
   selector: 'app-inicio',
@@ -59,11 +59,6 @@ export class InicioComponent implements OnInit {
       descricao: 'Monte seu pipeline de machine learning em uma trilha visual.',
       rota: '/trilha', cor: '#3B82F6',
     },
-    {
-      id: 'classico', emoji: '🖥️', titulo: 'Modo Clássico',
-      descricao: 'O painel completo, com todas as etapas e detalhes do pipeline.',
-      rota: '/view-aluno', cor: '#16A34A',
-    },
   ];
 
   constructor(
@@ -93,10 +88,10 @@ export class InicioComponent implements OnInit {
     this.router.navigate([m.rota]);
   }
 
-  // Projetos salvos abrem no modo clássico com o pipeline carregado.
+  // Projetos salvos abrem na Trilha de ML (carrega via PipelineService).
   abrirProjeto(p: PipelineState): void {
     if (!p.id) return;
-    this.router.navigate(['/view-aluno'], { queryParams: { pipeline: p.id } });
+    this.router.navigate(['/trilha'], { queryParams: { pipeline: p.id } });
   }
 
   excluirProjeto(p: PipelineState, event: Event): void {

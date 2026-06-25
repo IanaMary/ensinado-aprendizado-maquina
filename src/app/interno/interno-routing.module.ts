@@ -3,9 +3,14 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'view-aluno',
-    loadChildren: () => import('../interno/view-aluno/view-aluno.module').then(m => m.ViewAlunoModule),
-    data: { breadcrumb: 'Dashboard' }
+    path: 'projetos',
+    loadChildren: () => import('../interno/projetos/meus-projetos.module').then(m => m.MeusProjetosModule),
+    data: { breadcrumb: 'Meus Projetos' }
+  },
+  {
+    path: 'galeria',
+    loadChildren: () => import('../interno/galeria/galeria-pipelines.module').then(m => m.GaleriaPipelinesModule),
+    data: { breadcrumb: 'Galeria' }
   },
   {
     path: 'view-professor',
@@ -46,7 +51,7 @@ const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'view-aluno'
+    redirectTo: 'inicio'
   }
 ];
 

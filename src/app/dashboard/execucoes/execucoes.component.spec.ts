@@ -85,7 +85,7 @@ describe('ExecucoesComponent', () => {
     component.navegarParaProjetos();
 
     expect(component.usuarioMenuAberto).toBeFalse();
-    expect(router.navigate).toHaveBeenCalledWith(['/view-aluno/projetos']);
+    expect(router.navigate).toHaveBeenCalledWith(['/projetos']);
   });
 
   it('should logout from user menu', () => {

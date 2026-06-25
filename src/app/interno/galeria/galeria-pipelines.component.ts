@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { PipelineService, PipelineProfessor, PipelineState } from '../../../service/pipeline.service';
+import { PipelineService, PipelineProfessor, PipelineState } from '../../service/pipeline.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -86,7 +86,7 @@ export class GaleriaPipelinesComponent implements OnInit {
 
   abrirPipeline(pipeline: PipelineProfessor): void {
     // Navegar para o playground com o pipeline selecionado (modo visualização)
-    this.router.navigate(['/interno/view-aluno'], { 
+    this.router.navigate(['/inicio'], { 
       queryParams: { pipeline: pipeline.id, viewOnly: true } 
     });
   }
@@ -97,7 +97,7 @@ export class GaleriaPipelinesComponent implements OnInit {
       next: (copia: PipelineState) => {
         this.snackBar.open('Projeto copiado para sua lista!', 'Abrir', { duration: 5000 })
           .onAction().subscribe(() => {
-            this.router.navigate(['/interno/view-aluno'], { 
+            this.router.navigate(['/inicio'], { 
               queryParams: { pipeline: copia.id } 
             });
           });
@@ -135,6 +135,6 @@ export class GaleriaPipelinesComponent implements OnInit {
   }
 
   voltar(): void {
-    this.router.navigate(['/interno/view-aluno']);
+    this.router.navigate(['/inicio']);
   }
 }

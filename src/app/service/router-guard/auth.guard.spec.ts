@@ -29,14 +29,14 @@ describe('AuthGuard', () => {
   it('should allow access for authenticated user with correct role', async () => {
     authService.autenticado.and.returnValue(Promise.resolve(true));
     authService.getUsuarioRole.and.returnValue('aluno');
-    const segments = [new UrlSegment('view-aluno', {})];
+    const segments = [new UrlSegment('inicio', {})];
     const result = await guard.canLoad({} as Route, segments);
     expect(result).toBeTrue();
   });
 
   it('should deny access for unauthenticated user', async () => {
     authService.autenticado.and.returnValue(Promise.resolve(false));
-    const segments = [new UrlSegment('view-aluno', {})];
+    const segments = [new UrlSegment('inicio', {})];
     const result = await guard.canLoad({} as Route, segments);
     expect(result).toBeFalse();
     expect(router.navigate).toHaveBeenCalledWith(['/autenticacao/login']);

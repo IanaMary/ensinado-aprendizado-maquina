@@ -36,19 +36,16 @@ export class ShellComponent implements OnInit, OnDestroy {
   private routerSub?: Subscription;
 
   navItems: NavItem[] = [
-    { icon: 'home', label: 'Home', route: '/view-aluno', roles: ['aluno', 'professor'] },
+    { icon: 'home', label: 'Home', route: '/inicio', roles: ['aluno', 'professor'] },
     { icon: 'home', label: 'Home', route: '/view-admin', roles: ['admin'] },
-    { icon: 'dashboard', label: 'Pipeline', route: '/view-aluno', roles: ['aluno', 'professor'] },
-    { icon: 'dashboard', label: 'Pipeline', route: '/view-admin', roles: ['admin'] },
-    { icon: 'analytics', label: 'Resultados', route: '/view-aluno', roles: ['aluno', 'professor'] },
-    { icon: 'analytics', label: 'Resultados', route: '/view-admin', roles: ['admin'] },
+    { icon: 'analytics', label: 'Atividades', route: '/atividades', roles: ['professor', 'admin'] },
     { icon: 'settings', label: 'Configuracao', route: '/view-admin', roles: ['admin'] }
   ];
 
   menuItems: MenuItem[] = [
     { icon: 'person', label: 'Meu Perfil', route: '/perfil', roles: ['aluno', 'professor', 'admin'] },
-    { icon: 'folder', label: 'Meus Projetos', route: '/view-aluno/projetos', roles: ['aluno', 'professor', 'admin'] },
-    { icon: 'explore', label: 'Galeria de Pipelines', route: '/view-aluno/galeria', roles: ['aluno', 'professor'] },
+    { icon: 'folder', label: 'Meus Projetos', route: '/projetos', roles: ['aluno', 'professor', 'admin'] },
+    { icon: 'explore', label: 'Galeria de Pipelines', route: '/galeria', roles: ['aluno', 'professor'] },
     { icon: 'divider', label: '', divider: true, roles: ['aluno', 'professor', 'admin'] },
     { icon: 'help', label: 'Manual', action: 'manual', roles: ['aluno', 'professor', 'admin'] },
     { icon: 'admin_panel_settings', label: 'Painel Admin', route: '/view-admin', roles: ['admin'] },

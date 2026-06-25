@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { PipelineService, PipelineState } from '../../../service/pipeline.service';
+import { PipelineService, PipelineState } from '../../service/pipeline.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 interface Projeto {
@@ -79,7 +79,7 @@ export class MeusProjetosComponent implements OnInit {
   }
 
   abrirProjeto(projeto: Projeto): void {
-    this.router.navigate(['/interno/view-aluno'], { 
+    this.router.navigate(['/inicio'], { 
       queryParams: { pipeline: projeto.id } 
     });
   }
@@ -94,7 +94,7 @@ export class MeusProjetosComponent implements OnInit {
     this.pipelineService.salvarPipeline(novoPipeline).subscribe({
       next: (criado: PipelineState) => {
         this.snackBar.open('Novo projeto criado!', 'Fechar', { duration: 3000 });
-        this.router.navigate(['/interno/view-aluno'], { 
+        this.router.navigate(['/inicio'], { 
           queryParams: { pipeline: criado.id } 
         });
       },

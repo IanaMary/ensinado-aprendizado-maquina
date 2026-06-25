@@ -66,12 +66,12 @@ export class ViewAdminComponent implements OnInit {
 
   navegarParaProjetos(): void {
     this.usuarioMenuAberto = false;
-    this.router.navigate(['/view-aluno/projetos']);
+    this.router.navigate(['/projetos']);
   }
 
   navegarParaGaleria(): void {
     this.usuarioMenuAberto = false;
-    this.router.navigate(['/view-aluno/galeria']);
+    this.router.navigate(['/galeria']);
   }
 
   navegarParaUsuarios(): void {

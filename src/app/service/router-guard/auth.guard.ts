@@ -7,7 +7,7 @@ import { roleMap } from '../../../app/models/item-coleta-dado.model';
 // (seletor /inicio + as três experiências), então não é uma rota única — isso também
 // faz o refresh funcionar em qualquer uma delas.
 const ROTAS_POR_PAPEL: Record<string, string[]> = {
-  aluno: ['inicio', 'treine-robo', 'leo-mundo-real', 'trilha', 'view-aluno'],
+  aluno: ['inicio', 'treine-robo', 'leo-mundo-real', 'trilha', 'projetos', 'galeria'],
   professor: ['view-professor', 'atividades'],
   admin: ['view-admin', 'atividades'],
 };
