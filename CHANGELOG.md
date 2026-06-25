@@ -8,6 +8,31 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-06-25
+
+### Menu do usuário (avatar + Sair) no `/view-admin` + ajustes de UX no modal de métricas. Front `7ec88d1` (bundle `main-RVMAUYPM.js`) · só frontend
+- **Menu do usuário no `/view-admin`**: reescrito no mesmo padrão do dashboard `execucoes.component`
+  (`.admin-header > .header-actions > .usuario-menu` com `.usuario-avatar-btn`, dropdown
+  `.usuario-dropdown`含 `.usuario-header`/`.usuario-avatar-grande`/`.usuario-papel` e blocos de
+  `.usuario-opcoes`). Opções: **Meus Projetos**, **Galeria**, **Usuários**, **Sair**. Carrega
+  `name`/`email`/`role` do `sessionStorage` via `AuthService`, fecha ao clicar fora
+  (`@HostListener('document:click')` + `closest('.usuario-menu')`) e usa `authService.logout()`.
+  `MatTooltipModule` adicionado ao `ViewAdminModule`.
+- **Specs corrigidos**: `LogsErrosComponent`/`LogsBackendComponent` (faltavam `HttpClientTestingModule`
+  + `MatIconModule`/`MatProgressSpinnerModule`/`MatTableModule` e usavam `imports` em vez de
+  `declarations`). 108/108 verdes.
+- **Modal de seleção de métricas** (`selecao-metricas.component`):
+  - Botões "Selecionar todas" e "Selecionar todas do grupo" deixaram de ser `mat-icon-button` (o
+    ripple persistente do MDC descentralizava o glifo) e viraram `<button type="button">` simples,
+    alinhado via CSS existente.
+  - **Agregação multiclasse** (`media-config` com Weighted/Macro/Micro) agora aparece **dentro do
+    grupo "Classificação"**, junto às métricas às quais se refere, em vez de flutuar ao fim do
+    modal. Build OK + 108/108.
+
+### Menu do usuário (avatar + Sair) no `/view-admin` (versão inicial). Front `2f0c58b` (bundle `main-PDMQHJR7.js`) · só frontend
+- Versão inicial do menu de avatar (estilo `/inicio`), posteriormente reescrita no padrão do
+  dashboard em `7ec88d1`. Ver item acima.
+
 ## 2026-06-23
 
 ### `:host{display:block}` nos componentes da barra (overflow cross-browser). Front `7480e32` (bundle `main-R3EI5OEE.js`) · só frontend

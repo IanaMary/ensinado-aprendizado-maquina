@@ -1,6 +1,6 @@
 <nav class="selecao-metricas">
   <div class="header-metricas">
-    <button mat-icon-button class="btn-toggle"
+    <button type="button" class="btn-toggle"
       [matTooltip]="todasMarcadas ? 'Desmarcar todas' : 'Selecionar todas'"
       (click)="toggleTodas()">
       <mat-icon>{{ todasMarcadas ? 'deselect' : 'select_all' }}</mat-icon>
@@ -14,7 +14,7 @@
         <mat-icon>{{ grupo.icone }}</mat-icon>
         <span>{{ grupo.nome }}</span>
         <span class="grupo-tag" *ngIf="!grupoTemHabilitada(grupo)">não se aplica</span>
-        <button mat-icon-button class="btn-grupo-toggle"
+        <button type="button" class="btn-grupo-toggle"
           *ngIf="grupoTemHabilitada(grupo)"
           [matTooltip]="'Selecionar todas do grupo'"
           (click)="toggleGrupo(grupo)">
@@ -39,23 +39,23 @@
           </button>
         </div>
       </div>
+
+      <section class="media-config" *ngIf="grupo.nome === 'Classificação' && temClassificacao">
+        <div class="media-header">
+          <span class="label">Agregação para métricas multiclasse</span>
+        </div>
+
+        <mat-radio-group class="media-options" [ngModel]="mediaMetricas" (ngModelChange)="atualizarMedia($event)">
+          <mat-radio-button *ngFor="let media of medias" [value]="media.valor">
+            {{ media.label }}
+          </mat-radio-button>
+        </mat-radio-group>
+
+        <div class="media-descricao" *ngFor="let media of medias" [class.ativa]="media.valor === mediaMetricas">
+          <strong>{{ media.label }}</strong>
+          <span>{{ media.descricao }}</span>
+        </div>
+      </section>
     </div>
   </ng-container>
-
-  <section class="media-config" *ngIf="temClassificacao">
-    <div class="media-header">
-      <span class="label">Agregação para métricas multiclasse</span>
-    </div>
-
-    <mat-radio-group class="media-options" [ngModel]="mediaMetricas" (ngModelChange)="atualizarMedia($event)">
-      <mat-radio-button *ngFor="let media of medias" [value]="media.valor">
-        {{ media.label }}
-      </mat-radio-button>
-    </mat-radio-group>
-
-    <div class="media-descricao" *ngFor="let media of medias" [class.ativa]="media.valor === mediaMetricas">
-      <strong>{{ media.label }}</strong>
-      <span>{{ media.descricao }}</span>
-    </div>
-  </section>
 </nav>
