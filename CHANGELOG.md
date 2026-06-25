@@ -8,6 +8,28 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-06-25 (split — branch `mestrado-iana`)
+
+### Branch `mestrado-iana` — Modo Clássico + Admin only. Front `a57c99f`
+- **Split do repositório em duas bases de código:**
+  - `mestrado-iana` = **Modo Clássico** (`/view-aluno` com Projetos e Galeria) + painel admin
+    (`/view-admin`). Modos lúdicos do aluno removidos (Treine seu Robô, Léo no Mundo Real,
+    Trilha de ML).
+  - `master` = sistema-completo (admin + 3 modos lúdicos; `/view-aluno` removido).
+  - `desenvolvimento` = versão combinada original (snapshot, preserva todos os modos).
+- **Removido** desta branch: `interno/treine-robo/`, `leo-mundo-real/`, `trilha/`.
+- `interno-routing`: removidas rotas `trilha`/`treine-robo`/`leo-mundo-real` e seletor `inicio`
+  (default redirect → `/view-aluno`).
+- `AuthGuard ROTAS_POR_PAPEL.aluno`: `['view-aluno']`.
+- `roleMap.aluno`: `/view-aluno`.
+- `dashboard.component`: removidos `irParaTrilha()` e `voltar()`, botão Trilha e botão Voltar.
+- `manual`: removida seção "Trilha de ML".
+- `package.json`: removidas 4 deps `@tensorflow/*` (tfjs, tfjs-backend-webgpu,
+  tfjs-models/mobilenet, tfjs-models/knn-classifier). `angular.json`: `allowedCommonJsDependencies`
+  (seedrandom/node-fetch/string_decoder/long) removidas — eram só do TensorFlow.js.
+- `dashboard.service`: removido `classificadorPrever` (só usado por treine-robo).
+- Backup não-destrutivo (sem deploy). Build prod OK + 108/108 testes.
+
 ## 2026-06-25
 
 ### Menu do usuário (avatar + Sair) no `/view-admin` + ajustes de UX no modal de métricas. Front `7ec88d1` (bundle `main-RVMAUYPM.js`) · só frontend
