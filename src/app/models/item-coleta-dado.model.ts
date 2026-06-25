@@ -31,7 +31,7 @@ export const nomeModelos: Record<string, string> = {
 };
 
 export const roleMap: Record<string, string> = {
-  'aluno': '/inicio',
+  'aluno': '/view-aluno',
   'professor': '/view-professor',
   'admin': '/view-admin'
 };

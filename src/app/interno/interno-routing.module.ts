@@ -24,26 +24,6 @@ const routes: Routes = [
     data: { breadcrumb: 'Atividades' }
   },
   {
-    path: 'trilha',
-    loadChildren: () => import('../interno/trilha/trilha.module').then(m => m.TrilhaModule),
-    data: { breadcrumb: 'Trilha de ML' }
-  },
-  {
-    path: 'inicio',
-    loadComponent: () => import('../interno/inicio/inicio.component').then(m => m.InicioComponent),
-    data: { breadcrumb: 'Início' }
-  },
-  {
-    path: 'treine-robo',
-    loadComponent: () => import('../interno/treine-robo/treine-robo.component').then(m => m.TreineRoboComponent),
-    data: { breadcrumb: 'Treine seu Robô' }
-  },
-  {
-    path: 'leo-mundo-real',
-    loadComponent: () => import('../interno/leo-mundo-real/leo-mundo-real.component').then(m => m.LeoMundoRealComponent),
-    data: { breadcrumb: 'Léo no Mundo Real' }
-  },
-  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'view-aluno'

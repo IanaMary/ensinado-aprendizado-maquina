@@ -316,10 +316,6 @@ export class DashboardService {
     return this.http.post(`${this.url}visualizacao/pairplot`, body);
   }
 
-  classificadorPrever(body: any) {
-    return this.http.post(`${this.url}${this.endpointClassificador}/prever`, body);
-  }
-
 
   fetchItensColetasDados() {
     return this.http.get<ItemPipeline[]>(`${this.url}${this.endpointConfPipeline}${this.endpointColeta}todos`);

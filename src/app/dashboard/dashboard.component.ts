@@ -15,15 +15,6 @@ export class DashboardComponent implements OnInit {
 
   constructor(private dashboardService: DashboardService, private router: Router) { }
 
-  irParaTrilha() {
-    this.router.navigate(['/trilha']);
-  }
-
-  // Volta ao painel de entrada do aluno.
-  voltar() {
-    this.router.navigate(['/inicio']);
-  }
-
   ngOnInit() {
     this.dashboardService.carregarDados();
   }
