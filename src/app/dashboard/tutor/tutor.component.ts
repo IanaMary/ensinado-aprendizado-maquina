@@ -62,7 +62,7 @@ export class TutorComponent implements OnChanges {
   @Input() metricaSelecionada: any = null;
   @Input() tutorPipelineInfo: any = null;
   @Input() tutorItemInfo: TutorItemInfo | null = null;
-  @Input() tutorTheme: string = 'default';
+  @Input() tutorTheme = 'default';
 
   tutor = tutor;
   objectKeys = Object.keys;

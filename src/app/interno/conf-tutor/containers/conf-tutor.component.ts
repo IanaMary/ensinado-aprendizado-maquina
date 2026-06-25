@@ -53,7 +53,7 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
 
   // Configuracao LLM
   modelosLLM: { id: string; owned_by: string }[] = [];
-  modeloLLMAtual: string = '';
+  modeloLLMAtual = '';
   carregandoModelos = false;
   salvandoModelo = false;
 

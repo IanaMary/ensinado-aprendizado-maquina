@@ -23,9 +23,9 @@ export class SelecaoMetricasComponent implements OnChanges {
   @Output() ajudaItem = new EventEmitter<ItemPipeline>();
 
   metricasSelecionadas: ItemPipeline[] = [];
-  todasMarcadas: boolean = false;
+  todasMarcadas = false;
   grupos: GrupoMetricas[] = [];
-  temClassificacao: boolean = false;
+  temClassificacao = false;
 
   private nomesGrupos: Record<string, { nome: string; icone: string }> = {
     classificacao: { nome: 'Classificação', icone: 'category' },
@@ -33,7 +33,7 @@ export class SelecaoMetricasComponent implements OnChanges {
     agrupamento: { nome: 'Agrupamento', icone: 'scatter_plot' },
   };
 
-  medias: Array<{ valor: MediaMetrica; label: string; descricao: string }> = [
+  medias: { valor: MediaMetrica; label: string; descricao: string }[] = [
     {
       valor: 'weighted',
       label: 'Weighted',

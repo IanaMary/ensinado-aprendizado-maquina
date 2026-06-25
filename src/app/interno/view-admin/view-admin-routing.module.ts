@@ -5,7 +5,15 @@ import { DashboardComponent } from '../../dashboard/dashboard.component';
 import { ConfPipelineComponent } from '../conf-pipeline/containers/conf-pipeline.component';
 import { ConfTutorComponent } from '../conf-tutor/containers/conf-tutor.component';
 
+import { LogsErrosComponent } from './logs-erros/logs-erros.component';
+import { LogsBackendComponent } from './logs-backend/logs-backend.component';
+
 const routes: Routes = [
+  {
+    path: 'logs-backend',
+    component: LogsBackendComponent,
+    data: { breadcrumb: 'Logs de Backend' }
+  },
   {
     path: '',
     component: ViewAdminComponent,
@@ -35,6 +43,11 @@ const routes: Routes = [
     path: 'artefatos',
     loadChildren: () => import('./artefatos/artefatos.module').then(m => m.ArtefatosModule),
     data: { breadcrumb: 'Artefatos' }
+  },
+  {
+    path: 'logs-erros',
+    component: LogsErrosComponent,
+    data: { breadcrumb: 'Logs de Erros' }
   }
   // A tela de Atividades é uma rota compartilhada top-level (/atividades),
   // acessível por admin e professor — ver interno-routing.module.ts.

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../../services/dashboard.service';
 import { ItemPipeline } from '../../../models/item-coleta-dado.model';
@@ -10,7 +10,7 @@ import { PreProcessamentoDialogComponent } from './pre-processamento-dialog/pre-
   styleUrl: './pre-processamento.component.scss',
   standalone: false
 })
-export class PreProcessamentoComponent {
+export class PreProcessamentoComponent implements OnInit {
   itens: ItemPipeline[] = [];
   grupos: { nome: string; label: string; icon: string; itens: ItemPipeline[] }[] = [];
   // Sub-grupos colapsáveis (abertos por padrão; auto-colapsa os totalmente desabilitados).

@@ -96,7 +96,7 @@ export class BreadcrumbComponent implements OnInit, OnDestroy {
     this.router.navigate([url]);
   }
 
-  private buildBreadcrumbs(route: ActivatedRoute, url: string = '', breadcrumbs: Breadcrumb[] = []): Breadcrumb[] {
+  private buildBreadcrumbs(route: ActivatedRoute, url = '', breadcrumbs: Breadcrumb[] = []): Breadcrumb[] {
     const children: ActivatedRoute[] = route.children;
 
     if (children.length === 0) {

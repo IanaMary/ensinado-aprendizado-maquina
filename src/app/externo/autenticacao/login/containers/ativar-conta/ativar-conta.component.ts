@@ -13,7 +13,7 @@ import { environment } from '../../../../../../environments/environment';
 })
 export class AtivarContaComponent implements OnInit {
   formSenha!: FormGroup;
-  token: string = '';
+  token = '';
   carregando = true;
   tokenValido = false;
   nomeUsuario = '';
@@ -46,7 +46,7 @@ export class AtivarContaComponent implements OnInit {
     });
   }
 
-  senhasIguais(group: FormGroup): { [key: string]: boolean } | null {
+  senhasIguais(group: FormGroup): Record<string, boolean> | null {
     const senha = group.get('senha')?.value;
     const confirmar = group.get('confirmarSenha')?.value;
     return senha === confirmar ? null : { senhasNaoIguais: true };

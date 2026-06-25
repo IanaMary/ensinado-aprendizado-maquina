@@ -14,7 +14,7 @@ export class PlanilhaService {
    * @param file Arquivo .xlsx enviado pelo usuário
    * @param headerAsFirstRow Define se deve usar a primeira linha como cabeçalho (true) ou retornar array de arrays (false)
    */
-  lerPlanilha(file: File, headerAsFirstRow: boolean = true): Promise<any[] | any[][]> {
+  lerPlanilha(file: File, headerAsFirstRow = true): Promise<any[] | any[][]> {
     return new Promise((resolve, reject) => {
       const reader: FileReader = new FileReader();
 

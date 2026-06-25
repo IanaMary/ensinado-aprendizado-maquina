@@ -12,9 +12,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class GaleriaPipelinesComponent implements OnInit {
   pipelines: PipelineProfessor[] = [];
   carregando = true;
-  filtroDificuldade: string = 'todos';
-  filtroTipo: string = 'publicos';
-  termoBusca: string = '';
+  filtroDificuldade = 'todos';
+  filtroTipo = 'publicos';
+  termoBusca = '';
 
   constructor(
     private router: Router,

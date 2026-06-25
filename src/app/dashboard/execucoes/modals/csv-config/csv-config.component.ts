@@ -23,19 +23,19 @@ export class CsvConfigComponent implements OnInit {
     { valor: 'cp1252', label: 'Windows-1252' },
   ];
 
-  separador: string = 'virgula';
-  encoding: string = 'utf-8';
-  linhasPreview: number = 50;
+  separador = 'virgula';
+  encoding = 'utf-8';
+  linhasPreview = 50;
 
-  carregando: boolean = false;
-  erro: string = '';
+  carregando = false;
+  erro = '';
 
   preview: any[] = [];
   colunas: string[] = [];
   colunasDetalhes: any[] = [];
 
-  pagina: number = 0;
-  linhasPorPagina: number = 10;
+  pagina = 0;
+  linhasPorPagina = 10;
 
   constructor(
     public dialogRef: MatDialogRef<CsvConfigComponent>,

@@ -24,7 +24,7 @@ interface ManualUsuario {
 })
 export class ManualComponent implements OnInit {
   manualAtual: ManualUsuario | null = null;
-  secaoAtiva: string = '';
+  secaoAtiva = '';
   manuais: Record<string, ManualUsuario> = {};
 
   constructor(

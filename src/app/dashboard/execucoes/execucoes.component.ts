@@ -36,9 +36,9 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   tutor: any;
   tutorPipelineInfo: any = null;
   tutorItemInfo: any = null;
-  tutorTheme: string = 'default';
-  tutorThemeClass: string = 'theme-default';
-  chatAberto: boolean = false;
+  tutorTheme = 'default';
+  tutorThemeClass = 'theme-default';
+  chatAberto = false;
   chatContexto: any = null;
   chatSugestoes: string[] = [];
   paramsTutor = '';

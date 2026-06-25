@@ -15,15 +15,15 @@ export class VisualizacaoDadosComponent implements OnInit {
 
   colunasDisponiveis: string[] = [];
   colunasSelecionadas: string[] = [];
-  hueSelecionado: string = '';
+  hueSelecionado = '';
 
-  imagemBase64: string = '';
+  imagemBase64 = '';
   colunasVisualizadas: string[] = [];
-  hueAtual: string = '';
-  totalAmostras: number = 0;
+  hueAtual = '';
+  totalAmostras = 0;
 
-  carregando: boolean = false;
-  erro: string = '';
+  carregando = false;
+  erro = '';
 
   constructor(
     private dashboardService: DashboardService,

@@ -11,7 +11,7 @@ import { AuthService } from '../../../../../service/auth/auth.service';
   styleUrls: ['./cadastro-usuario.component.scss'],
   standalone: false,
 })
-export class CadastroUsuarioComponent {
+export class CadastroUsuarioComponent implements OnInit {
 
 
   cadastroUsuarioForm: FormGroup;

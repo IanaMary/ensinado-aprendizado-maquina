@@ -10,9 +10,9 @@ import { DashboardService } from '../../../services/dashboard.service';
 })
 export class ToyDatasetsDialogComponent implements OnInit {
   datasets: any[] = [];
-  filtroTipo: string = '';
+  filtroTipo = '';
   carregando = false;
-  datasetSelecionado: string = '';
+  datasetSelecionado = '';
 
   constructor(
     private dialogRef: MatDialogRef<ToyDatasetsDialogComponent>,

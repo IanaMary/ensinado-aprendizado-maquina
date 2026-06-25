@@ -1,0 +1,42 @@
+<div class="logs-container">
+  <h2>Logs de Erros (Frontend)</h2>
+  <button mat-raised-button color="primary" (click)="carregarErros()" style="margin-bottom: 16px;">
+    <mat-icon>refresh</mat-icon> Atualizar
+  </button>
+
+  <mat-spinner *ngIf="isLoading" diameter="40"></mat-spinner>
+
+  <table mat-table [dataSource]="erros" class="mat-elevation-z8" *ngIf="!isLoading && erros.length > 0">
+    <ng-container matColumnDef="timestamp">
+      <th mat-header-cell *matHeaderCellDef> Data/Hora </th>
+      <td mat-cell *matCellDef="let element"> {{element.timestamp | date:'dd/MM/yyyy HH:mm:ss'}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef> Status </th>
+      <td mat-cell *matCellDef="let element">
+         <mat-chip-listbox *ngIf="element.status">
+           <mat-chip color="warn" selected>{{element.status}}</mat-chip>
+         </mat-chip-listbox>
+         <span *ngIf="!element.status">-</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="url">
+      <th mat-header-cell *matHeaderCellDef> URL Afetada </th>
+      <td mat-cell *matCellDef="let element"> {{element.url || '-'}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="message">
+      <th mat-header-cell *matHeaderCellDef> Mensagem </th>
+      <td mat-cell *matCellDef="let element"> {{element.message}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <div *ngIf="!isLoading && erros.length === 0" class="no-data">
+    Nenhum erro registrado no sistema. Tudo tranquilo!
+  </div>
+</div>

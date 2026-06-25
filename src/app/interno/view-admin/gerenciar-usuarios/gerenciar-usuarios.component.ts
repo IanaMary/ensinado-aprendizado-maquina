@@ -23,9 +23,9 @@ interface Usuario {
 export class GerenciarUsuariosComponent implements OnInit {
   usuarios: Usuario[] = [];
   carregando = true;
-  filtroTipo: string = 'todos';
-  filtroStatus: string = 'todos';
-  termoBusca: string = '';
+  filtroTipo = 'todos';
+  filtroStatus = 'todos';
+  termoBusca = '';
   
   // Formulario de criacao
   formUsuario!: FormGroup;

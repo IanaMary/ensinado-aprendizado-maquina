@@ -14,8 +14,8 @@ export interface NomearPipelineDialogData {
 })
 export class NomearPipelineDialogComponent {
 
-  nome: string = '';
-  erro: string = '';
+  nome = '';
+  erro = '';
 
   constructor(
     private dialogRef: MatDialogRef<NomearPipelineDialogComponent, string | null>,

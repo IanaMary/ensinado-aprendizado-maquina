@@ -1,0 +1,31 @@
+.logs-container {
+  padding: 24px;
+
+  table {
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .mat-column-status {
+    width: 100px;
+    text-align: center;
+  }
+
+  .mat-column-timestamp {
+    width: 180px;
+  }
+
+  .mat-column-url {
+    width: 200px;
+    word-break: break-all;
+  }
+
+  .no-data {
+    margin-top: 24px;
+    padding: 16px;
+    text-align: center;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    color: #666;
+  }
+}

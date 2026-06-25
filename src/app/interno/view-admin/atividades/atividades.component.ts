@@ -74,7 +74,7 @@ export class AtividadesComponent implements OnInit, OnDestroy {
     return isNaN(d.getTime()) ? '' : d.toISOString();
   }
 
-  private montarFiltros(extra: { [k: string]: any } = {}) {
+  private montarFiltros(extra: Record<string, any> = {}) {
     return {
       ...this.filtros,
       data_inicio: this.toIso(this.filtros.data_inicio),
@@ -97,7 +97,7 @@ export class AtividadesComponent implements OnInit, OnDestroy {
     this.aplicarFiltros();
   }
 
-  buscar(incluirTotal: boolean = true): void {
+  buscar(incluirTotal = true): void {
     this.carregando = true;
     this.erro = '';
     this.atividade.listar(this.montarFiltros({ incluir_total: incluirTotal })).subscribe({

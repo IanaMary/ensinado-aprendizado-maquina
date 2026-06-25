@@ -177,20 +177,20 @@ export class AtividadeService {
   }
 
   // ---- Consulta (tela admin) ----
-  listar(filtros: { [k: string]: any } = {}) {
+  listar(filtros: Record<string, any> = {}) {
     return this.http.get<any>(`${this.endpoint}${this.qs(filtros)}`);
   }
 
-  resumo(filtros: { [k: string]: any } = {}) {
+  resumo(filtros: Record<string, any> = {}) {
     return this.http.get<any>(`${this.endpoint}/resumo${this.qs(filtros)}`);
   }
 
-  tempoPreso(filtros: { [k: string]: any } = {}) {
+  tempoPreso(filtros: Record<string, any> = {}) {
     return this.http.get<any>(`${this.endpoint}/tempo-preso${this.qs(filtros)}`);
   }
 
   /** Monta a querystring ignorando valores vazios/nulos. */
-  private qs(filtros: { [k: string]: any }): string {
+  private qs(filtros: Record<string, any>): string {
     const params = new URLSearchParams();
     Object.entries(filtros).forEach(([k, v]) => {
       if (v !== undefined && v !== null && v !== '') {

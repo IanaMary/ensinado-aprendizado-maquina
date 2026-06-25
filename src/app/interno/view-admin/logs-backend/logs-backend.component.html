@@ -1,0 +1,62 @@
+<div class="logs-container mat-elevation-z8">
+  <h2>Monitoramento de Logs do Servidor (Backend)</h2>
+  
+  <div class="actions">
+    <button mat-raised-button color="primary" (click)="carregarLogs()">
+      <mat-icon>refresh</mat-icon> Atualizar
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-shade">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <table mat-table [dataSource]="logs" class="mat-elevation-z2" *ngIf="!isLoading && logs.length > 0">
+
+    <!-- Time Column -->
+    <ng-container matColumnDef="time">
+      <th mat-header-cell *matHeaderCellDef> Data/Hora </th>
+      <td mat-cell *matCellDef="let element"> {{element.time | date:'dd/MM/yyyy HH:mm:ss'}} </td>
+    </ng-container>
+
+    <!-- Level Column -->
+    <ng-container matColumnDef="level">
+      <th mat-header-cell *matHeaderCellDef> Nível </th>
+      <td mat-cell *matCellDef="let element">
+        <mat-chip-set>
+          <mat-chip [color]="getLevelColor(element.level)" highlighted>{{element.level}}</mat-chip>
+        </mat-chip-set>
+      </td>
+    </ng-container>
+
+    <!-- Module Column -->
+    <ng-container matColumnDef="module">
+      <th mat-header-cell *matHeaderCellDef> Módulo </th>
+      <td mat-cell *matCellDef="let element"> {{element.module}} </td>
+    </ng-container>
+
+    <!-- Function Column -->
+    <ng-container matColumnDef="function">
+      <th mat-header-cell *matHeaderCellDef> Função </th>
+      <td mat-cell *matCellDef="let element"> {{element.function}} </td>
+    </ng-container>
+
+    <!-- Message Column -->
+    <ng-container matColumnDef="message">
+      <th mat-header-cell *matHeaderCellDef> Mensagem </th>
+      <td mat-cell *matCellDef="let element" class="message-cell"> 
+        {{element.message}}
+        <div *ngIf="element.exception" class="exception-block">
+          <code>{{element.exception}}</code>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <div class="no-data" *ngIf="!isLoading && logs.length === 0">
+    Nenhum log registrado no servidor ainda.
+  </div>
+</div>

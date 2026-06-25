@@ -24,8 +24,8 @@ interface Projeto {
 export class MeusProjetosComponent implements OnInit {
   projetos: Projeto[] = [];
   carregando = true;
-  filtroStatus: string = 'todos';
-  termoBusca: string = '';
+  filtroStatus = 'todos';
+  termoBusca = '';
 
   constructor(
     private router: Router,

@@ -71,7 +71,7 @@ export class LeoVisaoService {
   }
 
   /** Classifica um embedding. Devolve { classe, confidences } ou null se o KNN está vazio. */
-  async classificar(feat: Float32Array, k = 5): Promise<{ classe: number; confidences: { [label: string]: number } } | null> {
+  async classificar(feat: Float32Array, k = 5): Promise<{ classe: number; confidences: Record<string, number> } | null> {
     const total = this.totalExemplos;
     if (total === 0) return null;
     const t = tf.tensor(feat, [1, feat.length]);

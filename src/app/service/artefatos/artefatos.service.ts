@@ -10,7 +10,7 @@ export class ArtefatosService {
   constructor(private http: HttpClient) {}
 
   /** Lista runs associadas a usuários (filtro por usuário e data). */
-  listar(filtros: { [k: string]: any } = {}) {
+  listar(filtros: Record<string, any> = {}) {
     const params = new URLSearchParams();
     Object.entries(filtros).forEach(([k, v]) => {
       if (v !== undefined && v !== null && v !== '') {

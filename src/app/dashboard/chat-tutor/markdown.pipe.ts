@@ -43,7 +43,7 @@ export class MarkdownPipe implements PipeTransform {
 
   private parseTables(text: string): string {
     const lines = text.split('\n');
-    let result: string[] = [];
+    const result: string[] = [];
     let i = 0;
 
     while (i < lines.length) {

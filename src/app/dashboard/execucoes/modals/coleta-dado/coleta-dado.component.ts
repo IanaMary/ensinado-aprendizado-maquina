@@ -41,7 +41,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
   treino: InformacoesDados = { dados: [], totalDados: 0, nomeArquivo: '' };
   teste: InformacoesDados = { dados: [], totalDados: 0, nomeArquivo: '' };
 
-  att: { [key: string]: boolean } = {};
+  att: Record<string, boolean> = {};
 
   tipoPredicao: 'regressao' | 'classificacao' | 'exploratorio' = 'exploratorio';
 
@@ -69,12 +69,12 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
   opcoesTarget: string[] = [];
   target: string | null = '';
 
-  idColeta: string = '';
-  idConfigurcacaoTreinamento: string = '';
-  totalDados: number = 0;
+  idColeta = '';
+  idConfigurcacaoTreinamento = '';
+  totalDados = 0;
   treinoArquivo: any;
   testeArquivo: any;
-  todosMarcados: boolean = false;
+  todosMarcados = false;
 
   // Toy Datasets
   fonteDados: 'arquivo' | 'dataset' | 'url' = 'arquivo';
@@ -88,11 +88,11 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
   private urlTimer: any;
   get urlValida(): boolean { return /^https?:\/\/.+\..+/.test((this.urlInput || '').trim()); }
   datasets: any[] = [];
-  filtroTipoDataset: string = '';
-  datasetSelecionado: string = '';
-  datasetSelecionadoNome: string = '';
-  carregandoDataset: boolean = false;
-  redivisaoEmAndamento: boolean = false;
+  filtroTipoDataset = '';
+  datasetSelecionado = '';
+  datasetSelecionadoNome = '';
+  carregandoDataset = false;
+  redivisaoEmAndamento = false;
 
 
   constructor(private planilhaService: PlanilhaService,

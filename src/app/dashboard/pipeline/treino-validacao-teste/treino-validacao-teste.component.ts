@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { ItemPipeline } from '../../../models/item-coleta-dado.model';
 
@@ -8,7 +8,7 @@ import { ItemPipeline } from '../../../models/item-coleta-dado.model';
   styleUrl: './treino-validacao-teste.component.scss',
   standalone: false
 })
-export class TreinoValidacaoTesteComponent {
+export class TreinoValidacaoTesteComponent implements OnInit {
   itens: ItemPipeline[] = [];
   classificadores: ItemPipeline[] = [];
   regressores: ItemPipeline[] = [];

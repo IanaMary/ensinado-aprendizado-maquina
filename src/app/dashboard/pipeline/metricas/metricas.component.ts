@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { ItemPipeline } from '../../../models/item-coleta-dado.model';
 
@@ -14,7 +14,7 @@ interface GrupoMetricas {
   styleUrl: './metricas.component.scss',
   standalone: false
 })
-export class MetricasComponent {
+export class MetricasComponent implements OnInit {
   grupos: GrupoMetricas[] = [];
   // Grupos colapsáveis (abertos por padrão; auto-colapsa os totalmente desabilitados).
   gruposColapsados: Record<string, boolean> = {};
