@@ -5,137 +5,208 @@
 }
 
 .admin-container {
-  position: relative;
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-/* ---- Menu do usuário (canto superior direito) ---- */
-.usuario-menu {
-  position: absolute;
-  top: 22px;
-  right: 24px;
-  z-index: 10;
+/* ---- Header ---- */
+.admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
 }
 
-.usuario-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+.header-info {
+  h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: $roxo-escuro;
+  }
+
+  p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: $cinza-medio;
+  }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---- Menu do usuário (mesmo padrão do dashboard) ---- */
+.usuario-menu {
+  position: relative;
+}
+
+.usuario-avatar-btn {
+  width: 34px;
+  height: 34px;
   border: none;
-  cursor: pointer;
-  background: linear-gradient(135deg, $roxo-medio, #A855F7);
+  border-radius: 50%;
+  background: $info;
   color: $branco;
-  font-family: 'Baloo 2', 'Nunito', sans-serif;
-  font-weight: 800;
-  font-size: 15px;
-  box-shadow: 0 6px 18px rgba($roxo-medio, 0.35);
-  transition: transform 0.14s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    transform: scale(1.06);
+    background: #1976d2;
+    transform: translateY(-1px);
   }
 }
 
 .usuario-dropdown {
   position: absolute;
-  top: 54px;
+  top: calc(100% + 8px);
   right: 0;
-  min-width: 220px;
+  width: 288px;
   background: $branco;
-  border-radius: 16px;
-  padding: 12px;
-  box-shadow: 0 16px 40px rgba($roxo-medio, 0.22);
-  border: 1px solid #EEE6FB;
-  animation: popInMenu 0.16s ease both;
+  border: 1px solid rgba($cinza-medio, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 14px 34px rgba($preto, 0.16);
+  padding: 4px 0;
+  z-index: 100;
 }
 
-@keyframes popInMenu {
-  from {
-    opacity: 0;
-    transform: scale(0.94) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.usuario-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba($cinza-medio, 0.16);
 }
 
-.usuario-id {
-  padding: 6px 8px 10px;
-  border-bottom: 1px solid #F0EAFB;
-  margin-bottom: 6px;
+.usuario-avatar-grande {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: $info;
+  color: $branco;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.usuario-identidade {
+  min-width: 0;
 }
 
 .usuario-nome {
-  font-family: 'Baloo 2', 'Nunito', sans-serif;
-  font-weight: 800;
-  font-size: 15px;
-  color: $roxo-escuro;
+  color: $cinza-escuro;
+  font-size: 14px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.usuario-email {
-  font-size: 12px;
-  color: #9B7FCB;
-  font-weight: 600;
-  word-break: break-all;
+.usuario-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  color: $cinza-medio;
+  font-size: 11px;
+  min-width: 0;
+
+  span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.usuario-papel {
+  background: rgba($roxo-medio, 0.12);
+  color: $roxo-medio;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.usuario-opcoes {
+  padding: 4px 0;
+
+  & + .usuario-opcoes {
+    border-top: 1px solid rgba($cinza-medio, 0.16);
+  }
 }
 
 .usuario-opcao {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   width: 100%;
   border: none;
-  background: none;
-  padding: 9px 8px;
-  border-radius: 10px;
+  background: transparent;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 16px;
+  text-align: left;
+  color: $cinza-escuro;
   cursor: pointer;
-  font-weight: 700;
-  font-size: 14px;
-  color: #2D2440;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
+  transition: background 0.2s ease;
 
   &:hover {
-    background: #F6F1FE;
+    background: rgba($cinza-claro, 0.45);
+  }
+
+  mat-icon {
+    color: $cinza-medio;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    strong {
+      font-size: 13px;
+      font-weight: 600;
+      color: $cinza-escuro;
+    }
+
+    span {
+      font-size: 11px;
+      color: $cinza-medio;
+    }
   }
 
   &.sair {
-    color: #DC2626;
+    color: $erro;
+
+    mat-icon {
+      color: $erro;
+    }
 
     &:hover {
-      background: rgba(#DC2626, 0.08);
+      background: rgba($erro, 0.08);
     }
   }
 }
 
-.welcome-card {
-  background: linear-gradient(135deg, $roxo-escuro, $roxo-medio);
-  color: $branco;
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 32px;
-  box-shadow: 0 8px 32px rgba($roxo-escuro, 0.2);
-
-  h1 {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-  }
-
-  p {
-    font-size: 16px;
-    opacity: 0.9;
-    margin: 0;
-  }
-}
-
+/* ---- Grid de cards ---- */
 .grid-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -203,11 +274,12 @@
     padding: 16px;
   }
 
-  .welcome-card {
-    padding: 24px;
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
 
-    h1 {
-      font-size: 22px;
+    h2 {
+      font-size: 20px;
     }
   }
 
