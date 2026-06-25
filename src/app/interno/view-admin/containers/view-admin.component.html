@@ -1,4 +1,19 @@
 <div class="admin-container">
+  <!-- Menu do usuário -->
+  <div class="usuario-menu">
+    <button class="usuario-avatar" (click)="toggleMenu($event)" matTooltip="Menu do usuário"
+      aria-label="Menu do usuário">{{ iniciais }}</button>
+    <div class="usuario-dropdown" *ngIf="menuAberto" (click)="$event.stopPropagation()">
+      <div class="usuario-id">
+        <div class="usuario-nome">{{ nome || 'Admin' }}</div>
+        <div class="usuario-email" *ngIf="email">{{ email }}</div>
+      </div>
+      <button class="usuario-opcao sair" (click)="sair()">
+        <mat-icon>logout</mat-icon> Sair
+      </button>
+    </div>
+  </div>
+
   <div class="welcome-card">
     <h1>Painel de Administracao</h1>
     <p>Gerencie o pipeline de Machine Learning e as configuracoes do tutor.</p>

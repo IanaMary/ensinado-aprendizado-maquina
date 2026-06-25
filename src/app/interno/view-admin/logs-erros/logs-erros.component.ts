@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../../../environments/environment';
 
 export interface ErrorLogResponse {
   id: string;
@@ -31,7 +31,7 @@ export class LogsErrosComponent implements OnInit {
   carregarErros(): void {
     this.isLoading = true;
     this.http.get<ErrorLogResponse[]>(`${environment.apiUrl}/sistema/erros`).subscribe({
-      next: (dados) => {
+      next: (dados: ErrorLogResponse[]) => {
         this.erros = dados;
         this.isLoading = false;
       },

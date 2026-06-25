@@ -21,11 +21,11 @@ export class LogsBackendComponent implements OnInit {
   carregarLogs(): void {
     this.isLoading = true;
     this.errorLogService.getLogsBackend().subscribe({
-      next: (dados) => {
+      next: (dados: any[]) => {
         this.logs = dados;
         this.isLoading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erro ao carregar logs do backend', err);
         this.isLoading = false;
       }

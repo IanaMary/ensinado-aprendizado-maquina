@@ -10,6 +10,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 import { LogsErrosComponent } from './logs-erros/logs-erros.component';
@@ -32,6 +33,7 @@ import { LogsBackendComponent } from './logs-backend/logs-backend.component';
     MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
   ],
   providers: []
 })
