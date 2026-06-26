@@ -134,6 +134,10 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  // Datasets multiclasse (ex.: digits, 10 classes) extrapolam a largura do modal;
+  // rola horizontalmente em vez de estourar o layout.
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 // Label "Previsto" acima
@@ -156,7 +160,7 @@
   border-spacing: 2px;
 
   th, td {
-    padding: 10px 14px;
+    padding: 8px 10px;
     text-align: center;
     font-size: 13px;
     border: none;
@@ -184,7 +188,7 @@
     color: $roxo-escuro;
     font-size: 12px;
     border-radius: 6px 6px 0 0;
-    min-width: 70px;
+    min-width: 48px;
   }
 
   // Header das linhas (classes reais)
@@ -204,7 +208,7 @@
     cursor: default;
     transition: transform 0.15s, box-shadow 0.15s;
     font-weight: 600;
-    min-width: 70px;
+    min-width: 48px;
 
     &.cm-diagonal {
       border: 2px solid rgba(#2e7d32, 0.3);
