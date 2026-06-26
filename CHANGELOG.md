@@ -1,4 +1,4 @@
-# Changelog — Iana / H2IA Tutor
+# Changelog — Mestrado Iana / H2IA Tutor
 
 Histórico de deploys em produção (`https://absapt.tk/h2ia/`). Formato inspirado em
 [Keep a Changelog](https://keepachangelog.com); datas em AAAA-MM-DD. Cada entrada cita os

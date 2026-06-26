@@ -1,4 +1,4 @@
-# Documentação do Projeto Iana / H2IA Tutor
+# Documentação do Projeto Mestrado Iana / H2IA Tutor
 
 Plataforma educacional para ensinar **Machine Learning** de forma interativa, com público-alvo de
 **ensino fundamental e médio**. O aluno monta um pipeline de ML (dados → pré-processamento → modelo →
