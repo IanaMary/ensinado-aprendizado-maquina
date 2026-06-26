@@ -8,6 +8,18 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-06-26 (deploy em produção — branch `mestrado-iana`)
+
+### Deploy da branch `mestrado-iana` (Modo Clássico + Admin). Front `9b7b92c` (bundle `main-LCRSEPVQ.js`) · só frontend
+- **Primeiro deploy do split**: produção (`https://absapt.tk/h2ia/tutor/`) passa a servir a branch
+  `mestrado-iana` (**Modo Clássico** `/view-aluno` + painel admin `/view-admin`; sem os modos
+  lúdicos Treine seu Robô / Léo no Mundo Real / Trilha). Conteúdo da branch descrito na entrada
+  de 2026-06-25 (split) abaixo.
+- Backend **inalterado** (`3654547`); deploy só de frontend.
+- Verificação: build prod OK + 108/108 testes. Backup de produção:
+  `/home/ubuntu/backups/deploy-20260626-013633`.
+- Validação pós-deploy: frontend 200, `/api/docs` 200, `h2ia-backend.service` active.
+
 ## 2026-06-25 (split — branch `mestrado-iana`)
 
 ### Branch `mestrado-iana` — Modo Clássico + Admin only. Front `a57c99f`
