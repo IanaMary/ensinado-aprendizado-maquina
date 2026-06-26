@@ -8,6 +8,26 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-06-26 (textos de apoio: Básico/Avançado + código Python colorido + links)
+
+### Cards educacionais DB-driven com código colorido e link Yellowbrick. Front `76dc145` (bundle `main-DR46LGHV.js`) · Back `9b9265c`
+- **Código Python colorido (modo Avançado)**: highlight.js carregado **lazy** (core + python via
+  `import()` dinâmico, memoizado) — `HighlightService` + diretiva `appHighlightCode` no card do
+  tutor, com **fallback para texto puro** se offline. Tema dark escopado em `.codigo-bloco`. Não
+  pesa no bundle inicial (chunk lazy separado).
+- **Todos os elementos com Básico + Avançado + link** (conteúdo vem do DB — ver back `9b9265c`):
+  - `link_yellowbrick` em `TutorItemInfo` + render no card (irmão do link sklearn).
+  - Pré-processamento e coleta agora **100% DB-driven**: removidos os dicts hardcoded de
+    `getItemInfo` (caem em stub mínimo quando sem `conteudo`).
+  - **Gráficos** (modal de avaliação): a "dica" reusa o `<app-tutor>` com split Básico/Avançado
+    por `grafico_id` (`db.graficos`), com fallback ao texto hardcoded; `getConteudoGraficos`/
+    `getConteudoDataset` no `DashboardService`.
+  - Helper único `conteudo-to-item-info` (mapeamento DB→card), reusado em execucoes e nos gráficos.
+- **Admin (`ConteudoEditor`)**: novos campos **Resumo básico** (modo Básico) e **Link Yellowbrick**.
+- **Seleção de métricas**: o toggle "selecionar todas do grupo" agora mostra o rótulo **Todos/Nenhum**
+  (e troca o ícone) conforme o clique vá marcar ou desmarcar.
+- Verificação: **117/117** testes + build prod OK (highlight.js em chunk lazy).
+
 ## 2026-06-26 (branding — branch `mestrado-iana`)
 
 ### Nome exibido "Mestrado Iana". Front `8afdf3b` (bundle `main-NJP3DCSL.js`) · só frontend
