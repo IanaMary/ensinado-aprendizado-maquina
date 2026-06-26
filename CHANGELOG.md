@@ -8,6 +8,21 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-06-26 (limpeza do painel admin — código morto + logs expostos)
+
+### Remove wizards mortos do conf-tutor, duplicata de "Usuários" e expõe logs. Front (bundle `main-ZGZOF4J5.js`) · só frontend
+- **Código morto removido (−1066 linhas):** 7 componentes "wizard" do `conf-tutor` que estavam
+  declarados no módulo mas **nunca renderizados** (só `tutor-elementos-catalogo` é usado):
+  `tutor-inicio`, `tutor-coleta-dados`, `tutor-selecao-modelo`, `tutor-treinamento`,
+  `tutor-avaliacao`, `tutor-selecao-metricas`, `tutor-tipos-aprendizado`. Removido também o
+  `QuillModule` do `conf-tutor` (ficou órfão após a limpeza).
+- **Navegação:** removido o item **"Usuários" duplicado** do dropdown do avatar (segue como card
+  no painel); método `navegarParaUsuarios()` órfão removido.
+- **Logs expostos:** `logs-erros` e `logs-backend` tinham rota mas **nenhum menu** apontava para
+  elas (só por URL). Adicionados dois cards no painel admin ("Logs de Erros" → `/sistema/erros`;
+  "Logs do Backend" → `/sistema/logs-backend`). Endpoints já existentes no backend.
+- Verificação: 117/117 testes + build prod OK.
+
 ## 2026-06-26 (textos de apoio: Básico/Avançado + código Python colorido + links)
 
 ### Cards educacionais DB-driven com código colorido e link Yellowbrick. Front `76dc145` (bundle `main-DR46LGHV.js`) · Back `9b9265c`

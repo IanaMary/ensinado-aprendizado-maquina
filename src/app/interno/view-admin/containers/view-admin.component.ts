@@ -74,11 +74,6 @@ export class ViewAdminComponent implements OnInit {
     this.router.navigate(['/view-aluno/galeria']);
   }
 
-  navegarParaUsuarios(): void {
-    this.usuarioMenuAberto = false;
-    this.router.navigate(['/view-admin/usuarios']);
-  }
-
   sair(): void {
     this.usuarioMenuAberto = false;
     this.authService.logout();

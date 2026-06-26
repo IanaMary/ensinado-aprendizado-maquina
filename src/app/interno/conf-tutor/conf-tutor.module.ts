@@ -14,30 +14,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
-import { QuillModule } from 'ngx-quill';
 
 import { ConfTutorRoutingModule } from './conf-tutor-routing.module';
 import { ConfTutorComponent } from './containers/conf-tutor.component';
-import { TutorColetaDadosComponent } from './components/tutor-coleta-dados/tutor-coleta-dados.component';
-import { TutorInicioComponent } from './components/tutor-inicio/tutor-inicio.component';
-import { TutorSelecaoModeloComponent } from './components/tutor-selecao-modelo/tutor-selecao-modelo.component';
-import { TutorTreinamentoComponent } from './components/tutor-treinamento/tutor-treinamento.component';
-import { TutorAvaliacaoComponent } from './components/tutor-avaliacao/tutor-avaliacao.component';
-import { TutorSelecaoMetricasComponent } from './components/tutor-selecao-metricas/tutor-selecao-metricas.component';
-import { TtutorTiposAprendizadoComponent } from './components/tutor-tipos-aprendizado/tutor-tipos-aprendizado.component';
 import { TutorElementosCatalogoComponent } from './components/tutor-elementos-catalogo/tutor-elementos-catalogo.component';
 
 
 @NgModule({
   declarations: [
     ConfTutorComponent,
-    TutorInicioComponent,
-    TutorColetaDadosComponent,
-    TtutorTiposAprendizadoComponent,
-    TutorSelecaoModeloComponent,
-    TutorTreinamentoComponent,
-    TutorSelecaoMetricasComponent,
-    TutorAvaliacaoComponent,
     TutorElementosCatalogoComponent
   ],
   imports: [
@@ -58,7 +43,6 @@ import { TutorElementosCatalogoComponent } from './components/tutor-elementos-ca
     MatProgressBarModule,
     MatSlideToggleModule,
     MatSelectModule,
-    QuillModule.forRoot(),
   ],
   providers: []
 })
