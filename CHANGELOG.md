@@ -8,6 +8,17 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-06-26 (branding — branch `mestrado-iana`)
+
+### Nome exibido "Mestrado Iana". Front `8afdf3b` (bundle `main-NJP3DCSL.js`) · só frontend
+- Logo "Iana" → **"Mestrado Iana"** no shell (sidebar) e nas telas de login e ativar-conta.
+- Título da aba do navegador (`index.html`): `EnsinadoAprendizadoMaquina` → **`Mestrado Iana`**.
+- Títulos de docs (`CHANGELOG.md`, `docs/DOCUMENTACAO.md`): `Iana` → `Mestrado Iana`.
+- **Não** alterado: orgs do GitHub (`IanaMary/...`), caminhos, e a prosa do manual/script gerado
+  (evita texto truncado tipo "à Mestrado Iana").
+- Backend inalterado. Backup de produção: `/home/ubuntu/backups/deploy-20260626-051255`.
+- Validação: frontend 200, `<title>Mestrado Iana</title>` servido, `/api/docs` 200, backend active.
+
 ## 2026-06-26 (deploy em produção — branch `mestrado-iana`)
 
 ### Deploy da branch `mestrado-iana` (Modo Clássico + Admin). Front `9b7b92c` (bundle `main-LCRSEPVQ.js`) · só frontend
