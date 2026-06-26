@@ -36,6 +36,10 @@
           [href]="tutorItemInfo.link_sklearn" target="_blank" rel="noopener">
           Ver na documentação do scikit-learn ↗
         </a>
+        <a class="doc-sklearn-link doc-yellowbrick-link" *ngIf="tutorItemInfo.link_yellowbrick"
+          [href]="tutorItemInfo.link_yellowbrick" target="_blank" rel="noopener">
+          Ver na documentação do Yellowbrick ↗
+        </a>
       </div>
 
       <!-- Descrição: simples no Básico, técnica no Avançado -->
@@ -105,7 +109,7 @@
           <mat-icon>code</mat-icon>
           <span>Exemplo de código</span>
         </div>
-        <pre class="codigo-bloco"><code>{{ tutorItemInfo.exemplo_codigo }}</code></pre>
+        <pre class="codigo-bloco"><code [appHighlightCode]="tutorItemInfo.exemplo_codigo" lang="python"></code></pre>
       </div>
 
       <!-- Hiperparametros (para modelos) -->

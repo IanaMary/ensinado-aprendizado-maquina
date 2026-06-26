@@ -395,11 +395,19 @@
 }
 
 .yellowbrick-info-dialog {
-  width: min(520px, 92vw);
+  width: min(560px, 94vw);
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
   border-radius: 8px;
   background: $branco;
   box-shadow: 0 18px 54px rgba($preto, 0.26);
   overflow: hidden;
+
+  app-tutor {
+    display: block;
+    overflow-y: auto;
+  }
 
   p {
     margin: 0;

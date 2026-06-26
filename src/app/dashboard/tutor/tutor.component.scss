@@ -832,5 +832,30 @@ $metrica-cor-escuro: #E65100;
     margin: 0;
 
     code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre; }
+
+    // Tema de coloração (highlight.js) escopado ao bloco escuro #1e1e2e.
+    // Paleta no estilo "Material Palenight" para casar com o fundo roxo-escuro.
+    .hljs-keyword,
+    .hljs-selector-tag,
+    .hljs-built_in.hljs-keyword { color: #c792ea; }
+    .hljs-string,
+    .hljs-meta .hljs-string { color: #c3e88d; }
+    .hljs-number,
+    .hljs-literal { color: #f78c6c; }
+    .hljs-comment,
+    .hljs-quote { color: #676e95; font-style: italic; }
+    .hljs-built_in,
+    .hljs-class .hljs-title,
+    .hljs-type { color: #82aaff; }
+    .hljs-function .hljs-title,
+    .hljs-title.function_ { color: #82aaff; }
+    .hljs-params { color: #e6e6f0; }
+    .hljs-attr,
+    .hljs-attribute { color: #ffcb6b; }
+    .hljs-meta { color: #89ddff; }
+    .hljs-decorator,
+    .hljs-meta .hljs-keyword { color: #f78c6c; }
   }
+
+  .doc-yellowbrick-link { margin-left: 8px; }
 }

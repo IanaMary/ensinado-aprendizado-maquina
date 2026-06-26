@@ -13,10 +13,12 @@ interface Midia { tipo?: string; url?: string; legenda?: string; fonte?: string;
 interface ConteudoDraft {
   titulo: string;
   descricao: string;
+  resumo_basico: string;
   intuicao: string;
   exemplo: string;
   exemplo_codigo: string;
   link_sklearn: string;
+  link_yellowbrick: string;
   formula: string;
   dicas: string[];
   quandoUsar: string[];
@@ -60,10 +62,12 @@ export class ConteudoEditorComponent implements OnChanges {
     return {
       titulo: c.titulo || '',
       descricao: c.descricao || '',
+      resumo_basico: c.resumo_basico || '',
       intuicao: c.intuicao || '',
       exemplo: c.exemplo || '',
       exemplo_codigo: c.exemplo_codigo || '',
       link_sklearn: c.link_sklearn || '',
+      link_yellowbrick: c.link_yellowbrick || '',
       formula: c.formula || '',
       dicas: [...(c.dicas || [])],
       quandoUsar: [...(c.quandoUsar || [])],
@@ -102,10 +106,12 @@ export class ConteudoEditorComponent implements OnChanges {
     const conteudo: any = {};
     if (d.titulo.trim()) conteudo.titulo = d.titulo.trim();
     if (d.descricao.trim()) conteudo.descricao = d.descricao.trim();
+    if (d.resumo_basico.trim()) conteudo.resumo_basico = d.resumo_basico.trim();
     if (d.intuicao.trim()) conteudo.intuicao = d.intuicao.trim();
     if (d.exemplo.trim()) conteudo.exemplo = d.exemplo.trim();
     if (d.exemplo_codigo.trim()) conteudo.exemplo_codigo = d.exemplo_codigo.trim();
     if (d.link_sklearn.trim()) conteudo.link_sklearn = d.link_sklearn.trim();
+    if (d.link_yellowbrick.trim()) conteudo.link_yellowbrick = d.link_yellowbrick.trim();
     if (d.formula.trim()) conteudo.formula = d.formula.trim();
     const dicas = limparStr(d.dicas); if (dicas.length) conteudo.dicas = dicas;
     const qu = limparStr(d.quandoUsar); if (qu.length) conteudo.quandoUsar = qu;

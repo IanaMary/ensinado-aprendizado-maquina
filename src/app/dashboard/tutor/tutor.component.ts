@@ -42,6 +42,8 @@ export interface TutorItemInfo {
   exemplo?: string;
   exemplo_codigo?: string;
   link_sklearn?: string;
+  /** Link para a documentação do Yellowbrick (gráficos e modelos com visualização). */
+  link_yellowbrick?: string;
   midia?: TutorMidia[];
   referencias?: TutorReferencia[];
 }

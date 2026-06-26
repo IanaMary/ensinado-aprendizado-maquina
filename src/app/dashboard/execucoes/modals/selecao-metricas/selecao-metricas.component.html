@@ -16,9 +16,10 @@
         <span class="grupo-tag" *ngIf="!grupoTemHabilitada(grupo)">não se aplica</span>
         <button type="button" class="btn-grupo-toggle"
           *ngIf="grupoTemHabilitada(grupo)"
-          [matTooltip]="'Selecionar todas do grupo'"
+          [matTooltip]="grupoTodasMarcadas(grupo) ? 'Desmarcar todas do grupo' : 'Selecionar todas do grupo'"
           (click)="toggleGrupo(grupo)">
-          <mat-icon>select_all</mat-icon>
+          <mat-icon>{{ grupoTodasMarcadas(grupo) ? 'deselect' : 'select_all' }}</mat-icon>
+          <span class="btn-grupo-toggle-label">{{ grupoTodasMarcadas(grupo) ? 'Nenhum' : 'Todos' }}</span>
         </button>
       </div>
 

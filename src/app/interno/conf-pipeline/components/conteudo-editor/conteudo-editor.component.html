@@ -2,8 +2,10 @@
   <div class="campos-texto">
     <label><span>Título</span>
       <input type="text" [(ngModel)]="draft.titulo" placeholder="ex.: k-Nearest Neighbors" /></label>
-    <label><span>Descrição</span>
-      <textarea rows="2" [(ngModel)]="draft.descricao" placeholder="O que é, em uma ou duas frases."></textarea></label>
+    <label><span>Resumo básico (modo Básico)</span>
+      <textarea rows="2" [(ngModel)]="draft.resumo_basico" placeholder="Explicação simples e lúdica para o aluno (linguagem de adolescente, com analogia)."></textarea></label>
+    <label><span>Descrição (modo Avançado)</span>
+      <textarea rows="2" [(ngModel)]="draft.descricao" placeholder="Explicação técnica, em uma ou duas frases."></textarea></label>
     <label><span>Intuição</span>
       <textarea rows="2" [(ngModel)]="draft.intuicao" placeholder="A ideia central em linguagem simples."></textarea></label>
     <label><span>Exemplo</span>
@@ -16,6 +18,9 @@
     <label><span>Link da documentação sklearn (opcional)</span>
       <input type="text" [(ngModel)]="draft.link_sklearn"
         placeholder="https://scikit-learn.org/stable/modules/generated/..." /></label>
+    <label><span>Link da documentação Yellowbrick (opcional)</span>
+      <input type="text" [(ngModel)]="draft.link_yellowbrick"
+        placeholder="https://www.scikit-yb.org/en/latest/api/..." /></label>
   </div>
 
   <!-- Listas de texto simples -->

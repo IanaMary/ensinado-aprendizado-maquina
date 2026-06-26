@@ -88,10 +88,12 @@ describe('MetricaAvaliacaoComponent', () => {
     expect(event.stopPropagation).toHaveBeenCalled();
     expect(component.dicaVisualizacao?.titulo).toBe('Relatório de classificação');
     expect(component.dicaVisualizacao?.modelo).toBe('KNN');
-    expect(component.dicaVisualizacao?.descricao).toContain('precision');
+    // Sem conteúdo no DB, cai no fallback: o card mostra a descrição hardcoded.
+    expect(component.graficoItemInfoAtual?.descricao).toContain('precision');
 
     component.fecharDicaVisualizacao();
 
     expect(component.dicaVisualizacao).toBeNull();
+    expect(component.graficoItemInfoAtual).toBeNull();
   });
 });

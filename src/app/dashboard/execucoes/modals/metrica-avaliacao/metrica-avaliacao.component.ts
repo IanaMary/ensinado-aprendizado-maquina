@@ -4,6 +4,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ScriptGeneratorService } from '../../../../service/script-generator.service';
 import { ItemPipeline, MediaMetrica, nomeMetricas, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
+import { TutorItemInfo } from '../../../tutor/tutor.component';
+import { conteudoParaItemInfo } from '../../../tutor/conteudo-to-item-info';
 
 @Component({
   selector: 'app-metrica-avaliacao',
@@ -29,7 +31,11 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   metricsAvaliadas: string[] = [];
   visualizacoesYellowbrick: Record<string, { titulo: string; mime: string; base64: string }[]> = {};
   visualizacaoAmpliada: { titulo: string; mime: string; base64: string; modelo: string } | null = null;
-  dicaVisualizacao: { titulo: string; modelo: string; descricao: string } | null = null;
+  dicaVisualizacao: { titulo: string; modelo: string } | null = null;
+  /** Card educacional (Básico/Avançado) do gráfico aberto na dica — alimenta o <app-tutor>. */
+  graficoItemInfoAtual: TutorItemInfo | null = null;
+  /** Conteúdo dos gráficos indexado por slug (grafico_id). Vem do DB (db.graficos). */
+  private conteudoGraficos: Record<string, any> = {};
 
   tooltipInfo: { linha: number; coluna: number; valor: number; tipo: string; classeReal: string; classePredita: string } | null = null;
 
@@ -50,6 +56,15 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
 
   ngOnInit(): void {
     this.atualizarVariaveis();
+    // Conteúdo educacional dos gráficos (DB-driven). Indexa por slug (valor).
+    this.dashboardService.getConteudoGraficos().subscribe({
+      next: (docs) => {
+        (docs || []).forEach((d: any) => {
+          if (d?.valor && d?.conteudo) this.conteudoGraficos[d.valor] = d.conteudo;
+        });
+      },
+      error: () => { /* sem DB: usa fallback hardcoded */ },
+    });
   }
 
 
@@ -107,17 +122,30 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     this.visualizacaoAmpliada = null;
   }
 
-  abrirDicaVisualizacao(event: Event, visualizacao: { titulo: string }, modelo: string): void {
+  abrirDicaVisualizacao(event: Event, visualizacao: { titulo: string; grafico_id?: string }, modelo: string): void {
     event.stopPropagation();
-    this.dicaVisualizacao = {
+    this.dicaVisualizacao = { titulo: visualizacao.titulo, modelo };
+    this.graficoItemInfoAtual = this.montarGraficoItemInfo(visualizacao);
+  }
+
+  /** Monta o TutorItemInfo do gráfico: usa o conteúdo do DB (por slug) quando há,
+   *  senão cai no texto/descrição hardcoded (fallback) — nunca fica vazio. */
+  private montarGraficoItemInfo(visualizacao: { titulo: string; grafico_id?: string }): TutorItemInfo {
+    const conteudo = visualizacao.grafico_id ? this.conteudoGraficos[visualizacao.grafico_id] : null;
+    if (conteudo) {
+      return conteudoParaItemInfo(conteudo, visualizacao.titulo);
+    }
+    return {
       titulo: visualizacao.titulo,
-      modelo,
-      descricao: this.getDescricaoVisualizacao(visualizacao.titulo)
+      descricao: this.getDescricaoVisualizacao(visualizacao.titulo),
+      resumo_basico: this.getDescricaoVisualizacao(visualizacao.titulo),
+      link_yellowbrick: this.getLinkVisualizacao(visualizacao.titulo),
     };
   }
 
   fecharDicaVisualizacao(): void {
     this.dicaVisualizacao = null;
+    this.graficoItemInfoAtual = null;
   }
 
   getDescricaoVisualizacao(titulo: string): string {

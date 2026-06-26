@@ -106,6 +106,13 @@ export class SelecaoMetricasComponent implements OnChanges {
     return grupo.itens.some(m => m.habilitado);
   }
 
+  /** True se TODAS as métricas habilitadas do grupo já estão marcadas — define se
+   *  o toggle vai desmarcar ("Nenhum") ou marcar ("Todos"). */
+  grupoTodasMarcadas(grupo: GrupoMetricas): boolean {
+    const habilitadas = grupo.itens.filter(m => m.habilitado);
+    return habilitadas.length > 0 && habilitadas.every(m => m.movido);
+  }
+
   toggleTodas() {
     this.todasMarcadas = !this.todasMarcadas;
     this.metricasHabilitadas.forEach(m => m.movido = this.todasMarcadas);
