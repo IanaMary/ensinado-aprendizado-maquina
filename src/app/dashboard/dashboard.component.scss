@@ -155,3 +155,27 @@
     max-height: 300px;
   }
 }
+
+@media (pointer: coarse) {
+  .pipeline-back-btn {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .pipeline-action-btn {
+    width: 44px !important;
+    height: 44px !important;
+
+    mat-icon {
+      font-size: 20px !important;
+      width: 20px !important;
+      height: 20px !important;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-pipeline {
+    max-height: 260px;
+  }
+}

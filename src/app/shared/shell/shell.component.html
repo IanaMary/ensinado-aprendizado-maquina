@@ -40,6 +40,12 @@
     </div>
   </aside>
 
+  <!-- Mobile backdrop — closes sidebar when tapping outside -->
+  <div class="sidebar-backdrop"
+       *ngIf="!sidebarCollapsed && isMobile"
+       (click)="closeSidebarBackdrop()">
+  </div>
+
   <!-- Main Content -->
   <main class="main-content">
     <!-- Topbar -->

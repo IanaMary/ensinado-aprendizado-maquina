@@ -736,6 +736,41 @@ $metrica-cor-escuro: #E65100;
   to { opacity: 1; transform: translateY(0); }
 }
 
+// Touch: make info/remove buttons always visible (hover never fires on touch)
+@media (hover: none), (pointer: coarse) {
+  .item-card {
+    .btn-info,
+    .btn-remover {
+      opacity: 1;
+    }
+  }
+
+  // Ensure 44×44px touch targets
+  .btn-info,
+  .btn-remover {
+    font-size: 20px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .usuario-avatar-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 14px;
+  }
+
+  // Action buttons: taller touch target
+  .btn-salvar,
+  .btn-download,
+  .btn-clear {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+}
+
 // Responsive
 @media (max-width: 1200px) {
   .execucoes-columns {
@@ -750,5 +785,12 @@ $metrica-cor-escuro: #E65100;
 
   .execucoes-container {
     padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .execucoes-container {
+    padding: 8px;
+    gap: 10px;
   }
 }

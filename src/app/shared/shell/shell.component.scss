@@ -388,13 +388,234 @@ $transition-speed: 0.3s;
   overflow-y: auto;
 }
 
+// Mobile backdrop — dims content when sidebar overlay is open
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba($preto, 0.4);
+  z-index: 99; // below sidebar (100) above content
+  backdrop-filter: blur(1px);
+}
+
+// Topbar user menu
+.user-menu-container {
+  position: relative;
+}
+
+.user-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 6px 6px;
+  border: none;
+  background: rgba($roxo-medio, 0.06);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  min-height: 44px;
+
+  &:hover {
+    background: rgba($roxo-medio, 0.12);
+  }
+}
+
+.user-avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, $roxo-medio, $roxo-escuro);
+  color: $branco;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-info-topbar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+
+  .user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: $preto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+
+  .user-role {
+    font-size: 11px;
+    color: $cinza-medio;
+    white-space: nowrap;
+  }
+}
+
+.menu-arrow {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: $cinza-medio;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 240px;
+  background: $branco;
+  border: 1px solid rgba($cinza-medio, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba($preto, 0.14);
+  z-index: 200;
+  overflow: hidden;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: $roxo-fundo;
+  border-bottom: 1px solid rgba($roxo-claro, 0.6);
+
+  .user-avatar-large {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, $roxo-medio, $roxo-escuro);
+    color: $branco;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .user-details-dropdown {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    .user-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: $roxo-escuro;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-email {
+      font-size: 11px;
+      color: $cinza-medio;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role-badge {
+      display: inline-block;
+      margin-top: 3px;
+      background: rgba($roxo-medio, 0.12);
+      color: $roxo-medio;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+  }
+}
+
+.dropdown-items {
+  padding: 6px 0;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba($cinza-medio, 0.12);
+  margin: 4px 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  color: $cinza-escuro;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+  min-height: 44px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: $cinza-medio;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: $cinza-claro;
+
+    mat-icon {
+      color: $roxo-medio;
+    }
+  }
+
+  &.active {
+    background: $roxo-fundo;
+    color: $roxo-escuro;
+    font-weight: 600;
+
+    mat-icon {
+      color: $roxo-medio;
+    }
+  }
+
+  &.logout {
+    color: $erro;
+
+    mat-icon {
+      color: $erro;
+    }
+
+    &:hover {
+      background: $erro-claro;
+    }
+  }
+}
+
 // Responsive
 @media (max-width: 1024px) {
   .sidebar {
     transform: translateX(-100%);
     transition: transform $transition-speed cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
   }
 
+  // sidebar-collapsed = true → hidden; NOT collapsed = shown
   .shell:not(.sidebar-collapsed) .sidebar {
     transform: translateX(0);
   }
@@ -409,19 +630,14 @@ $transition-speed: 0.3s;
     margin-left: 0;
   }
 
+  // Backdrop only appears on mobile (Angular *ngIf controls it via isMobile getter)
+  .sidebar-backdrop {
+    display: block;
+  }
+
   .topbar {
     .topbar-left {
       .menu-btn {
-        display: flex;
-      }
-    }
-
-    .topbar-right {
-      .user-name-mobile {
-        display: block;
-      }
-
-      .icon-btn {
         display: flex;
       }
     }
@@ -434,10 +650,49 @@ $transition-speed: 0.3s;
 
 @media (max-width: 768px) {
   .topbar {
-    padding: 0 16px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  // Compact user button on small screens — hide name/role, show only avatar
+  .user-info-topbar,
+  .menu-arrow {
+    display: none;
+  }
+
+  .user-menu-btn {
+    padding: 6px;
+    background: transparent;
+    border-radius: 50%;
+
+    &:hover {
+      background: rgba($roxo-medio, 0.10);
+    }
+  }
+
+  .user-avatar-small {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+  }
+
+  // Dropdown anchors to right edge safely
+  .user-dropdown {
+    min-width: 220px;
+    right: -4px;
   }
 
   .page-content {
     padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 0 10px;
+  }
+
+  .page-content {
+    padding: 8px;
   }
 }

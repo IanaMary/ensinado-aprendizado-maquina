@@ -325,3 +325,37 @@
     padding: 24px;
   }
 }
+
+@media (max-width: 480px) {
+  .login-branding {
+    padding: 18px 20px;
+    min-height: 0;
+
+    // Compact logo on small phones
+    .logo-container {
+      margin-bottom: 6px;
+
+      .logo-icon { width: 36px; height: 36px; font-size: 14px; }
+      .logo-text { font-size: 20px; }
+    }
+
+    .branding-subtitle {
+      font-size: 13px;
+      margin-bottom: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  .login-form-section {
+    padding: 20px 16px;
+    flex: 1;
+  }
+
+  .btn-register {
+    min-height: 44px;
+    width: 100%;
+  }
+}

@@ -228,6 +228,27 @@
   }
 }
 
+// Touch: btn-info-sidebar always visible + 44px minimum touch targets
+@media (pointer: coarse) {
+  .btn-info-sidebar {
+    opacity: 1 !important;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pipeline-actions button {
+    min-height: 44px;
+  }
+
+  .pipeline-item {
+    min-height: 44px;
+  }
+}
+
 // Botao de datasets prontos - mesmo estilo dos pipeline items
 .btn-toy-datasets {
   cursor: pointer;

@@ -27,7 +27,7 @@ interface MenuItem {
   standalone: false
 })
 export class ShellComponent implements OnInit, OnDestroy {
-  sidebarCollapsed = false;
+  sidebarCollapsed = true;
   userRole = '';
   userName = '';
   userEmail = '';
@@ -62,16 +62,27 @@ export class ShellComponent implements OnInit, OnDestroy {
     private authService: AuthService
   ) {}
 
+  get isMobile(): boolean {
+    return window.innerWidth <= 1024;
+  }
+
   ngOnInit(): void {
     this.userRole = this.authService.getUsuarioRole();
     this.userName = sessionStorage.getItem('name') || 'Usuario';
     this.userEmail = sessionStorage.getItem('email') || 'usuario@email.com';
     this.currentRoute = this.router.url;
 
+    // Desktop starts expanded; mobile starts with sidebar hidden.
+    this.sidebarCollapsed = this.isMobile;
+
     this.routerSub = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         this.currentRoute = event.urlAfterRedirects || event.url;
+        // Close sidebar overlay on navigation (mobile).
+        if (this.isMobile) {
+          this.sidebarCollapsed = true;
+        }
       });
   }
 
@@ -118,6 +129,10 @@ export class ShellComponent implements OnInit, OnDestroy {
 
   toggleSidebar(): void {
     this.sidebarCollapsed = !this.sidebarCollapsed;
+  }
+
+  closeSidebarBackdrop(): void {
+    this.sidebarCollapsed = true;
   }
 
   toggleUserMenu(event: Event): void {
