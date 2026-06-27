@@ -236,3 +236,9 @@
     color: $roxo-escuro;
   }
 }
+
+@media (pointer: coarse) {
+  .btn-toggle { width: 44px; height: 44px; }
+  .btn-grupo-toggle { height: 44px; padding: 0 10px; }
+  .btn-info-metrica { width: 44px; height: 44px; }
+}

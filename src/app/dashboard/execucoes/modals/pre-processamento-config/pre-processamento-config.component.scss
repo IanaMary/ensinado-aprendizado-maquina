@@ -353,6 +353,13 @@ h4 {
   }
 }
 
+@media (pointer: coarse) {
+  .btn-info-item { width: 44px; height: 44px; }
+  .btn-remove { width: 44px; height: 44px; justify-content: center; }
+  .coluna-chip { padding: 10px 12px; }
+  .item-option { min-height: 44px; }
+}
+
 // Estilos para informação de tipos
 .tipos-info {
   margin-top: 16px;

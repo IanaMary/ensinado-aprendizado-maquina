@@ -1,5 +1,5 @@
 .nomear-pipeline-dialog {
-  min-width: 380px;
+  min-width: min(380px, 90vw);
   max-width: 480px;
   padding: 8px 4px 4px;
 

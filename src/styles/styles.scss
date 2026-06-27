@@ -593,3 +593,19 @@ body {
   color: $roxo-medio !important;
   fill: $roxo-medio !important;
 }
+
+// Mobile dialog constraint — Angular Material sets width via inline style on
+// .cdk-overlay-pane; override at the container level so dialogs never overflow
+// small screens regardless of the width passed to dialog.open().
+@media (max-width: 480px) {
+  .cdk-overlay-pane {
+    max-width: 95vw !important;
+    width: 95vw !important;
+  }
+
+  .mat-mdc-dialog-container,
+  .mat-mdc-dialog-surface {
+    max-width: 95vw;
+    border-radius: 12px !important;
+  }
+}
