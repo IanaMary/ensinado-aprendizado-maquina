@@ -482,6 +482,7 @@
 
 .param-card {
   background: $cinza-claro;
+  border: 1px solid transparent;
   border-radius: 8px;
   padding: 10px;
 
@@ -721,6 +722,7 @@
 // Formula card
 .formula-card {
   background: $cinza-claro;
+  border: 1px solid transparent;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -783,7 +785,7 @@ $metrica-cor-escuro: #E65100;
   .section-header mat-icon { color: $treino-cor; }
   .conceito-nome { color: $treino-cor-escuro; }
   .info-list li::before { background: $treino-cor; }
-  .param-card { border-left: 3px solid $treino-cor; }
+  .param-card { border-color: rgba($treino-cor, 0.35); background: rgba($treino-cor, 0.05); }
 }
 
 .tutor.theme-metrica {
@@ -791,7 +793,7 @@ $metrica-cor-escuro: #E65100;
   .section-header mat-icon { color: $metrica-cor; }
   .conceito-nome { color: $metrica-cor-escuro; }
   .info-list li::before { background: $metrica-cor; }
-  .formula-card { border-left: 3px solid $metrica-cor; }
+  .formula-card { border-color: rgba($metrica-cor, 0.35); background: rgba($metrica-cor, 0.05); }
 }
 
 // Conceitos list

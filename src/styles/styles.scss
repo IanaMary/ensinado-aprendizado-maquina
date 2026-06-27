@@ -609,3 +609,26 @@ body {
     border-radius: 12px !important;
   }
 }
+
+// Keyboard navigation — visible focus ring for all interactive elements
+// Uses :focus-visible so the ring only shows for keyboard, not mouse clicks.
+:focus-visible {
+  outline: 2px solid $roxo-medio;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+// Accessibility — Reduced Motion
+// Suppresses all CSS animations and shortens transitions for users
+// who have enabled "Reduce Motion" in their OS/browser settings.
+// This is required by WCAG 2.1 AA (2.3.3) and listed in PRODUCT.md.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
