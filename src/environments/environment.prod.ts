@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '/h2ia/api/'
+  apiUrl: '/h2ia/tutor/api/'
 };

@@ -8,6 +8,25 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-03 (fix 404 intermitente em prod + API movida p/ `/h2ia/tutor/api/`)
+
+### Bug de infra: dois serviços na porta 8002 · API isolada sob o prefixo do tutor. Front (bundle `main-ZQCG37CJ.js`) · nginx + infra
+
+- **Fix do 404 intermitente (infra, sem código):** havia **dois serviços systemd escutando a
+  porta 8002** via SO_REUSEPORT — `h2ia-backend.service` (código atual, `/home/ubuntu/ensinado-aprendizado-maquina-back`)
+  e uma cópia ANTIGA `h2ia-tutor.service` (`/home/ubuntu/servers/h2ia_tutor/backend`, commit
+  `2a31d00` de 11/06). O kernel balanceava conexões entre os dois, então parte das requisições
+  caía no backend velho → **404 intermitente** em rotas novas (`conf_pipeline/pre_processamento/todos`,
+  `atividades/lote`, `sistema/erro`, `configurar_treinamento/.../redividir`), enquanto `/docs`
+  respondia 200. Fix: `stop` + `disable` do `h2ia-tutor.service` (unit salvo em
+  `/home/ubuntu/backups/h2ia-tutor.service.disabled-*`) e `restart` do `h2ia-backend.service`.
+- **API movida de `/h2ia/api/` → `/h2ia/tutor/api/`:** todo o app do tutor agora vive sob
+  `/h2ia/tutor/`; nada fica solto direto em `/h2ia/` (que hospeda outros apps: enade, proxy,
+  checker, vlp…). Mudança: nginx renomeia a `location` (proxy segue p/ 8002) + `environment.prod.ts`
+  (`apiUrl`). O path antigo `/h2ia/api/` foi **removido** (corte limpo — abas antigas quebram até dar F5).
+- Verificação: build prod OK; ao vivo novo path 401/405/422 (rota existe), path antigo 404, docs 200,
+  frontend 200. Backup `/home/ubuntu/backups/deploy-20260703-232436`.
+
 ## 2026-06-26 (limpeza do painel admin — código morto + logs expostos)
 
 ### Remove wizards mortos do conf-tutor, duplicata de "Usuários" e expõe logs. Front (bundle `main-ZGZOF4J5.js`) · só frontend

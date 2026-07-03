@@ -58,7 +58,7 @@ export class PipelineService {
         tap(saved => this.pipelineAtual.next(saved))
       );
     }
-    // Barra final: a rota é POST /pipelines/ e, atrás do nginx (prefixo /h2ia/api),
+    // Barra final: a rota é POST /pipelines/ e, atrás do nginx (prefixo /h2ia/tutor/api),
     // o redirect 307 sem-barra perde o prefixo e vira 404.
     return this.http.post<PipelineState>(`${this.endpoint}/`, state).pipe(
       tap(saved => this.pipelineAtual.next(saved))
