@@ -270,9 +270,13 @@
   gap: 12px;
   transform: translateX(100%);
   transition: transform 0.25s ease;
+  // Fechado: fora da tela E sem capturar clique. Sem isto, o painel fixo (mesmo
+  // deslocado) podia interceptar o clique nos controles do card de gráfico.
+  pointer-events: none;
 
   &.open {
     transform: translateX(0);
+    pointer-events: auto;
   }
 
   // Conteúdo contextual: ocupa o espaço disponível e rola quando estoura a tela.

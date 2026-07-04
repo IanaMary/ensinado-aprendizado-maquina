@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ItemPipeline, ResultadoColetaDado } from '../models/item-coleta-dado.model';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import { slugificarNome } from './slug.util';
 
 // Pré-processadores com template curado no gerador. Itens fora deste conjunto
 // (registrados pelo admin) são gerados de forma genérica a partir do bloco `execucao`.
@@ -34,7 +35,8 @@ export class ScriptGeneratorService {
     metricasSelecionadas: ItemPipeline[],
     hiperparametros: any,
     preProcessamentoConfig?: any,
-    resultadosTreinamento?: Record<string, any>
+    resultadosTreinamento?: Record<string, any>,
+    nomeExperimento?: string | null
   ): Promise<void> {
     const zip = new JSZip();
     const folder = zip.folder('pipeline_iana')!;
@@ -60,9 +62,12 @@ export class ScriptGeneratorService {
     folder.file('README.md', this.generateReadme(modeloSelecionado, resultadoColetaDado, isMultiModelo ? modelosTreinados : undefined));
 
     const content = await zip.generateAsync({ type: 'blob' });
+    // Quando o experimento foi salvo pelo aluno, o arquivo usa o nome salvo
+    // (ex.: "overfit" -> pipeline_overfit.zip); senão, o nome genérico por modelo+data.
+    const slug = slugificarNome(nomeExperimento);
     const nomePipeline = isMultiModelo ? 'comparacao_modelos' : (modeloSelecionado?.label || 'modelo');
     const data = new Date().toISOString().slice(0, 10);
-    saveAs(content, `pipeline_${nomePipeline}_${data}.zip`);
+    saveAs(content, slug ? `pipeline_${slug}.zip` : `pipeline_${nomePipeline}_${data}.zip`);
   }
 
   private generateMultiModelScript(

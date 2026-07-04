@@ -66,6 +66,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   resultadosDasAvaliacoes: any = {};
   preProcessamentoConfig: any = null;
   hiperparametrosAtuais: any = {};
+  /** Nome do experimento salvo pelo aluno (para nomear os downloads: pipeline_<nome>.zip / relatorio_<nome>.pdf). */
+  nomeExperimento: string | null = null;
 
   constructor(
     private dashboardService: DashboardService,
@@ -268,7 +270,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         // Ao adicionar um modelo novo, não reaproveita a avaliação antiga: a etapa
         // de avaliação re-roda para comparar TODOS os modelos com as métricas atuais.
         resultadosDasAvaliacoes: ehComparacao ? {} : this.resultadosDasAvaliacoes,
-        preProcessamentoConfig: this.preProcessamentoConfig
+        preProcessamentoConfig: this.preProcessamentoConfig,
+        nomeExperimento: this.nomeExperimento
       }
     });
 
@@ -582,7 +585,9 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       this.modeloSelecionado,
       this.metricasSelecionadas,
       {},
-      this.preProcessamentoConfig
+      this.preProcessamentoConfig,
+      undefined,
+      this.nomeExperimento
     );
   }
 
@@ -606,6 +611,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         this.dashboardService.sincronizarPreProcessamentosSelecionados(this.preProcessamentoConfig?.itens || []);
         this.resultadoTreinamento = pipeline.resultadoTreinamento;
         this.resultadosDasAvaliacoes = pipeline.resultadosDasAvaliacoes;
+        this.nomeExperimento = pipeline.nome || null;
         this.atualizarTutorContexto();
       }
       this.carregandoProjeto = false;
@@ -637,7 +643,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
       };
 
-      this.pipelineService.salvarPipeline(state).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.pipelineService.salvarPipeline(state).pipe(takeUntil(this.destroy$)).subscribe((saved) => {
+        this.nomeExperimento = saved?.nome || nome;
         this.atividade.registrar('pipeline', 'salvou_projeto', { contexto: 'classico', nome });
       });
     });
@@ -815,7 +822,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         resultadoTreinamento: this.resultadoTreinamento,
         metricasSelecionadas: this.metricasSelecionadas,
         mediaMetricas: this.mediaMetricas,
-        resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
+        resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
+        nomeExperimento: this.nomeExperimento
       }
     });
 
