@@ -68,6 +68,10 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   hiperparametrosAtuais: any = {};
   /** Nome do experimento salvo pelo aluno (para nomear os downloads: pipeline_<nome>.zip / relatorio_<nome>.pdf). */
   nomeExperimento: string | null = null;
+  /** Quando o aluno abre uma atividade de turma: a submissão salva fica ligada a ela. */
+  atividadeId: string | null = null;
+  turmaId: string | null = null;
+  datasetSugerido: string | null = null;
 
   constructor(
     private dashboardService: DashboardService,
@@ -132,6 +136,12 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       if (params['pipeline']) {
         this.carregarPipeline(params['pipeline']);
+      }
+      // Aluno abrindo uma atividade de turma: liga a submissão à atividade.
+      if (params['atividade']) {
+        this.atividadeId = params['atividade'];
+        this.turmaId = params['turma'] || null;
+        this.datasetSugerido = params['dataset'] || null;
       }
     });
   }
@@ -656,6 +666,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         resultadoTreinamento: this.resultadoTreinamento,
         resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
         is_public: publicar,
+        atividade_id: this.atividadeId || undefined,
+        turma_id: this.turmaId || undefined,
       };
 
       this.pipelineService.salvarPipeline(state).pipe(takeUntil(this.destroy$)).subscribe((saved) => {

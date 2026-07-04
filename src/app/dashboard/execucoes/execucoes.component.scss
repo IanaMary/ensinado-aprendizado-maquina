@@ -802,3 +802,10 @@ $metrica-cor-escuro: #E65100;
     gap: 10px;
   }
 }
+
+.atividade-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba($roxo-medio, 0.08); border: 1px solid rgba($roxo-medio, 0.25);
+  color: $roxo-escuro; border-radius: 10px; padding: 10px 14px; font-size: 13px;
+  mat-icon { color: $roxo-medio; }
+}

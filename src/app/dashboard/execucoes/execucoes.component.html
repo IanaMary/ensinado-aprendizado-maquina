@@ -70,6 +70,12 @@
     </div>
   </div>
 
+  <!-- Banner de atividade de turma -->
+  <div class="atividade-banner" *ngIf="atividadeId">
+    <mat-icon>assignment_turned_in</mat-icon>
+    <span>Você está fazendo uma <strong>atividade de turma</strong><span *ngIf="datasetSugerido"> — dataset sugerido: <strong>{{ datasetSugerido }}</strong></span>. Complete o pipeline e <strong>salve</strong> para enviar sua submissão.</span>
+  </div>
+
   <!-- Columns -->
   <div class="execucoes-columns">
     <!-- Coleta -->

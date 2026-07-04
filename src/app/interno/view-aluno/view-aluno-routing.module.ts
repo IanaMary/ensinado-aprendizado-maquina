@@ -14,6 +14,11 @@ const routes: Routes = [
     data: { breadcrumb: 'Galeria de Pipelines' }
   },
   {
+    path: 'entrar',
+    loadChildren: () => import('./entrar-turma/entrar-turma.module').then(m => m.EntrarTurmaModule),
+    data: { breadcrumb: 'Minhas turmas' }
+  },
+  {
     path: '',
     component: ViewAlunoComponent,
     data: { breadcrumb: 'Pipeline' }

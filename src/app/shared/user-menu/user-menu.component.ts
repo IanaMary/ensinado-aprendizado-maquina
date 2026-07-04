@@ -52,6 +52,7 @@ export class UserMenuComponent {
 
   navegarParaProjetos(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-aluno/projetos']); }
   navegarParaGaleria(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-aluno/galeria']); }
+  navegarParaTurmas(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-aluno/entrar']); }
   navegarParaAdmin(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-admin']); }
   navegarParaUsuarios(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-admin/usuarios']); }
   sair(): void { this.authService.logout(); }

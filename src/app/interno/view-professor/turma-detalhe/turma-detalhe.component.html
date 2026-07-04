@@ -1,0 +1,141 @@
+<div class="td-container">
+  <div class="td-header">
+    <button class="btn-voltar" (click)="voltar()"><mat-icon>arrow_back</mat-icon></button>
+    <div class="header-info">
+      <h2>{{ turma?.nome || 'Turma' }}</h2>
+      <p *ngIf="turma?.descricao">{{ turma?.descricao }}</p>
+    </div>
+    <app-user-menu></app-user-menu>
+  </div>
+
+  <div *ngIf="carregando" class="vazio">Carregando…</div>
+
+  <div class="td-grid" *ngIf="!carregando && turma">
+    <!-- Entrada: código + QR + link -->
+    <section class="card entrada-card">
+      <h3><mat-icon>qr_code_2</mat-icon> Entrada dos alunos</h3>
+      <div class="codigo-grande">{{ turma.codigo }}</div>
+      <img *ngIf="qrDataUrl" [src]="qrDataUrl" alt="QR de entrada" class="qr">
+      <div class="link-row">
+        <input readonly [value]="linkEntrada">
+        <button class="btn-mini" (click)="copiarLink()"><mat-icon>content_copy</mat-icon></button>
+      </div>
+      <p class="dica">O aluno entra digitando o código ou abrindo o link/QR.</p>
+    </section>
+
+    <!-- Alunos -->
+    <section class="card alunos-card">
+      <h3><mat-icon>group</mat-icon> Alunos ({{ turma.total_alunos || 0 }})</h3>
+      <div class="add-row">
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Adicionar por e-mail</mat-label>
+          <input matInput [(ngModel)]="emailAluno" (keyup.enter)="adicionarAluno()" placeholder="aluno@escola.br">
+        </mat-form-field>
+        <button class="btn-primario" (click)="adicionarAluno()"><mat-icon>person_add</mat-icon></button>
+      </div>
+      <ul class="alunos-lista">
+        <li *ngFor="let a of turma.alunos_detalhe">
+          <div><strong>{{ a.nome || 'Aluno' }}</strong><span>{{ a.email }}</span></div>
+          <button class="btn-mini danger" (click)="removerAluno(a.id)"><mat-icon>person_remove</mat-icon></button>
+        </li>
+        <li *ngIf="!turma.alunos_detalhe?.length" class="vazio">Nenhum aluno ainda.</li>
+      </ul>
+    </section>
+
+    <!-- Atividades -->
+    <section class="card atividades-card">
+      <h3><mat-icon>assignment</mat-icon> Atividades</h3>
+
+      <div class="nova-ativ">
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Título</mat-label>
+          <input matInput [(ngModel)]="novaAtiv.titulo" placeholder="Ex: Classificar flores">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Dataset inicial</mat-label>
+          <select matNativeControl [(ngModel)]="novaAtiv.datasetNome">
+            <option value="">(o aluno escolhe)</option>
+            <option *ngFor="let d of datasets" [value]="d.nome">{{ d.label }}</option>
+          </select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Métrica do ranking</mat-label>
+          <select matNativeControl [(ngModel)]="novaAtiv.metrica">
+            <option *ngFor="let m of metricas" [value]="m.valor">{{ m.label }}</option>
+          </select>
+        </mat-form-field>
+        <button class="btn-primario" (click)="criarAtividade()" [disabled]="criandoAtiv || !novaAtiv.titulo.trim()">
+          <mat-icon>add</mat-icon> Criar atividade
+        </button>
+      </div>
+
+      <ul class="ativ-lista">
+        <li *ngFor="let a of atividades">
+          <div class="ativ-info">
+            <strong>{{ a.titulo }}</strong>
+            <span>métrica: {{ a.criterio?.metrica }}<span *ngIf="a.template?.datasetNome"> · dataset: {{ a.template?.datasetNome }}</span></span>
+          </div>
+          <div class="ativ-acoes">
+            <button class="btn-mini" (click)="verRanking(a)" matTooltip="Ranking"><mat-icon>leaderboard</mat-icon></button>
+            <button class="btn-mini danger" (click)="excluirAtividade(a)" matTooltip="Excluir"><mat-icon>delete</mat-icon></button>
+          </div>
+        </li>
+        <li *ngIf="!atividades.length" class="vazio">Nenhuma atividade ainda.</li>
+      </ul>
+
+      <!-- Ranking -->
+      <div class="ranking" *ngIf="rankingAtiv">
+        <h4><mat-icon>leaderboard</mat-icon> Ranking — {{ rankingAtiv.titulo }} <small>({{ rankingMetrica }})</small></h4>
+        <table>
+          <tr><th>#</th><th>Aluno</th><th>{{ rankingMetrica }}</th></tr>
+          <tr *ngFor="let r of ranking; let i = index">
+            <td>{{ i + 1 }}</td><td>{{ r.aluno_nome }}</td><td>{{ fmtValor(r.valor) }}</td>
+          </tr>
+          <tr *ngIf="!ranking.length"><td colspan="3" class="vazio">Sem submissões avaliadas ainda.</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- Progresso -->
+    <section class="card progresso-card">
+      <h3><mat-icon>insights</mat-icon> Progresso dos alunos</h3>
+      <table class="progresso-tabela">
+        <tr><th>Aluno</th><th>Submissões</th><th>Chats</th><th>Último acesso</th><th></th></tr>
+        <tr *ngFor="let p of progresso">
+          <td>{{ p.aluno_nome }}</td>
+          <td>{{ p.submissoes }} / {{ p.total_atividades }}</td>
+          <td>{{ p.chats }}</td>
+          <td>{{ p.ultimo_acesso ? (p.ultimo_acesso | date:'dd/MM HH:mm') : '—' }}</td>
+          <td><button class="btn-mini" (click)="verChats(p.aluno_id, p.aluno_nome)" matTooltip="Ver conversas do chat"><mat-icon>forum</mat-icon></button></td>
+        </tr>
+        <tr *ngIf="!progresso.length"><td colspan="5" class="vazio">Sem alunos/dados ainda.</td></tr>
+      </table>
+    </section>
+  </div>
+
+  <!-- Visualizador do chat do aluno -->
+  <div class="chat-backdrop" *ngIf="chatAlunoId" (click)="fecharChats()">
+    <div class="chat-dialog" (click)="$event.stopPropagation()">
+      <div class="chat-head">
+        <strong>Conversas de {{ chatAlunoNome }}</strong>
+        <button class="btn-mini" (click)="fecharChats()"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="chat-body">
+        <ul class="chat-lista" *ngIf="!chatAberto">
+          <li *ngFor="let c of chats" (click)="abrirChat(c.id)">
+            <mat-icon>chat</mat-icon>
+            <div><strong>{{ c.titulo || 'Conversa' }}</strong><span>{{ c.atualizado_em | date:'dd/MM/yyyy HH:mm' }}</span></div>
+          </li>
+          <li *ngIf="!chats.length" class="vazio">Nenhuma conversa.</li>
+        </ul>
+        <div class="transcript" *ngIf="chatAberto">
+          <button class="btn-mini voltar-chat" (click)="chatAberto = null"><mat-icon>arrow_back</mat-icon> voltar</button>
+          <div class="msg" *ngFor="let m of chatAberto.mensagens" [class.user]="m.role === 'user'">
+            <span class="quem">{{ m.role === 'user' ? 'Aluno' : 'Léo' }}</span>
+            <div class="texto">{{ m.content }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
