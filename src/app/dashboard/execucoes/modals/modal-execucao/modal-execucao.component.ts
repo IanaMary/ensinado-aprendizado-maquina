@@ -94,12 +94,14 @@ export class ModalExecucaoComponent implements OnInit {
   private contextoChatAssinatura = '';
 
   getContextoChat(): any {
+    const treinados = this.resultadoTreinamento ? Object.values(this.resultadoTreinamento) : [];
     const assinatura = JSON.stringify({
       d: this.resultadoColetaDado?.nomeDataset || this.resultadoColetaDado?.treino?.nomeArquivo,
       m: this.modeloSelecionado?.valor,
       h: this.hiperparametrosAtuais,
       mt: this.metricasSelecionadas.map(m => m.valor),
       av: Object.keys(this.resultadosDasAvaliacoes || {}),
+      tr: treinados.map((r: any) => r?.modelo),
       if: this.itemFoco?.valor,
     });
     if (assinatura === this.contextoChatAssinatura && this.contextoChatCache) {
@@ -116,7 +118,11 @@ export class ModalExecucaoComponent implements OnInit {
       }
     } catch { codigoPython = ''; }
 
-    const modeloInfo = (tutor.modelos as any)?.[this.modeloSelecionado?.valor || ''];
+    // Fonte do "modelo": selecionado > 1º modelo já treinado (a etapa de métricas
+    // pode não ter modeloSelecionado, mas há modelos treinados/avaliados).
+    const base: any = this.modeloSelecionado
+      || (treinados[0] ? { valor: (treinados[0] as any).modelo, label: (treinados[0] as any).nome_modelo } : null);
+    const modeloInfo = (tutor.modelos as any)?.[base?.valor || ''];
     this.contextoChatCache = {
       dataset: {
         nome: this.resultadoColetaDado?.nomeDataset || this.resultadoColetaDado?.treino?.nomeArquivo || null,
@@ -124,12 +130,16 @@ export class ModalExecucaoComponent implements OnInit {
         tipoTarget: this.resultadoColetaDado?.tipoTarget || null,
         colunas: this.resultadoColetaDado?.colunas || Object.keys(this.resultadoColetaDado?.atributos || {}),
       },
-      modelo: this.modeloSelecionado ? {
-        valor: this.modeloSelecionado.valor,
-        label: this.modeloSelecionado.label,
+      modelo: base ? {
+        valor: base.valor,
+        label: base.label,
         descricao: modeloInfo?.descricao,
         sklearn: modeloInfo?.sklearn,
       } : null,
+      // Todos os modelos já treinados (com hiperparâmetros) — comparação/avaliação.
+      modelosTreinados: treinados.map((r: any) => ({
+        valor: r?.modelo, label: r?.nome_modelo, hiperparametros: r?.hiperparametros,
+      })),
       hiperparametros: this.hiperparametrosAtuais,
       preProcessamento: this.preProcessamentoConfig,
       metricas: this.metricasSelecionadas.map(m => ({ valor: m.valor, label: m.label })),

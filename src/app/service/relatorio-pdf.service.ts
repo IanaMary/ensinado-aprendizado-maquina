@@ -34,23 +34,21 @@ const ROXO: [number, number, number] = [76, 29, 149];
  */
 @Injectable({ providedIn: 'root' })
 export class RelatorioPdfService {
-  private libs?: Promise<{ jsPDF: any; autoTable: any }>;
+  private libs?: Promise<{ jsPDF: any }>;
 
-  private load(): Promise<{ jsPDF: any; autoTable: any }> {
+  private load(): Promise<{ jsPDF: any }> {
     if (!this.libs) {
       this.libs = (async () => {
         const jsPDFmod: any = await import('jspdf');
         const jsPDF = jsPDFmod.jsPDF || jsPDFmod.default;
-        const autoTableMod: any = await import('jspdf-autotable');
-        const autoTable = autoTableMod.default || autoTableMod;
-        return { jsPDF, autoTable };
+        return { jsPDF };
       })();
     }
     return this.libs;
   }
 
   async gerar(input: RelatorioPdfInput): Promise<void> {
-    const { jsPDF, autoTable } = await this.load();
+    const { jsPDF } = await this.load();
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
     const M = 15;
     const W = doc.internal.pageSize.getWidth();
@@ -97,20 +95,31 @@ export class RelatorioPdfService {
     texto(input.modelos.map(m => `• ${m}`).join('\n'));
     if (input.melhorModelo) texto(`Melhor modelo (mais métricas ganhas): ${input.melhorModelo}`, { style: 'bold', gap: 2 });
 
-    // Tabela de métricas.
+    // Tabela de métricas (desenhada à mão — sem depender de jspdf-autotable, cujo
+    // interop de import quebrava no bundle: "n is not a function").
     if (input.metricasLinhas.length) {
       garantir(14);
       texto('Resultados', { size: 12, style: 'bold', color: ROXO });
-      autoTable(doc, {
-        head: [input.metricasHeader],
-        body: input.metricasLinhas,
-        startY: y,
-        margin: { left: M, right: M },
-        styles: { fontSize: 9, cellPadding: 2 },
-        headStyles: { fillColor: ROXO, textColor: 255 },
-        alternateRowStyles: { fillColor: [245, 240, 255] },
+      const nCols = input.metricasHeader.length;
+      const colW = CW / nCols;
+      const rowH = 7;
+      const linha = (cells: string[], fill: [number, number, number] | null, bold: boolean) => {
+        if (fill) { doc.setFillColor(...fill); doc.rect(M, y, CW, rowH, 'F'); }
+        doc.setFont('helvetica', bold ? 'bold' : 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(...(bold ? [255, 255, 255] : [30, 30, 30]));
+        cells.forEach((c, i) => {
+          const txt = doc.splitTextToSize(String(c ?? ''), colW - 3)[0] || '';
+          doc.text(txt, M + i * colW + 1.5, y + 4.8);
+        });
+        y += rowH;
+      };
+      linha(input.metricasHeader, ROXO, true);
+      input.metricasLinhas.forEach((r, idx) => {
+        if (y + rowH > H - M) { doc.addPage(); y = M; linha(input.metricasHeader, ROXO, true); }
+        linha(r, idx % 2 === 1 ? [245, 240, 255] : null, false);
       });
-      y = ((doc as any).lastAutoTable?.finalY ?? y) + 6;
+      y += 6;
     }
 
     // Observações ("O que observar").
