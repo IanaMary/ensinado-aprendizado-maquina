@@ -79,7 +79,7 @@ export class MeusProjetosComponent implements OnInit {
   }
 
   abrirProjeto(projeto: Projeto): void {
-    this.router.navigate(['/interno/view-aluno'], { 
+    this.router.navigate(['/view-aluno'], { 
       queryParams: { pipeline: projeto.id } 
     });
   }
@@ -94,7 +94,7 @@ export class MeusProjetosComponent implements OnInit {
     this.pipelineService.salvarPipeline(novoPipeline).subscribe({
       next: (criado: PipelineState) => {
         this.snackBar.open('Novo projeto criado!', 'Fechar', { duration: 3000 });
-        this.router.navigate(['/interno/view-aluno'], { 
+        this.router.navigate(['/view-aluno'], { 
           queryParams: { pipeline: criado.id } 
         });
       },
@@ -151,6 +151,6 @@ export class MeusProjetosComponent implements OnInit {
   }
 
   voltar(): void {
-    this.router.navigate(['/interno']);
+    this.router.navigate(['/view-aluno']);
   }
 }

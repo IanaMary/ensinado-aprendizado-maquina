@@ -14,7 +14,10 @@ export interface ErrorLog {
   providedIn: 'root'
 })
 export class ErrorLogService {
-  private apiUrl = environment.apiUrl + '/sistema';
+  // environment.apiUrl já termina em "/" (ex.: /h2ia/tutor/api/). Sem barra à
+  // esquerda aqui — senão vira "//sistema" (duplo-barra) e 404 atrás do nginx,
+  // o que impedia GRAVAR e LER os logs.
+  private apiUrl = environment.apiUrl + 'sistema';
 
   constructor(private http: HttpClient) {}
 

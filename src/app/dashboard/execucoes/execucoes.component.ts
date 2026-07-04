@@ -11,7 +11,7 @@ import { ScriptGeneratorService } from '../../service/script-generator.service';
 import { PipelineService, PipelineState } from '../../service/pipeline.service';
 import { SessionService } from '../../service/sessao-store.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NomearPipelineDialogComponent } from './modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
+import { NomearPipelineDialogComponent, NomearPipelineDialogData, NomearPipelineDialogResult } from './modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
 import { AuthService } from '../../service/auth/auth.service';
 import { AtividadeService } from '../../service/atividade/atividade.service';
 import { NotificacaoService } from '../../service/notificacao.service';
@@ -630,17 +630,20 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   }
 
   salvarPipeline(): void {
-    const dialogRef = this.dialog.open<NomearPipelineDialogComponent, any, string | null>(
+    const podePublicar = this.roleUsuario === 'professor' || this.roleUsuario === 'admin';
+    const dialogRef = this.dialog.open<NomearPipelineDialogComponent, NomearPipelineDialogData, NomearPipelineDialogResult | null>(
       NomearPipelineDialogComponent,
       {
         width: '440px',
         disableClose: false,
         autoFocus: 'first-tabbable',
+        data: { podePublicar },
       }
     );
 
-    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(nome => {
-      if (!nome) return;
+    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(resultado => {
+      if (!resultado) return;
+      const { nome, publicar } = resultado;
 
       const state: PipelineState = {
         nome,
@@ -651,12 +654,13 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         mediaMetricas: this.mediaMetricas,
         preProcessamentoConfig: this.preProcessamentoConfig,
         resultadoTreinamento: this.resultadoTreinamento,
-        resultadosDasAvaliacoes: this.resultadosDasAvaliacoes
+        resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
+        is_public: publicar,
       };
 
       this.pipelineService.salvarPipeline(state).pipe(takeUntil(this.destroy$)).subscribe((saved) => {
         this.nomeExperimento = saved?.nome || nome;
-        this.atividade.registrar('pipeline', 'salvou_projeto', { contexto: 'classico', nome });
+        this.atividade.registrar('pipeline', 'salvou_projeto', { contexto: 'classico', nome, publicado: publicar });
       });
     });
   }

@@ -21,6 +21,9 @@ export interface PipelineState {
   dataCriacao?: string;
   dataModificacao?: string;
   status?: 'rascunho' | 'em_progresso' | 'concluido';
+  is_public?: boolean;          // publicado na galeria (professor/admin)
+  atividade_id?: string;        // submissão ligada a uma atividade de turma
+  turma_id?: string;
 }
 
 export interface PipelineProfessor {
