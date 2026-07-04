@@ -8,6 +8,31 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-04 (4 correções de UX: relatório PDF, clique nos gráficos, contexto do chat, logout ao carregar projeto)
+
+### Front (bundle `main-O6ARUHQO.js`, commit `fa98542`) · só frontend
+
+- **Relatório PDF voltou a gerar:** removido o `jspdf-autotable` (o interop de import quebrava no
+  bundle — `TypeError: n is not a function`); a tabela de métricas passou a ser **desenhada à mão**
+  com jsPDF core (retângulos + texto + quebra de página). `RelatorioPdfService`.
+- **Cliques nos controles do gráfico (zoom/link/info) destravados:** o **FAB do tutor da página**
+  (`execucoes.component.scss`, `position:fixed`) tinha `z-index:2100` e flutuava **acima** do modal de
+  métricas (CDK overlay ~1000), roubando os cliques. Rebaixado para `900` (drawer `2090→890`), abaixo
+  do overlay — um modal aberto agora o cobre. (A correção anterior só tratava o drawer.)
+- **Chatbot passa a conhecer os modelos treinados:** o contexto do chat só olhava `modeloSelecionado`
+  (null na comparação) e dizia "você não selecionou um modelo" mesmo após treinar/avaliar. Agora inclui
+  `modelosTreinados` (com hiperparâmetros), `modelos` selecionados e `avaliacoes`; `modelo` cai no 1º
+  treinado quando não há selecionado. Vale para o modal (`getContextoChat`) e a página
+  (`montarContextoChat`). O backend já repassa o contexto inteiro (`json.dumps`) — sem mudança de backend.
+- **Carregar projeto salvo não desloga mais admin/professor:** abrir um projeto navega para `view-aluno`
+  (área clássica compartilhada); o `AuthGuard` só permitia isso ao aluno e mandava admin/professor ao
+  `/autenticacao/login` (parecia "deslogar") — o backend nem recebia o `GET /pipelines/{id}`. Agora
+  admin/professor também carregam `view-aluno`, e um autenticado com papel errado vai para a HOME do
+  papel (`roleMap`), não para o login.
+- **Master (`1d593ca`, não implantado):** mesmas 4 correções (auth adaptado às rotas do master —
+  `projetos`/`trilha`/`galeria` para admin/professor).
+- Verificação: build prod + 117/117 (mestrado-iana) / 108/108 (master). Backup `deploy-20260704-062257`.
+
 ## 2026-07-04 (exportar o modelo já treinado + código para usá-lo)
 
 ### Zip do pipeline passa a incluir o modelo treinado (MLflow) + `usar_modelo.py`. Front (bundle `main-CYDRHMCG.js`) · Back `b94ca13`
