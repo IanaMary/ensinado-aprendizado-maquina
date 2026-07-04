@@ -453,6 +453,15 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   }
 
   private montarContextoChat(item?: ItemPipeline, info?: any): any {
+    // Modelos JÁ treinados (a resposta do backend traz slug/label/hiperparâmetros).
+    const treinados = this.resultadoTreinamento ? Object.values(this.resultadoTreinamento) : [];
+    const modelosTreinados = treinados.map((r: any) => ({
+      valor: r?.modelo, label: r?.nome_modelo, hiperparametros: r?.hiperparametros,
+    }));
+    // Fonte do "modelo" no contexto: selecionado > 1º da comparação > 1º treinado.
+    const base: any = this.modeloSelecionado || this.modelosSelecionados?.[0]
+      || (treinados[0] ? { valor: (treinados[0] as any).modelo, label: (treinados[0] as any).nome_modelo } : null);
+
     return {
       etapaAtual: this.etapaAtual || null,
       itemSelecionado: item ? { tipo: item.tipoItem, valor: item.valor, label: item.label } : null,
@@ -461,13 +470,15 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         target: this.resultadoColetaDado.target,
         fonte: this.getResumoFonteColeta?.() || null,
       } : null,
-      modelo: this.modeloSelecionado ? {
-        valor: this.modeloSelecionado.valor,
-        label: this.modeloSelecionado.label,
-      } : null,
+      modelo: base ? { valor: base.valor, label: base.label } : null,
+      // Comparação: todos os preditores escolhidos e os já treinados (com hiperparâmetros).
+      modelos: (this.modelosSelecionados || []).map(m => ({ valor: m.valor, label: m.label })),
+      modelosTreinados,
       hiperparametros: this.hiperparametrosAtuais || null,
       preProcessamento: this.preProcessamentoConfig || null,
       metricas: this.metricasSelecionadas?.map(m => m.valor) || [],
+      avaliacoes: this.resultadosDasAvaliacoes && Object.keys(this.resultadosDasAvaliacoes).length
+        ? this.resultadosDasAvaliacoes : null,
     };
   }
 

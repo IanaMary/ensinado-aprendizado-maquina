@@ -610,7 +610,10 @@ $metrica-cor-escuro: #E65100;
   background: $roxo-medio;
   color: $branco;
   cursor: pointer;
-  z-index: 2100;
+  // Abaixo do CDK overlay (~1000): quando um modal (ex.: métricas) abre, ele cobre
+  // o FAB da página. Sem isto, este FAB fixo (z alto) flutuava por cima do modal e
+  // roubava os cliques dos controles do gráfico.
+  z-index: 900;
   box-shadow: 0 6px 20px rgba($roxo-escuro, 0.32);
   display: flex;
   align-items: center;
@@ -659,7 +662,8 @@ $metrica-cor-escuro: #E65100;
   background: $roxo-fundo;
   border-left: 1px solid $roxo-claro;
   box-shadow: -12px 0 36px rgba($roxo-escuro, 0.20);
-  z-index: 2090;
+  // Abaixo do CDK overlay (ver .tutor-fab): um modal aberto cobre a gaveta da página.
+  z-index: 890;
   overflow: hidden; // quem rola é a região de conteúdo, não a gaveta inteira
   display: flex;
   flex-direction: column;
