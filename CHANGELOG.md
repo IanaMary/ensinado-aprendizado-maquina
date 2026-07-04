@@ -8,6 +8,29 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-04 (Turmas & Atividades — professor/aluno — + correções e "publicar")
+
+### Subsistema de Turmas (backend `aec30b7`+`e786757`; frontend bundles `main-PFBXCGYF.js` → `main-35UES7KI.js`)
+
+- **Correções (Parte A):** logout ao "Voltar"/abrir projeto era navegação para a rota MORTA
+  `/interno/view-aluno` (→ wildcard → login), corrigida para `/view-aluno` (galeria + meus-projetos);
+  **UserMenuComponent** compartilhado (menu do usuário na galeria + "Painel admin"/"Usuários" no menu
+  do admin); **logs vazios** (URL com `//sistema` duplo-barra corrigida no front + `get_last_logs`
+  achatado no backend); **publicar pipeline** (checkbox no modal de salvar, só professor/admin → `is_public`).
+- **Turmas & Atividades (Parte B):**
+  - Backend: router `/turmas` (criar/gerir turmas, alunos, **entrar por código**, atividades com
+    template = pipeline parcial, **ranking** por métrica, **progresso**), pipeline com
+    `atividade_id`/`turma_id`, e `GET /tutor/chat/aluno/{id}/historico` gated professor (transcript
+    completo, com auditoria — LGPD). Testes `test_turmas.py`; suíte 317+4 passed.
+  - Frontend professor (`view-professor`): lista/criação de turmas; **turma-detalhe** com código +
+    **QR code** + link de entrada, alunos (add por e-mail/remover), atividades (dataset + métrica),
+    ranking, tabela de progresso e **visualizador do chat** do aluno.
+  - Frontend aluno (`view-aluno/entrar`, lazy): entrar por código/link (`?codigo=` auto-join), listar
+    turmas/atividades, "Fazer" → dashboard clássico com `?atividade=&turma=&dataset=`; a submissão
+    salva fica ligada à atividade e alimenta o ranking. Dep nova: `qrcode`.
+- Verificação: build prod + 117/117 (mestrado-iana). Backups `deploy-20260704-062257` … `-161346`.
+- **Master:** port do subsistema Turmas é follow-up (não implantado).
+
 ## 2026-07-04 (4 correções de UX: relatório PDF, clique nos gráficos, contexto do chat, logout ao carregar projeto)
 
 ### Front (bundle `main-O6ARUHQO.js`, commit `fa98542`) · só frontend
