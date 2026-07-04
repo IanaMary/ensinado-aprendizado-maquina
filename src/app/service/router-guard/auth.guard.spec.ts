@@ -42,13 +42,15 @@ describe('AuthGuard', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/autenticacao/login']);
   });
 
-  it('should deny access for user with wrong role', async () => {
+  it('should deny access for user with wrong role (redireciona à home, não ao login)', async () => {
     authService.autenticado.and.returnValue(Promise.resolve(true));
     authService.getUsuarioRole.and.returnValue('aluno');
     const segments = [new UrlSegment('view-admin', {})];
     const result = await guard.canLoad({} as Route, segments);
     expect(result).toBeFalse();
-    expect(router.navigate).toHaveBeenCalledWith(['/autenticacao/login']);
+    // Autenticado com papel errado → vai para a home do papel (não desloga).
+    expect(router.navigate).toHaveBeenCalledWith(['/view-aluno']);
+    expect(router.navigate).not.toHaveBeenCalledWith(['/autenticacao/login']);
   });
 
   it('should allow admin to access admin routes', async () => {

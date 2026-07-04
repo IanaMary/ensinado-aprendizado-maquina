@@ -6,10 +6,14 @@ import { roleMap } from '../../../app/models/item-coleta-dado.model';
 // Rotas (1º segmento) que cada papel pode carregar. O aluno tem MÚLTIPLAS entradas
 // (seletor /inicio + as três experiências), então não é uma rota única — isso também
 // faz o refresh funcionar em qualquer uma delas.
+// Rotas (1º segmento) que cada papel pode carregar. Admin e professor também
+// carregam `view-aluno` (a área clássica é compartilhada): abrir um projeto salvo
+// navega para `view-aluno`, e sem isto o guard mandava admin/professor para o login
+// (parecia "deslogar") ao carregar um pipeline.
 const ROTAS_POR_PAPEL: Record<string, string[]> = {
   aluno: ['view-aluno'],
-  professor: ['view-professor', 'atividades'],
-  admin: ['view-admin', 'atividades'],
+  professor: ['view-professor', 'view-aluno', 'atividades'],
+  admin: ['view-admin', 'view-aluno', 'atividades'],
 };
 
 @Injectable({
@@ -39,7 +43,10 @@ export class AuthGuard implements CanLoad {
     }
 
     if (firstSegment && !permitidas.includes(firstSegment)) {
-      this.router.navigate(['/autenticacao/login']);
+      // Autenticado, mas a rota não é do papel: manda para a HOME do papel — não
+      // para o login (não deslogar quem está autenticado).
+      const home = roleMap[role] || `/interno/${permitidas[0]}`;
+      this.router.navigate([home]);
       return false;
     }
 
