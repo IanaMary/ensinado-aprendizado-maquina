@@ -21,6 +21,9 @@ export interface PipelineState {
   dataCriacao?: string;
   dataModificacao?: string;
   status?: 'rascunho' | 'em_progresso' | 'concluido';
+  is_public?: boolean;
+  atividade_id?: string;
+  turma_id?: string;
 }
 
 export interface PipelineProfessor {

@@ -151,6 +151,6 @@ export class MeusProjetosComponent implements OnInit {
   }
 
   voltar(): void {
-    this.router.navigate(['/interno']);
+    this.router.navigate(['/inicio']);
   }
 }

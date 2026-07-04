@@ -1,38 +1,56 @@
-<div class="professor-container">
-  <div class="welcome-card">
-    <h1>Ola, Professor!</h1>
-    <p>Acompanhe o progresso dos seus alunos e gerencie experimentos.</p>
+<div class="prof-container">
+  <div class="prof-header">
+    <div class="header-info">
+      <h2>Painel do Professor</h2>
+      <p>Crie turmas, proponha atividades e acompanhe o desenvolvimento dos alunos.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secundario" (click)="irAtividades()">
+        <mat-icon>insights</mat-icon> Atividades dos alunos
+      </button>
+      <app-user-menu></app-user-menu>
+    </div>
   </div>
 
-  <div class="grid-cards">
-    <div class="professor-card">
-      <div class="card-icon">
-        <mat-icon>people</mat-icon>
-      </div>
-      <div class="card-content">
-        <h3>Meus Alunos</h3>
-        <p>Visualize o progresso e desempenho dos alunos nos experimentos.</p>
-      </div>
-    </div>
+  <div class="prof-grid">
+    <!-- Criar turma -->
+    <section class="card criar-card">
+      <h3><mat-icon>group_add</mat-icon> Nova turma</h3>
+      <mat-form-field appearance="outline" class="campo">
+        <mat-label>Nome da turma</mat-label>
+        <input matInput [(ngModel)]="novoNome" (keyup.enter)="criarTurma()" maxlength="80" placeholder="Ex: 9º ano B — 2026">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="campo">
+        <mat-label>Descrição (opcional)</mat-label>
+        <input matInput [(ngModel)]="novaDescricao" maxlength="160">
+      </mat-form-field>
+      <button class="btn-primario" (click)="criarTurma()" [disabled]="criando || !novoNome.trim()">
+        <mat-icon>add</mat-icon> Criar turma
+      </button>
+    </section>
 
-    <div class="professor-card">
-      <div class="card-icon">
-        <mat-icon>assignment</mat-icon>
-      </div>
-      <div class="card-content">
-        <h3>Experimentos</h3>
-        <p>Crie e gerencie experimentos para os alunos realizarem.</p>
-      </div>
-    </div>
+    <!-- Lista de turmas -->
+    <section class="card turmas-card">
+      <h3><mat-icon>groups</mat-icon> Minhas turmas</h3>
 
-    <div class="professor-card" (click)="irAtividades()" style="cursor: pointer;">
-      <div class="card-icon">
-        <mat-icon>analytics</mat-icon>
+      <div *ngIf="carregando" class="vazio">Carregando…</div>
+      <div *ngIf="!carregando && !turmas.length" class="vazio">
+        Você ainda não tem turmas. Crie a primeira ao lado.
       </div>
-      <div class="card-content">
-        <h3>Atividades dos Alunos</h3>
-        <p>Acompanhe a jornada dos alunos: ações, erros, tempo nas etapas e uso do tutor.</p>
-      </div>
-    </div>
+
+      <ul class="turmas-lista" *ngIf="!carregando && turmas.length">
+        <li *ngFor="let t of turmas" class="turma-item" (click)="abrirTurma(t)">
+          <div class="turma-info">
+            <strong>{{ t.nome }}</strong>
+            <span *ngIf="t.descricao">{{ t.descricao }}</span>
+          </div>
+          <div class="turma-meta">
+            <span class="chip"><mat-icon>person</mat-icon> {{ t.total_alunos || 0 }}</span>
+            <span class="codigo">{{ t.codigo }}</span>
+            <mat-icon class="ir">chevron_right</mat-icon>
+          </div>
+        </li>
+      </ul>
+    </section>
   </div>
 </div>

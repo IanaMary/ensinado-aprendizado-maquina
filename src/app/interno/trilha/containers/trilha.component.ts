@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { Subject, forkJoin, of, takeUntil } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
@@ -91,13 +92,20 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     private pipelineSvc: PipelineService,
     private atividade: AtividadeService,
     private relatorioPdf: RelatorioPdfService,
+    private route: ActivatedRoute,
   ) {}
+
+  /** Quando o aluno abre uma atividade de turma: a submissão salva fica ligada a ela. */
+  atividadeId: string | null = null;
+  turmaId: string | null = null;
 
   ngOnInit(): void {
     this.dashboard.carregarDados();
     this.dashboard.getModelos().pipe(takeUntil(this.destroy$)).subscribe(m => this.catModelos = m || []);
     this.dashboard.getItensMetricas().pipe(takeUntil(this.destroy$)).subscribe(m => this.catMetricas = m || []);
     this.dashboard.getItensPreProcessamento().pipe(takeUntil(this.destroy$)).subscribe(p => this.catPreProc = p || []);
+    const q = this.route.snapshot.queryParamMap;
+    if (q.get('atividade')) { this.atividadeId = q.get('atividade'); this.turmaId = q.get('turma'); }
   }
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
@@ -752,6 +760,8 @@ export class TrilhaComponent implements OnInit, OnDestroy {
       preProcessamentoConfig: this.preProcCfg(),
       resultadoTreinamento: this.resultadoTreinamento,
       resultadosDasAvaliacoes: this.resultadosDasAvaliacoes,
+      atividade_id: this.atividadeId || undefined,
+      turma_id: this.turmaId || undefined,
     };
   }
 

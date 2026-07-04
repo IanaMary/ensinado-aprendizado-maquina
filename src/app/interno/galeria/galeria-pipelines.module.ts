@@ -5,6 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { SharedModule } from '../../shared/shared.module';
 import { GaleriaPipelinesComponent } from './galeria-pipelines.component';
 
 const routes: Routes = [
@@ -25,7 +26,8 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     MatIconModule,
     MatTooltipModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    SharedModule
   ]
 })
 export class GaleriaPipelinesModule { }

@@ -12,11 +12,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { ShellComponent } from './shell/shell.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
+import { UserMenuComponent } from './user-menu/user-menu.component';
 
 @NgModule({
   declarations: [
     ShellComponent,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    UserMenuComponent
   ],
   imports: [
     CommonModule,
@@ -46,7 +48,8 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
     MatTooltipModule,
     MatDividerModule,
     ShellComponent,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    UserMenuComponent
   ],
   providers: []
 })

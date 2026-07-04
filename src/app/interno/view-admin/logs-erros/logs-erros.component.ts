@@ -30,7 +30,7 @@ export class LogsErrosComponent implements OnInit {
 
   carregarErros(): void {
     this.isLoading = true;
-    this.http.get<ErrorLogResponse[]>(`${environment.apiUrl}/sistema/erros`).subscribe({
+    this.http.get<ErrorLogResponse[]>(`${environment.apiUrl}sistema/erros`).subscribe({
       next: (dados: ErrorLogResponse[]) => {
         this.erros = dados;
         this.isLoading = false;

@@ -1,112 +1,54 @@
-@import '../../../../styles/colores.scss';
+@use '../../../../styles/styles.scss' as *;
 
-:host {
-  display: block;
+:host { display: block; }
+
+.prof-container { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+.prof-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  .header-info h2 { margin: 0; font-size: 18px; font-weight: 700; color: $roxo-escuro; }
+  .header-info p { margin: 4px 0 0; font-size: 13px; color: $cinza-medio; }
+  .header-actions { display: flex; align-items: center; gap: 10px; }
 }
 
-.professor-container {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+.btn-secundario, .btn-primario {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  border: 1px solid transparent;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+.btn-secundario { background: rgba($roxo-medio, 0.08); color: $roxo-medio; border-color: rgba($roxo-medio, 0.2); }
+.btn-primario { background: $roxo-medio; color: $branco; &:disabled { opacity: 0.5; cursor: not-allowed; } }
+
+.prof-grid { display: grid; grid-template-columns: 340px 1fr; gap: 16px; align-items: start; }
+@media (max-width: 820px) { .prof-grid { grid-template-columns: 1fr; } }
+
+.card {
+  background: $branco; border: 1px solid rgba($roxo-claro, 0.7); border-radius: 12px; padding: 16px;
+  h3 { margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-size: 15px; color: $roxo-escuro;
+       mat-icon { color: $roxo-medio; } }
+  .campo { width: 100%; }
 }
 
-.welcome-card {
-  background: linear-gradient(135deg, $roxo-escuro, $roxo-medio);
-  color: $branco;
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 32px;
-  box-shadow: 0 8px 32px rgba($roxo-escuro, 0.2);
+.vazio { color: $cinza-medio; font-size: 14px; padding: 12px 0; }
 
-  h1 {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-  }
+.turmas-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.turma-item {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 12px 14px; border: 1px solid rgba($roxo-claro, 0.7); border-radius: 10px; cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+  &:hover { border-color: $roxo-medio; box-shadow: 0 4px 14px rgba($roxo-escuro, 0.1); }
 
-  p {
-    font-size: 16px;
-    opacity: 0.9;
-    margin: 0;
-  }
-}
-
-.grid-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-.professor-card {
-  background: $branco;
-  border-radius: 16px;
-  padding: 24px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid $cinza-claro;
-  box-shadow: 0 4px 16px rgba($preto, 0.05);
-
-  &:hover {
-    transform: translateY(-4px);
-    border-color: $roxo-medio;
-    box-shadow: 0 8px 32px rgba($roxo-medio, 0.15);
-
-    .card-icon {
-      background: $roxo-medio;
-      color: $branco;
-    }
-  }
-
-  .card-icon {
-    width: 56px;
-    height: 56px;
-    background: $roxo-fundo;
-    color: $roxo-medio;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 16px;
-    transition: all 0.3s;
-
-    mat-icon {
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
-    }
-  }
-
-  .card-content {
-    h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: $roxo-escuro;
-      margin: 0 0 8px 0;
-    }
-
-    p {
-      font-size: 14px;
-      color: $cinza-medio;
-      margin: 0;
-      line-height: 1.5;
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .professor-container {
-    padding: 16px;
-  }
-
-  .welcome-card {
-    padding: 24px;
-
-    h1 {
-      font-size: 22px;
-    }
-  }
-
-  .grid-cards {
-    grid-template-columns: 1fr;
-  }
+  .turma-info { min-width: 0; strong { display: block; color: $cinza-escuro; }
+                span { display: block; font-size: 12px; color: $cinza-medio; } }
+  .turma-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .chip { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; color: $roxo-medio;
+          mat-icon { font-size: 15px; width: 15px; height: 15px; } }
+  .codigo { font-family: monospace; font-weight: 700; letter-spacing: 1px; color: $roxo-escuro;
+            background: rgba($roxo-medio, 0.08); padding: 2px 8px; border-radius: 6px; }
+  .ir { color: $cinza-medio; }
 }

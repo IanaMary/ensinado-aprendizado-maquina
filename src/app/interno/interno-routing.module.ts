@@ -13,6 +13,11 @@ const routes: Routes = [
     data: { breadcrumb: 'Galeria' }
   },
   {
+    path: 'entrar',
+    loadChildren: () => import('../interno/entrar-turma/entrar-turma.module').then(m => m.EntrarTurmaModule),
+    data: { breadcrumb: 'Minhas turmas' }
+  },
+  {
     path: 'view-professor',
     loadChildren: () => import('../interno/view-professor/view-professor.module').then(m => m.ViewProfessorModule),
     data: { breadcrumb: 'Professor' }

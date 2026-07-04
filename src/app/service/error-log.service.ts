@@ -14,7 +14,7 @@ export interface ErrorLog {
   providedIn: 'root'
 })
 export class ErrorLogService {
-  private apiUrl = environment.apiUrl + '/sistema';
+  private apiUrl = environment.apiUrl + 'sistema';
 
   constructor(private http: HttpClient) {}
 

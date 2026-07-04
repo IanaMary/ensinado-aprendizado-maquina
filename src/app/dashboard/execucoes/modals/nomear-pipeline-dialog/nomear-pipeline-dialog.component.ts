@@ -4,6 +4,15 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 export interface NomearPipelineDialogData {
   nomeAtual?: string;
   isEdicao?: boolean;
+  /** Mostra o checkbox "Publicar na galeria" (só professor/admin). */
+  podePublicar?: boolean;
+  publicarAtual?: boolean;
+}
+
+/** Resultado do diálogo: nome + se deve publicar na galeria. */
+export interface NomearPipelineDialogResult {
+  nome: string;
+  publicar: boolean;
 }
 
 @Component({
@@ -15,13 +24,15 @@ export interface NomearPipelineDialogData {
 export class NomearPipelineDialogComponent {
 
   nome = '';
+  publicar = false;
   erro = '';
 
   constructor(
-    private dialogRef: MatDialogRef<NomearPipelineDialogComponent, string | null>,
+    private dialogRef: MatDialogRef<NomearPipelineDialogComponent, NomearPipelineDialogResult | null>,
     @Inject(MAT_DIALOG_DATA) public data: NomearPipelineDialogData,
   ) {
     this.nome = data?.nomeAtual?.trim() || '';
+    this.publicar = !!data?.publicarAtual;
   }
 
   cancelar(): void {
@@ -38,6 +49,6 @@ export class NomearPipelineDialogComponent {
       this.erro = 'O nome deve ter no máximo 100 caracteres.';
       return;
     }
-    this.dialogRef.close(nomeTrim);
+    this.dialogRef.close({ nome: nomeTrim, publicar: this.data?.podePublicar ? this.publicar : false });
   }
 }
