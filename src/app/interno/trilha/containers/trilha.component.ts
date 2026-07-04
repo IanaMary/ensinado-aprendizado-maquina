@@ -10,6 +10,9 @@ import { AtividadeService } from '../../../service/atividade/atividade.service';
 import { ItemPipeline, ResultadoColetaDado } from '../../../models/item-coleta-dado.model';
 import { TutorItemInfo } from '../../../dashboard/tutor/tutor.component';
 import { ModalExecucaoComponent } from '../../../dashboard/execucoes/modals/modal-execucao/modal-execucao.component';
+import { RelatorioPdfService } from '../../../service/relatorio-pdf.service';
+import { slugificarNome } from '../../../service/slug.util';
+import { descricaoVisualizacao } from '../../../dashboard/tutor/viz-descricoes';
 import tutor from '../../../constants/tutor.json';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -87,6 +90,7 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     private scriptGen: ScriptGeneratorService,
     private pipelineSvc: PipelineService,
     private atividade: AtividadeService,
+    private relatorioPdf: RelatorioPdfService,
   ) {}
 
   ngOnInit(): void {
@@ -654,8 +658,56 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     }
     if (this.exportComparativo && this.comparacaoMetricas.length) zip.file('comparacao.csv', this.comparacaoCsv());
     const blob = await zip.generateAsync({ type: 'blob' });
-    saveAs(blob, `trilha_${this.resultadoColetaDado?.nomeDataset || 'modelos'}.zip`);
+    // Experimento salvo -> pipeline_<nome>.zip; senão, trilha_<dataset>.zip.
+    const slug = slugificarNome(this.projetoNome);
+    saveAs(blob, slug ? `pipeline_${slug}.zip` : `trilha_${this.resultadoColetaDado?.nomeDataset || 'modelos'}.zip`);
     this.exportOpen = false;
+  }
+
+  /** Relatório PDF completo da Trilha (tabela comparativa + gráficos + discussões). */
+  async baixarRelatorioPdf(): Promise<void> {
+    if (!this.modelosTreinados.length) { this.flash('Rode a trilha antes de gerar o relatório.'); return; }
+    const modelos = this.comparacaoModelos.length
+      ? this.comparacaoModelos
+      : this.modelosTreinados.map(c => c.label);
+
+    const metricasHeader = ['Métrica', ...this.comparacaoModelos];
+    const metricasLinhas = this.comparacaoMetricas.map(m => [
+      m, ...this.comparacaoModelos.map(mod => this.valorComparacao(m, mod)),
+    ]);
+
+    const graficos: any[] = [];
+    for (const g of this.vizComparada) {
+      for (const it of g.itens) {
+        graficos.push({
+          titulo: g.titulo,
+          modelo: it.modelo,
+          dataUrl: this.imgViz(it.viz),
+          discussao: descricaoVisualizacao(g.titulo),
+          dicas: [],
+        });
+      }
+    }
+
+    try {
+      await this.relatorioPdf.gerar({
+        nomeExperimento: this.projetoNome || null,
+        dataset: this.resultadoColetaDado?.nomeDataset || 'Dataset',
+        modelos,
+        metricasHeader,
+        metricasLinhas,
+        observacoes: [
+          'Compare as métricas entre os modelos: qual foi melhor e por qual margem?',
+          'Os gráficos mostram onde cada modelo acerta e erra?',
+          'O que você mudaria (dados, pré-processamento, hiperparâmetros) para melhorar?',
+        ],
+        graficos,
+      });
+      this.exportOpen = false;
+    } catch (err) {
+      console.error('[relatorio-pdf]', err);
+      this.flash('Não foi possível gerar o PDF do relatório.');
+    }
   }
 
   private toNotebook(titulo: string, script: string): string {

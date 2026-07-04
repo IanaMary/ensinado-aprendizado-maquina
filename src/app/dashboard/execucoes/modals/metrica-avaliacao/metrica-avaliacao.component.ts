@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ScriptGeneratorService } from '../../../../service/script-generator.service';
 import { ItemPipeline, MediaMetrica, nomeMetricas, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
+import { RelatorioPdfService } from '../../../../service/relatorio-pdf.service';
 
 @Component({
   selector: 'app-metrica-avaliacao',
@@ -21,6 +22,8 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   @Input() hiperparametros: any = {};
   @Input() preProcessamentoConfig: any = null;
   @Input() mediaMetricas: MediaMetrica = 'weighted';
+  /** Nome do experimento salvo pelo aluno (usado no nome do arquivo do relatório). */
+  @Input() nomeExperimento?: string | null;
 
   @Output() atualizarResultadoAvaliacoes = new EventEmitter<any>();
 
@@ -38,7 +41,8 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
   constructor(
     private dashboardService: DashboardService,
     private scriptGenerator: ScriptGeneratorService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private relatorioPdf: RelatorioPdfService
   ) { }
   cont = 0;
 
@@ -339,22 +343,64 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     );
   }
 
-  gerarRelatorioAluno(): string {
-    const dataset = this.resultadoColetaDado?.nomeDataset || this.resultadoColetaDado?.treino?.nomeArquivo || 'Dataset';
-    const pergunta = (this.resultadoColetaDado as any)?.missao?.pergunta || 'Que padrão o modelo conseguiu aprender com os dados?';
+  private getDatasetNome(): string {
+    return this.resultadoColetaDado?.nomeDataset || this.resultadoColetaDado?.treino?.nomeArquivo || 'Dataset';
+  }
+
+  private getPergunta(): string {
+    return (this.resultadoColetaDado as any)?.missao?.pergunta || 'Que padrão o modelo conseguiu aprender com os dados?';
+  }
+
+  /** Bullets de "O que observar" por tipo de tarefa (sem o cabeçalho). */
+  private montarObservacoes(): string[] {
     const isClustering = this.modeloSelecionado?.dadosRotulados === false;
     const isRegressao = !isClustering && this.modeloSelecionado?.preverCategoria === false;
     const isComparacao = this.modelosAvaliados.length > 1;
+
+    if (isClustering) return [
+      'Os clusters fazem sentido com os dados? Você consegue nomear cada grupo?',
+      'O Silhouette Score está próximo de 1 (bom) ou de 0/negativo (clusters sobrepostos)?',
+      'O gráfico do cotovelo mostra um "K" claro? Se não, tente outros valores de K.',
+      'Os clusters encontrados revelam algum padrão interessante nos dados?',
+    ];
+    if (isRegressao) return [
+      'O R² está próximo de 1? Quanto mais alto, melhor o modelo explica a variação dos dados.',
+      'O RMSE e o MAE estão baixos em relação à faixa dos valores do target?',
+      'O gráfico "Previsto vs. Real" mostra pontos próximos da linha diagonal?',
+      'Os resíduos estão espalhados aleatoriamente ou mostram algum padrão?',
+      ...(isComparacao ? ['Qual modelo teve o melhor R²? A diferença entre eles é grande ou pequena?'] : []),
+    ];
+    return [
+      'O modelo acertou bem todas as classes ou errou mais em alguma?',
+      ...(isComparacao ? [
+        'Qual modelo teve a melhor acurácia? A diferença foi grande ou pequena?',
+        'Os modelos erraram nas mesmas amostras ou em amostras diferentes?',
+      ] : []),
+      'Alguma pista dos dados parece ter ajudado mais?',
+      'O que você mudaria para tentar melhorar o resultado?',
+    ];
+  }
+
+  private formatarValorMetrica(v: any): string {
+    if (typeof v === 'number') return Number.isInteger(v) ? String(v) : v.toFixed(3);
+    return v == null ? '—' : String(v);
+  }
+
+  private metricasEscalares(): string[] {
+    return this.metricsAvaliadas
+      .filter(metrica => !this.isConfusionMatrix(this.resultadosDasAvaliacoes[metrica]?.[this.modelosAvaliados[0]]));
+  }
+
+  gerarRelatorioAluno(): string {
+    const isComparacao = this.modelosAvaliados.length > 1;
     const melhor = this.getMelhorModeloGeral();
 
-    const linhasMetricas = this.metricsAvaliadas
-      .filter(metrica => !this.isConfusionMatrix(this.resultadosDasAvaliacoes[metrica]?.[this.modelosAvaliados[0]]))
-      .map(metrica => {
-        const valores = this.modelosAvaliados
-          .map(modeloNome => `${modeloNome}: ${this.resultadosDasAvaliacoes[metrica]?.[modeloNome]}`)
-          .join('; ');
-        return `- ${metrica}: ${valores}`;
-      });
+    const linhasMetricas = this.metricasEscalares().map(metrica => {
+      const valores = this.modelosAvaliados
+        .map(modeloNome => `${modeloNome}: ${this.resultadosDasAvaliacoes[metrica]?.[modeloNome]}`)
+        .join('; ');
+      return `- ${metrica}: ${valores}`;
+    });
 
     const secaoModelos = isComparacao ? [
       '## Modelos avaliados',
@@ -366,56 +412,66 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
       `Modelo escolhido: ${this.modeloSelecionado?.label || 'Modelo treinado'}`,
     ];
 
-    const observacoes = isClustering ? [
-      '## O que observar',
-      '- Os clusters fazem sentido com os dados? Você consegue nomear cada grupo?',
-      '- O Silhouette Score está próximo de 1 (bom) ou de 0/negativo (clusters sobrepostos)?',
-      '- O gráfico do cotovelo mostra um "K" claro? Se não, tente outros valores de K.',
-      '- Os clusters encontrados revelam algum padrão interessante nos dados?',
-    ] : isRegressao ? [
-      '## O que observar',
-      '- O R² está próximo de 1? Quanto mais alto, melhor o modelo explica a variação dos dados.',
-      '- O RMSE e o MAE estão baixos em relação à faixa dos valores do target?',
-      '- O gráfico "Previsto vs. Real" mostra pontos próximos da linha diagonal?',
-      '- Os resíduos estão espalhados aleatoriamente ou mostram algum padrão?',
-      ...(isComparacao ? ['- Qual modelo teve o melhor R²? A diferença entre eles é grande ou pequena?'] : []),
-    ] : [
-      '## O que observar',
-      '- O modelo acertou bem todas as classes ou errou mais em alguma?',
-      ...(isComparacao ? [
-        '- Qual modelo teve a melhor acurácia? A diferença foi grande ou pequena?',
-        '- Os modelos erraram nas mesmas amostras ou em amostras diferentes?',
-      ] : []),
-      '- Alguma pista dos dados parece ter ajudado mais?',
-      '- O que você mudaria para tentar melhorar o resultado?',
-    ];
-
     return [
       '# Relatório do experimento',
       '',
       '## Pergunta',
-      pergunta,
+      this.getPergunta(),
       '',
       '## Dados',
-      `Dataset usado: ${dataset}`,
+      `Dataset usado: ${this.getDatasetNome()}`,
       '',
       ...secaoModelos,
       '',
       '## Resultados',
       ...(linhasMetricas.length ? linhasMetricas : ['- Gere as avaliações para preencher esta seção.']),
       '',
-      ...observacoes,
+      '## O que observar',
+      ...this.montarObservacoes().map(o => `- ${o}`),
       '',
     ].join('\n');
   }
 
-  baixarRelatorioAluno(): void {
-    const blob = new Blob([this.gerarRelatorioAluno()], { type: 'text/markdown;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'relatorio-experimento-ml.md';
-    link.click();
-    URL.revokeObjectURL(url);
+  /** Baixa o relatório do experimento em PDF (gráficos + discussões + dicas). */
+  async baixarRelatorioAluno(): Promise<void> {
+    const modelos = this.modelosAvaliados.length
+      ? this.modelosAvaliados
+      : [this.modeloSelecionado?.label || 'Modelo treinado'];
+
+    const metricasHeader = ['Métrica', ...this.modelosAvaliados];
+    const metricasLinhas = this.metricasEscalares().map(metrica => [
+      metrica,
+      ...this.modelosAvaliados.map(mod => this.formatarValorMetrica(this.resultadosDasAvaliacoes[metrica]?.[mod])),
+    ]);
+
+    const graficos = [];
+    for (const grupo of this.getVisualizacoesPorTipo()) {
+      for (const item of grupo.itens) {
+        graficos.push({
+          titulo: grupo.titulo,
+          modelo: item.modelo,
+          dataUrl: this.getImagemVisualizacao(item.visualizacao),
+          discussao: this.getDescricaoVisualizacao(grupo.titulo),
+          dicas: [],
+        });
+      }
+    }
+
+    try {
+      await this.relatorioPdf.gerar({
+        nomeExperimento: this.nomeExperimento,
+        dataset: this.getDatasetNome(),
+        pergunta: this.getPergunta(),
+        modelos,
+        melhorModelo: this.getMelhorModeloGeral(),
+        metricasHeader,
+        metricasLinhas,
+        observacoes: this.montarObservacoes(),
+        graficos,
+      });
+    } catch (err) {
+      console.error('[relatorio-pdf]', err);
+      this.snackBar.open('Não foi possível gerar o PDF do relatório.', 'Fechar', { duration: 5000 });
+    }
   }
 }

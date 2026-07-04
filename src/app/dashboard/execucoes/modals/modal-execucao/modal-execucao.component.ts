@@ -67,6 +67,8 @@ export class ModalExecucaoComponent implements OnInit {
   resultadosDasAvaliacoes: any = {};
   hiperparametrosAtuais: any = {};
   hiperparametrosEditados: Record<string, any> = {};
+  /** Nome do experimento salvo (repassado ao relatório PDF do metrica-avaliacao). */
+  nomeExperimento: string | null = null;
 
   // Contexto do tutor por etapa
   tutorContexto: TutorContexto | null = null;
@@ -377,6 +379,7 @@ export class ModalExecucaoComponent implements OnInit {
   atualizarVariaveis(data: any) {
     let todosExistem = false
     this.somenteColeta = !!data?.somenteColeta;
+    this.nomeExperimento = data?.nomeExperimento ?? null;
     if (data?.tipoArquivoSelecionado) {
       this.tipoArquivoSelecionado = data.tipoArquivoSelecionado;
     }

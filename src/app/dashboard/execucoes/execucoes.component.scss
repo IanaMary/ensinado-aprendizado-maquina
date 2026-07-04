@@ -667,9 +667,13 @@ $metrica-cor-escuro: #E65100;
   gap: 12px;
   transform: translateX(100%);
   transition: transform 0.25s ease;
+  // Fechado: não captura clique (o painel fixo, mesmo deslocado, podia
+  // interceptar cliques nos controles atrás dele).
+  pointer-events: none;
 
   &.open {
     transform: translateX(0);
+    pointer-events: auto;
   }
 
   // Cor da borda segue o tema do item clicado
