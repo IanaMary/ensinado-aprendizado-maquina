@@ -30,7 +30,7 @@ com um tutor (cards didáticos + chatbot com LLM) durante todo o caminho.
 | LLM (chatbot) | API NVIDIA (OpenAI-compatible) | externo |
 | Base de conhecimento | Markdown/JSON didático | `base_de_conhecimento/` |
 
-**Produção (Oracle Cloud):** frontend em `https://absapt.tk/h2ia/tutor/`, API em `https://absapt.tk/h2ia/api/`.
+**Produção (Oracle Cloud):** frontend em `https://absapt.tk/h2ia/tutor/`, API em `https://absapt.tk/h2ia/tutor/api/`.
 
 O aluno tem **quatro entradas** (escolhidas no seletor `/inicio` após o login):
 - **Dashboard clássico** (`/view-aluno`) — editor de pipeline tradicional;
@@ -52,7 +52,7 @@ flowchart TB
   end
 
   subgraph Edge["Servidor (Oracle VM) — nginx"]
-    NGINX["nginx<br/>serve o SPA estático<br/>+ proxy reverso /h2ia/api"]
+    NGINX["nginx<br/>serve o SPA estático<br/>+ proxy reverso /h2ia/tutor/api"]
   end
 
   subgraph App["Backend FastAPI (uvicorn, systemd)"]
@@ -69,7 +69,7 @@ flowchart TB
 
   SPA -->|HTTPS| NGINX
   NGINX -->|/h2ia/tutor| SPA
-  NGINX -->|/h2ia/api| API
+  NGINX -->|/h2ia/tutor/api| API
   API --> MONGO
   API --> SANDBOX
   SANDBOX --> MONGO
@@ -98,7 +98,7 @@ flowchart LR
     SVC["h2ia-backend.service<br/>uvicorn :8002"]
     DB[("MongoDB")]
     NG --> WWW
-    NG -->|/h2ia/api| SVC
+    NG -->|/h2ia/tutor/api| SVC
     SVC --> DB
   end
   DEV["Build local<br/>ng build + tar|ssh"] -->|publica| WWW
@@ -243,7 +243,7 @@ flowchart LR
 
 ### 4.6 Ambientes
 - `environment.ts` (dev): `apiUrl: 'http://127.0.0.1:8000/'`.
-- `environment.prod.ts`: `apiUrl: '/h2ia/api/'` (atrás do nginx).
+- `environment.prod.ts`: `apiUrl: '/h2ia/tutor/api/'` (atrás do nginx).
 - `environment.docker.ts` (branch docker): `apiUrl: '/api/'`.
 
 ### 4.7 Léo no Mundo Real — visão no navegador (TF.js)
@@ -480,7 +480,7 @@ sequenceDiagram
 
 ## 8. Infraestrutura e deploy
 
-- **Produção:** Oracle VM, nginx servindo o SPA em `/var/www/h2ia/tutor` e fazendo proxy de `/h2ia/api` para o backend (`h2ia-backend.service`, uvicorn :8002). MongoDB local.
+- **Produção:** Oracle VM, nginx servindo o SPA em `/var/www/h2ia/tutor` e fazendo proxy de `/h2ia/tutor/api` para o backend (`h2ia-backend.service`, uvicorn :8002). MongoDB local.
 - **Deploy backend:** `git pull` na VM + `systemctl restart h2ia-backend.service`.
 - **Deploy frontend:** `ng build --configuration production` → `tar | ssh` para `/var/www/h2ia/tutor` → `nginx reload`.
 - **Backups:** antes de cada deploy, cópia de frontend/backend/nginx/serviço em `/home/ubuntu/backups/`.
