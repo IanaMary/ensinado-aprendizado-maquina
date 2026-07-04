@@ -8,6 +8,29 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-04 (relatório PDF, nome do experimento nos downloads e fix de clique nos gráficos)
+
+### Relatório em PDF + arquivos por nome do experimento + drawer não bloqueia clique. Front (bundle `main-KVS5ZUGR.js`) · Back `32ac226`
+
+- **Relatório em PDF (Clássico)**: o botão "Baixar relatório" do painel de métricas passa a
+  gerar um **PDF completo** (capa com nome do experimento + dataset + modelos, tabela de métricas,
+  seção "O que observar" e, por gráfico, imagem + discussão) em vez do `.md` anterior. Novo
+  `RelatorioPdfService` (jsPDF + jspdf-autotable **carregados lazy** — bundle inicial inalterado).
+- **Downloads usam o nome do experimento salvo**: `pipeline_<nome>.zip` e `relatorio_<nome>.pdf`
+  (ex.: experimento "overfit" → `pipeline_overfit.zip`/`relatorio_overfit.pdf`). Sem nome salvo,
+  mantém o nome genérico. Util `slugificarNome`; o nome é propagado por `pipelineAtual$` →
+  `execucoes` → `modal-execucao` → `metrica-avaliacao`.
+- **Fix cliques bloqueados nos controles do gráfico** (zoom/link/info): o painel do tutor (drawer
+  fixo) ganhou `pointer-events: none` quando **fechado** — mesmo deslocado para fora da tela ele
+  podia interceptar o clique (agravado pelo bloco contido de um ancestral com `transform` no
+  mat-dialog). Aplicado no `modal-execucao` e no `execucoes`.
+- **Backend `32ac226`**: legenda do gráfico "Erros de Predição por Classe" movida para **fora das
+  barras** (`ax.legend` com `bbox_to_anchor` à direita). **Re-rodar a avaliação** para regenerar os PNGs.
+- **Master (`e46813d`, não implantado)**: mesmas mudanças + relatório PDF também na **Trilha**
+  (botão "Relatório (PDF)" no modal de exportação; zip da Trilha passa a usar o nome do projeto).
+- Verificação: build prod OK, 117/117 testes (mestrado-iana) e 108/108 (master); PDF e legenda
+  validados por render. Backup `deploy-20260704-043623`.
+
 ## 2026-07-03 (fix 404 intermitente em prod + API movida p/ `/h2ia/tutor/api/`)
 
 ### Bug de infra: dois serviços na porta 8002 · API isolada sob o prefixo do tutor. Front (bundle `main-ZQCG37CJ.js`) · nginx + infra
