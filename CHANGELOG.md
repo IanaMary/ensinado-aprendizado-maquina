@@ -8,6 +8,31 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-04 (exportar o modelo já treinado + código para usá-lo)
+
+### Zip do pipeline passa a incluir o modelo treinado (MLflow) + `usar_modelo.py`. Front (bundle `main-CYDRHMCG.js`) · Back `b94ca13`
+
+- **O zip exportado agora leva o modelo JÁ treinado + como reutilizá-lo:** pasta `modelo/`
+  (formato MLflow — `MLmodel`, `model.pkl`, `requirements.txt`, `python_env.yaml`, `input_example`)
+  e um **`usar_modelo.py`** gerado (carrega via `mlflow.sklearn.load_model("modelo")` e prevê um
+  exemplo). README com a seção "Como usar o modelo". Multi-modelo: cada um em `modelos/<nome>/`.
+- **Backend `b94ca13`:** o treino passa a logar o modelo como **flavor `mlflow.sklearn`** (não só
+  bytes brutos) → o MLflow gera as configs + exemplo de uso; novo endpoint
+  **`GET /classificador/modelo/{id}/artefato`** devolve um `.zip` do dir `model/` do MLflow
+  (fallback: `model.pkl` + `requirements.txt` fixo). Bytes no Mongo intactos (`/prever` inalterado).
+  Correções: loga no run já ativo (evita "Run already active"); `serialization_format=cloudpickle`
+  (o default skops do MLflow 3.x recusa o KDTree do KNN).
+- **"Salvar no projeto":** o projeto já persiste `resultadoTreinamento` (com `id` + `mlflow_run_id`),
+  então recarregar o projeto mantém a referência ao modelo (usável por `/prever`/`/avaliar`); com o
+  log de flavor, o modelo fica navegável em `/view-admin/artefatos`.
+- **Front:** `DashboardService.baixarModeloArtefato(id)` (blob, auth via interceptor);
+  `ScriptGeneratorService.anexarModeloTreinado` (baixa, mescla o zip sob `modelo/`, escreve
+  `usar_modelo.py`); `execucoes.baixarPipeline` passa `resultadoTreinamento`. **Trilha** (master
+  `3b6977c`, não implantado): mesmo anexo por ramo no `exportar()`.
+- Verificação: backend 317 passed (+2 novos do endpoint); fluxo MLflow (log→download→zip→load→predict)
+  validado por script; front build + 117/117 (mestrado-iana) / 108/108 (master); endpoint 401 em prod.
+  Backup `deploy-20260704-053304`. **Modelos treinados ANTES deste deploy** caem no fallback joblib.
+
 ## 2026-07-04 (relatório PDF, nome do experimento nos downloads e fix de clique nos gráficos)
 
 ### Relatório em PDF + arquivos por nome do experimento + drawer não bloqueia clique. Front (bundle `main-KVS5ZUGR.js`) · Back `32ac226`
