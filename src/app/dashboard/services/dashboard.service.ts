@@ -312,6 +312,11 @@ export class DashboardService {
     return this.http.post(`${this.url}${this.endpointClassificador}/avaliar_modelos`, body);
   }
 
+  /** Baixa o modelo treinado (id) como um .zip (dir MLflow model/ ou fallback joblib). */
+  baixarModeloArtefato(modeloId: string) {
+    return this.http.get(`${this.url}${this.endpointClassificador}/modelo/${modeloId}/artefato`, { responseType: 'blob' });
+  }
+
   gerarPairplot(body: { arquivo_id: string; configuracao_id: string; colunas?: string[]; hue?: string | null }) {
     return this.http.post(`${this.url}visualizacao/pairplot`, body);
   }
