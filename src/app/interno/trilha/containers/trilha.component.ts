@@ -654,7 +654,10 @@ export class TrilhaComponent implements OnInit, OnDestroy {
         this.resultadoColetaDado, c.item, this.evalCards.map(e => e.item), this.hiperParaTreino(c), this.preProcCfg(),
       );
       const conteudo = this.exportFormato === 'ipynb' ? this.toNotebook(c.label, script) : script;
-      zip.folder(c.valor)!.file(`pipeline.${ext}`, conteudo);
+      const pasta = zip.folder(c.valor)!;
+      pasta.file(`pipeline.${ext}`, conteudo);
+      // Modelo JÁ treinado do ramo + usar_modelo.py (best-effort).
+      await this.scriptGen.anexarModeloTreinado(pasta, c.resultado, this.resultadoColetaDado);
     }
     if (this.exportComparativo && this.comparacaoMetricas.length) zip.file('comparacao.csv', this.comparacaoCsv());
     const blob = await zip.generateAsync({ type: 'blob' });
