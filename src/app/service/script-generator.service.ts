@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { ItemPipeline, ResultadoColetaDado } from '../models/item-coleta-dado.model';
+import { environment } from '../../environments/environment';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { slugificarNome } from './slug.util';
@@ -16,6 +19,62 @@ const PRE_PROC_BUILTINS = new Set<string>([
   providedIn: 'root'
 })
 export class ScriptGeneratorService {
+
+  constructor(private http: HttpClient) { }
+
+  /** Baixa o modelo treinado (id) e o mescla no bundle sob `<subpasta>/modelo/`,
+   *  escrevendo também um `usar_modelo.py` gerado. Best-effort: se o download
+   *  falhar (modelo indisponível), o bundle segue sem o modelo. */
+  async anexarModeloTreinado(
+    folder: JSZip, entry: any, coleta: ResultadoColetaDado | undefined, subpasta?: string,
+  ): Promise<void> {
+    if (!entry?.id) return;
+    try {
+      const blob = await firstValueFrom(
+        this.http.get(`${environment.apiUrl}classificador/modelo/${entry.id}/artefato`, { responseType: 'blob' })
+      );
+      const dest = subpasta ? folder.folder(subpasta)! : folder;
+      const modeloDir = dest.folder('modelo')!;
+      const zipModelo = await JSZip.loadAsync(blob as Blob);
+      for (const nome of Object.keys(zipModelo.files)) {
+        const f = zipModelo.files[nome];
+        if (f.dir) continue;
+        modeloDir.file(nome, await f.async('uint8array'));
+      }
+      dest.file('usar_modelo.py', this.gerarUsarModelo(entry, coleta));
+    } catch {
+      /* modelo indisponível: segue sem ele */
+    }
+  }
+
+  /** Código Python que carrega o modelo salvo (pasta modelo/, formato MLflow) e prevê. */
+  private gerarUsarModelo(entry: any, coleta: ResultadoColetaDado | undefined): string {
+    const cols: string[] = (entry?.atributos?.length ? entry.atributos
+      : (coleta?.colunas || []).filter((c: string) => c !== coleta?.target)) || [];
+    const colsPy = cols.map(c => JSON.stringify(c)).join(', ');
+    const zeros = cols.map(() => '0').join(', ');
+    return [
+      '"""Usa o modelo já treinado para prever um novo exemplo.',
+      '',
+      'O modelo está na pasta ./modelo (formato MLflow). Instale as MESMAS versões do',
+      'treino (joblib/pickle é sensível à versão do scikit-learn):',
+      '    pip install -r modelo/requirements.txt',
+      '"""',
+      'import pandas as pd',
+      'import mlflow.sklearn   # alternativa sem MLflow: joblib.load("modelo/model.pkl")',
+      '',
+      'modelo = mlflow.sklearn.load_model("modelo")',
+      '',
+      '# Colunas de entrada, na ordem esperada (as mesmas do treino):',
+      `COLUNAS = [${colsPy}]`,
+      '# Troque os valores abaixo pelo seu novo exemplo (na ordem de COLUNAS):',
+      `exemplo = pd.DataFrame([[${zeros}]], columns=COLUNAS)`,
+      '',
+      'previsao = modelo.predict(exemplo)',
+      'print("Previsão:", previsao)',
+      '',
+    ].join('\n');
+  }
 
   /** Script Python completo de UM modelo (dados → split → X|y → modelo → métricas).
    *  Usado para exibir o código de um ramo no inspetor da Trilha. */
@@ -59,7 +118,14 @@ export class ScriptGeneratorService {
       }
     }
 
-    folder.file('README.md', this.generateReadme(modeloSelecionado, resultadoColetaDado, isMultiModelo ? modelosTreinados : undefined));
+    folder.file('README.md', this.generateReadme(modeloSelecionado, resultadoColetaDado, isMultiModelo ? modelosTreinados : undefined, modelosTreinados.length > 0));
+
+    // Modelo(s) já treinado(s) + `usar_modelo.py` (best-effort; requer que o modelo
+    // ainda exista no backend). Single: `modelo/` na raiz; multi: `modelos/<nome>/`.
+    for (const entry of modelosTreinados) {
+      const subpasta = isMultiModelo ? `modelos/${slugificarNome(entry?.nome_modelo) || 'modelo'}` : undefined;
+      await this.anexarModeloTreinado(folder, entry, resultadoColetaDado, subpasta);
+    }
 
     const content = await zip.generateAsync({ type: 'blob' });
     // Quando o experimento foi salvo pelo aluno, o arquivo usa o nome salvo
@@ -226,7 +292,7 @@ export class ScriptGeneratorService {
     return [headers.join(','), ...rows].join('\n');
   }
 
-  private generateReadme(modelo: ItemPipeline | undefined, resultado: ResultadoColetaDado | undefined, modelosTreinados?: any[]): string {
+  private generateReadme(modelo: ItemPipeline | undefined, resultado: ResultadoColetaDado | undefined, modelosTreinados?: any[], temModelo = false): string {
     const lines: string[] = [];
     lines.push('# Pipeline de Machine Learning - Iana');
     lines.push('');
@@ -241,6 +307,10 @@ export class ScriptGeneratorService {
       lines.push('├── data/');
       lines.push('│   ├── treino.csv       # Dados de treino');
       lines.push('│   └── teste.csv        # Dados de teste');
+    }
+    if (temModelo) {
+      lines.push('├── modelo/              # Modelo JÁ treinado (formato MLflow)');
+      lines.push('├── usar_modelo.py       # Carrega o modelo e faz uma previsão');
     }
     lines.push('└── README.md            # Este arquivo');
     lines.push('```');
@@ -257,6 +327,21 @@ export class ScriptGeneratorService {
     lines.push('   python pipeline.py');
     lines.push('   ```');
     lines.push('');
+    if (temModelo) {
+      lines.push('## Como usar o modelo JÁ treinado (sem re-treinar)');
+      lines.push('');
+      lines.push('A pasta `modelo/` contém o modelo salvo no formato MLflow (com `MLmodel`,');
+      lines.push('`model.pkl` e `requirements.txt`). Para prever novos exemplos:');
+      lines.push('');
+      lines.push('```bash');
+      lines.push('pip install -r modelo/requirements.txt   # mesmas versões do treino');
+      lines.push('python usar_modelo.py');
+      lines.push('```');
+      lines.push('');
+      lines.push('> Edite os valores de exemplo em `usar_modelo.py` para os seus dados.');
+      lines.push('> No modo comparação, cada modelo fica em `modelos/<nome>/` com seu `usar_modelo.py`.');
+      lines.push('');
+    }
 
     if (modelosTreinados && modelosTreinados.length > 1) {
       lines.push('## Modelos Comparados');

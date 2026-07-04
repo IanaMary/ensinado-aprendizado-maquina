@@ -586,7 +586,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       this.metricasSelecionadas,
       {},
       this.preProcessamentoConfig,
-      undefined,
+      this.resultadoTreinamento,
       this.nomeExperimento
     );
   }
