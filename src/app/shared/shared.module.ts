@@ -13,12 +13,14 @@ import { MatDividerModule } from '@angular/material/divider';
 import { ShellComponent } from './shell/shell.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { UserMenuComponent } from './user-menu/user-menu.component';
+import { MarkdownPipe } from '../dashboard/chat-tutor/markdown.pipe';
 
 @NgModule({
   declarations: [
     ShellComponent,
     BreadcrumbComponent,
-    UserMenuComponent
+    UserMenuComponent,
+    MarkdownPipe
   ],
   imports: [
     CommonModule,
@@ -49,7 +51,8 @@ import { UserMenuComponent } from './user-menu/user-menu.component';
     MatDividerModule,
     ShellComponent,
     BreadcrumbComponent,
-    UserMenuComponent
+    UserMenuComponent,
+    MarkdownPipe
   ],
   providers: []
 })

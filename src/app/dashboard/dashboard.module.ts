@@ -42,7 +42,7 @@ import { CsvConfigComponent } from './execucoes/modals/csv-config/csv-config.com
 import { NomearPipelineDialogComponent } from './execucoes/modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
 import { VisualizacaoDadosComponent } from './execucoes/modals/visualizacao-dados/visualizacao-dados.component';
 import { ChatTutorComponent } from './chat-tutor/chat-tutor.component';
-import { MarkdownPipe } from './chat-tutor/markdown.pipe';
+import { SharedModule } from '../shared/shared.module';
 import { HighlightCodeDirective } from './tutor/highlight/highlight-code.directive';
 import { SessionService } from '../service/sessao-store.service';
 
@@ -70,13 +70,13 @@ import { SessionService } from '../service/sessao-store.service';
     MetricaAvaliacaoComponent,
     TutorComponent,
     ChatTutorComponent,
-    MarkdownPipe,
     HighlightCodeDirective,
     CsvConfigComponent,
     NomearPipelineDialogComponent,
     VisualizacaoDadosComponent
   ],
   imports: [CommonModule,
+    SharedModule,
     DragDropModule,
     MatCardModule,
     MatDialogModule,

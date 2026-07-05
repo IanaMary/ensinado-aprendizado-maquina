@@ -77,25 +77,8 @@ describe('ExecucoesComponent', () => {
     expect(component.itens.length).toBe(0);
   });
 
-  it('should toggle user menu and close when navigating', () => {
-    component.alternarMenuUsuario(new Event('click'));
-
-    expect(component.usuarioMenuAberto).toBeTrue();
-
-    component.navegarParaProjetos();
-
-    expect(component.usuarioMenuAberto).toBeFalse();
-    expect(router.navigate).toHaveBeenCalledWith(['/view-aluno/projetos']);
-  });
-
-  it('should logout from user menu', () => {
-    component.usuarioMenuAberto = true;
-
-    component.sair();
-
-    expect(component.usuarioMenuAberto).toBeFalse();
-    expect(authService.logout).toHaveBeenCalled();
-  });
+  // O menu do usuário agora é o componente compartilhado <app-user-menu>
+  // (coberto por user-menu.component.spec); os testes do menu inline saíram daqui.
 
   it('should summarize collection settings for a loaded file dataset', () => {
     component.resultadoColetaDado = {

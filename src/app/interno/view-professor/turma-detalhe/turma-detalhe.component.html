@@ -132,7 +132,8 @@
           <button class="btn-mini voltar-chat" (click)="chatAberto = null"><mat-icon>arrow_back</mat-icon> voltar</button>
           <div class="msg" *ngFor="let m of chatAberto.mensagens" [class.user]="m.role === 'user'">
             <span class="quem">{{ m.role === 'user' ? 'Aluno' : 'Léo' }}</span>
-            <div class="texto">{{ m.content }}</div>
+            <div class="texto" *ngIf="m.role === 'user'">{{ m.content }}</div>
+            <div class="texto" *ngIf="m.role !== 'user'" [innerHTML]="m.content | markdown"></div>
           </div>
         </div>
       </div>
