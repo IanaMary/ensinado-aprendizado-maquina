@@ -13,7 +13,8 @@ import { roleMap } from '../../../app/models/item-coleta-dado.model';
 const ROTAS_POR_PAPEL: Record<string, string[]> = {
   aluno: ['view-aluno'],
   professor: ['view-professor', 'view-aluno', 'atividades'],
-  admin: ['view-admin', 'view-aluno', 'atividades'],
+  // Admin herda as capacidades de professor (Turmas & Atividades) além do painel admin.
+  admin: ['view-admin', 'view-professor', 'view-aluno', 'atividades'],
 };
 
 @Injectable({
