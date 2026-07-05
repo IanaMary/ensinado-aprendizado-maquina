@@ -8,6 +8,15 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-05 (admin herda capacidades de professor)
+
+### Frontend `mestrado-iana` `cb08626` (bundle `main-TWZFP3KS.js`) + teste backend `e121c24`
+- **Admin ganha as capacidades de professor** (Turmas & Atividades): `AuthGuard` libera a rota
+  `view-professor` para admin; menu do usuário ganha **"Gerenciar turmas"** (→ `/view-professor`)
+  para professor e admin; painel admin ganha o card **"Turmas & Atividades"**.
+- Backend **inalterado** (já aceitava admin via `exigir_admin_ou_professor`, escopo por dono da
+  turma); +teste de regressão (`test_criar_turma_admin`). Build + 115/115 + turmas 5 passed.
+
 ## 2026-07-05 (manutenção — dedup de menu + MarkdownPipe compartilhado)
 
 ### Frontend `mestrado-iana` `6fef786` (bundle `main-PHAXKDVA.js`) · só frontend
