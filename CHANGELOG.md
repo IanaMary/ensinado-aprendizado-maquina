@@ -8,6 +8,18 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-05 (manutenção — dedup de menu + MarkdownPipe compartilhado)
+
+### Frontend `mestrado-iana` `6fef786` (bundle `main-PHAXKDVA.js`) · só frontend
+- **Dedup do menu do usuário:** `execucoes` e `view-admin` passam a usar o `<app-user-menu>`
+  compartilhado; removida a lógica de menu duplicada (getters/métodos/`HostListener`) e os
+  testes do menu inline (cobertos por `user-menu.component.spec`). Rotas idênticas (+ entrada
+  "Minhas turmas" agora também nesses menus).
+- **`MarkdownPipe` → `SharedModule`** (DashboardModule importa SharedModule): o visualizador de
+  chat do aluno (`turma-detalhe`) renderiza a resposta do tutor com **markdown** (antes mostrava
+  `**`/`#` crus). Sem mudança de comportamento nos demais usos. Build + 115/115. Backup
+  `frontend-20260705-174127`.
+
 ## 2026-07-05 (correções da revisão — Turmas)
 
 ### Frontend `mestrado-iana` `4d2620a` (bundle `main-Q3ESLUUV.js`) + backend `14746d0`
