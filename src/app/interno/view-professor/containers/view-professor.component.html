@@ -31,7 +31,7 @@
 
     <!-- Lista de turmas -->
     <section class="card turmas-card">
-      <h3><mat-icon>groups</mat-icon> Minhas turmas</h3>
+      <h3><mat-icon>groups</mat-icon> {{ usuarioAdmin ? 'Todas as turmas' : 'Minhas turmas' }}</h3>
 
       <div *ngIf="carregando" class="vazio">Carregando…</div>
       <div *ngIf="!carregando && !turmas.length" class="vazio">

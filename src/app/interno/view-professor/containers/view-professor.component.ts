@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TurmaService, Turma } from '../../../service/turma.service';
+import { AuthService } from '../../../service/auth/auth.service';
 
 @Component({
   selector: 'app-view-professor',
@@ -21,7 +22,11 @@ export class ViewProfessorComponent implements OnInit {
     private router: Router,
     private turmaService: TurmaService,
     private snackBar: MatSnackBar,
+    private authService: AuthService,
   ) { }
+
+  /** Admin supervisiona todas as turmas; professor vê apenas as suas. */
+  get usuarioAdmin(): boolean { return this.authService.getUsuarioRole() === 'admin'; }
 
   ngOnInit(): void {
     this.carregarTurmas();
