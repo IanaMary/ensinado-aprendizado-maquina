@@ -65,7 +65,8 @@ export class EntrarTurmaComponent implements OnInit {
   }
 
   fazerAtividade(t: Turma, a: Atividade): void {
-    // Abre o dashboard clássico já vinculado à atividade; carrega o dataset do template.
+    // Abre o dashboard clássico já vinculado à atividade; o dataset sugerido vai
+    // como dica (banner + atalho de Coleta), a submissão salva leva atividade_id/turma_id.
     this.router.navigate(['/view-aluno'], {
       queryParams: { atividade: a.id, turma: t.id, dataset: a.template?.datasetNome || undefined },
     });

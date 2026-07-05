@@ -240,6 +240,13 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   }
 
 
+  /** Atalho do banner de atividade: abre direto a etapa de Coleta para o aluno
+   *  carregar o dataset sugerido (o card de coleta já existe na lane). */
+  abrirColetaAtividade(): void {
+    const coleta = this.colunaColeta[0];
+    if (coleta) this.abrirModalExecucao(coleta);
+  }
+
   abrirModalExecucao(item: ItemPipeline): void {
     if (this.modalAberto) return;
 

@@ -809,3 +809,10 @@ $metrica-cor-escuro: #E65100;
   color: $roxo-escuro; border-radius: 10px; padding: 10px 14px; font-size: 13px;
   mat-icon { color: $roxo-medio; }
 }
+
+.atividade-banner .banner-acao {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border: 1px solid $roxo-medio; background: $roxo-medio; color: $branco;
+  border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
