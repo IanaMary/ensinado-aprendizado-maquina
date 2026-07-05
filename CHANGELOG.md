@@ -8,6 +8,12 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-05 (admin: supervisão global de turmas)
+
+### Frontend `mestrado-iana` `61ccf8f` (bundle `main-5IB3SKSX.js`) + backend `77aeeda`
+- Admin passa a **ver/gerenciar todas as turmas** (backend devolve todas para admin); o
+  cabeçalho da lista mostra "Todas as turmas" (admin) vs "Minhas turmas" (professor).
+
 ## 2026-07-05 (admin herda capacidades de professor)
 
 ### Frontend `mestrado-iana` `cb08626` (bundle `main-TWZFP3KS.js`) + teste backend `e121c24`
