@@ -8,6 +8,17 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-05 (correções da revisão — Turmas)
+
+### Frontend `mestrado-iana` `4d2620a` (bundle `main-Q3ESLUUV.js`) + backend `14746d0`
+- **Backend (ver CHANGELOG do back):** ranking por rótulo da métrica + dedup por aluno; chat do
+  aluno gated por vínculo de turma; `is_public` e `atividade_id`/`turma_id` validados no servidor;
+  `progresso` escopado à turma; índices; N+1 → agregações. 334 testes.
+- **Frontend (#5):** o dashboard lia o queryParam `dataset` da atividade mas **nunca o usava** (o
+  comentário prometia carregar o template). Agora o banner de atividade tem o botão **"Carregar
+  dados"** que abre direto a etapa de Coleta; comentário corrigido. Build + 117/117.
+- Deploy validado (front 200, API 200, endpoints gated 401). Backup `deploy-20260705-160308`.
+
 ## 2026-07-04 (Turmas & Atividades — professor/aluno — + correções e "publicar")
 
 ### Subsistema de Turmas (backend `aec30b7`+`e786757`; frontend bundles `main-PFBXCGYF.js` → `main-35UES7KI.js`)
