@@ -12,6 +12,13 @@
 * { font-family: 'Maven Pro', 'Roboto', 'Helvetica Neue', sans-serif; }
 mat-icon, .material-icons { font-family: 'Material Icons' !important; }
 
+/* Grafismo institucional H2IA — malha de pontos (aplicar como textura sutil de fundo).
+   Use em um pseudo-elemento/camada; nunca sobre texto. */
+.grafismo-pontos {
+  background-image: radial-gradient(rgba($roxo-medio, 0.16) 1.4px, transparent 1.6px);
+  background-size: 14px 14px;
+}
+
 html,
 body {
   box-sizing: border-box;

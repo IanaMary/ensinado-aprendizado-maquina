@@ -19,8 +19,9 @@
 .cabecalho { display: flex; align-items: center; gap: 14px; z-index: 2; }
 .logo {
   width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #7C3AED, #A855F7); color: #fff; box-shadow: 0 6px 18px rgba(124,58,237,.35);
+  background: #fff; box-shadow: 0 6px 18px rgba(124,58,237,.28);
   mat-icon { font-size: 28px; width: 28px; height: 28px; }
+  img { width: 34px; height: 34px; display: block; }
 }
 .titulo { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 26px; color: #4C1D95; line-height: 1.1; }
 .sub { font-size: 14px; color: #9B7FCB; font-weight: 700; margin-top: 2px; }

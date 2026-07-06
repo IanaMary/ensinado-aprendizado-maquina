@@ -13,13 +13,21 @@
 /* ---- Header ---- */
 .admin-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
   gap: 16px;
   margin-bottom: 32px;
+
+  .header-logo {
+    flex-shrink: 0;
+    padding-right: 16px;
+    border-right: 1px solid rgba($roxo-claro, 0.9);
+  }
 }
 
 .header-info {
+  flex: 1;
+  min-width: 0;
+
   h2 {
     margin: 0;
     font-size: 22px;

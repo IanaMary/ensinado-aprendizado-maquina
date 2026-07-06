@@ -6,10 +6,11 @@
 
 .prof-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 
+  .header-logo { flex-shrink: 0; padding-right: 16px; border-right: 1px solid rgba($roxo-claro, 0.9); }
+  .header-info { flex: 1; min-width: 0; }
   .header-info h2 { margin: 0; font-size: 18px; font-weight: 700; color: $roxo-escuro; }
   .header-info p { margin: 4px 0 0; font-size: 13px; color: $cinza-medio; }
   .header-actions { display: flex; align-items: center; gap: 10px; }
