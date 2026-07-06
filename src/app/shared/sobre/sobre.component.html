@@ -1,0 +1,90 @@
+<div class="sobre">
+  <!-- Barra superior -->
+  <header class="sobre-topo">
+    <img src="assets/brand/hub-ia-positivo.png" alt="Hub de Inovação em Inteligência Artificial" class="topo-logo">
+    <button type="button" class="btn-voltar" (click)="voltar()">
+      <mat-icon aria-hidden="true">arrow_back</mat-icon>
+      <span>Voltar</span>
+    </button>
+  </header>
+
+  <!-- Capa / cabeçalho do trabalho -->
+  <section class="capa">
+    <div class="capa-grafismo" aria-hidden="true"></div>
+    <div class="capa-conteudo">
+      <p class="capa-tipo">Dissertação de Mestrado</p>
+      <h1>Um tutor para o ensino de aprendizado de máquina</h1>
+      <div class="capa-autoria">
+        <span class="autor">Iana Mary Costa</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span class="inst">Hub de Inovação em Inteligência Artificial</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resumo -->
+  <article class="resumo">
+    <h2>Resumo</h2>
+
+    <p class="lead">Uma aplicação web voltada ao apoio interativo e individualizado no estudo
+      de algoritmos e técnicas de modelagem preditiva foi desenvolvida, combinando interface
+      visual de montagem de experimentos por blocos com assistente conversacional apoiado por
+      um grande modelo de linguagem.</p>
+
+    <p>O referencial teórico abrange o processo de ensino e tutoria — distinguindo tutores
+      automatizados, de regras fixas, de tutores inteligentes, capazes de adaptar o suporte
+      ao estudante — e os principais conceitos de aprendizado de máquina: os paradigmas
+      supervisionado e não supervisionado, algoritmos como K-Vizinhos, Árvore de Decisão,
+      Floresta Aleatória, Máquina de Vetores de Suporte, Naive Bayes e Regressão Logística,
+      técnicas de pré-processamento e métricas de avaliação para classificação, regressão e
+      agrupamento.</p>
+
+    <p>A ferramenta foi desenvolvida com arquitetura cliente-servidor: o front-end, em Angular,
+      oferece uma interface de blocos arrastáveis e painel de chat; o back-end, em Python,
+      executa os algoritmos por meio da biblioteca Scikit-Learn, registra experimentos no
+      MLflow e intermedia o acesso ao modelo de linguagem, mantendo a chave de acesso
+      protegida no servidor.</p>
+
+    <p>O conteúdo pedagógico de cada bloco — descrição, intuição, exemplos e referências — é
+      armazenado em banco de dados e editado por professores sem necessidade de recompilar a
+      aplicação, o que transforma o material didático em dado curado e mantido por quem ensina.</p>
+
+    <p>O assistente conversacional adota a estratégia de geração aumentada por cache (CAG): o
+      material curado e o estado atual do pipeline do estudante são fornecidos diretamente ao
+      modelo de linguagem, sem etapa de recuperação vetorial, tornando as respostas mais
+      precisas e previsíveis.</p>
+
+    <p>A ferramenta reconhece três perfis de usuário — estudante, professor e administrador — e
+      registra a atividade do estudante para subsidiar o acompanhamento pedagógico. Ao concluir
+      um experimento, o estudante pode exportar o código Python correspondente ao pipeline
+      montado, facilitando a transição entre o ambiente visual e a programação direta.</p>
+  </article>
+
+  <!-- Fecho: os três pilares (eco da frase final do resumo) -->
+  <section class="pilares" aria-label="O que a ferramenta reúne">
+    <p class="pilares-intro">Um único ambiente que reúne</p>
+    <ul class="pilares-lista">
+      <li>
+        <mat-icon aria-hidden="true">view_module</mat-icon>
+        <h3>Interface visual por blocos</h3>
+        <p>Montagem de experimentos arrastando etapas, do dado à avaliação.</p>
+      </li>
+      <li>
+        <mat-icon aria-hidden="true">memory</mat-icon>
+        <h3>Execução real de algoritmos</h3>
+        <p>Treino e métricas de verdade via Scikit-Learn, com registro no MLflow.</p>
+      </li>
+      <li>
+        <mat-icon aria-hidden="true">forum</mat-icon>
+        <h3>Tutoria por linguagem natural</h3>
+        <p>Assistente ciente do material curado e do pipeline em construção.</p>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="sobre-rodape">
+    <img src="assets/brand/favicon-ia-64.png" alt="" aria-hidden="true" class="rodape-marca">
+    <p>Plataforma de apoio ao ensino de aprendizado de máquina para disciplinas introdutórias.</p>
+    <button type="button" class="btn-plataforma" (click)="voltar()">Acessar a plataforma</button>
+  </footer>
+</div>

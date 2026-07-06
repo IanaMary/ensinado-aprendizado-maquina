@@ -58,5 +58,6 @@ export class UserMenuComponent {
   navegarGerenciarTurmas(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-professor']); }
   navegarParaAdmin(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-admin']); }
   navegarParaUsuarios(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-admin/usuarios']); }
+  navegarParaSobre(): void { this.usuarioMenuAberto = false; this.router.navigate(['/sobre']); }
   sair(): void { this.authService.logout(); }
 }
