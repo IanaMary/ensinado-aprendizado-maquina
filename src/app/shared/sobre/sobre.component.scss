@@ -84,16 +84,31 @@
   }
 
   .capa-autoria {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 6px 12px;
-    margin-top: 22px;
-    font-size: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px 32px;
+    margin: 30px 0 0;
+    padding-top: 26px;
+    border-top: 1px solid rgba($branco, 0.22);
 
-    .autor { font-weight: 700; color: $branco; letter-spacing: .1px; }
-    .sep { color: rgba($branco, 0.55); }
-    .inst { color: rgba($branco, 0.82); }
+    .autoria-item.programa { grid-column: 1 / -1; }
+
+    dt {
+      margin: 0 0 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba($branco, 0.62);
+    }
+
+    dd {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: $branco;
+    }
   }
 }
 
