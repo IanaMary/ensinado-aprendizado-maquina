@@ -34,6 +34,13 @@
   .campo { width: 100%; }
 }
 
+.criar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  .btn-primario { margin-top: 4px; align-self: flex-start; }
+}
+
 .vazio { color: $cinza-medio; font-size: 14px; padding: 12px 0; }
 
 .turmas-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }

@@ -16,14 +16,20 @@
     <!-- Criar turma -->
     <section class="card criar-card">
       <h3><mat-icon>group_add</mat-icon> Nova turma</h3>
-      <mat-form-field appearance="outline" class="campo">
-        <mat-label>Nome da turma</mat-label>
-        <input matInput [(ngModel)]="novoNome" (keyup.enter)="criarTurma()" maxlength="80" placeholder="Ex: 9º ano B — 2026">
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="campo">
-        <mat-label>Descrição (opcional)</mat-label>
-        <input matInput [(ngModel)]="novaDescricao" maxlength="160">
-      </mat-form-field>
+      <div class="campo-form">
+        <label class="campo-label">Nome da turma</label>
+        <div class="campo-input-wrapper">
+          <mat-icon class="campo-icon">badge</mat-icon>
+          <input class="campo-input" [(ngModel)]="novoNome" (keyup.enter)="criarTurma()" maxlength="80" placeholder="Ex: 9º ano B — 2026">
+        </div>
+      </div>
+      <div class="campo-form">
+        <label class="campo-label">Descrição (opcional)</label>
+        <div class="campo-input-wrapper">
+          <mat-icon class="campo-icon">notes</mat-icon>
+          <input class="campo-input" [(ngModel)]="novaDescricao" maxlength="160" placeholder="Breve descrição da turma">
+        </div>
+      </div>
       <button class="btn-primario" (click)="criarTurma()" [disabled]="criando || !novoNome.trim()">
         <mat-icon>add</mat-icon> Criar turma
       </button>

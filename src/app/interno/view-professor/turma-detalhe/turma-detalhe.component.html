@@ -27,10 +27,13 @@
     <section class="card alunos-card">
       <h3><mat-icon>group</mat-icon> Alunos ({{ turma.total_alunos || 0 }})</h3>
       <div class="add-row">
-        <mat-form-field appearance="outline" class="campo">
-          <mat-label>Adicionar por e-mail</mat-label>
-          <input matInput [(ngModel)]="emailAluno" (keyup.enter)="adicionarAluno()" placeholder="aluno@escola.br">
-        </mat-form-field>
+        <div class="campo-form">
+          <label class="campo-label">Adicionar por e-mail</label>
+          <div class="campo-input-wrapper">
+            <mat-icon class="campo-icon">mail</mat-icon>
+            <input class="campo-input" [(ngModel)]="emailAluno" (keyup.enter)="adicionarAluno()" placeholder="aluno@escola.br">
+          </div>
+        </div>
         <button class="btn-primario" (click)="adicionarAluno()"><mat-icon>person_add</mat-icon></button>
       </div>
       <ul class="alunos-lista">
@@ -47,23 +50,32 @@
       <h3><mat-icon>assignment</mat-icon> Atividades</h3>
 
       <div class="nova-ativ">
-        <mat-form-field appearance="outline" class="campo">
-          <mat-label>Título</mat-label>
-          <input matInput [(ngModel)]="novaAtiv.titulo" placeholder="Ex: Classificar flores">
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="campo">
-          <mat-label>Dataset inicial</mat-label>
-          <select matNativeControl [(ngModel)]="novaAtiv.datasetNome">
-            <option value="">(o aluno escolhe)</option>
-            <option *ngFor="let d of datasets" [value]="d.nome">{{ d.label }}</option>
-          </select>
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="campo">
-          <mat-label>Métrica do ranking</mat-label>
-          <select matNativeControl [(ngModel)]="novaAtiv.metrica">
-            <option *ngFor="let m of metricas" [value]="m.valor">{{ m.label }}</option>
-          </select>
-        </mat-form-field>
+        <div class="campo-form">
+          <label class="campo-label">Título</label>
+          <div class="campo-input-wrapper">
+            <mat-icon class="campo-icon">title</mat-icon>
+            <input class="campo-input" [(ngModel)]="novaAtiv.titulo" placeholder="Ex: Classificar flores">
+          </div>
+        </div>
+        <div class="campo-form">
+          <label class="campo-label">Dataset inicial</label>
+          <div class="campo-input-wrapper">
+            <mat-icon class="campo-icon">dataset</mat-icon>
+            <select class="campo-input" [(ngModel)]="novaAtiv.datasetNome">
+              <option value="">(o aluno escolhe)</option>
+              <option *ngFor="let d of datasets" [value]="d.nome">{{ d.label }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="campo-form">
+          <label class="campo-label">Métrica do ranking</label>
+          <div class="campo-input-wrapper">
+            <mat-icon class="campo-icon">leaderboard</mat-icon>
+            <select class="campo-input" [(ngModel)]="novaAtiv.metrica">
+              <option *ngFor="let m of metricas" [value]="m.valor">{{ m.label }}</option>
+            </select>
+          </div>
+        </div>
         <button class="btn-primario" (click)="criarAtividade()" [disabled]="criandoAtiv || !novaAtiv.titulo.trim()">
           <mat-icon>add</mat-icon> Criar atividade
         </button>

@@ -11,10 +11,13 @@
   <section class="card entrar-card">
     <h3><mat-icon>login</mat-icon> Entrar em uma turma</h3>
     <div class="entrar-row">
-      <mat-form-field appearance="outline" class="campo">
-        <mat-label>Código da turma</mat-label>
-        <input matInput [(ngModel)]="codigo" (keyup.enter)="entrar()" maxlength="10" placeholder="Ex: ABC234" style="text-transform:uppercase">
-      </mat-form-field>
+      <div class="campo-form">
+        <label class="campo-label">Código da turma</label>
+        <div class="campo-input-wrapper">
+          <mat-icon class="campo-icon">key</mat-icon>
+          <input class="campo-input" [(ngModel)]="codigo" (keyup.enter)="entrar()" maxlength="10" placeholder="Ex: ABC234" style="text-transform:uppercase">
+        </div>
+      </div>
       <button class="btn-primario" (click)="entrar()" [disabled]="entrando || !codigo.trim()">
         <mat-icon>arrow_forward</mat-icon> Entrar
       </button>
