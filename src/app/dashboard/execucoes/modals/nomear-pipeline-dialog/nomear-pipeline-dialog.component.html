@@ -11,19 +11,21 @@
       Dê um nome para identificar este pipeline na sua galeria de projetos.
     </p>
 
-    <mat-form-field appearance="outline" class="nome-field">
-      <mat-label>Nome do pipeline</mat-label>
-      <input
-        matInput
-        type="text"
-        [(ngModel)]="nome"
-        (keyup.enter)="confirmar()"
-        maxlength="100"
-        placeholder="Ex: Classificação Iris com KNN"
-        autocomplete="off">
-      <mat-icon matSuffix>label</mat-icon>
-      <mat-hint align="end">{{ nome.length }} / 100</mat-hint>
-    </mat-form-field>
+    <div class="campo-form nome-field">
+      <label class="campo-label">Nome do pipeline</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">label</mat-icon>
+        <input
+          class="campo-input"
+          type="text"
+          [(ngModel)]="nome"
+          (keyup.enter)="confirmar()"
+          maxlength="100"
+          placeholder="Ex: Classificação Iris com KNN"
+          autocomplete="off">
+        <span class="campo-contador">{{ nome.length }}/100</span>
+      </div>
+    </div>
 
     <mat-checkbox *ngIf="data?.podePublicar" [(ngModel)]="publicar" class="publicar-check">
       Publicar na galeria (visível para os alunos)
