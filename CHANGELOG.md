@@ -8,6 +8,17 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-06 (Artefatos: filtros modelo/papel + detalhe em drawer)
+
+### Frontend `mestrado-iana` `81f0d0d` (bundle `main-PJH75CY3.js`) + backend `b1f6831`
+- **Filtros novos:** Modelo e Papel (aluno/professor/admin), dropdowns populados por
+  `GET /artefatos/facetas`. (Dataset/professor-de-turma/turma **não** são gravados na run —
+  filtrar por eles exigiria enriquecer o doc no treino, não retroativo.)
+- **"Ver" → painel lateral (drawer):** o resumo abre num painel deslizante à direita com
+  backdrop (antes empilhava abaixo da lista e parecia "não ter acontecido nada"). Fecha por X,
+  backdrop ou **Esc**; respeita `prefers-reduced-motion`; z-index semântico.
+- Build + 115/115; backend 340 passed.
+
 ## 2026-07-06 (polish da tela de Artefatos MLflow — /impeccable critique)
 
 ### Frontend `mestrado-iana` `cf6008f` (bundle `main-25GBCWSY.js`) · só frontend
