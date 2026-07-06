@@ -124,6 +124,20 @@
       <button class="btn-secundario sm fechar" (click)="fecharDetalhe()"><mat-icon>close</mat-icon> Fechar</button>
     </div>
 
+    <div class="vinculos" *ngIf="contextoVinculos.length">
+      <mat-icon>school</mat-icon>
+      <div class="vinculos-texto">
+        <span class="vinculos-titulo">Usada em atividade de turma</span>
+        <div class="vinculo" *ngFor="let v of contextoVinculos">
+          <strong>{{ v.atividade_titulo || 'Atividade' }}</strong>
+          <ng-container *ngIf="v.turma_nome"> · turma
+            <a class="link-turma" (click)="abrirTurma(v.turma_id)">{{ v.turma_nome }}</a>
+          </ng-container>
+          <span class="vinculo-sub" *ngIf="v.pipeline_nome">submissão: {{ v.pipeline_nome }}</span>
+        </div>
+      </div>
+    </div>
+
     <div class="erro-msg" *ngIf="erroDetalhe" role="alert">{{ erroDetalhe }}</div>
     <div class="carregando" *ngIf="carregandoDetalhe" role="status" aria-live="polite">Carregando resumo…</div>
 

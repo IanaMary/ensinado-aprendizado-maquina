@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ArtefatosService } from '../../../service/artefatos/artefatos.service';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 
@@ -32,11 +33,16 @@ export class ArtefatosComponent implements OnInit {
   erroDetalhe = '';
   resumo: any = null;
   runIdCopiado = false;
+  contextoVinculos: any[] = [];
 
   @HostListener('document:keydown.escape')
   aoApertarEsc(): void { if (this.runSelecionada) this.fecharDetalhe(); }
 
-  constructor(private artefatos: ArtefatosService, private dashboard: DashboardService) {}
+  constructor(private artefatos: ArtefatosService, private dashboard: DashboardService, private router: Router) {}
+
+  abrirTurma(turmaId: string): void {
+    if (turmaId) this.router.navigate(['/view-professor/turmas', turmaId]);
+  }
 
   ngOnInit(): void {
     this.carregarUsuarios();
@@ -134,6 +140,11 @@ export class ArtefatosComponent implements OnInit {
     this.carregandoDetalhe = true;
     this.erroDetalhe = '';
     this.resumo = null;
+    this.contextoVinculos = [];
+    this.artefatos.contextoRun(runId).subscribe({
+      next: (c) => (this.contextoVinculos = c?.vinculos || []),
+      error: () => (this.contextoVinculos = []),
+    });
     this.artefatos.obterRun(runId).subscribe({
       next: (r) => {
         this.resumo = r;

@@ -30,4 +30,9 @@ export class ArtefatosService {
   obterRun(runId: string) {
     return this.http.get<any>(`${this.endpoint}/${encodeURIComponent(runId)}`);
   }
+
+  /** Submissões de atividade/turma que usaram esta run. */
+  contextoRun(runId: string) {
+    return this.http.get<{ vinculos: any[] }>(`${this.endpoint}/${encodeURIComponent(runId)}/contexto`);
+  }
 }

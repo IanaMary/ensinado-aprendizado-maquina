@@ -168,6 +168,25 @@ $z-drawer: 1001;
   }
 }
 
+.vinculos {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: rgba($roxo-medio, 0.06);
+  border: 1px solid $roxo-claro;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 4px 0 12px;
+
+  > mat-icon { color: $roxo-medio; flex-shrink: 0; }
+  .vinculos-texto { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+  .vinculos-titulo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: $roxo-medio; }
+  .vinculo { color: $cinza-escuro; }
+  .vinculo-sub { display: block; font-size: 12px; color: $cinza-escuro; }
+  .link-turma { color: $roxo-medio; font-weight: 600; cursor: pointer; text-decoration: underline; }
+  .link-turma:hover { color: $roxo-escuro; }
+}
+
 @keyframes artefatos-slide-in {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }

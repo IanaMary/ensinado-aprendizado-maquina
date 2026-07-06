@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 import { ArtefatosComponent } from './artefatos.component';
 import { ArtefatosService } from '../../../service/artefatos/artefatos.service';
@@ -13,14 +14,15 @@ describe('ArtefatosComponent', () => {
   let dash: jasmine.SpyObj<DashboardService>;
 
   beforeEach(async () => {
-    svc = jasmine.createSpyObj('ArtefatosService', ['listar', 'obterRun', 'getFacetas']);
+    svc = jasmine.createSpyObj('ArtefatosService', ['listar', 'obterRun', 'getFacetas', 'contextoRun']);
     svc.listar.and.returnValue(of({ total: 0, itens: [] }));
     svc.getFacetas.and.returnValue(of({ modelos: [], papeis: [], datasets: [] }));
+    svc.contextoRun.and.returnValue(of({ vinculos: [] }));
     dash = jasmine.createSpyObj('DashboardService', ['listarUsuarios']);
     dash.listarUsuarios.and.returnValue(of([]));
     await TestBed.configureTestingModule({
       declarations: [ArtefatosComponent],
-      imports: [CommonModule, FormsModule, MatIconModule],
+      imports: [CommonModule, FormsModule, MatIconModule, RouterTestingModule],
       providers: [
         { provide: ArtefatosService, useValue: svc },
         { provide: DashboardService, useValue: dash },
