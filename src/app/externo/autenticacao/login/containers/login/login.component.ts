@@ -57,6 +57,16 @@ export class LoginComponent implements OnInit {
       next: (usuario: any) => {
         this.auth.salvarUsuarioSessionStorage(usuario).then(() => {
           const role = usuario?.usuario?.role;
+          // Se veio de um deep-link protegido (ex.: entrar na turma pelo QR), volta pra lá.
+          const retorno = sessionStorage.getItem('returnUrl');
+          if (retorno) {
+            sessionStorage.removeItem('returnUrl');
+            this.router.navigateByUrl(retorno).catch(err => {
+              console.error('[Login] Erro ao voltar ao returnUrl:', err);
+              this.router.navigate([roleMap[role] || '/autenticacao/login']);
+            });
+            return;
+          }
           const rota = roleMap[role] || '/autenticacao/login';
           this.router.navigate([rota]).catch(err => {
             console.error('[Login] Erro na navegação:', err);

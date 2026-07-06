@@ -27,6 +27,13 @@ export class AuthGuard implements CanLoad {
     const autenticado: boolean = await this.authService.autenticado();
 
     if (!autenticado) {
+      // Preserva o destino (com query, ex.: /view-aluno/entrar?codigo=XXX do QR) para
+      // voltar após o login — senão o ?codigo se perde e o aluno não entra na turma.
+      const nav = this.router.getCurrentNavigation?.();
+      const destino = nav?.extractedUrl?.toString() || ('/' + segments.map(s => s.path).join('/'));
+      if (destino && destino !== '/' && !destino.startsWith('/autenticacao')) {
+        sessionStorage.setItem('returnUrl', destino);
+      }
       this.router.navigate(['/autenticacao/login']);
       return false;
     }
