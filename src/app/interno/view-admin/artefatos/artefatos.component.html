@@ -28,6 +28,26 @@
         <input class="campo-input" type="datetime-local" [(ngModel)]="filtros.data_fim" />
       </div>
     </div>
+    <div class="campo-form">
+      <label class="campo-label">Modelo</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">model_training</mat-icon>
+        <select class="campo-input" [(ngModel)]="filtros.modelo">
+          <option value="">todos</option>
+          <option *ngFor="let m of modelosDisponiveis" [value]="m">{{ m }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="campo-form">
+      <label class="campo-label">Papel</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">badge</mat-icon>
+        <select class="campo-input" [(ngModel)]="filtros.papel">
+          <option value="">todos</option>
+          <option *ngFor="let p of papeisDisponiveis" [value]="p">{{ papelLabel[p] || p }}</option>
+        </select>
+      </div>
+    </div>
     <div class="acoes">
       <button class="btn-primario" (click)="aplicarFiltros()"><mat-icon>search</mat-icon> Filtrar</button>
       <button class="btn-secundario" (click)="limparFiltros()">Limpar</button>
@@ -79,8 +99,9 @@
     <button class="btn-secundario" (click)="proximaPagina()" [disabled]="skip + limit >= total">Próxima</button>
   </div>
 
-  <!-- Detalhe da run -->
-  <div class="detalhe" [class.destaque]="destaqueDetalhe" *ngIf="runSelecionada">
+  <!-- Detalhe da run: painel lateral (drawer) -->
+  <div class="drawer-backdrop" *ngIf="runSelecionada" (click)="fecharDetalhe()"></div>
+  <aside class="drawer" *ngIf="runSelecionada" role="dialog" aria-modal="true" aria-label="Resumo da run">
     <div class="detalhe-head">
       <h2>Resumo da run</h2>
       <code class="rid">{{ runSelecionada }}</code>
@@ -88,7 +109,7 @@
         <mat-icon>{{ runIdCopiado ? 'check' : 'content_copy' }}</mat-icon>
         {{ runIdCopiado ? 'Copiado' : 'Copiar' }}
       </button>
-      <button class="btn-secundario sm" (click)="fecharDetalhe()"><mat-icon>close</mat-icon> Fechar</button>
+      <button class="btn-secundario sm fechar" (click)="fecharDetalhe()"><mat-icon>close</mat-icon> Fechar</button>
     </div>
 
     <div class="erro-msg" *ngIf="erroDetalhe" role="alert">{{ erroDetalhe }}</div>
@@ -150,5 +171,5 @@
         <p class="vazio" *ngIf="!(resumo.models || []).length">Sem modelos logados.</p>
       </section>
     </div>
-  </div>
+  </aside>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ArtefatosService } from '../../../service/artefatos/artefatos.service';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 
@@ -12,9 +12,12 @@ export class ArtefatosComponent implements OnInit {
   carregando = false;
   erro = '';
 
-  // filtros (busca por usuário e por data)
-  filtros = { usuario_id: '', data_inicio: '', data_fim: '' };
+  // filtros (usuário, modelo, papel, período)
+  filtros = { usuario_id: '', modelo: '', papel: '', data_inicio: '', data_fim: '' };
   usuarios: { id: string; nome: string; email: string }[] = [];
+  modelosDisponiveis: string[] = [];
+  papeisDisponiveis: string[] = [];
+  readonly papelLabel: Record<string, string> = { aluno: 'Aluno', professor: 'Professor', admin: 'Admin' };
 
   // paginação
   skip = 0;
@@ -27,13 +30,16 @@ export class ArtefatosComponent implements OnInit {
   carregandoDetalhe = false;
   erroDetalhe = '';
   resumo: any = null;
-  destaqueDetalhe = false;
   runIdCopiado = false;
+
+  @HostListener('document:keydown.escape')
+  aoApertarEsc(): void { if (this.runSelecionada) this.fecharDetalhe(); }
 
   constructor(private artefatos: ArtefatosService, private dashboard: DashboardService) {}
 
   ngOnInit(): void {
     this.carregarUsuarios();
+    this.carregarFacetas();
     this.buscar();
   }
 
@@ -41,6 +47,13 @@ export class ArtefatosComponent implements OnInit {
     this.dashboard.listarUsuarios().subscribe({
       next: (us) => (this.usuarios = (us || []).map((u: any) => ({ id: u.id, nome: u.nome, email: u.email }))),
       error: () => (this.usuarios = []),
+    });
+  }
+
+  private carregarFacetas(): void {
+    this.artefatos.getFacetas().subscribe({
+      next: (f) => { this.modelosDisponiveis = f?.modelos || []; this.papeisDisponiveis = f?.papeis || []; },
+      error: () => { this.modelosDisponiveis = []; this.papeisDisponiveis = []; },
     });
   }
 
@@ -53,6 +66,8 @@ export class ArtefatosComponent implements OnInit {
   private montarFiltros() {
     return {
       usuario_id: this.filtros.usuario_id,
+      modelo: this.filtros.modelo,
+      papel: this.filtros.papel,
       data_inicio: this.toIso(this.filtros.data_inicio),
       data_fim: this.toIso(this.filtros.data_fim),
       skip: this.skip,
@@ -66,7 +81,7 @@ export class ArtefatosComponent implements OnInit {
   }
 
   limparFiltros(): void {
-    this.filtros = { usuario_id: '', data_inicio: '', data_fim: '' };
+    this.filtros = { usuario_id: '', modelo: '', papel: '', data_inicio: '', data_fim: '' };
     this.aplicarFiltros();
   }
 
@@ -109,20 +124,10 @@ export class ArtefatosComponent implements OnInit {
   // ---- detalhe ----
   verDetalhe(runId: string): void {
     if (!runId) return;
-    this.runSelecionada = runId;
+    this.runSelecionada = runId;   // abre o painel lateral (drawer)
     this.carregandoDetalhe = true;
     this.erroDetalhe = '';
     this.resumo = null;
-    // Rola até o resumo (que abre abaixo da lista) e o destaca por um instante,
-    // para o admin não perder onde a informação apareceu.
-    setTimeout(() => {
-      const el = document.querySelector('.artefatos-container .detalhe') as HTMLElement | null;
-      if (!el) return;
-      const reduz = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-      el.scrollIntoView({ behavior: reduz ? 'auto' : 'smooth', block: 'start' });
-      this.destaqueDetalhe = true;
-      setTimeout(() => (this.destaqueDetalhe = false), 1200);
-    }, 60);
     this.artefatos.obterRun(runId).subscribe({
       next: (r) => {
         this.resumo = r;

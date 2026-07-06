@@ -21,6 +21,11 @@ export class ArtefatosService {
     return this.http.get<any>(`${this.endpoint}${qs ? '?' + qs : ''}`);
   }
 
+  /** Valores distintos p/ os filtros (modelos, papéis). */
+  getFacetas() {
+    return this.http.get<{ modelos: string[]; papeis: string[] }>(`${this.endpoint}/facetas`);
+  }
+
   /** Resumo detalhado de uma run específica. */
   obterRun(runId: string) {
     return this.http.get<any>(`${this.endpoint}/${encodeURIComponent(runId)}`);

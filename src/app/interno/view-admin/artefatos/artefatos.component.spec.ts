@@ -13,8 +13,9 @@ describe('ArtefatosComponent', () => {
   let dash: jasmine.SpyObj<DashboardService>;
 
   beforeEach(async () => {
-    svc = jasmine.createSpyObj('ArtefatosService', ['listar', 'obterRun']);
+    svc = jasmine.createSpyObj('ArtefatosService', ['listar', 'obterRun', 'getFacetas']);
     svc.listar.and.returnValue(of({ total: 0, itens: [] }));
+    svc.getFacetas.and.returnValue(of({ modelos: [], papeis: [] }));
     dash = jasmine.createSpyObj('DashboardService', ['listarUsuarios']);
     dash.listarUsuarios.and.returnValue(of([]));
     await TestBed.configureTestingModule({
