@@ -2,6 +2,16 @@
 @use 'sass:map';
 @import '../styles/colores.scss';
 
+/* Tipografia institucional H2IA — Maven Pro (auto-hospedada) */
+@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: swap; }
+
+/* Aplica a fonte institucional em toda a aplicação (inclui componentes Material) */
+* { font-family: 'Maven Pro', 'Roboto', 'Helvetica Neue', sans-serif; }
+mat-icon, .material-icons { font-family: 'Material Icons' !important; }
+
 html,
 body {
   box-sizing: border-box;
@@ -559,7 +569,7 @@ body {
 
 body {
   margin: 0;
-  font-family: 'Inter', 'Roboto', "Helvetica Neue", sans-serif;
+  font-family: 'Maven Pro', 'Roboto', "Helvetica Neue", sans-serif;
   color: $preto;
 }
 
