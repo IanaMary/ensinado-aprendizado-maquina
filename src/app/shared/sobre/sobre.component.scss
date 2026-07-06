@@ -1,0 +1,244 @@
+@import '../../../styles/colores.scss';
+
+:host { display: block; }
+
+.sobre {
+  min-height: 100vh;
+  background: $branco-gelado;
+  color: $preto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Barra superior ---------- */
+.sobre-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px clamp(16px, 5vw, 40px);
+  background: $branco;
+  border-bottom: 1px solid rgba($roxo-claro, 0.7);
+
+  .topo-logo { height: 32px; width: auto; display: block; }
+
+  .btn-voltar {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border: 1px solid rgba($roxo-claro, 0.9);
+    background: $branco; color: $roxo-medio; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background .18s ease, border-color .18s ease;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+    &:hover { background: rgba($roxo-medio, 0.06); border-color: $roxo-medio; }
+    &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba($roxo-medio, 0.32); }
+  }
+}
+
+/* ---------- Capa ---------- */
+.capa {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(48px, 9vw, 104px) clamp(20px, 5vw, 40px);
+  background: linear-gradient(135deg, $roxo-escuro 0%, darken($roxo-medio, 4%) 62%, $roxo-medio 100%);
+  color: $branco;
+}
+
+.capa-grafismo {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba($branco, 0.14) 1.4px, transparent 1.6px);
+  background-size: 15px 15px;
+  /* esvai da esquerda→direita para não competir com o texto */
+  -webkit-mask-image: linear-gradient(105deg, rgba(0,0,0,.9) 0%, transparent 46%);
+  mask-image: linear-gradient(105deg, rgba(0,0,0,.9) 0%, transparent 46%);
+  pointer-events: none;
+}
+
+.capa-conteudo {
+  position: relative;
+  z-index: 1;
+  max-width: 820px;
+  margin: 0 auto;
+  animation: subir .6s cubic-bezier(.2,.7,.2,1) both;
+
+  .capa-tipo {
+    display: inline-block;
+    margin: 0 0 18px;
+    padding: 5px 13px;
+    border: 1px solid rgba($branco, 0.35);
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: rgba($branco, 0.92);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 5.2vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    color: $branco;
+  }
+
+  .capa-autoria {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 12px;
+    margin-top: 22px;
+    font-size: 16px;
+
+    .autor { font-weight: 700; color: $branco; letter-spacing: .1px; }
+    .sep { color: rgba($branco, 0.55); }
+    .inst { color: rgba($branco, 0.82); }
+  }
+}
+
+/* ---------- Resumo ---------- */
+.resumo {
+  max-width: 720px;   /* ~66ch em Maven Pro */
+  margin: 0 auto;
+  padding: clamp(40px, 7vw, 72px) clamp(20px, 5vw, 24px) clamp(24px, 5vw, 40px);
+
+  h2 {
+    margin: 0 0 22px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: $roxo-medio;
+  }
+
+  p {
+    margin: 0 0 20px;
+    font-size: 17px;
+    line-height: 1.72;
+    color: $cinza-escuro;
+    text-wrap: pretty;
+    animation: subir .55s cubic-bezier(.2,.7,.2,1) both;
+  }
+
+  .lead {
+    font-size: clamp(19px, 2.4vw, 21px);
+    line-height: 1.6;
+    font-weight: 500;
+    color: $preto;
+  }
+
+  /* stagger discreto dos parágrafos */
+  p:nth-child(2) { animation-delay: .04s; }
+  p:nth-child(3) { animation-delay: .08s; }
+  p:nth-child(4) { animation-delay: .12s; }
+  p:nth-child(5) { animation-delay: .16s; }
+  p:nth-child(6) { animation-delay: .20s; }
+  p:nth-child(7) { animation-delay: .24s; }
+}
+
+/* ---------- Fecho: os três pilares ---------- */
+.pilares {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: clamp(16px, 4vw, 32px) clamp(20px, 5vw, 24px) clamp(48px, 8vw, 80px);
+
+  .pilares-intro {
+    margin: 0 0 24px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: $cinza-escuro;
+  }
+
+  .pilares-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: clamp(20px, 4vw, 40px);
+
+    li {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 20px;
+      border-top: 2px solid $roxo-claro;   /* keyline de topo — separa sem "caixa" */
+    }
+
+    mat-icon {
+      color: $roxo-medio;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+
+    h3 {
+      margin: 4px 0 0;
+      font-size: 17px;
+      font-weight: 700;
+      color: $roxo-escuro;
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: $cinza-escuro;
+    }
+  }
+}
+
+/* ---------- Rodapé ---------- */
+.sobre-rodape {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: clamp(32px, 6vw, 48px) 24px clamp(40px, 7vw, 56px);
+  text-align: center;
+  background: $branco;
+  border-top: 1px solid rgba($roxo-claro, 0.7);
+
+  .rodape-marca { width: 40px; height: 40px; display: block; opacity: .95; }
+
+  p {
+    margin: 0;
+    max-width: 46ch;
+    font-size: 14px;
+    line-height: 1.55;
+    color: $cinza-escuro;
+  }
+
+  .btn-plataforma {
+    margin-top: 4px;
+    padding: 11px 26px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, $roxo-medio 0%, $roxo-escuro 100%);
+    color: $branco;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+
+    &:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba($roxo-medio, 0.32); }
+    &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba($roxo-medio, 0.32); }
+  }
+}
+
+@keyframes subir {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .capa-conteudo,
+  .resumo p { animation: none; }
+}
+
+@media (max-width: 560px) {
+  .sobre-topo .topo-logo { height: 26px; }
+}

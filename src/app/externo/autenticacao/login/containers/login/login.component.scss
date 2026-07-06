@@ -290,6 +290,19 @@
         background: $roxo-fundo;
       }
     }
+
+    .link-sobre {
+      display: inline-block;
+      margin-top: 14px;
+      color: $cinza-escuro;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid rgba($roxo-medio, 0.4);
+      transition: color 0.2s ease, border-color 0.2s ease;
+
+      &:hover { color: $roxo-medio; border-color: $roxo-medio; }
+    }
   }
 }
 

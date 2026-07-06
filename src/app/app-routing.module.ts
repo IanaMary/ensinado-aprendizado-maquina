@@ -16,6 +16,10 @@ const routes: Routes = [
     loadChildren: () => import('./shared/manual/manual.module').then(m => m.ManualModule)
   },
   {
+    path: 'sobre',
+    loadComponent: () => import('./shared/sobre/sobre.component').then(m => m.SobreComponent)
+  },
+  {
     path: '',
     loadChildren: () => import('./interno/interno.module').then(m => m.InternoModule),
     canLoad: [AuthGuard]
