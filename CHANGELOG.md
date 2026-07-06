@@ -8,6 +8,15 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-06 (Artefatos: filtros Usuário/Modelo com autocomplete)
+
+### Frontend `mestrado-iana` `f9593a5` (bundle `main-ETFF2MHY.js`) + backend `07c9fa3`
+- Os `<select>` de **Usuário** e **Modelo** viravam inviáveis com muitos registros. Agora:
+  **Usuário** = input com autocomplete + **busca debounced no servidor** (`/artefatos/usuarios`,
+  regex nome/email, limitado) — escala p/ milhares de alunos, não carrega todos no init;
+  **Modelo** = autocomplete filtrando a lista de facetas. Painel via CDK overlay (não clipa).
+  Build + 115/115; backend 342 passed.
+
 ## 2026-07-06 (Artefatos: botão Baixar modelo no drawer)
 
 ### Frontend `mestrado-iana` `0a6e2fc` (bundle `main-6YHNVWUM.js`) · só frontend
