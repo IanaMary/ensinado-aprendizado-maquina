@@ -4,24 +4,33 @@
 
   <!-- Filtros -->
   <div class="filtros">
-    <label>
-      Usuário
-      <select [(ngModel)]="filtros.usuario_id">
-        <option value="">todos</option>
-        <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nome }} ({{ u.email }})</option>
-      </select>
-    </label>
-    <label>
-      De
-      <input type="datetime-local" [(ngModel)]="filtros.data_inicio" />
-    </label>
-    <label>
-      Até
-      <input type="datetime-local" [(ngModel)]="filtros.data_fim" />
-    </label>
+    <div class="campo-form">
+      <label class="campo-label">Usuário</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">person</mat-icon>
+        <select class="campo-input" [(ngModel)]="filtros.usuario_id">
+          <option value="">todos</option>
+          <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nome }} ({{ u.email }})</option>
+        </select>
+      </div>
+    </div>
+    <div class="campo-form">
+      <label class="campo-label">De</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">event</mat-icon>
+        <input class="campo-input" type="datetime-local" [(ngModel)]="filtros.data_inicio" />
+      </div>
+    </div>
+    <div class="campo-form">
+      <label class="campo-label">Até</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">event</mat-icon>
+        <input class="campo-input" type="datetime-local" [(ngModel)]="filtros.data_fim" />
+      </div>
+    </div>
     <div class="acoes">
-      <button class="btn" (click)="aplicarFiltros()">Filtrar</button>
-      <button class="btn secundario" (click)="limparFiltros()">Limpar</button>
+      <button class="btn-primario" (click)="aplicarFiltros()"><mat-icon>search</mat-icon> Filtrar</button>
+      <button class="btn-secundario" (click)="limparFiltros()">Limpar</button>
     </div>
   </div>
 
@@ -46,8 +55,15 @@
           <td>{{ formatarData(r.criado_em) }}</td>
           <td>{{ r.usuario_nome || r.usuario_email }}</td>
           <td>{{ r.modelo || '—' }}</td>
-          <td><code class="rid">{{ r.run_id }}</code></td>
-          <td><button class="btn secundario sm" (click)="verDetalhe(r.run_id)">Ver</button></td>
+          <td>
+            <span class="rid-cell">
+              <code class="rid">{{ r.run_id }}</code>
+              <button class="btn-icone" (click)="copiarRunId(r.run_id)" [attr.aria-label]="'Copiar run_id ' + r.run_id" title="Copiar run_id">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </span>
+          </td>
+          <td><button class="btn-secundario sm" (click)="verDetalhe(r.run_id)">Ver</button></td>
         </tr>
         <tr *ngIf="!itens.length">
           <td colspan="5" class="vazio">Nenhuma run encontrada. (As runs aparecem após treinos com o MLflow configurado.)</td>
@@ -58,17 +74,21 @@
 
   <!-- Paginação -->
   <div class="paginacao" *ngIf="total > 0">
-    <button class="btn secundario" (click)="paginaAnterior()" [disabled]="skip <= 0">Anterior</button>
+    <button class="btn-secundario" (click)="paginaAnterior()" [disabled]="skip <= 0">Anterior</button>
     <span>Página {{ paginaAtual }} de {{ totalPaginas }} · {{ total }} runs</span>
-    <button class="btn secundario" (click)="proximaPagina()" [disabled]="skip + limit >= total">Próxima</button>
+    <button class="btn-secundario" (click)="proximaPagina()" [disabled]="skip + limit >= total">Próxima</button>
   </div>
 
   <!-- Detalhe da run -->
-  <div class="detalhe" *ngIf="runSelecionada">
+  <div class="detalhe" [class.destaque]="destaqueDetalhe" *ngIf="runSelecionada">
     <div class="detalhe-head">
       <h2>Resumo da run</h2>
       <code class="rid">{{ runSelecionada }}</code>
-      <button class="btn secundario sm" (click)="fecharDetalhe()">Fechar</button>
+      <button class="btn-secundario sm" (click)="copiarRunId(runSelecionada)">
+        <mat-icon>{{ runIdCopiado ? 'check' : 'content_copy' }}</mat-icon>
+        {{ runIdCopiado ? 'Copiado' : 'Copiar' }}
+      </button>
+      <button class="btn-secundario sm" (click)="fecharDetalhe()"><mat-icon>close</mat-icon> Fechar</button>
     </div>
 
     <div class="erro-msg" *ngIf="erroDetalhe" role="alert">{{ erroDetalhe }}</div>

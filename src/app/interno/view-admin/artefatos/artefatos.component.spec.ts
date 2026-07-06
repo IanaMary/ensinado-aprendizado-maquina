@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { of, throwError } from 'rxjs';
 import { ArtefatosComponent } from './artefatos.component';
 import { ArtefatosService } from '../../../service/artefatos/artefatos.service';
@@ -18,7 +19,7 @@ describe('ArtefatosComponent', () => {
     dash.listarUsuarios.and.returnValue(of([]));
     await TestBed.configureTestingModule({
       declarations: [ArtefatosComponent],
-      imports: [CommonModule, FormsModule],
+      imports: [CommonModule, FormsModule, MatIconModule],
       providers: [
         { provide: ArtefatosService, useValue: svc },
         { provide: DashboardService, useValue: dash },

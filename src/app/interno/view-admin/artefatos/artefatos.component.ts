@@ -27,6 +27,8 @@ export class ArtefatosComponent implements OnInit {
   carregandoDetalhe = false;
   erroDetalhe = '';
   resumo: any = null;
+  destaqueDetalhe = false;
+  runIdCopiado = false;
 
   constructor(private artefatos: ArtefatosService, private dashboard: DashboardService) {}
 
@@ -111,6 +113,16 @@ export class ArtefatosComponent implements OnInit {
     this.carregandoDetalhe = true;
     this.erroDetalhe = '';
     this.resumo = null;
+    // Rola até o resumo (que abre abaixo da lista) e o destaca por um instante,
+    // para o admin não perder onde a informação apareceu.
+    setTimeout(() => {
+      const el = document.querySelector('.artefatos-container .detalhe') as HTMLElement | null;
+      if (!el) return;
+      const reduz = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ behavior: reduz ? 'auto' : 'smooth', block: 'start' });
+      this.destaqueDetalhe = true;
+      setTimeout(() => (this.destaqueDetalhe = false), 1200);
+    }, 60);
     this.artefatos.obterRun(runId).subscribe({
       next: (r) => {
         this.resumo = r;
@@ -126,6 +138,14 @@ export class ArtefatosComponent implements OnInit {
           : (e?.error?.detail || 'Falha ao buscar o resumo da run.');
       },
     });
+  }
+
+  copiarRunId(runId: string | null): void {
+    if (!runId) return;
+    navigator.clipboard?.writeText(runId).then(() => {
+      this.runIdCopiado = true;
+      setTimeout(() => (this.runIdCopiado = false), 1500);
+    }).catch(() => {});
   }
 
   fecharDetalhe(): void {
