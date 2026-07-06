@@ -102,6 +102,26 @@
       }
     }
   }
+
+  .branding-sobre {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 10px 16px;
+    border: 1px solid rgba($branco, 0.35);
+    border-radius: 10px;
+    color: $branco;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+    &:hover { background: rgba($branco, 0.12); border-color: rgba($branco, 0.6); }
+    &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba($branco, 0.45); }
+  }
 }
 
 // Right side - Login Form
