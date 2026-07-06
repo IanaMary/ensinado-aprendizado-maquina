@@ -125,7 +125,8 @@
 
 .confusion-wrapper {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
   align-items: flex-start;
 }
 
@@ -229,12 +230,17 @@
 
 .confusion-legend {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  padding: 8px 14px;
   background: $cinza-claro;
   border-radius: 8px;
-  min-width: 160px;
+  width: 100%;
+
+  // "N erros" alinhado à direita, na mesma linha
+  .legend-item:last-child { margin-left: auto; }
 
   .legend-item {
     display: flex;

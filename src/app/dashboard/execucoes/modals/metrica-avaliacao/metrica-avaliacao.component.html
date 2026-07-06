@@ -46,6 +46,20 @@
           </div>
 
           <div class="confusion-wrapper">
+            <div class="confusion-legend">
+              <div class="legend-item">
+                <span class="legend-color legend-acerto"></span>
+                <span>Diagonal = Acertos (VP)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color legend-erro"></span>
+                <span>Fora diagonal = Erros</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-count erros">{{ getTotalErros(resultadosDasAvaliacoes[metrica][modelo].matriz) }} erros</span>
+              </div>
+            </div>
+
             <div class="confusion-matrix-container">
               <div class="cm-label-top"><span>Previsto</span></div>
               <table class="cm-table">
@@ -74,20 +88,6 @@
                   </tr>
                 </tbody>
               </table>
-            </div>
-
-            <div class="confusion-legend">
-              <div class="legend-item">
-                <span class="legend-color legend-acerto"></span>
-                <span>Diagonal = Acertos (VP)</span>
-              </div>
-              <div class="legend-item">
-                <span class="legend-color legend-erro"></span>
-                <span>Fora diagonal = Erros</span>
-              </div>
-              <div class="legend-item">
-                <span class="legend-count erros">{{ getTotalErros(resultadosDasAvaliacoes[metrica][modelo].matriz) }} erros</span>
-              </div>
             </div>
           </div>
         </div>
