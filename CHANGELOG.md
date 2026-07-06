@@ -8,6 +8,12 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-06 (Artefatos: filtro Dataset com autocomplete)
+
+### Frontend `mestrado-iana` `cd14583` (bundle `main-3LZKNEI6.js`) · só frontend
+- O `<select>` de **Dataset** virou autocomplete (mesmo padrão de Modelo: filtra a lista de
+  facetas por texto). Build + 115/115.
+
 ## 2026-07-06 (Artefatos: filtros Usuário/Modelo com autocomplete)
 
 ### Frontend `mestrado-iana` `f9593a5` (bundle `main-ETFF2MHY.js`) + backend `07c9fa3`
