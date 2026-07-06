@@ -8,6 +8,14 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-06 (Artefatos: run ligada à atividade/turma)
+
+### Frontend `mestrado-iana` `689327e` (bundle `main-MV5KT6UD.js`) + backend `b7b320a`
+- Ao abrir uma run, o painel mostra **"Usada em atividade X · turma Y"** (submissões que
+  usaram a run), com **link para a turma** (`/view-professor/turmas/{id}`). Cruza run↔pipeline
+  via `GET /artefatos/{run_id}/contexto` — **sem tocar no fluxo de treino**. Build + 115/115;
+  backend 341 passed.
+
 ## 2026-07-06 (Artefatos: dataset gravado na run + filtro/coluna)
 
 ### Frontend `mestrado-iana` `3b4dfb9` (bundle `main-VEEKPYQC.js`) + backend `0dbd5b5`
