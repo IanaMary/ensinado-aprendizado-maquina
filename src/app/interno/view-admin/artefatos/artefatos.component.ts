@@ -86,6 +86,11 @@ export class ArtefatosComponent implements OnInit, OnDestroy {
     return q ? this.modelosDisponiveis.filter((m) => m.toLowerCase().includes(q)) : this.modelosDisponiveis;
   }
 
+  datasetsFiltrados(): string[] {
+    const q = (this.filtros.dataset || '').toLowerCase();
+    return q ? this.datasetsDisponiveis.filter((d) => d.toLowerCase().includes(q)) : this.datasetsDisponiveis;
+  }
+
   private carregarFacetas(): void {
     this.artefatos.getFacetas().subscribe({
       next: (f) => {

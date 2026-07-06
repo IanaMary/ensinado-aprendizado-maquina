@@ -59,10 +59,12 @@
       <label class="campo-label">Dataset</label>
       <div class="campo-input-wrapper">
         <mat-icon class="campo-icon">dataset</mat-icon>
-        <select class="campo-input" [(ngModel)]="filtros.dataset">
-          <option value="">todos</option>
-          <option *ngFor="let d of datasetsDisponiveis" [value]="d">{{ d }}</option>
-        </select>
+        <input class="campo-input" type="text" placeholder="todos"
+               [(ngModel)]="filtros.dataset" [matAutocomplete]="autoDataset" autocomplete="off">
+        <mat-autocomplete #autoDataset="matAutocomplete">
+          <mat-option [value]="''">todos</mat-option>
+          <mat-option *ngFor="let d of datasetsFiltrados()" [value]="d">{{ d }}</mat-option>
+        </mat-autocomplete>
       </div>
     </div>
     <div class="acoes">
