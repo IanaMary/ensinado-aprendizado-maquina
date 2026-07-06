@@ -4,24 +4,72 @@
 
   <!-- Filtros -->
   <div class="filtros">
-    <label>
-      Usuário
-      <select [(ngModel)]="filtros.usuario_id">
-        <option value="">todos</option>
-        <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nome }} ({{ u.email }})</option>
-      </select>
-    </label>
-    <label>
-      De
-      <input type="datetime-local" [(ngModel)]="filtros.data_inicio" />
-    </label>
-    <label>
-      Até
-      <input type="datetime-local" [(ngModel)]="filtros.data_fim" />
-    </label>
+    <div class="campo-form">
+      <label class="campo-label">Usuário</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">person</mat-icon>
+        <input class="campo-input" type="text" placeholder="buscar por nome ou e-mail…"
+               [(ngModel)]="usuarioBusca" (ngModelChange)="onBuscaUsuario($event)"
+               [matAutocomplete]="autoUser" autocomplete="off">
+        <mat-autocomplete #autoUser="matAutocomplete">
+          <mat-option *ngFor="let u of usuariosSugeridos" [value]="rotuloUsuario(u)"
+                      (onSelectionChange)="$event.isUserInput && escolherUsuario(u)">
+            {{ u.nome }} <small *ngIf="u.email">· {{ u.email }}</small>
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+    <div class="campo-form">
+      <label class="campo-label">De</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">event</mat-icon>
+        <input class="campo-input" type="datetime-local" [(ngModel)]="filtros.data_inicio" />
+      </div>
+    </div>
+    <div class="campo-form">
+      <label class="campo-label">Até</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">event</mat-icon>
+        <input class="campo-input" type="datetime-local" [(ngModel)]="filtros.data_fim" />
+      </div>
+    </div>
+    <div class="campo-form">
+      <label class="campo-label">Modelo</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">model_training</mat-icon>
+        <input class="campo-input" type="text" placeholder="todos"
+               [(ngModel)]="filtros.modelo" [matAutocomplete]="autoModelo" autocomplete="off">
+        <mat-autocomplete #autoModelo="matAutocomplete">
+          <mat-option [value]="''">todos</mat-option>
+          <mat-option *ngFor="let m of modelosFiltrados()" [value]="m">{{ m }}</mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+    <div class="campo-form">
+      <label class="campo-label">Papel</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">badge</mat-icon>
+        <select class="campo-input" [(ngModel)]="filtros.papel">
+          <option value="">todos</option>
+          <option *ngFor="let p of papeisDisponiveis" [value]="p">{{ papelLabel[p] || p }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="campo-form" *ngIf="datasetsDisponiveis.length">
+      <label class="campo-label">Dataset</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">dataset</mat-icon>
+        <input class="campo-input" type="text" placeholder="todos"
+               [(ngModel)]="filtros.dataset" [matAutocomplete]="autoDataset" autocomplete="off">
+        <mat-autocomplete #autoDataset="matAutocomplete">
+          <mat-option [value]="''">todos</mat-option>
+          <mat-option *ngFor="let d of datasetsFiltrados()" [value]="d">{{ d }}</mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
     <div class="acoes">
-      <button class="btn" (click)="aplicarFiltros()">Filtrar</button>
-      <button class="btn secundario" (click)="limparFiltros()">Limpar</button>
+      <button class="btn-primario" (click)="aplicarFiltros()"><mat-icon>search</mat-icon> Filtrar</button>
+      <button class="btn-secundario" (click)="limparFiltros()">Limpar</button>
     </div>
   </div>
 
@@ -37,6 +85,7 @@
           <th scope="col">Data</th>
           <th scope="col">Usuário</th>
           <th scope="col">Modelo</th>
+          <th scope="col">Dataset</th>
           <th scope="col">run_id</th>
           <th scope="col"></th>
         </tr>
@@ -46,11 +95,19 @@
           <td>{{ formatarData(r.criado_em) }}</td>
           <td>{{ r.usuario_nome || r.usuario_email }}</td>
           <td>{{ r.modelo || '—' }}</td>
-          <td><code class="rid">{{ r.run_id }}</code></td>
-          <td><button class="btn secundario sm" (click)="verDetalhe(r.run_id)">Ver</button></td>
+          <td>{{ r.dataset_nome || '—' }}</td>
+          <td>
+            <span class="rid-cell">
+              <code class="rid">{{ r.run_id }}</code>
+              <button class="btn-icone" (click)="copiarRunId(r.run_id)" [attr.aria-label]="'Copiar run_id ' + r.run_id" title="Copiar run_id">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </span>
+          </td>
+          <td><button class="btn-secundario sm" (click)="verDetalhe(r.run_id)">Ver</button></td>
         </tr>
         <tr *ngIf="!itens.length">
-          <td colspan="5" class="vazio">Nenhuma run encontrada. (As runs aparecem após treinos com o MLflow configurado.)</td>
+          <td colspan="6" class="vazio">Nenhuma run encontrada. (As runs aparecem após treinos com o MLflow configurado.)</td>
         </tr>
       </tbody>
     </table>
@@ -58,17 +115,40 @@
 
   <!-- Paginação -->
   <div class="paginacao" *ngIf="total > 0">
-    <button class="btn secundario" (click)="paginaAnterior()" [disabled]="skip <= 0">Anterior</button>
+    <button class="btn-secundario" (click)="paginaAnterior()" [disabled]="skip <= 0">Anterior</button>
     <span>Página {{ paginaAtual }} de {{ totalPaginas }} · {{ total }} runs</span>
-    <button class="btn secundario" (click)="proximaPagina()" [disabled]="skip + limit >= total">Próxima</button>
+    <button class="btn-secundario" (click)="proximaPagina()" [disabled]="skip + limit >= total">Próxima</button>
   </div>
 
-  <!-- Detalhe da run -->
-  <div class="detalhe" *ngIf="runSelecionada">
+  <!-- Detalhe da run: painel lateral (drawer) -->
+  <div class="drawer-backdrop" *ngIf="runSelecionada" (click)="fecharDetalhe()"></div>
+  <aside class="drawer" *ngIf="runSelecionada" role="dialog" aria-modal="true" aria-label="Resumo da run">
     <div class="detalhe-head">
       <h2>Resumo da run</h2>
       <code class="rid">{{ runSelecionada }}</code>
-      <button class="btn secundario sm" (click)="fecharDetalhe()">Fechar</button>
+      <button class="btn-secundario sm" (click)="copiarRunId(runSelecionada)">
+        <mat-icon>{{ runIdCopiado ? 'check' : 'content_copy' }}</mat-icon>
+        {{ runIdCopiado ? 'Copiado' : 'Copiar' }}
+      </button>
+      <button class="btn-primario sm" *ngIf="modeloIdSelecionado" (click)="baixarModelo()" [disabled]="baixandoModelo">
+        <mat-icon>download</mat-icon>
+        {{ baixandoModelo ? 'Baixando…' : 'Baixar modelo' }}
+      </button>
+      <button class="btn-secundario sm fechar" (click)="fecharDetalhe()"><mat-icon>close</mat-icon> Fechar</button>
+    </div>
+
+    <div class="vinculos" *ngIf="contextoVinculos.length">
+      <mat-icon>school</mat-icon>
+      <div class="vinculos-texto">
+        <span class="vinculos-titulo">Usada em atividade de turma</span>
+        <div class="vinculo" *ngFor="let v of contextoVinculos">
+          <strong>{{ v.atividade_titulo || 'Atividade' }}</strong>
+          <ng-container *ngIf="v.turma_nome"> · turma
+            <a class="link-turma" (click)="abrirTurma(v.turma_id)">{{ v.turma_nome }}</a>
+          </ng-container>
+          <span class="vinculo-sub" *ngIf="v.pipeline_nome">submissão: {{ v.pipeline_nome }}</span>
+        </div>
+      </div>
     </div>
 
     <div class="erro-msg" *ngIf="erroDetalhe" role="alert">{{ erroDetalhe }}</div>
@@ -130,5 +210,5 @@
         <p class="vazio" *ngIf="!(resumo.models || []).length">Sem modelos logados.</p>
       </section>
     </div>
-  </div>
+  </aside>
 </div>

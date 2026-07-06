@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Subject, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 import { ArtefatosService } from '../../../service/artefatos/artefatos.service';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 
@@ -8,13 +11,21 @@ import { DashboardService } from '../../../dashboard/services/dashboard.service'
   styleUrls: ['./artefatos.component.scss'],
   standalone: false,
 })
-export class ArtefatosComponent implements OnInit {
+export class ArtefatosComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  private buscaUsuario$ = new Subject<string>();
   carregando = false;
   erro = '';
 
-  // filtros (busca por usuário e por data)
-  filtros = { usuario_id: '', data_inicio: '', data_fim: '' };
-  usuarios: { id: string; nome: string; email: string }[] = [];
+  // filtros (usuário, modelo, papel, período)
+  filtros = { usuario_id: '', modelo: '', papel: '', dataset: '', data_inicio: '', data_fim: '' };
+  // autocomplete de usuário (busca no servidor — escala p/ milhares de alunos)
+  usuarioBusca = '';
+  usuariosSugeridos: { id: string; nome: string; email: string }[] = [];
+  modelosDisponiveis: string[] = [];
+  papeisDisponiveis: string[] = [];
+  datasetsDisponiveis: string[] = [];
+  readonly papelLabel: Record<string, string> = { aluno: 'Aluno', professor: 'Professor', admin: 'Admin' };
 
   // paginação
   skip = 0;
@@ -27,18 +38,67 @@ export class ArtefatosComponent implements OnInit {
   carregandoDetalhe = false;
   erroDetalhe = '';
   resumo: any = null;
+  runIdCopiado = false;
+  contextoVinculos: any[] = [];
+  modeloIdSelecionado: string | null = null;
+  modeloNomeSelecionado: string | null = null;
+  baixandoModelo = false;
 
-  constructor(private artefatos: ArtefatosService, private dashboard: DashboardService) {}
+  @HostListener('document:keydown.escape')
+  aoApertarEsc(): void { if (this.runSelecionada) this.fecharDetalhe(); }
 
-  ngOnInit(): void {
-    this.carregarUsuarios();
-    this.buscar();
+  constructor(private artefatos: ArtefatosService, private dashboard: DashboardService, private router: Router) {}
+
+  abrirTurma(turmaId: string): void {
+    if (turmaId) this.router.navigate(['/view-professor/turmas', turmaId]);
   }
 
-  private carregarUsuarios(): void {
-    this.dashboard.listarUsuarios().subscribe({
-      next: (us) => (this.usuarios = (us || []).map((u: any) => ({ id: u.id, nome: u.nome, email: u.email }))),
-      error: () => (this.usuarios = []),
+  ngOnInit(): void {
+    this.carregarFacetas();
+    this.buscar();
+    // Busca de usuário debounced no servidor (só quando há texto).
+    this.buscaUsuario$.pipe(
+      debounceTime(250),
+      distinctUntilChanged(),
+      switchMap((q) => (q.trim().length >= 1 ? this.artefatos.buscarUsuarios(q.trim()) : of([]))),
+      takeUntil(this.destroy$),
+    ).subscribe((res) => (this.usuariosSugeridos = res || []));
+  }
+
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
+
+  onBuscaUsuario(texto: string): void {
+    if (!texto || !texto.trim()) { this.filtros.usuario_id = ''; this.usuariosSugeridos = []; }
+    this.buscaUsuario$.next(texto || '');
+  }
+
+  rotuloUsuario(u: { nome: string; email: string }): string {
+    return `${u.nome}${u.email ? ' · ' + u.email : ''}`;
+  }
+
+  escolherUsuario(u: { id: string; nome: string; email: string }): void {
+    // O texto exibido é escrito pelo autocomplete (value = rótulo); aqui só guardamos o id.
+    this.filtros.usuario_id = u.id;
+  }
+
+  modelosFiltrados(): string[] {
+    const q = (this.filtros.modelo || '').toLowerCase();
+    return q ? this.modelosDisponiveis.filter((m) => m.toLowerCase().includes(q)) : this.modelosDisponiveis;
+  }
+
+  datasetsFiltrados(): string[] {
+    const q = (this.filtros.dataset || '').toLowerCase();
+    return q ? this.datasetsDisponiveis.filter((d) => d.toLowerCase().includes(q)) : this.datasetsDisponiveis;
+  }
+
+  private carregarFacetas(): void {
+    this.artefatos.getFacetas().subscribe({
+      next: (f) => {
+        this.modelosDisponiveis = f?.modelos || [];
+        this.papeisDisponiveis = f?.papeis || [];
+        this.datasetsDisponiveis = f?.datasets || [];
+      },
+      error: () => { this.modelosDisponiveis = []; this.papeisDisponiveis = []; this.datasetsDisponiveis = []; },
     });
   }
 
@@ -51,6 +111,9 @@ export class ArtefatosComponent implements OnInit {
   private montarFiltros() {
     return {
       usuario_id: this.filtros.usuario_id,
+      modelo: this.filtros.modelo,
+      papel: this.filtros.papel,
+      dataset: this.filtros.dataset,
       data_inicio: this.toIso(this.filtros.data_inicio),
       data_fim: this.toIso(this.filtros.data_fim),
       skip: this.skip,
@@ -64,7 +127,9 @@ export class ArtefatosComponent implements OnInit {
   }
 
   limparFiltros(): void {
-    this.filtros = { usuario_id: '', data_inicio: '', data_fim: '' };
+    this.filtros = { usuario_id: '', modelo: '', papel: '', dataset: '', data_inicio: '', data_fim: '' };
+    this.usuarioBusca = '';
+    this.usuariosSugeridos = [];
     this.aplicarFiltros();
   }
 
@@ -107,10 +172,18 @@ export class ArtefatosComponent implements OnInit {
   // ---- detalhe ----
   verDetalhe(runId: string): void {
     if (!runId) return;
-    this.runSelecionada = runId;
+    this.runSelecionada = runId;   // abre o painel lateral (drawer)
     this.carregandoDetalhe = true;
     this.erroDetalhe = '';
     this.resumo = null;
+    this.contextoVinculos = [];
+    const item = this.itens.find((i) => i.run_id === runId);
+    this.modeloIdSelecionado = item?.modelo_id || null;
+    this.modeloNomeSelecionado = item?.modelo || null;
+    this.artefatos.contextoRun(runId).subscribe({
+      next: (c) => (this.contextoVinculos = c?.vinculos || []),
+      error: () => (this.contextoVinculos = []),
+    });
     this.artefatos.obterRun(runId).subscribe({
       next: (r) => {
         this.resumo = r;
@@ -126,6 +199,35 @@ export class ArtefatosComponent implements OnInit {
           : (e?.error?.detail || 'Falha ao buscar o resumo da run.');
       },
     });
+  }
+
+  baixarModelo(): void {
+    if (!this.modeloIdSelecionado || this.baixandoModelo) return;
+    this.baixandoModelo = true;
+    this.dashboard.baixarModeloArtefato(this.modeloIdSelecionado).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const nome = (this.modeloNomeSelecionado || 'modelo').replace(/[^\w.-]+/g, '_');
+        a.download = `modelo-${nome}-${(this.runSelecionada || '').slice(0, 8)}.zip`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.baixandoModelo = false;
+      },
+      error: () => {
+        this.baixandoModelo = false;
+        this.erroDetalhe = 'Não foi possível baixar o modelo desta run (pode ter sido removido).';
+      },
+    });
+  }
+
+  copiarRunId(runId: string | null): void {
+    if (!runId) return;
+    navigator.clipboard?.writeText(runId).then(() => {
+      this.runIdCopiado = true;
+      setTimeout(() => (this.runIdCopiado = false), 1500);
+    }).catch(() => {});
   }
 
   fecharDetalhe(): void {

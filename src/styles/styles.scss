@@ -593,3 +593,89 @@ body {
   color: $roxo-medio !important;
   fill: $roxo-medio !important;
 }
+/* ----------------------------------------------------------------------------
+   Campos de formulário reutilizáveis (estilo do login: arredondado, com ícone).
+   Use nas telas internas para manter o design consistente.
+---------------------------------------------------------------------------- */
+.campo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .campo-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: $roxo-escuro;
+  }
+
+  .campo-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    height: 44px;
+    background: $branco;
+    border: 2px solid $cinza-claro;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+
+    &:focus-within {
+      border-color: $roxo-medio;
+      box-shadow: 0 0 0 3px rgba($roxo-medio, 0.1);
+    }
+
+    .campo-icon {
+      color: $cinza-medio;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .campo-input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: $cinza-escuro;
+      background: transparent;
+      height: 100%;
+
+      &::placeholder { color: $cinza-medio; }
+    }
+
+    select.campo-input {
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+  }
+}
+
+/* Contador de caracteres dentro do campo (ex.: 12/100) */
+.campo-form .campo-input-wrapper .campo-contador {
+  font-size: 11px;
+  color: $cinza-medio;
+  flex-shrink: 0;
+}
+
+/* ----------------------------------------------------------------------------
+   Consistência visual dos mat-form-field "outline" restantes (modais de dados,
+   editores admin): cantos arredondados + borda 2px + foco roxo, sem mexer no
+   markup/comportamento dos controles Material (mat-select, máscaras etc.).
+---------------------------------------------------------------------------- */
+.mat-mdc-form-field.mat-form-field-appearance-outline {
+  .mdc-notched-outline__leading {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-width: 2px;
+  }
+  .mdc-notched-outline__notch { border-top-width: 2px; border-bottom-width: 2px; }
+  .mdc-notched-outline__trailing {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-width: 2px;
+  }
+  &.mat-focused .mdc-notched-outline > * { border-color: $roxo-medio; }
+}
