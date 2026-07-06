@@ -91,6 +91,7 @@
     padding-top: 26px;
     border-top: 1px solid rgba($branco, 0.22);
 
+    .autoria-item.coorientacao,
     .autoria-item.programa { grid-column: 1 / -1; }
 
     dt {
@@ -108,6 +109,22 @@
       font-weight: 600;
       line-height: 1.4;
       color: $branco;
+
+      .sep { margin: 0 4px; color: rgba($branco, 0.5); }
+
+      a {
+        color: $branco;
+        text-decoration: none;
+        border-bottom: 1px solid rgba($branco, 0.4);
+        transition: border-color .18s ease, color .18s ease;
+
+        &:hover { border-bottom-color: $branco; }
+        &:focus-visible {
+          outline: none;
+          border-radius: 3px;
+          box-shadow: 0 0 0 3px rgba($branco, 0.45);
+        }
+      }
     }
   }
 }
