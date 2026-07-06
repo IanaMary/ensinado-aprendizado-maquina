@@ -8,6 +8,18 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-06 (polish da tela de Artefatos MLflow — /impeccable critique)
+
+### Frontend `mestrado-iana` `cf6008f` (bundle `main-25GBCWSY.js`) · só frontend
+- Corrige os achados da crítica em `/view-admin/artefatos`:
+  - **Design system:** hexes hardcoded (roxo-Material) → tokens `colores.scss`; filtros no padrão
+    `.campo-*`; botões `.btn-primario`/`.btn-secundario` do app.
+  - **Contraste AA:** textos suaves (#999/#777, falhavam) → `$cinza-escuro` (≥7:1).
+  - **Estados:** hover + `:focus-visible` (anel roxo) nos botões; hover nas linhas.
+  - **"Ver":** rola até o resumo e o destaca 1,2s (reduced-motion → instantâneo).
+  - **Copiar run_id** em 1 clique (tabela + detalhe), com feedback "Copiado".
+- Build + 115/115; detector `/impeccable` limpo.
+
 ## 2026-07-06 (design: salvar-pipeline + arredondamento global dos campos)
 
 ### Frontend `mestrado-iana` `fc0dfc6` (bundle `main-AQRT7EVE.js`) · só frontend
