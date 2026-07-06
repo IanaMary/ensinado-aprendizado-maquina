@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as QRCode from 'qrcode';
@@ -148,6 +148,12 @@ export class TurmaDetalheComponent implements OnInit {
   }
 
   fecharChats(): void { this.chatAlunoId = ''; this.chats = []; this.chatAberto = null; }
+
+  @HostListener('document:keydown.escape')
+  aoApertarEsc(): void {
+    if (this.chatAberto) this.chatAberto = null;   // volta à lista
+    else if (this.chatAlunoId) this.fecharChats(); // fecha o modal
+  }
 
   fmtValor(v: any): string {
     if (typeof v !== 'number') return '—';
