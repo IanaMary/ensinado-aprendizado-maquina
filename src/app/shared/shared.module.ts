@@ -13,6 +13,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { ShellComponent } from './shell/shell.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { UserMenuComponent } from './user-menu/user-menu.component';
+import { BrandLogoComponent } from './brand-logo/brand-logo.component';
 import { MarkdownPipe } from '../dashboard/chat-tutor/markdown.pipe';
 
 @NgModule({
@@ -20,6 +21,7 @@ import { MarkdownPipe } from '../dashboard/chat-tutor/markdown.pipe';
     ShellComponent,
     BreadcrumbComponent,
     UserMenuComponent,
+    BrandLogoComponent,
     MarkdownPipe
   ],
   imports: [
@@ -52,6 +54,7 @@ import { MarkdownPipe } from '../dashboard/chat-tutor/markdown.pipe';
     ShellComponent,
     BreadcrumbComponent,
     UserMenuComponent,
+    BrandLogoComponent,
     MarkdownPipe
   ],
   providers: []
