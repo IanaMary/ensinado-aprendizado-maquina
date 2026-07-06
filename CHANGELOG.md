@@ -8,6 +8,15 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-06 (design: campos de Turmas no estilo do login)
+
+### Frontend `mestrado-iana` `27d2dcd` (bundle `main-SGZFKQEX.js`) · só frontend
+- As telas de **Turmas** usavam `mat-form-field` outline ("quadradão, sem profundidade"),
+  destoando do login. Novo conjunto **reutilizável `.campo-*`** (global em `styles.scss`) com o
+  visual do login (borda 2px arredondada, ícone, foco com anel roxo). Aplicado em `view-professor`
+  (criar turma), `turma-detalhe` (adicionar aluno, criar atividade — inputs e **selects**) e
+  `entrar-turma` (código). Build + 115/115.
+
 ## 2026-07-05 (admin: supervisão global de turmas)
 
 ### Frontend `mestrado-iana` `61ccf8f` (bundle `main-5IB3SKSX.js`) + backend `77aeeda`
