@@ -103,15 +103,18 @@
     <nav class="secao-datasets" *ngIf="fonteDados === 'dataset'">
       <nav class="datasets-header">
         <nav class="datasets-filtro">
-          <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-label>Filtrar por tipo</mat-label>
-            <mat-select [(ngModel)]="filtroTipoDataset">
-              <mat-option [value]="">Todos</mat-option>
-              <mat-option value="classificacao">Classificação</mat-option>
-              <mat-option value="regressao">Regressão</mat-option>
-              <mat-option value="agrupamento">Agrupamento</mat-option>
-            </mat-select>
-          </mat-form-field>
+          <div class="campo-form">
+            <label class="campo-label">Filtrar por tipo</label>
+            <div class="campo-input-wrapper">
+              <mat-icon class="campo-icon">filter_list</mat-icon>
+              <select class="campo-input" [(ngModel)]="filtroTipoDataset">
+                <option value="">Todos</option>
+                <option value="classificacao">Classificação</option>
+                <option value="regressao">Regressão</option>
+                <option value="agrupamento">Agrupamento</option>
+              </select>
+            </div>
+          </div>
         </nav>
         <button
           type="button"

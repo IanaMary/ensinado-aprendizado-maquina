@@ -507,7 +507,7 @@ input[type="file"] {
     flex: 1;
     min-width: 180px;
 
-    mat-form-field {
+    mat-form-field, .campo-form {
       width: 100%;
     }
   }
