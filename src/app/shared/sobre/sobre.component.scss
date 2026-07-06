@@ -20,7 +20,7 @@
   background: $branco;
   border-bottom: 1px solid rgba($roxo-claro, 0.7);
 
-  .topo-logo { height: 32px; width: auto; display: block; }
+  .topo-logo { height: 40px; width: auto; display: block; }
 
   .btn-voltar {
     display: inline-flex; align-items: center; gap: 6px;
@@ -61,6 +61,14 @@
   max-width: 820px;
   margin: 0 auto;
   animation: subir .6s cubic-bezier(.2,.7,.2,1) both;
+
+  .capa-marca {
+    width: clamp(72px, 11vw, 108px);
+    height: auto;
+    display: block;
+    margin: 0 0 24px;
+    filter: drop-shadow(0 8px 22px rgba($preto-puro, 0.25));
+  }
 
   .capa-tipo {
     display: inline-block;
