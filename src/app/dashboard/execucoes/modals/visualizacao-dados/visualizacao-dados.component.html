@@ -19,15 +19,16 @@
     </div>
 
     <div class="controle-grupo">
-      <label>Colorir por (hue):</label>
-      <mat-form-field appearance="outline">
-        <mat-select [(value)]="hueSelecionado">
-          <mat-option [value]="''">Nenhuma</mat-option>
-          <mat-option *ngFor="let col of colunasDisponiveis" [value]="col">
-            {{ col }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div class="campo-form">
+        <label class="campo-label">Colorir por (hue)</label>
+        <div class="campo-input-wrapper">
+          <mat-icon class="campo-icon">palette</mat-icon>
+          <select class="campo-input" [(ngModel)]="hueSelecionado">
+            <option value="">Nenhuma</option>
+            <option *ngFor="let col of colunasDisponiveis" [value]="col">{{ col }}</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <button

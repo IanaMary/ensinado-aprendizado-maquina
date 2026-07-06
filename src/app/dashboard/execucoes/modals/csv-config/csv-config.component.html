@@ -8,29 +8,33 @@
 
   <mat-dialog-content class="dialog-content">
     <div class="config-row">
-      <mat-form-field appearance="outline">
-        <mat-label>Separador</mat-label>
-        <mat-select [(ngModel)]="separador" (selectionChange)="onSeparadorChange()">
-          <mat-option *ngFor="let s of separadores" [value]="s.valor">
-            {{ s.label }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div class="campo-form">
+        <label class="campo-label">Separador</label>
+        <div class="campo-input-wrapper">
+          <mat-icon class="campo-icon">more_vert</mat-icon>
+          <select class="campo-input" [(ngModel)]="separador" (ngModelChange)="onSeparadorChange()">
+            <option *ngFor="let s of separadores" [value]="s.valor">{{ s.label }}</option>
+          </select>
+        </div>
+      </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Encoding</mat-label>
-        <mat-select [(ngModel)]="encoding" (selectionChange)="onEncodingChange()">
-          <mat-option *ngFor="let e of encodings" [value]="e.valor">
-            {{ e.label }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div class="campo-form">
+        <label class="campo-label">Encoding</label>
+        <div class="campo-input-wrapper">
+          <mat-icon class="campo-icon">translate</mat-icon>
+          <select class="campo-input" [(ngModel)]="encoding" (ngModelChange)="onEncodingChange()">
+            <option *ngFor="let e of encodings" [value]="e.valor">{{ e.label }}</option>
+          </select>
+        </div>
+      </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Linhas preview</mat-label>
-        <input matInput type="number" [(ngModel)]="linhasPreview" min="1" max="100"
-          (change)="fazerPreview()" />
-      </mat-form-field>
+      <div class="campo-form">
+        <label class="campo-label">Linhas preview</label>
+        <div class="campo-input-wrapper">
+          <mat-icon class="campo-icon">table_rows</mat-icon>
+          <input class="campo-input" type="number" [(ngModel)]="linhasPreview" min="1" max="100" (change)="fazerPreview()" />
+        </div>
+      </div>
     </div>
 
     <div *ngIf="carregando" class="loading">

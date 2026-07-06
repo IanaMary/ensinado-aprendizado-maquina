@@ -1,5 +1,5 @@
 .nomear-pipeline-dialog {
-  min-width: 380px;
+  min-width: min(380px, 90vw);
   max-width: 480px;
   padding: 8px 4px 4px;
 
@@ -33,10 +33,6 @@
 
   .nome-field {
     width: 100%;
-
-    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-      padding-bottom: 0;
-    }
   }
 
   .erro {

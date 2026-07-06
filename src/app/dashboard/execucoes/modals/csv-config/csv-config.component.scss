@@ -66,7 +66,7 @@ mat-dialog-actions {
   gap: 16px;
   margin-bottom: 16px;
 
-  mat-form-field {
+  mat-form-field, .campo-form {
     flex: 1;
   }
 }
