@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 import { ArtefatosComponent } from './artefatos.component';
@@ -14,15 +16,16 @@ describe('ArtefatosComponent', () => {
   let dash: jasmine.SpyObj<DashboardService>;
 
   beforeEach(async () => {
-    svc = jasmine.createSpyObj('ArtefatosService', ['listar', 'obterRun', 'getFacetas', 'contextoRun']);
+    svc = jasmine.createSpyObj('ArtefatosService', ['listar', 'obterRun', 'getFacetas', 'contextoRun', 'buscarUsuarios']);
     svc.listar.and.returnValue(of({ total: 0, itens: [] }));
     svc.getFacetas.and.returnValue(of({ modelos: [], papeis: [], datasets: [] }));
     svc.contextoRun.and.returnValue(of({ vinculos: [] }));
+    svc.buscarUsuarios.and.returnValue(of([]));
     dash = jasmine.createSpyObj('DashboardService', ['listarUsuarios']);
     dash.listarUsuarios.and.returnValue(of([]));
     await TestBed.configureTestingModule({
       declarations: [ArtefatosComponent],
-      imports: [CommonModule, FormsModule, MatIconModule, RouterTestingModule],
+      imports: [CommonModule, FormsModule, MatIconModule, MatAutocompleteModule, NoopAnimationsModule, RouterTestingModule],
       providers: [
         { provide: ArtefatosService, useValue: svc },
         { provide: DashboardService, useValue: dash },
@@ -31,10 +34,12 @@ describe('ArtefatosComponent', () => {
     comp = TestBed.createComponent(ArtefatosComponent).componentInstance;
   });
 
-  it('lista runs e usuários no init', () => {
+  it('lista runs e facetas no init (usuário é buscado sob demanda)', () => {
     comp.ngOnInit();
-    expect(dash.listarUsuarios).toHaveBeenCalled();
     expect(svc.listar).toHaveBeenCalled();
+    expect(svc.getFacetas).toHaveBeenCalled();
+    // usuários não são mais carregados em massa no init (autocomplete busca no servidor)
+    expect(dash.listarUsuarios).not.toHaveBeenCalled();
   });
 
   it('converte datetime-local para ISO UTC ao filtrar', () => {

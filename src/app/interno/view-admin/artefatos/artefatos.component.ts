@@ -1,5 +1,7 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 import { ArtefatosService } from '../../../service/artefatos/artefatos.service';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 
@@ -9,13 +11,17 @@ import { DashboardService } from '../../../dashboard/services/dashboard.service'
   styleUrls: ['./artefatos.component.scss'],
   standalone: false,
 })
-export class ArtefatosComponent implements OnInit {
+export class ArtefatosComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  private buscaUsuario$ = new Subject<string>();
   carregando = false;
   erro = '';
 
   // filtros (usuário, modelo, papel, período)
   filtros = { usuario_id: '', modelo: '', papel: '', dataset: '', data_inicio: '', data_fim: '' };
-  usuarios: { id: string; nome: string; email: string }[] = [];
+  // autocomplete de usuário (busca no servidor — escala p/ milhares de alunos)
+  usuarioBusca = '';
+  usuariosSugeridos: { id: string; nome: string; email: string }[] = [];
   modelosDisponiveis: string[] = [];
   papeisDisponiveis: string[] = [];
   datasetsDisponiveis: string[] = [];
@@ -48,16 +54,36 @@ export class ArtefatosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.carregarUsuarios();
     this.carregarFacetas();
     this.buscar();
+    // Busca de usuário debounced no servidor (só quando há texto).
+    this.buscaUsuario$.pipe(
+      debounceTime(250),
+      distinctUntilChanged(),
+      switchMap((q) => (q.trim().length >= 1 ? this.artefatos.buscarUsuarios(q.trim()) : of([]))),
+      takeUntil(this.destroy$),
+    ).subscribe((res) => (this.usuariosSugeridos = res || []));
   }
 
-  private carregarUsuarios(): void {
-    this.dashboard.listarUsuarios().subscribe({
-      next: (us) => (this.usuarios = (us || []).map((u: any) => ({ id: u.id, nome: u.nome, email: u.email }))),
-      error: () => (this.usuarios = []),
-    });
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
+
+  onBuscaUsuario(texto: string): void {
+    if (!texto || !texto.trim()) { this.filtros.usuario_id = ''; this.usuariosSugeridos = []; }
+    this.buscaUsuario$.next(texto || '');
+  }
+
+  rotuloUsuario(u: { nome: string; email: string }): string {
+    return `${u.nome}${u.email ? ' · ' + u.email : ''}`;
+  }
+
+  escolherUsuario(u: { id: string; nome: string; email: string }): void {
+    // O texto exibido é escrito pelo autocomplete (value = rótulo); aqui só guardamos o id.
+    this.filtros.usuario_id = u.id;
+  }
+
+  modelosFiltrados(): string[] {
+    const q = (this.filtros.modelo || '').toLowerCase();
+    return q ? this.modelosDisponiveis.filter((m) => m.toLowerCase().includes(q)) : this.modelosDisponiveis;
   }
 
   private carregarFacetas(): void {
@@ -97,6 +123,8 @@ export class ArtefatosComponent implements OnInit {
 
   limparFiltros(): void {
     this.filtros = { usuario_id: '', modelo: '', papel: '', dataset: '', data_inicio: '', data_fim: '' };
+    this.usuarioBusca = '';
+    this.usuariosSugeridos = [];
     this.aplicarFiltros();
   }
 

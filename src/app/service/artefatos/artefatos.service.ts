@@ -26,6 +26,12 @@ export class ArtefatosService {
     return this.http.get<{ modelos: string[]; papeis: string[]; datasets: string[] }>(`${this.endpoint}/facetas`);
   }
 
+  /** Busca leve de usuários (autocomplete do filtro) — escala p/ milhares. */
+  buscarUsuarios(q: string) {
+    return this.http.get<{ id: string; nome: string; email: string }[]>(
+      `${this.endpoint}/usuarios?q=${encodeURIComponent(q)}&limit=20`);
+  }
+
   /** Resumo detalhado de uma run específica. */
   obterRun(runId: string) {
     return this.http.get<any>(`${this.endpoint}/${encodeURIComponent(runId)}`);

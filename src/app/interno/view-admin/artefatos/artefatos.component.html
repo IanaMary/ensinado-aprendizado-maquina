@@ -8,10 +8,15 @@
       <label class="campo-label">Usuário</label>
       <div class="campo-input-wrapper">
         <mat-icon class="campo-icon">person</mat-icon>
-        <select class="campo-input" [(ngModel)]="filtros.usuario_id">
-          <option value="">todos</option>
-          <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nome }} ({{ u.email }})</option>
-        </select>
+        <input class="campo-input" type="text" placeholder="buscar por nome ou e-mail…"
+               [(ngModel)]="usuarioBusca" (ngModelChange)="onBuscaUsuario($event)"
+               [matAutocomplete]="autoUser" autocomplete="off">
+        <mat-autocomplete #autoUser="matAutocomplete">
+          <mat-option *ngFor="let u of usuariosSugeridos" [value]="rotuloUsuario(u)"
+                      (onSelectionChange)="$event.isUserInput && escolherUsuario(u)">
+            {{ u.nome }} <small *ngIf="u.email">· {{ u.email }}</small>
+          </mat-option>
+        </mat-autocomplete>
       </div>
     </div>
     <div class="campo-form">
@@ -32,10 +37,12 @@
       <label class="campo-label">Modelo</label>
       <div class="campo-input-wrapper">
         <mat-icon class="campo-icon">model_training</mat-icon>
-        <select class="campo-input" [(ngModel)]="filtros.modelo">
-          <option value="">todos</option>
-          <option *ngFor="let m of modelosDisponiveis" [value]="m">{{ m }}</option>
-        </select>
+        <input class="campo-input" type="text" placeholder="todos"
+               [(ngModel)]="filtros.modelo" [matAutocomplete]="autoModelo" autocomplete="off">
+        <mat-autocomplete #autoModelo="matAutocomplete">
+          <mat-option [value]="''">todos</mat-option>
+          <mat-option *ngFor="let m of modelosFiltrados()" [value]="m">{{ m }}</mat-option>
+        </mat-autocomplete>
       </div>
     </div>
     <div class="campo-form">
