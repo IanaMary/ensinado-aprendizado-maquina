@@ -121,6 +121,10 @@
         <mat-icon>{{ runIdCopiado ? 'check' : 'content_copy' }}</mat-icon>
         {{ runIdCopiado ? 'Copiado' : 'Copiar' }}
       </button>
+      <button class="btn-primario sm" *ngIf="modeloIdSelecionado" (click)="baixarModelo()" [disabled]="baixandoModelo">
+        <mat-icon>download</mat-icon>
+        {{ baixandoModelo ? 'Baixando…' : 'Baixar modelo' }}
+      </button>
       <button class="btn-secundario sm fechar" (click)="fecharDetalhe()"><mat-icon>close</mat-icon> Fechar</button>
     </div>
 

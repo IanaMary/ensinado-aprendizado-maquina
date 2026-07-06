@@ -34,6 +34,9 @@ export class ArtefatosComponent implements OnInit {
   resumo: any = null;
   runIdCopiado = false;
   contextoVinculos: any[] = [];
+  modeloIdSelecionado: string | null = null;
+  modeloNomeSelecionado: string | null = null;
+  baixandoModelo = false;
 
   @HostListener('document:keydown.escape')
   aoApertarEsc(): void { if (this.runSelecionada) this.fecharDetalhe(); }
@@ -141,6 +144,9 @@ export class ArtefatosComponent implements OnInit {
     this.erroDetalhe = '';
     this.resumo = null;
     this.contextoVinculos = [];
+    const item = this.itens.find((i) => i.run_id === runId);
+    this.modeloIdSelecionado = item?.modelo_id || null;
+    this.modeloNomeSelecionado = item?.modelo || null;
     this.artefatos.contextoRun(runId).subscribe({
       next: (c) => (this.contextoVinculos = c?.vinculos || []),
       error: () => (this.contextoVinculos = []),
@@ -158,6 +164,27 @@ export class ArtefatosComponent implements OnInit {
           : s === 404 ? 'Run não encontrada.'
           : s === 400 ? 'run_id inválido.'
           : (e?.error?.detail || 'Falha ao buscar o resumo da run.');
+      },
+    });
+  }
+
+  baixarModelo(): void {
+    if (!this.modeloIdSelecionado || this.baixandoModelo) return;
+    this.baixandoModelo = true;
+    this.dashboard.baixarModeloArtefato(this.modeloIdSelecionado).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const nome = (this.modeloNomeSelecionado || 'modelo').replace(/[^\w.-]+/g, '_');
+        a.download = `modelo-${nome}-${(this.runSelecionada || '').slice(0, 8)}.zip`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.baixandoModelo = false;
+      },
+      error: () => {
+        this.baixandoModelo = false;
+        this.erroDetalhe = 'Não foi possível baixar o modelo desta run (pode ter sido removido).';
       },
     });
   }
