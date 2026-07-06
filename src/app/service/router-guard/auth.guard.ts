@@ -12,7 +12,7 @@ import { roleMap } from '../../../app/models/item-coleta-dado.model';
 const ROTAS_POR_PAPEL: Record<string, string[]> = {
   aluno: ['inicio', 'treine-robo', 'leo-mundo-real', 'trilha', 'projetos', 'galeria', 'entrar'],
   professor: ['view-professor', 'atividades', 'projetos', 'trilha', 'galeria', 'entrar'],
-  admin: ['view-admin', 'atividades', 'projetos', 'trilha', 'galeria', 'entrar'],
+  admin: ['view-admin', 'view-professor', 'atividades', 'projetos', 'trilha', 'galeria', 'entrar'],
 };
 
 @Injectable({

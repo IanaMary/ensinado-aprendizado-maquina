@@ -39,6 +39,16 @@
       </button>
     </div>
 
+    <div class="usuario-opcoes" *ngIf="usuarioProfessorOuAdmin">
+      <button class="usuario-opcao" (click)="navegarGerenciarTurmas()">
+        <mat-icon>school</mat-icon>
+        <div>
+          <strong>Gerenciar turmas</strong>
+          <span>Turmas, atividades e ranking</span>
+        </div>
+      </button>
+    </div>
+
     <div class="usuario-opcoes" *ngIf="usuarioAdmin">
       <button class="usuario-opcao" (click)="navegarParaAdmin()">
         <mat-icon>admin_panel_settings</mat-icon>

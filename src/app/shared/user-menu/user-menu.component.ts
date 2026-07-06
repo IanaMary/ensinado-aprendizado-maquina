@@ -44,6 +44,8 @@ export class UserMenuComponent {
   }
 
   get usuarioAdmin(): boolean { return this.roleUsuario === 'admin'; }
+  /** Professor e admin gerenciam Turmas & Atividades. */
+  get usuarioProfessorOuAdmin(): boolean { return this.roleUsuario === 'professor' || this.roleUsuario === 'admin'; }
 
   alternar(event: Event): void {
     event.stopPropagation();
@@ -53,6 +55,7 @@ export class UserMenuComponent {
   navegarParaProjetos(): void { this.usuarioMenuAberto = false; this.router.navigate(['/projetos']); }
   navegarParaGaleria(): void { this.usuarioMenuAberto = false; this.router.navigate(['/galeria']); }
   navegarParaTurmas(): void { this.usuarioMenuAberto = false; this.router.navigate(['/entrar']); }
+  navegarGerenciarTurmas(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-professor']); }
   navegarParaAdmin(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-admin']); }
   navegarParaUsuarios(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-admin/usuarios']); }
   sair(): void { this.authService.logout(); }
