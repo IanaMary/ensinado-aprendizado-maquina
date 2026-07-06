@@ -8,6 +8,16 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-06 (design: salvar-pipeline + arredondamento global dos campos)
+
+### Frontend `mestrado-iana` `fc0dfc6` (bundle `main-AQRT7EVE.js`) · só frontend
+- **Salvar/renomear pipeline** (`nomear-pipeline-dialog`): campo convertido para `.campo-*`
+  (arredondado, com ícone + contador de caracteres), igual ao login.
+- **Arredondamento global** dos `mat-form-field` outline restantes (modais de coleta/CSV/
+  visualização de dados e o editor de conteúdo do tutor): cantos 10px, borda 2px, foco roxo —
+  **override CSS seguro**, sem alterar markup/comportamento dos controles Material (mat-select,
+  máscaras). Build + 115/115.
+
 ## 2026-07-06 (design: campos de Turmas no estilo do login)
 
 ### Frontend `mestrado-iana` `27d2dcd` (bundle `main-SGZFKQEX.js`) · só frontend
