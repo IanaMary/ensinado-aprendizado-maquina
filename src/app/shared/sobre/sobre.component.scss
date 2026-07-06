@@ -14,13 +14,10 @@
 .sobre-topo {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
-  padding: 16px clamp(16px, 5vw, 40px);
+  padding: 12px clamp(16px, 5vw, 40px);
   background: $branco;
   border-bottom: 1px solid rgba($roxo-claro, 0.7);
-
-  .topo-logo { height: 40px; width: auto; display: block; }
 
   .btn-voltar {
     display: inline-flex; align-items: center; gap: 6px;
