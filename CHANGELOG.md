@@ -8,6 +8,14 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-06 (Artefatos: dataset gravado na run + filtro/coluna)
+
+### Frontend `mestrado-iana` `3b4dfb9` (bundle `main-VEEKPYQC.js`) + backend `0dbd5b5`
+- O **treino passa a enviar `dataset_nome`** → a run guarda o dataset. Artefatos ganha
+  **filtro Dataset** (dropdown via `/facetas`) e **coluna Dataset** na tabela.
+- Retroativo: runs antigas ficam sem dataset (—); vale dos próximos treinos. Build + 115/115;
+  backend 340 passed.
+
 ## 2026-07-06 (Artefatos: filtros modelo/papel + detalhe em drawer)
 
 ### Frontend `mestrado-iana` `81f0d0d` (bundle `main-PJH75CY3.js`) + backend `b1f6831`
