@@ -23,7 +23,7 @@ export class ArtefatosService {
 
   /** Valores distintos p/ os filtros (modelos, papéis). */
   getFacetas() {
-    return this.http.get<{ modelos: string[]; papeis: string[] }>(`${this.endpoint}/facetas`);
+    return this.http.get<{ modelos: string[]; papeis: string[]; datasets: string[] }>(`${this.endpoint}/facetas`);
   }
 
   /** Resumo detalhado de uma run específica. */

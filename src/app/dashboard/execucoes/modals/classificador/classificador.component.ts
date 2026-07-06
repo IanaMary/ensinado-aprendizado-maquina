@@ -82,13 +82,15 @@ export class ClasificadorComponent implements OnChanges {
       colunas: item.colunas || []
     }));
 
+    const coleta: any = this.resultadoColetaDado || {};
     const body = {
       tipo_arquivo: 'xlsx',
       arquivo_id: arquivoId,
       configuracao_id: configuracaoId,
       modelo_id: modeloId,
       hiperparametros: this.hiperparametros || {},
-      pre_processamento: preProcessamento
+      pre_processamento: preProcessamento,
+      dataset_nome: coleta.nomeDataset || coleta.nome_dataset || undefined,
     }
 
     this.dashboardService.classificadorTreino(tipoClassficador, body).subscribe({

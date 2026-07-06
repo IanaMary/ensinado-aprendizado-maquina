@@ -13,10 +13,11 @@ export class ArtefatosComponent implements OnInit {
   erro = '';
 
   // filtros (usuário, modelo, papel, período)
-  filtros = { usuario_id: '', modelo: '', papel: '', data_inicio: '', data_fim: '' };
+  filtros = { usuario_id: '', modelo: '', papel: '', dataset: '', data_inicio: '', data_fim: '' };
   usuarios: { id: string; nome: string; email: string }[] = [];
   modelosDisponiveis: string[] = [];
   papeisDisponiveis: string[] = [];
+  datasetsDisponiveis: string[] = [];
   readonly papelLabel: Record<string, string> = { aluno: 'Aluno', professor: 'Professor', admin: 'Admin' };
 
   // paginação
@@ -52,8 +53,12 @@ export class ArtefatosComponent implements OnInit {
 
   private carregarFacetas(): void {
     this.artefatos.getFacetas().subscribe({
-      next: (f) => { this.modelosDisponiveis = f?.modelos || []; this.papeisDisponiveis = f?.papeis || []; },
-      error: () => { this.modelosDisponiveis = []; this.papeisDisponiveis = []; },
+      next: (f) => {
+        this.modelosDisponiveis = f?.modelos || [];
+        this.papeisDisponiveis = f?.papeis || [];
+        this.datasetsDisponiveis = f?.datasets || [];
+      },
+      error: () => { this.modelosDisponiveis = []; this.papeisDisponiveis = []; this.datasetsDisponiveis = []; },
     });
   }
 
@@ -68,6 +73,7 @@ export class ArtefatosComponent implements OnInit {
       usuario_id: this.filtros.usuario_id,
       modelo: this.filtros.modelo,
       papel: this.filtros.papel,
+      dataset: this.filtros.dataset,
       data_inicio: this.toIso(this.filtros.data_inicio),
       data_fim: this.toIso(this.filtros.data_fim),
       skip: this.skip,
@@ -81,7 +87,7 @@ export class ArtefatosComponent implements OnInit {
   }
 
   limparFiltros(): void {
-    this.filtros = { usuario_id: '', modelo: '', papel: '', data_inicio: '', data_fim: '' };
+    this.filtros = { usuario_id: '', modelo: '', papel: '', dataset: '', data_inicio: '', data_fim: '' };
     this.aplicarFiltros();
   }
 

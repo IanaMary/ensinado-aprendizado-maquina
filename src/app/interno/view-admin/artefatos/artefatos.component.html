@@ -48,6 +48,16 @@
         </select>
       </div>
     </div>
+    <div class="campo-form" *ngIf="datasetsDisponiveis.length">
+      <label class="campo-label">Dataset</label>
+      <div class="campo-input-wrapper">
+        <mat-icon class="campo-icon">dataset</mat-icon>
+        <select class="campo-input" [(ngModel)]="filtros.dataset">
+          <option value="">todos</option>
+          <option *ngFor="let d of datasetsDisponiveis" [value]="d">{{ d }}</option>
+        </select>
+      </div>
+    </div>
     <div class="acoes">
       <button class="btn-primario" (click)="aplicarFiltros()"><mat-icon>search</mat-icon> Filtrar</button>
       <button class="btn-secundario" (click)="limparFiltros()">Limpar</button>
@@ -66,6 +76,7 @@
           <th scope="col">Data</th>
           <th scope="col">Usuário</th>
           <th scope="col">Modelo</th>
+          <th scope="col">Dataset</th>
           <th scope="col">run_id</th>
           <th scope="col"></th>
         </tr>
@@ -75,6 +86,7 @@
           <td>{{ formatarData(r.criado_em) }}</td>
           <td>{{ r.usuario_nome || r.usuario_email }}</td>
           <td>{{ r.modelo || '—' }}</td>
+          <td>{{ r.dataset_nome || '—' }}</td>
           <td>
             <span class="rid-cell">
               <code class="rid">{{ r.run_id }}</code>
@@ -86,7 +98,7 @@
           <td><button class="btn-secundario sm" (click)="verDetalhe(r.run_id)">Ver</button></td>
         </tr>
         <tr *ngIf="!itens.length">
-          <td colspan="5" class="vazio">Nenhuma run encontrada. (As runs aparecem após treinos com o MLflow configurado.)</td>
+          <td colspan="6" class="vazio">Nenhuma run encontrada. (As runs aparecem após treinos com o MLflow configurado.)</td>
         </tr>
       </tbody>
     </table>
