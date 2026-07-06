@@ -68,6 +68,11 @@
     display: block;
     margin: 0 0 24px;
     filter: drop-shadow(0 8px 22px rgba($preto-puro, 0.25));
+    transform-origin: left center;
+    /* entrada (uma vez) + flutuar sutil e contínuo depois */
+    animation:
+      marca-entra .72s cubic-bezier(.16, .84, .32, 1) both,
+      marca-flutua 5s ease-in-out 1.1s infinite;
   }
 
   .capa-tipo {
@@ -274,8 +279,19 @@
   to   { opacity: 1; transform: none; }
 }
 
+@keyframes marca-entra {
+  from { opacity: 0; transform: scale(.78) translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes marca-flutua {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .capa-conteudo,
+  .capa-marca,
   .resumo p { animation: none; }
 }
 
