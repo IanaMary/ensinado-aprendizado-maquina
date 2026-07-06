@@ -8,6 +8,13 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-06 (Artefatos: botão Baixar modelo no drawer)
+
+### Frontend `mestrado-iana` `0a6e2fc` (bundle `main-6YHNVWUM.js`) · só frontend
+- Quando a run tem `modelo_id`, o painel mostra **"Baixar modelo"** → baixa o `.zip` do modelo
+  MLflow (`MLmodel`/`model.pkl`/`requirements`/exemplo) via `baixarModeloArtefato` (blob +
+  download client-side). Endpoint backend já existia. Build + 115/115.
+
 ## 2026-07-06 (Artefatos: run ligada à atividade/turma)
 
 ### Frontend `mestrado-iana` `689327e` (bundle `main-MV5KT6UD.js`) + backend `b7b320a`
