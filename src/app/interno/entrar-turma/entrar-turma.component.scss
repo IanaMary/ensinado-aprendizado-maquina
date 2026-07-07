@@ -1,4 +1,4 @@
-@use '../../../styles/styles.scss' as *;
+@use '../../../styles/colores.scss' as *;
 
 :host { display: block; }
 .et-container { padding: 20px; display: flex; flex-direction: column; gap: 16px; max-width: 820px; margin: 0 auto; }
