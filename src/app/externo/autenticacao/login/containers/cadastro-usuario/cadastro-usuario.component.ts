@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { LoginService } from '../../services/login.service';
 import { AuthService } from '../../../../../service/auth/auth.service';
+import { lerReturnUrl, limparReturnUrl } from '../../../../../service/auth/retorno-login';
 
 @Component({
   selector: 'app-cadastro-usuario',
@@ -67,6 +68,16 @@ export class CadastroUsuarioComponent implements OnInit {
       next: async (user: any) => {
         const validar = await this.auth.salvarUsuarioSessionStorage(user);
         if (validar) {
+          // Quem chegou por deep-link (ex.: QR de turma) e precisou criar conta volta
+          // ao destino original — sem isto o aluno "entrava" mas nunca aparecia na turma.
+          const retorno = lerReturnUrl();
+          if (retorno) {
+            this.router.navigateByUrl(retorno).then(ok => {
+              limparReturnUrl();
+              if (!ok) this.router.navigate(['']);
+            }).catch(() => this.router.navigate(['']));
+            return;
+          }
           this.router.navigate(['']);
         }
       },

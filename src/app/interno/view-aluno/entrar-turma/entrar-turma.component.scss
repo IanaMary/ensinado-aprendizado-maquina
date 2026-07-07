@@ -16,6 +16,14 @@
 
 .vazio { color: $cinza-medio; font-size: 14px; padding: 8px 4px; }
 
+.confirmar-aviso {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 10px 14px;
+  background: $roxo-fundo; border: 1px solid $roxo-claro; border-radius: 10px;
+  font-size: 13px; line-height: 1.5; color: $cinza-escuro;
+  mat-icon { color: $roxo-medio; flex-shrink: 0; }
+  strong { color: $roxo-escuro; }
+}
+
 .entrar-row { display: flex; gap: 8px; align-items: flex-end; .campo-form { flex: 1; } .btn-primario { height: 44px; } }
 
 .btn-primario { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: none;

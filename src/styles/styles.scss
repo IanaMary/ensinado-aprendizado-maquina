@@ -12,6 +12,14 @@
 * { font-family: 'Maven Pro', 'Roboto', 'Helvetica Neue', sans-serif; }
 mat-icon, .material-icons { font-family: 'Material Icons' !important; }
 
+/* Código continua MONOESPAÇADO: a regra universal acima vence o default do navegador
+   em <code>/<pre> (origem de autor > UA), o que desalinharia stack traces, snippets
+   sklearn e blocos de código do tutor. `pre *` etc. cobre os filhos (spans do hljs). */
+code, kbd, samp, pre,
+code *, kbd *, samp *, pre * {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Courier New', monospace;
+}
+
 /* Grafismo institucional H2IA — malha de pontos (aplicar como textura sutil de fundo).
    Use em um pseudo-elemento/camada; nunca sobre texto. */
 .grafismo-pontos {

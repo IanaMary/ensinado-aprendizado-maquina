@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../service/auth/auth.service';
+import { roleMap } from '../../models/item-coleta-dado.model';
 
 /**
  * Tela "Sobre" — apresenta o trabalho de mestrado que originou a plataforma.
@@ -15,10 +17,15 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./sobre.component.scss'],
 })
 export class SobreComponent {
-  constructor(private location: Location, private router: Router) {}
+  constructor(private router: Router, private auth: AuthService) {}
 
+  /**
+   * Sempre navega PARA DENTRO do app (home do papel ou login) — nunca history.back():
+   * a página é pública/compartilhável, e quem chega de um link externo tem histórico
+   * de outra origem na aba; back() jogaria a pessoa para fora da plataforma.
+   */
   voltar(): void {
-    if (history.length > 1) this.location.back();
-    else this.router.navigate(['/autenticacao/login']);
+    const role = this.auth.getUsuarioRole();
+    this.router.navigateByUrl((role && roleMap[role]) || '/autenticacao/login');
   }
 }

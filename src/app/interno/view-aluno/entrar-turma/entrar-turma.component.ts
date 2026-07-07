@@ -12,6 +12,8 @@ import { TurmaService, Turma, Atividade } from '../../../service/turma.service';
 export class EntrarTurmaComponent implements OnInit {
   codigo = '';
   entrando = false;
+  /** Código veio de link/QR: pede confirmação explícita em vez de matricular sozinho. */
+  confirmarCodigo = false;
   turmas: Turma[] = [];
   atividadesPorTurma: Record<string, Atividade[]> = {};
   carregando = true;
@@ -26,16 +28,19 @@ export class EntrarTurmaComponent implements OnInit {
   ngOnInit(): void {
     const codigo = this.route.snapshot.queryParamMap.get('codigo');
     if (codigo) {
+      // Pré-preenche e pede UM clique de confirmação — não matricula sozinho: o link/QR
+      // pode ter sido aberto por outra pessoa nesta aba (PC compartilhado) ou restaurado
+      // de um returnUrl antigo; a conta logada precisa confirmar que é ela quem entra.
       this.codigo = codigo.toUpperCase();
-      this.entrar();
-    } else {
-      this.carregarMinhas();
+      this.confirmarCodigo = true;
     }
+    this.carregarMinhas();
   }
 
   entrar(): void {
     const codigo = this.codigo.trim().toUpperCase();
     if (!codigo) return;
+    this.confirmarCodigo = false;
     this.entrando = true;
     this.turmaService.entrar(codigo).subscribe({
       next: (t) => {

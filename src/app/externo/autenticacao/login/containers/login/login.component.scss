@@ -356,13 +356,15 @@
     padding: 18px 20px;
     min-height: 0;
 
-    // Compact logo on small phones
+    // Logo compacto em celulares: sem isto o .brand-logo de 360px empurra o
+    // formulário para baixo da dobra na coluna empilhada.
     .logo-container {
       margin-bottom: 6px;
 
-      .logo-icon { width: 36px; height: 36px; font-size: 14px; }
-      .logo-text { font-size: 20px; }
+      .brand-logo { width: 200px; }
     }
+
+    .logo-text { font-size: 18px; }
 
     .branding-subtitle {
       font-size: 13px;

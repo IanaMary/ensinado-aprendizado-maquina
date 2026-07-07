@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanLoad, Route, UrlSegment, Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
+import { guardarReturnUrl } from '../auth/retorno-login';
 import { roleMap } from '../../../app/models/item-coleta-dado.model';
 
 // Rotas (1º segmento) que cada papel pode carregar. O aluno tem MÚLTIPLAS entradas
@@ -32,7 +33,7 @@ export class AuthGuard implements CanLoad {
       const nav = this.router.getCurrentNavigation?.();
       const destino = nav?.extractedUrl?.toString() || ('/' + segments.map(s => s.path).join('/'));
       if (destino && destino !== '/' && !destino.startsWith('/autenticacao')) {
-        sessionStorage.setItem('returnUrl', destino);
+        guardarReturnUrl(destino); // com expiração curta — ver retorno-login.ts
       }
       this.router.navigate(['/autenticacao/login']);
       return false;

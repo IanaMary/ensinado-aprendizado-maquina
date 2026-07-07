@@ -156,7 +156,7 @@
           <li *ngIf="!chats.length" class="vazio">Nenhuma conversa.</li>
         </ul>
         <div class="transcript" *ngIf="chatAberto">
-          <button class="btn-mini voltar-chat" (click)="chatAberto = null"><mat-icon aria-hidden="true">arrow_back</mat-icon> voltar</button>
+          <button class="btn-mini voltar-chat" (click)="voltarLista()"><mat-icon aria-hidden="true">arrow_back</mat-icon> voltar</button>
           <div class="msg" *ngFor="let m of chatAberto.mensagens" [class.user]="m.role === 'user'">
             <span class="quem">{{ m.role === 'user' ? 'Aluno' : 'Léo' }}</span>
             <div class="texto" *ngIf="m.role === 'user'">{{ m.content }}</div>
