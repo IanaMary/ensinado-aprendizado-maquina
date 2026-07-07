@@ -2,30 +2,9 @@
 @use 'sass:map';
 @import '../styles/colores.scss';
 
-/* Tipografia institucional H2IA — Maven Pro (auto-hospedada) */
-@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: swap; }
-
-/* Aplica a fonte institucional em toda a aplicação (inclui componentes Material) */
-* { font-family: 'Maven Pro', 'Roboto', 'Helvetica Neue', sans-serif; }
-mat-icon, .material-icons { font-family: 'Material Icons' !important; }
-
-/* Código continua MONOESPAÇADO: a regra universal acima vence o default do navegador
-   em <code>/<pre> (origem de autor > UA), o que desalinharia stack traces, snippets
-   sklearn e blocos de código do tutor. `pre *` etc. cobre os filhos (spans do hljs). */
-code, kbd, samp, pre,
-code *, kbd *, samp *, pre * {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Courier New', monospace;
-}
-
-/* Grafismo institucional H2IA — malha de pontos (aplicar como textura sutil de fundo).
-   Use em um pseudo-elemento/camada; nunca sobre texto. */
-.grafismo-pontos {
-  background-image: radial-gradient(rgba($roxo-medio, 0.16) 1.4px, transparent 1.6px);
-  background-size: 14px 14px;
-}
+// Tipografia institucional (Maven Pro) e monospace vivem em `styles/fontes.scss`
+// (global-only, via angular.json) — não aqui, senão o @font-face era duplicado em
+// cada componente que faz @import deste arquivo.
 
 html,
 body {
