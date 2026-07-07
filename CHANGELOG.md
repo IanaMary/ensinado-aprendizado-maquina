@@ -1,4 +1,4 @@
-# Changelog — Iana / H2IA Tutor
+# Changelog — Mestrado Iana / H2IA Tutor
 
 Histórico de deploys em produção (`https://absapt.tk/h2ia/`). Formato inspirado em
 [Keep a Changelog](https://keepachangelog.com); datas em AAAA-MM-DD. Cada entrada cita os
@@ -8,24 +8,346 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
-## 2026-06-25 (split — branch `sistema-completo`/master)
+## 2026-07-06/07 (Identidade H2IA + tela Sobre + a11y/QR + performance)
 
-### Branch `sistema-completo` (vira master) — Admin + 3 modos do aluno. Front `0fbf3a1`
+> Sequência de deploys só-frontend em `mestrado-iana`; tudo portado para `master`
+> (`0658e4e`, não implantado). Backend inalterado. Verificação: 115/115 (`mestrado-iana`) /
+> 108/108 (`master`) em cada passo. **Sem verificação visual** (extensão do Chrome offline).
+
+### Frontend `mestrado-iana` `1918306` (bundle `main-FVDVRNVM.js`, estado final)
+
+- **Fluxo de entrada por QR corrigido + endurecido.** O link/QR aponta para rota protegida;
+  aluno deslogado perdia o `?codigo` no login (join nunca acontecia). Helper
+  `service/auth/retorno-login.ts`: `returnUrl` com **expiração 10 min**, consumido só após a
+  navegação resolver; o **cadastro** também o consome; e o `entrar-turma` **não auto-matricula**
+  mais — pede **1 clique de confirmação** (evita matricular a conta errada em PC compartilhado).
+- **Acessibilidade em `turma-detalhe`:** `aria-label` nos botões só-ícone, contraste AA, modal de
+  chat com `role="dialog"`+`cdkTrapFocus`+Esc + foco devolvido a elemento vivo, `<thead>`/`scope`,
+  `overflow-x`, `:focus-visible`, `<h1>`, `<li>`→`<button>`.
+- **Identidade visual H2IA:** fonte **Maven Pro** auto-hospedada (**WOFF2**, ~124 KB; TTF fallback);
+  **logo do Hub** no login, cabeçalhos Admin/Professor e favicon "iA"; componente `<app-brand-logo>`.
+- **Tela pública `/sobre`** (dissertação de **Iana Mary Costa**; orientador Ulisses Brisolara Corrêa;
+  coorientação Larissa Astrogildo de Freitas e Marilton Sanchotene de Aguiar — links UFPel; PPGC/UFPel;
+  ano 2026). Acessível pelo login (rodapé + painel) e menu do usuário. Símbolo iA animado.
+- **Matriz de confusão:** legenda movida para uma linha horizontal acima da matriz.
+- **Performance (revisão `max`):** fim da **duplicação global de CSS** — 23 componentes passaram a
+  importar `colores.scss` (variáveis-only) em vez de `styles.scss` (que re-emitia todo o CSS global
+  com escopo): `.pipeline-item` **337→35** no bundle, `'Maven Pro'` 120→12. Fontes movidas para
+  `styles/fontes.scss` (global-only, via `angular.json`). Dead code/assets removidos.
+
+Detalhes: `handoffs/2026-07-07-marca-h2ia-sobre-a11y-perf.md`.
+
+## 2026-07-06 (Artefatos: filtro Dataset com autocomplete)
+
+### Frontend `mestrado-iana` `cd14583` (bundle `main-3LZKNEI6.js`) · só frontend
+- O `<select>` de **Dataset** virou autocomplete (mesmo padrão de Modelo: filtra a lista de
+  facetas por texto). Build + 115/115.
+
+## 2026-07-06 (Artefatos: filtros Usuário/Modelo com autocomplete)
+
+### Frontend `mestrado-iana` `f9593a5` (bundle `main-ETFF2MHY.js`) + backend `07c9fa3`
+- Os `<select>` de **Usuário** e **Modelo** viravam inviáveis com muitos registros. Agora:
+  **Usuário** = input com autocomplete + **busca debounced no servidor** (`/artefatos/usuarios`,
+  regex nome/email, limitado) — escala p/ milhares de alunos, não carrega todos no init;
+  **Modelo** = autocomplete filtrando a lista de facetas. Painel via CDK overlay (não clipa).
+  Build + 115/115; backend 342 passed.
+
+## 2026-07-06 (Artefatos: botão Baixar modelo no drawer)
+
+### Frontend `mestrado-iana` `0a6e2fc` (bundle `main-6YHNVWUM.js`) · só frontend
+- Quando a run tem `modelo_id`, o painel mostra **"Baixar modelo"** → baixa o `.zip` do modelo
+  MLflow (`MLmodel`/`model.pkl`/`requirements`/exemplo) via `baixarModeloArtefato` (blob +
+  download client-side). Endpoint backend já existia. Build + 115/115.
+
+## 2026-07-06 (Artefatos: run ligada à atividade/turma)
+
+### Frontend `mestrado-iana` `689327e` (bundle `main-MV5KT6UD.js`) + backend `b7b320a`
+- Ao abrir uma run, o painel mostra **"Usada em atividade X · turma Y"** (submissões que
+  usaram a run), com **link para a turma** (`/view-professor/turmas/{id}`). Cruza run↔pipeline
+  via `GET /artefatos/{run_id}/contexto` — **sem tocar no fluxo de treino**. Build + 115/115;
+  backend 341 passed.
+
+## 2026-07-06 (Artefatos: dataset gravado na run + filtro/coluna)
+
+### Frontend `mestrado-iana` `3b4dfb9` (bundle `main-VEEKPYQC.js`) + backend `0dbd5b5`
+- O **treino passa a enviar `dataset_nome`** → a run guarda o dataset. Artefatos ganha
+  **filtro Dataset** (dropdown via `/facetas`) e **coluna Dataset** na tabela.
+- Retroativo: runs antigas ficam sem dataset (—); vale dos próximos treinos. Build + 115/115;
+  backend 340 passed.
+
+## 2026-07-06 (Artefatos: filtros modelo/papel + detalhe em drawer)
+
+### Frontend `mestrado-iana` `81f0d0d` (bundle `main-PJH75CY3.js`) + backend `b1f6831`
+- **Filtros novos:** Modelo e Papel (aluno/professor/admin), dropdowns populados por
+  `GET /artefatos/facetas`. (Dataset/professor-de-turma/turma **não** são gravados na run —
+  filtrar por eles exigiria enriquecer o doc no treino, não retroativo.)
+- **"Ver" → painel lateral (drawer):** o resumo abre num painel deslizante à direita com
+  backdrop (antes empilhava abaixo da lista e parecia "não ter acontecido nada"). Fecha por X,
+  backdrop ou **Esc**; respeita `prefers-reduced-motion`; z-index semântico.
+- Build + 115/115; backend 340 passed.
+
+## 2026-07-06 (polish da tela de Artefatos MLflow — /impeccable critique)
+
+### Frontend `mestrado-iana` `cf6008f` (bundle `main-25GBCWSY.js`) · só frontend
+- Corrige os achados da crítica em `/view-admin/artefatos`:
+  - **Design system:** hexes hardcoded (roxo-Material) → tokens `colores.scss`; filtros no padrão
+    `.campo-*`; botões `.btn-primario`/`.btn-secundario` do app.
+  - **Contraste AA:** textos suaves (#999/#777, falhavam) → `$cinza-escuro` (≥7:1).
+  - **Estados:** hover + `:focus-visible` (anel roxo) nos botões; hover nas linhas.
+  - **"Ver":** rola até o resumo e o destaca 1,2s (reduced-motion → instantâneo).
+  - **Copiar run_id** em 1 clique (tabela + detalhe), com feedback "Copiado".
+- Build + 115/115; detector `/impeccable` limpo.
+
+## 2026-07-06 (design: salvar-pipeline + arredondamento global dos campos)
+
+### Frontend `mestrado-iana` `fc0dfc6` (bundle `main-AQRT7EVE.js`) · só frontend
+- **Salvar/renomear pipeline** (`nomear-pipeline-dialog`): campo convertido para `.campo-*`
+  (arredondado, com ícone + contador de caracteres), igual ao login.
+- **Arredondamento global** dos `mat-form-field` outline restantes (modais de coleta/CSV/
+  visualização de dados e o editor de conteúdo do tutor): cantos 10px, borda 2px, foco roxo —
+  **override CSS seguro**, sem alterar markup/comportamento dos controles Material (mat-select,
+  máscaras). Build + 115/115.
+
+## 2026-07-06 (design: campos de Turmas no estilo do login)
+
+### Frontend `mestrado-iana` `27d2dcd` (bundle `main-SGZFKQEX.js`) · só frontend
+- As telas de **Turmas** usavam `mat-form-field` outline ("quadradão, sem profundidade"),
+  destoando do login. Novo conjunto **reutilizável `.campo-*`** (global em `styles.scss`) com o
+  visual do login (borda 2px arredondada, ícone, foco com anel roxo). Aplicado em `view-professor`
+  (criar turma), `turma-detalhe` (adicionar aluno, criar atividade — inputs e **selects**) e
+  `entrar-turma` (código). Build + 115/115.
+
+## 2026-07-05 (admin: supervisão global de turmas)
+
+### Frontend `mestrado-iana` `61ccf8f` (bundle `main-5IB3SKSX.js`) + backend `77aeeda`
+- Admin passa a **ver/gerenciar todas as turmas** (backend devolve todas para admin); o
+  cabeçalho da lista mostra "Todas as turmas" (admin) vs "Minhas turmas" (professor).
+
+## 2026-07-05 (admin herda capacidades de professor)
+
+### Frontend `mestrado-iana` `cb08626` (bundle `main-TWZFP3KS.js`) + teste backend `e121c24`
+- **Admin ganha as capacidades de professor** (Turmas & Atividades): `AuthGuard` libera a rota
+  `view-professor` para admin; menu do usuário ganha **"Gerenciar turmas"** (→ `/view-professor`)
+  para professor e admin; painel admin ganha o card **"Turmas & Atividades"**.
+- Backend **inalterado** (já aceitava admin via `exigir_admin_ou_professor`, escopo por dono da
+  turma); +teste de regressão (`test_criar_turma_admin`). Build + 115/115 + turmas 5 passed.
+
+## 2026-07-05 (manutenção — dedup de menu + MarkdownPipe compartilhado)
+
+### Frontend `mestrado-iana` `6fef786` (bundle `main-PHAXKDVA.js`) · só frontend
+- **Dedup do menu do usuário:** `execucoes` e `view-admin` passam a usar o `<app-user-menu>`
+  compartilhado; removida a lógica de menu duplicada (getters/métodos/`HostListener`) e os
+  testes do menu inline (cobertos por `user-menu.component.spec`). Rotas idênticas (+ entrada
+  "Minhas turmas" agora também nesses menus).
+- **`MarkdownPipe` → `SharedModule`** (DashboardModule importa SharedModule): o visualizador de
+  chat do aluno (`turma-detalhe`) renderiza a resposta do tutor com **markdown** (antes mostrava
+  `**`/`#` crus). Sem mudança de comportamento nos demais usos. Build + 115/115. Backup
+  `frontend-20260705-174127`.
+
+## 2026-07-05 (correções da revisão — Turmas)
+
+### Frontend `mestrado-iana` `4d2620a` (bundle `main-Q3ESLUUV.js`) + backend `14746d0`
+- **Backend (ver CHANGELOG do back):** ranking por rótulo da métrica + dedup por aluno; chat do
+  aluno gated por vínculo de turma; `is_public` e `atividade_id`/`turma_id` validados no servidor;
+  `progresso` escopado à turma; índices; N+1 → agregações. 334 testes.
+- **Frontend (#5):** o dashboard lia o queryParam `dataset` da atividade mas **nunca o usava** (o
+  comentário prometia carregar o template). Agora o banner de atividade tem o botão **"Carregar
+  dados"** que abre direto a etapa de Coleta; comentário corrigido. Build + 117/117.
+- Deploy validado (front 200, API 200, endpoints gated 401). Backup `deploy-20260705-160308`.
+
+## 2026-07-04 (Turmas & Atividades — professor/aluno — + correções e "publicar")
+
+### Subsistema de Turmas (backend `aec30b7`+`e786757`; frontend bundles `main-PFBXCGYF.js` → `main-35UES7KI.js`)
+
+- **Correções (Parte A):** logout ao "Voltar"/abrir projeto era navegação para a rota MORTA
+  `/interno/view-aluno` (→ wildcard → login), corrigida para `/view-aluno` (galeria + meus-projetos);
+  **UserMenuComponent** compartilhado (menu do usuário na galeria + "Painel admin"/"Usuários" no menu
+  do admin); **logs vazios** (URL com `//sistema` duplo-barra corrigida no front + `get_last_logs`
+  achatado no backend); **publicar pipeline** (checkbox no modal de salvar, só professor/admin → `is_public`).
+- **Turmas & Atividades (Parte B):**
+  - Backend: router `/turmas` (criar/gerir turmas, alunos, **entrar por código**, atividades com
+    template = pipeline parcial, **ranking** por métrica, **progresso**), pipeline com
+    `atividade_id`/`turma_id`, e `GET /tutor/chat/aluno/{id}/historico` gated professor (transcript
+    completo, com auditoria — LGPD). Testes `test_turmas.py`; suíte 317+4 passed.
+  - Frontend professor (`view-professor`): lista/criação de turmas; **turma-detalhe** com código +
+    **QR code** + link de entrada, alunos (add por e-mail/remover), atividades (dataset + métrica),
+    ranking, tabela de progresso e **visualizador do chat** do aluno.
+  - Frontend aluno (`view-aluno/entrar`, lazy): entrar por código/link (`?codigo=` auto-join), listar
+    turmas/atividades, "Fazer" → dashboard clássico com `?atividade=&turma=&dataset=`; a submissão
+    salva fica ligada à atividade e alimenta o ranking. Dep nova: `qrcode`.
+- Verificação: build prod + 117/117 (mestrado-iana). Backups `deploy-20260704-062257` … `-161346`.
+- **Master:** port do subsistema Turmas é follow-up (não implantado).
+
+## 2026-07-04 (4 correções de UX: relatório PDF, clique nos gráficos, contexto do chat, logout ao carregar projeto)
+
+### Front (bundle `main-O6ARUHQO.js`, commit `fa98542`) · só frontend
+
+- **Relatório PDF voltou a gerar:** removido o `jspdf-autotable` (o interop de import quebrava no
+  bundle — `TypeError: n is not a function`); a tabela de métricas passou a ser **desenhada à mão**
+  com jsPDF core (retângulos + texto + quebra de página). `RelatorioPdfService`.
+- **Cliques nos controles do gráfico (zoom/link/info) destravados:** o **FAB do tutor da página**
+  (`execucoes.component.scss`, `position:fixed`) tinha `z-index:2100` e flutuava **acima** do modal de
+  métricas (CDK overlay ~1000), roubando os cliques. Rebaixado para `900` (drawer `2090→890`), abaixo
+  do overlay — um modal aberto agora o cobre. (A correção anterior só tratava o drawer.)
+- **Chatbot passa a conhecer os modelos treinados:** o contexto do chat só olhava `modeloSelecionado`
+  (null na comparação) e dizia "você não selecionou um modelo" mesmo após treinar/avaliar. Agora inclui
+  `modelosTreinados` (com hiperparâmetros), `modelos` selecionados e `avaliacoes`; `modelo` cai no 1º
+  treinado quando não há selecionado. Vale para o modal (`getContextoChat`) e a página
+  (`montarContextoChat`). O backend já repassa o contexto inteiro (`json.dumps`) — sem mudança de backend.
+- **Carregar projeto salvo não desloga mais admin/professor:** abrir um projeto navega para `view-aluno`
+  (área clássica compartilhada); o `AuthGuard` só permitia isso ao aluno e mandava admin/professor ao
+  `/autenticacao/login` (parecia "deslogar") — o backend nem recebia o `GET /pipelines/{id}`. Agora
+  admin/professor também carregam `view-aluno`, e um autenticado com papel errado vai para a HOME do
+  papel (`roleMap`), não para o login.
+- **Master (`1d593ca`, não implantado):** mesmas 4 correções (auth adaptado às rotas do master —
+  `projetos`/`trilha`/`galeria` para admin/professor).
+- Verificação: build prod + 117/117 (mestrado-iana) / 108/108 (master). Backup `deploy-20260704-062257`.
+
+## 2026-07-04 (exportar o modelo já treinado + código para usá-lo)
+
+### Zip do pipeline passa a incluir o modelo treinado (MLflow) + `usar_modelo.py`. Front (bundle `main-CYDRHMCG.js`) · Back `b94ca13`
+
+- **O zip exportado agora leva o modelo JÁ treinado + como reutilizá-lo:** pasta `modelo/`
+  (formato MLflow — `MLmodel`, `model.pkl`, `requirements.txt`, `python_env.yaml`, `input_example`)
+  e um **`usar_modelo.py`** gerado (carrega via `mlflow.sklearn.load_model("modelo")` e prevê um
+  exemplo). README com a seção "Como usar o modelo". Multi-modelo: cada um em `modelos/<nome>/`.
+- **Backend `b94ca13`:** o treino passa a logar o modelo como **flavor `mlflow.sklearn`** (não só
+  bytes brutos) → o MLflow gera as configs + exemplo de uso; novo endpoint
+  **`GET /classificador/modelo/{id}/artefato`** devolve um `.zip` do dir `model/` do MLflow
+  (fallback: `model.pkl` + `requirements.txt` fixo). Bytes no Mongo intactos (`/prever` inalterado).
+  Correções: loga no run já ativo (evita "Run already active"); `serialization_format=cloudpickle`
+  (o default skops do MLflow 3.x recusa o KDTree do KNN).
+- **"Salvar no projeto":** o projeto já persiste `resultadoTreinamento` (com `id` + `mlflow_run_id`),
+  então recarregar o projeto mantém a referência ao modelo (usável por `/prever`/`/avaliar`); com o
+  log de flavor, o modelo fica navegável em `/view-admin/artefatos`.
+- **Front:** `DashboardService.baixarModeloArtefato(id)` (blob, auth via interceptor);
+  `ScriptGeneratorService.anexarModeloTreinado` (baixa, mescla o zip sob `modelo/`, escreve
+  `usar_modelo.py`); `execucoes.baixarPipeline` passa `resultadoTreinamento`. **Trilha** (master
+  `3b6977c`, não implantado): mesmo anexo por ramo no `exportar()`.
+- Verificação: backend 317 passed (+2 novos do endpoint); fluxo MLflow (log→download→zip→load→predict)
+  validado por script; front build + 117/117 (mestrado-iana) / 108/108 (master); endpoint 401 em prod.
+  Backup `deploy-20260704-053304`. **Modelos treinados ANTES deste deploy** caem no fallback joblib.
+
+## 2026-07-04 (relatório PDF, nome do experimento nos downloads e fix de clique nos gráficos)
+
+### Relatório em PDF + arquivos por nome do experimento + drawer não bloqueia clique. Front (bundle `main-KVS5ZUGR.js`) · Back `32ac226`
+
+- **Relatório em PDF (Clássico)**: o botão "Baixar relatório" do painel de métricas passa a
+  gerar um **PDF completo** (capa com nome do experimento + dataset + modelos, tabela de métricas,
+  seção "O que observar" e, por gráfico, imagem + discussão) em vez do `.md` anterior. Novo
+  `RelatorioPdfService` (jsPDF + jspdf-autotable **carregados lazy** — bundle inicial inalterado).
+- **Downloads usam o nome do experimento salvo**: `pipeline_<nome>.zip` e `relatorio_<nome>.pdf`
+  (ex.: experimento "overfit" → `pipeline_overfit.zip`/`relatorio_overfit.pdf`). Sem nome salvo,
+  mantém o nome genérico. Util `slugificarNome`; o nome é propagado por `pipelineAtual$` →
+  `execucoes` → `modal-execucao` → `metrica-avaliacao`.
+- **Fix cliques bloqueados nos controles do gráfico** (zoom/link/info): o painel do tutor (drawer
+  fixo) ganhou `pointer-events: none` quando **fechado** — mesmo deslocado para fora da tela ele
+  podia interceptar o clique (agravado pelo bloco contido de um ancestral com `transform` no
+  mat-dialog). Aplicado no `modal-execucao` e no `execucoes`.
+- **Backend `32ac226`**: legenda do gráfico "Erros de Predição por Classe" movida para **fora das
+  barras** (`ax.legend` com `bbox_to_anchor` à direita). **Re-rodar a avaliação** para regenerar os PNGs.
+- **Master (`e46813d`, não implantado)**: mesmas mudanças + relatório PDF também na **Trilha**
+  (botão "Relatório (PDF)" no modal de exportação; zip da Trilha passa a usar o nome do projeto).
+- Verificação: build prod OK, 117/117 testes (mestrado-iana) e 108/108 (master); PDF e legenda
+  validados por render. Backup `deploy-20260704-043623`.
+
+## 2026-07-03 (fix 404 intermitente em prod + API movida p/ `/h2ia/tutor/api/`)
+
+### Bug de infra: dois serviços na porta 8002 · API isolada sob o prefixo do tutor. Front (bundle `main-ZQCG37CJ.js`) · nginx + infra
+
+- **Fix do 404 intermitente (infra, sem código):** havia **dois serviços systemd escutando a
+  porta 8002** via SO_REUSEPORT — `h2ia-backend.service` (código atual, `/home/ubuntu/ensinado-aprendizado-maquina-back`)
+  e uma cópia ANTIGA `h2ia-tutor.service` (`/home/ubuntu/servers/h2ia_tutor/backend`, commit
+  `2a31d00` de 11/06). O kernel balanceava conexões entre os dois, então parte das requisições
+  caía no backend velho → **404 intermitente** em rotas novas (`conf_pipeline/pre_processamento/todos`,
+  `atividades/lote`, `sistema/erro`, `configurar_treinamento/.../redividir`), enquanto `/docs`
+  respondia 200. Fix: `stop` + `disable` do `h2ia-tutor.service` (unit salvo em
+  `/home/ubuntu/backups/h2ia-tutor.service.disabled-*`) e `restart` do `h2ia-backend.service`.
+- **API movida de `/h2ia/api/` → `/h2ia/tutor/api/`:** todo o app do tutor agora vive sob
+  `/h2ia/tutor/`; nada fica solto direto em `/h2ia/` (que hospeda outros apps: enade, proxy,
+  checker, vlp…). Mudança: nginx renomeia a `location` (proxy segue p/ 8002) + `environment.prod.ts`
+  (`apiUrl`). O path antigo `/h2ia/api/` foi **removido** (corte limpo — abas antigas quebram até dar F5).
+- Verificação: build prod OK; ao vivo novo path 401/405/422 (rota existe), path antigo 404, docs 200,
+  frontend 200. Backup `/home/ubuntu/backups/deploy-20260703-232436`.
+
+## 2026-06-26 (limpeza do painel admin — código morto + logs expostos)
+
+### Remove wizards mortos do conf-tutor, duplicata de "Usuários" e expõe logs. Front (bundle `main-ZGZOF4J5.js`) · só frontend
+- **Código morto removido (−1066 linhas):** 7 componentes "wizard" do `conf-tutor` que estavam
+  declarados no módulo mas **nunca renderizados** (só `tutor-elementos-catalogo` é usado):
+  `tutor-inicio`, `tutor-coleta-dados`, `tutor-selecao-modelo`, `tutor-treinamento`,
+  `tutor-avaliacao`, `tutor-selecao-metricas`, `tutor-tipos-aprendizado`. Removido também o
+  `QuillModule` do `conf-tutor` (ficou órfão após a limpeza).
+- **Navegação:** removido o item **"Usuários" duplicado** do dropdown do avatar (segue como card
+  no painel); método `navegarParaUsuarios()` órfão removido.
+- **Logs expostos:** `logs-erros` e `logs-backend` tinham rota mas **nenhum menu** apontava para
+  elas (só por URL). Adicionados dois cards no painel admin ("Logs de Erros" → `/sistema/erros`;
+  "Logs do Backend" → `/sistema/logs-backend`). Endpoints já existentes no backend.
+- Verificação: 117/117 testes + build prod OK.
+
+## 2026-06-26 (textos de apoio: Básico/Avançado + código Python colorido + links)
+
+### Cards educacionais DB-driven com código colorido e link Yellowbrick. Front `76dc145` (bundle `main-DR46LGHV.js`) · Back `9b9265c`
+- **Código Python colorido (modo Avançado)**: highlight.js carregado **lazy** (core + python via
+  `import()` dinâmico, memoizado) — `HighlightService` + diretiva `appHighlightCode` no card do
+  tutor, com **fallback para texto puro** se offline. Tema dark escopado em `.codigo-bloco`. Não
+  pesa no bundle inicial (chunk lazy separado).
+- **Todos os elementos com Básico + Avançado + link** (conteúdo vem do DB — ver back `9b9265c`):
+  - `link_yellowbrick` em `TutorItemInfo` + render no card (irmão do link sklearn).
+  - Pré-processamento e coleta agora **100% DB-driven**: removidos os dicts hardcoded de
+    `getItemInfo` (caem em stub mínimo quando sem `conteudo`).
+  - **Gráficos** (modal de avaliação): a "dica" reusa o `<app-tutor>` com split Básico/Avançado
+    por `grafico_id` (`db.graficos`), com fallback ao texto hardcoded; `getConteudoGraficos`/
+    `getConteudoDataset` no `DashboardService`.
+  - Helper único `conteudo-to-item-info` (mapeamento DB→card), reusado em execucoes e nos gráficos.
+- **Admin (`ConteudoEditor`)**: novos campos **Resumo básico** (modo Básico) e **Link Yellowbrick**.
+- **Seleção de métricas**: o toggle "selecionar todas do grupo" agora mostra o rótulo **Todos/Nenhum**
+  (e troca o ícone) conforme o clique vá marcar ou desmarcar.
+- Verificação: **117/117** testes + build prod OK (highlight.js em chunk lazy).
+
+## 2026-06-26 (branding — branch `mestrado-iana`)
+
+### Nome exibido "Mestrado Iana". Front `8afdf3b` (bundle `main-NJP3DCSL.js`) · só frontend
+- Logo "Iana" → **"Mestrado Iana"** no shell (sidebar) e nas telas de login e ativar-conta.
+- Título da aba do navegador (`index.html`): `EnsinadoAprendizadoMaquina` → **`Mestrado Iana`**.
+- Títulos de docs (`CHANGELOG.md`, `docs/DOCUMENTACAO.md`): `Iana` → `Mestrado Iana`.
+- **Não** alterado: orgs do GitHub (`IanaMary/...`), caminhos, e a prosa do manual/script gerado
+  (evita texto truncado tipo "à Mestrado Iana").
+- Backend inalterado. Backup de produção: `/home/ubuntu/backups/deploy-20260626-051255`.
+- Validação: frontend 200, `<title>Mestrado Iana</title>` servido, `/api/docs` 200, backend active.
+
+## 2026-06-26 (deploy em produção — branch `mestrado-iana`)
+
+### Deploy da branch `mestrado-iana` (Modo Clássico + Admin). Front `9b7b92c` (bundle `main-LCRSEPVQ.js`) · só frontend
+- **Primeiro deploy do split**: produção (`https://absapt.tk/h2ia/tutor/`) passa a servir a branch
+  `mestrado-iana` (**Modo Clássico** `/view-aluno` + painel admin `/view-admin`; sem os modos
+  lúdicos Treine seu Robô / Léo no Mundo Real / Trilha). Conteúdo da branch descrito na entrada
+  de 2026-06-25 (split) abaixo.
+- Backend **inalterado** (`3654547`); deploy só de frontend.
+- Verificação: build prod OK + 108/108 testes. Backup de produção:
+  `/home/ubuntu/backups/deploy-20260626-013633`.
+- Validação pós-deploy: frontend 200, `/api/docs` 200, `h2ia-backend.service` active.
+
+## 2026-06-25 (split — branch `mestrado-iana`)
+
+### Branch `mestrado-iana` — Modo Clássico + Admin only. Front `a57c99f`
 - **Split do repositório em duas bases de código:**
-  - `master` = **sistema-completo** (admin + Treine seu Robô + Léo no Mundo Real + Trilha de ML).
-  - `mestrado-iana` = Modo Clássico (`/view-aluno`) + admin dashboard; modos lúdicos removidos.
+  - `mestrado-iana` = **Modo Clássico** (`/view-aluno` com Projetos e Galeria) + painel admin
+    (`/view-admin`). Modos lúdicos do aluno removidos (Treine seu Robô, Léo no Mundo Real,
+    Trilha de ML).
+  - `master` = sistema-completo (admin + 3 modos lúdicos; `/view-aluno` removido).
   - `desenvolvimento` = versão combinada original (snapshot, preserva todos os modos).
-- **Removido** `/view-aluno` (dashboard clássico) desta branch; `meus-projetos` e `galeria-pipelines`
-  **relocados** para rotas top-level `/projetos` e `/galeria` (um nível acima, `interno/projetos/`
-  e `interno/galeria/`). Imports TS/SCSS ajustados à nova profundidade.
-- `interno-routing`: default redirect `''` → `/inicio`; removida rota `view-aluno`.
-- `AuthGuard ROTAS_POR_PAPEL.aluno`: `['inicio','treine-robo','leo-mundo-real','trilha','projetos','galeria']`.
-- `shell.component`: Home → `/inicio` (aluno) / `/view-admin` (admin); Meus Projetos → `/projetos`;
-  Galeria → `/galeria`; removidos Pipeline/Resultados (eram `/view-aluno`).
-- `inicio.component`: card "Modo Clássico" removido (3 cards: Robô/Léo/Trilha); `abrirProjeto`
-  leva a `/trilha` em vez de `/view-aluno`.
-- `trilha.component.html`: "Voltar ao dashboard clássico" → "Voltar ao início" (`/inicio`).
-- Specs: `auth.guard.spec` usa segmento `inicio` (aluno); `execucoes.component.spec` espera `/projetos`.
+- **Removido** desta branch: `interno/treine-robo/`, `leo-mundo-real/`, `trilha/`.
+- `interno-routing`: removidas rotas `trilha`/`treine-robo`/`leo-mundo-real` e seletor `inicio`
+  (default redirect → `/view-aluno`).
+- `AuthGuard ROTAS_POR_PAPEL.aluno`: `['view-aluno']`.
+- `roleMap.aluno`: `/view-aluno`.
+- `dashboard.component`: removidos `irParaTrilha()` e `voltar()`, botão Trilha e botão Voltar.
+- `manual`: removida seção "Trilha de ML".
+- `package.json`: removidas 4 deps `@tensorflow/*` (tfjs, tfjs-backend-webgpu,
+  tfjs-models/mobilenet, tfjs-models/knn-classifier). `angular.json`: `allowedCommonJsDependencies`
+  (seedrandom/node-fetch/string_decoder/long) removidas — eram só do TensorFlow.js.
+- `dashboard.service`: removido `classificadorPrever` (só usado por treine-robo).
 - Backup não-destrutivo (sem deploy). Build prod OK + 108/108 testes.
 
 ## 2026-06-25
