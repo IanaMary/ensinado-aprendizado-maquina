@@ -144,14 +144,33 @@ export class TurmaDetalheComponent implements OnInit {
   }
 
   abrirChat(chatId: string): void {
-    this.turmaService.historicoAlunoChat(this.chatAlunoId, chatId).subscribe({ next: (c) => this.chatAberto = c });
+    this.turmaService.historicoAlunoChat(this.chatAlunoId, chatId).subscribe({ next: (c) => {
+      this.chatAberto = c;
+      // O botão clicado é destruído pelo *ngIf; sem isto o foco cai no <body>, FORA do
+      // trap do diálogo, e o Tab passa a interagir com a página atrás do backdrop.
+      this.focarNoDialogo('.voltar-chat');
+    } });
+  }
+
+  /** Volta do transcript para a lista devolvendo o foco a um elemento vivo do diálogo. */
+  voltarLista(): void {
+    this.chatAberto = null;
+    this.focarNoDialogo('.chat-item');
+  }
+
+  private focarNoDialogo(seletor: string): void {
+    setTimeout(() => {
+      const alvo = document.querySelector<HTMLElement>(`.chat-dialog ${seletor}`)
+        ?? document.querySelector<HTMLElement>('.chat-dialog .btn-mini');
+      alvo?.focus();
+    });
   }
 
   fecharChats(): void { this.chatAlunoId = ''; this.chats = []; this.chatAberto = null; }
 
   @HostListener('document:keydown.escape')
   aoApertarEsc(): void {
-    if (this.chatAberto) this.chatAberto = null;   // volta à lista
+    if (this.chatAberto) this.voltarLista();       // volta à lista
     else if (this.chatAlunoId) this.fecharChats(); // fecha o modal
   }
 

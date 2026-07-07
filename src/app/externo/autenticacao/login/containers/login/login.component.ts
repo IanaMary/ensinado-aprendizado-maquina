@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
 import { AuthService } from '../../../../../service/auth/auth.service';
+import { lerReturnUrl, limparReturnUrl } from '../../../../../service/auth/retorno-login';
 import { NotificacaoService } from '../../../../../service/notificacao.service';
 import { roleMap } from '../../../../../models/item-coleta-dado.model';
 
@@ -58,11 +59,16 @@ export class LoginComponent implements OnInit {
         this.auth.salvarUsuarioSessionStorage(usuario).then(() => {
           const role = usuario?.usuario?.role;
           // Se veio de um deep-link protegido (ex.: entrar na turma pelo QR), volta pra lá.
-          const retorno = sessionStorage.getItem('returnUrl');
+          // lerReturnUrl aplica expiração (deep-link abandonado não é herdado por quem
+          // logar depois na mesma aba); a limpeza só acontece após a navegação resolver —
+          // falha transitória (chunk lazy fora do ar) preserva o link p/ nova tentativa.
+          const retorno = lerReturnUrl();
           if (retorno) {
-            sessionStorage.removeItem('returnUrl');
-            this.router.navigateByUrl(retorno).catch(err => {
-              console.error('[Login] Erro ao voltar ao returnUrl:', err);
+            this.router.navigateByUrl(retorno).then(ok => {
+              limparReturnUrl();
+              if (!ok) this.router.navigate([roleMap[role] || '/autenticacao/login']);
+            }).catch(err => {
+              console.error('[Login] Erro ao voltar ao returnUrl (mantido p/ nova tentativa):', err);
               this.router.navigate([roleMap[role] || '/autenticacao/login']);
             });
             return;

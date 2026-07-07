@@ -10,6 +10,11 @@
 
   <section class="card entrar-card">
     <h3><mat-icon>login</mat-icon> Entrar em uma turma</h3>
+    <p class="confirmar-aviso" *ngIf="confirmarCodigo" role="status">
+      <mat-icon aria-hidden="true">qr_code_2</mat-icon>
+      Você abriu um convite para a turma de código <strong>{{ codigo }}</strong>.
+      Confira se esta é a sua conta e clique em <strong>Entrar</strong> para confirmar.
+    </p>
     <div class="entrar-row">
       <div class="campo-form">
         <label class="campo-label">Código da turma</label>
