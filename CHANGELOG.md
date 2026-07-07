@@ -8,6 +8,35 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-06/07 (Identidade H2IA + tela Sobre + a11y/QR + performance)
+
+> Sequência de deploys só-frontend em `mestrado-iana`; tudo portado para `master`
+> (`0658e4e`, não implantado). Backend inalterado. Verificação: 115/115 (`mestrado-iana`) /
+> 108/108 (`master`) em cada passo. **Sem verificação visual** (extensão do Chrome offline).
+
+### Frontend `mestrado-iana` `1918306` (bundle `main-FVDVRNVM.js`, estado final)
+
+- **Fluxo de entrada por QR corrigido + endurecido.** O link/QR aponta para rota protegida;
+  aluno deslogado perdia o `?codigo` no login (join nunca acontecia). Helper
+  `service/auth/retorno-login.ts`: `returnUrl` com **expiração 10 min**, consumido só após a
+  navegação resolver; o **cadastro** também o consome; e o `entrar-turma` **não auto-matricula**
+  mais — pede **1 clique de confirmação** (evita matricular a conta errada em PC compartilhado).
+- **Acessibilidade em `turma-detalhe`:** `aria-label` nos botões só-ícone, contraste AA, modal de
+  chat com `role="dialog"`+`cdkTrapFocus`+Esc + foco devolvido a elemento vivo, `<thead>`/`scope`,
+  `overflow-x`, `:focus-visible`, `<h1>`, `<li>`→`<button>`.
+- **Identidade visual H2IA:** fonte **Maven Pro** auto-hospedada (**WOFF2**, ~124 KB; TTF fallback);
+  **logo do Hub** no login, cabeçalhos Admin/Professor e favicon "iA"; componente `<app-brand-logo>`.
+- **Tela pública `/sobre`** (dissertação de **Iana Mary Costa**; orientador Ulisses Brisolara Corrêa;
+  coorientação Larissa Astrogildo de Freitas e Marilton Sanchotene de Aguiar — links UFPel; PPGC/UFPel;
+  ano 2026). Acessível pelo login (rodapé + painel) e menu do usuário. Símbolo iA animado.
+- **Matriz de confusão:** legenda movida para uma linha horizontal acima da matriz.
+- **Performance (revisão `max`):** fim da **duplicação global de CSS** — 23 componentes passaram a
+  importar `colores.scss` (variáveis-only) em vez de `styles.scss` (que re-emitia todo o CSS global
+  com escopo): `.pipeline-item` **337→35** no bundle, `'Maven Pro'` 120→12. Fontes movidas para
+  `styles/fontes.scss` (global-only, via `angular.json`). Dead code/assets removidos.
+
+Detalhes: `handoffs/2026-07-07-marca-h2ia-sobre-a11y-perf.md`.
+
 ## 2026-07-06 (Artefatos: filtro Dataset com autocomplete)
 
 ### Frontend `mestrado-iana` `cd14583` (bundle `main-3LZKNEI6.js`) · só frontend
