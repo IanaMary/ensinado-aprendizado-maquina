@@ -288,10 +288,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .capa-conteudo,
-  .capa-marca,
+  // .capa-conteudo .capa-marca p/ vencer a especificidade da animação (0,2,0) —
+  // um `.capa-marca` sozinho (0,1,0) perderia e o flutuar continuaria.
+  .capa-conteudo .capa-marca,
   .resumo p { animation: none; }
-}
-
-@media (max-width: 560px) {
-  .sobre-topo .topo-logo { height: 26px; }
 }

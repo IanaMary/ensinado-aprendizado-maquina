@@ -1,0 +1,24 @@
+/* Tipografia institucional H2IA — Maven Pro (auto-hospedada).
+ *
+ * IMPORTANTE: estas regras ficam NESTE arquivo global-only (registrado em
+ * angular.json > styles), FORA do styles.scss — porque ~23 componentes fazem
+ * `@import '.../styles/styles.scss'`, e o @font-face aqui era inlinado (duplicado)
+ * em cada um deles (178 cópias no bundle). Aqui elas entram uma única vez, no CSS
+ * global, e continuam valendo para o conteúdo de todos os componentes. */
+
+@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Regular.woff2') format('woff2'), url('../assets/fonts/MavenPro-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Medium.woff2') format('woff2'), url('../assets/fonts/MavenPro-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Bold.woff2') format('woff2'), url('../assets/fonts/MavenPro-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Maven Pro'; src: url('../assets/fonts/MavenPro-Black.woff2') format('woff2'), url('../assets/fonts/MavenPro-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: swap; }
+
+/* Fonte institucional em toda a aplicação (inclui componentes Material). */
+* { font-family: 'Maven Pro', 'Roboto', 'Helvetica Neue', sans-serif; }
+mat-icon, .material-icons { font-family: 'Material Icons' !important; }
+
+/* Código continua MONOESPAÇADO: a regra universal acima venceria o default do
+   navegador em <code>/<pre> (origem de autor > UA), desalinhando stack traces,
+   snippets sklearn e blocos de código do tutor. `pre *` cobre os spans do hljs. */
+code, kbd, samp, pre,
+code *, kbd *, samp *, pre * {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Courier New', monospace;
+}

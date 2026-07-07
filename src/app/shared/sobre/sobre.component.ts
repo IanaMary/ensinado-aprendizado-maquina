@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../service/auth/auth.service';
 import { roleMap } from '../../models/item-coleta-dado.model';
@@ -12,7 +11,7 @@ import { roleMap } from '../../models/item-coleta-dado.model';
 @Component({
   selector: 'app-sobre',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule],
+  imports: [MatIconModule],
   templateUrl: './sobre.component.html',
   styleUrls: ['./sobre.component.scss'],
 })
