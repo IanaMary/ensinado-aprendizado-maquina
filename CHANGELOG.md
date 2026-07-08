@@ -8,6 +8,18 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-08 (exportação: usar_modelo em 2 versões — MLflow e joblib)
+
+> Frontend `mestrado-iana` `8443dbd` (bundle `main-AX4QGGHT.js`), portado p/ `master` (não
+> implantado). Backend inalterado. Verificação: 115/115 + build prod.
+
+### Adicionado
+- O zip exportado do pipeline traz **dois** exemplos de uso do modelo treinado no lugar do
+  `usar_modelo.py` único: `usar_modelo_joblib.py` (carrega `modelo/model.pkl` direto, sem
+  dependência do MLflow — funciona inclusive quando o artefato veio do fallback sem MLflow) e
+  `usar_modelo_mlflow.py` (`mlflow.sklearn.load_model`). README do bundle documenta as duas
+  opções; no modo comparação cada modelo ganha os dois arquivos.
+
 ## 2026-07-08 (coleta: rótulo numérico + upload xlsx de teste; tutor por etapa; lanes; escopo do LLM)
 
 > Frontend `mestrado-iana` `bfce9c9`+`1640098` (bundle `main-SDFP4XFO.js`), portado p/ `master`
