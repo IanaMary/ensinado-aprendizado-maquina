@@ -538,7 +538,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     const isTexto = tipo === 'texto';
     const isNumero = tipo === 'número' || tipo === 'numero';
 
-    if (this.tipoPredicao === 'classificacao') return isTexto;
+    if (this.tipoPredicao === 'classificacao') return isTexto || isNumero;
     if (this.tipoPredicao === 'regressao') return isNumero;
     return false;
   }
@@ -551,7 +551,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     const isTexto = tipo === 'texto';
     const isNumero = tipo === 'número' || tipo === 'numero';
 
-    if (this.tipoPredicao === 'classificacao' && !isTexto) return 'Classificação requer coluna Texto';
+    if (this.tipoPredicao === 'classificacao' && !isTexto && !isNumero) return 'Classificação requer coluna Texto ou Número';
     if (this.tipoPredicao === 'regressao' && !isNumero) return 'Regressão requer coluna Número';
     return '';
   }
