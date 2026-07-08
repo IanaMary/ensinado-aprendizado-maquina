@@ -8,6 +8,22 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-08 (login/marca/voltar: link Sobre único, logo símbolo nos cabeçalhos, voltar no Pipeline)
+
+> Frontend `mestrado-iana` `efd647e`+`6319f12` (bundle `main-JIBVUOCP.js`). `efd647e` portado p/
+> `master`; `6319f12` é só-`mestrado-iana` (o dashboard do `master` mantém o voltar p/ `/inicio`).
+> Backend inalterado. Verificação: 115/115 + build prod.
+
+### Corrigido
+- **Login:** removido o link "Sobre este trabalho" duplicado no rodapé do formulário; o botão do
+  painel esquerdo virou o 4º card, com o mesmo visual/largura dos `feature-item`.
+- **Cabeçalhos Admin/Professor:** o logo completo (lockup com texto) a 34px era ilegível — trocado
+  pela variante `marca` (símbolo "iA") a 40px; a variante passa a usar `apple-touch-icon.png`
+  (180px, mais nítido que o favicon 64).
+- **Dashboard (`/view-admin/dashboard`):** restaurado o botão **voltar** no cabeçalho do Pipeline
+  (perdido na criação da branch `mestrado-iana` por apontar p/ `/inicio`); agora volta à home do
+  papel via `roleMap`.
+
 ## 2026-07-08 (exportação: usar_modelo em 2 versões — MLflow e joblib)
 
 > Frontend `mestrado-iana` `8443dbd` (bundle `main-AX4QGGHT.js`), portado p/ `master` (não
