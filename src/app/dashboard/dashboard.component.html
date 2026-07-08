@@ -2,6 +2,9 @@
   <!-- Pipeline sidebar -->
   <aside class="dashboard-pipeline">
     <div class="pipeline-header">
+      <button type="button" class="pipeline-back-btn" (click)="voltar()" matTooltip="Voltar" aria-label="Voltar">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
       <span>Pipeline</span>
       <div class="pipeline-actions">
         <button type="button" class="pipeline-action-btn" (click)="salvarPipeline()" matTooltip="Salvar">
