@@ -3174,6 +3174,32 @@
         }
       ]
     },
+    "pre_processamento": {
+      "titulo": "Pré-processamento",
+      "subtitulo": "Preparar os dados para o treino",
+      "descricao": "Antes de treinar, os dados quase sempre precisam de um preparo: preencher valores faltantes, colocar os números na mesma escala e transformar textos em números. É como lavar e cortar os ingredientes antes de cozinhar — o modelo aprende melhor com dados bem preparados.",
+      "dicas": [
+        "Modelos baseados em distância (KNN, K-Means, SVM) precisam de dados na mesma escala — use um scaler",
+        "Colunas de texto (categorias) precisam virar números para a maioria dos modelos — use um encoder",
+        "Se há valores faltantes, trate-os com um imputer antes do treino",
+        "Escolha as colunas certas para cada transformação: escala para números, codificação para categorias",
+        "Esta etapa é opcional: se seus dados já estão limpos e numéricos, você pode seguir direto para o modelo"
+      ],
+      "conceitos": [
+        {
+          "nome": "Escalonamento (Scaling)",
+          "descricao": "Colocar os números em faixas parecidas. Ex.: idade (0-100) e salário (0-100000) em escalas tão diferentes fazem o modelo dar mais peso ao salário só pelo tamanho do número."
+        },
+        {
+          "nome": "Codificação (Encoding)",
+          "descricao": "Transformar categorias de texto em números. Ex.: 'vermelho', 'verde' e 'azul' viram colunas de 0 e 1 (one-hot) para o modelo entender."
+        },
+        {
+          "nome": "Valores Faltantes (Imputação)",
+          "descricao": "Preencher os buracos da tabela com um valor estimado, como a média ou o valor mais frequente da coluna, em vez de descartar a linha inteira."
+        }
+      ]
+    },
     "selecao_modelo": {
       "titulo": "Seleção do Modelo",
       "subtitulo": "Escolher o algoritmo",

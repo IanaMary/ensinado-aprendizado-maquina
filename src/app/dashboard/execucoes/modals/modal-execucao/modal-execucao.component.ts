@@ -237,14 +237,13 @@ export class ModalExecucaoComponent implements OnInit {
     // Foco por item é transitório: limpa ao trocar de etapa.
     this.itemFoco = null;
 
-    // Reset contexto quando muda de etapa
-    if (idx !== 1 && idx !== 3) {
-      this.tutorContexto = null;
-    }
+    // Reset contexto quando muda de etapa; sem isso o <app-tutor> mantém a
+    // referência anterior e não re-renderiza o conteúdo da nova etapa.
+    this.tutorContexto = null;
   }
 
   private getPipelineKey(idx: number): string {
-    const keys = ['coleta', 'selecao_modelo', 'treinamento', 'selecao_metricas', 'avaliacao'];
+    const keys = ['coleta', 'pre_processamento', 'selecao_modelo', 'treinamento', 'selecao_metricas', 'avaliacao'];
     return keys[idx] || '';
   }
 
