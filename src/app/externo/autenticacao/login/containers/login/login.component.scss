@@ -102,23 +102,34 @@
     }
   }
 
+  // Mesmo visual dos .feature-item acima (mesma largura/cartão), por ser o 4º "card" da coluna.
   .branding-sobre {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 24px;
-    padding: 10px 16px;
-    border: 1px solid rgba($branco, 0.35);
-    border-radius: 10px;
-    color: $branco;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba($branco, 0.08);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    color: rgba($branco, 0.9);
     font-size: 13px;
-    font-weight: 600;
+    line-height: 1.4;
     text-decoration: none;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    transition: all 0.2s ease;
 
-    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+    mat-icon {
+      color: rgba($branco, 0.9);
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
 
-    &:hover { background: rgba($branco, 0.12); border-color: rgba($branco, 0.6); }
+    &:hover {
+      background: rgba($branco, 0.12);
+      transform: translateX(4px);
+    }
+
     &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba($branco, 0.45); }
   }
 }
@@ -310,18 +321,6 @@
       }
     }
 
-    .link-sobre {
-      display: inline-block;
-      margin-top: 14px;
-      color: $cinza-escuro;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      border-bottom: 1px solid rgba($roxo-medio, 0.4);
-      transition: color 0.2s ease, border-color 0.2s ease;
-
-      &:hover { color: $roxo-medio; border-color: $roxo-medio; }
-    }
   }
 }
 
