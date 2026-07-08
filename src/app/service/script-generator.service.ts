@@ -23,8 +23,8 @@ export class ScriptGeneratorService {
   constructor(private http: HttpClient) { }
 
   /** Baixa o modelo treinado (id) e o mescla no bundle sob `<subpasta>/modelo/`,
-   *  escrevendo também um `usar_modelo.py` gerado. Best-effort: se o download
-   *  falhar (modelo indisponível), o bundle segue sem o modelo. */
+   *  escrevendo também os exemplos `usar_modelo_mlflow.py` e `usar_modelo_joblib.py`.
+   *  Best-effort: se o download falhar (modelo indisponível), o bundle segue sem o modelo. */
   async anexarModeloTreinado(
     folder: JSZip, entry: any, coleta: ResultadoColetaDado | undefined, subpasta?: string,
   ): Promise<void> {
@@ -41,30 +41,27 @@ export class ScriptGeneratorService {
         if (f.dir) continue;
         modeloDir.file(nome, await f.async('uint8array'));
       }
-      dest.file('usar_modelo.py', this.gerarUsarModelo(entry, coleta));
+      dest.file('usar_modelo_mlflow.py', this.gerarUsarModeloMlflow(entry, coleta));
+      dest.file('usar_modelo_joblib.py', this.gerarUsarModeloJoblib(entry, coleta));
     } catch {
       /* modelo indisponível: segue sem ele */
     }
   }
 
-  /** Código Python que carrega o modelo salvo (pasta modelo/, formato MLflow) e prevê. */
-  private gerarUsarModelo(entry: any, coleta: ResultadoColetaDado | undefined): string {
+  /** Colunas de entrada e exemplo zerado compartilhados pelos dois `usar_modelo_*.py`. */
+  private montarEntradaExemplo(entry: any, coleta: ResultadoColetaDado | undefined): { colsPy: string; zeros: string } {
     const cols: string[] = (entry?.atributos?.length ? entry.atributos
       : (coleta?.colunas || []).filter((c: string) => c !== coleta?.target)) || [];
-    const colsPy = cols.map(c => JSON.stringify(c)).join(', ');
-    const zeros = cols.map(() => '0').join(', ');
+    return {
+      colsPy: cols.map(c => JSON.stringify(c)).join(', '),
+      zeros: cols.map(() => '0').join(', '),
+    };
+  }
+
+  /** Trecho comum aos dois exemplos: colunas, exemplo e previsão. */
+  private corpoPrevisao(entry: any, coleta: ResultadoColetaDado | undefined): string[] {
+    const { colsPy, zeros } = this.montarEntradaExemplo(entry, coleta);
     return [
-      '"""Usa o modelo já treinado para prever um novo exemplo.',
-      '',
-      'O modelo está na pasta ./modelo (formato MLflow). Instale as MESMAS versões do',
-      'treino (joblib/pickle é sensível à versão do scikit-learn):',
-      '    pip install -r modelo/requirements.txt',
-      '"""',
-      'import pandas as pd',
-      'import mlflow.sklearn   # alternativa sem MLflow: joblib.load("modelo/model.pkl")',
-      '',
-      'modelo = mlflow.sklearn.load_model("modelo")',
-      '',
       '# Colunas de entrada, na ordem esperada (as mesmas do treino):',
       `COLUNAS = [${colsPy}]`,
       '# Troque os valores abaixo pelo seu novo exemplo (na ordem de COLUNAS):',
@@ -73,6 +70,45 @@ export class ScriptGeneratorService {
       'previsao = modelo.predict(exemplo)',
       'print("Previsão:", previsao)',
       '',
+    ];
+  }
+
+  /** Código Python que carrega o modelo salvo via MLflow (pasta modelo/) e prevê. */
+  private gerarUsarModeloMlflow(entry: any, coleta: ResultadoColetaDado | undefined): string {
+    return [
+      '"""Usa o modelo já treinado para prever um novo exemplo (via MLflow).',
+      '',
+      'O modelo está na pasta ./modelo (formato MLflow). Instale as MESMAS versões do',
+      'treino (pickle é sensível à versão do scikit-learn) e o MLflow:',
+      '    pip install -r modelo/requirements.txt',
+      '    pip install mlflow',
+      '',
+      'Sem o MLflow instalado? Use o usar_modelo_joblib.py, que carrega o mesmo modelo.',
+      '"""',
+      'import pandas as pd',
+      'import mlflow.sklearn',
+      '',
+      'modelo = mlflow.sklearn.load_model("modelo")',
+      '',
+      ...this.corpoPrevisao(entry, coleta),
+    ].join('\n');
+  }
+
+  /** Código Python que carrega o modelo salvo via joblib (modelo/model.pkl) e prevê. */
+  private gerarUsarModeloJoblib(entry: any, coleta: ResultadoColetaDado | undefined): string {
+    return [
+      '"""Usa o modelo já treinado para prever um novo exemplo (via joblib).',
+      '',
+      'Carrega direto o arquivo ./modelo/model.pkl — não precisa do MLflow.',
+      'Instale as MESMAS versões do treino (pickle é sensível à versão do scikit-learn):',
+      '    pip install -r modelo/requirements.txt',
+      '"""',
+      'import joblib',
+      'import pandas as pd',
+      '',
+      'modelo = joblib.load("modelo/model.pkl")',
+      '',
+      ...this.corpoPrevisao(entry, coleta),
     ].join('\n');
   }
 
@@ -120,7 +156,7 @@ export class ScriptGeneratorService {
 
     folder.file('README.md', this.generateReadme(modeloSelecionado, resultadoColetaDado, isMultiModelo ? modelosTreinados : undefined, modelosTreinados.length > 0));
 
-    // Modelo(s) já treinado(s) + `usar_modelo.py` (best-effort; requer que o modelo
+    // Modelo(s) já treinado(s) + `usar_modelo_{mlflow,joblib}.py` (best-effort; requer que o modelo
     // ainda exista no backend). Single: `modelo/` na raiz; multi: `modelos/<nome>/`.
     for (const entry of modelosTreinados) {
       const subpasta = isMultiModelo ? `modelos/${slugificarNome(entry?.nome_modelo) || 'modelo'}` : undefined;
@@ -310,7 +346,8 @@ export class ScriptGeneratorService {
     }
     if (temModelo) {
       lines.push('├── modelo/              # Modelo JÁ treinado (formato MLflow)');
-      lines.push('├── usar_modelo.py       # Carrega o modelo e faz uma previsão');
+      lines.push('├── usar_modelo_mlflow.py # Carrega o modelo via MLflow e faz uma previsão');
+      lines.push('├── usar_modelo_joblib.py # Carrega o modelo via joblib (sem MLflow) e faz uma previsão');
     }
     lines.push('└── README.md            # Este arquivo');
     lines.push('```');
@@ -331,15 +368,21 @@ export class ScriptGeneratorService {
       lines.push('## Como usar o modelo JÁ treinado (sem re-treinar)');
       lines.push('');
       lines.push('A pasta `modelo/` contém o modelo salvo no formato MLflow (com `MLmodel`,');
-      lines.push('`model.pkl` e `requirements.txt`). Para prever novos exemplos:');
+      lines.push('`model.pkl` e `requirements.txt`). Há DUAS formas de usá-lo:');
       lines.push('');
       lines.push('```bash');
       lines.push('pip install -r modelo/requirements.txt   # mesmas versões do treino');
-      lines.push('python usar_modelo.py');
+      lines.push('');
+      lines.push('# Opção 1 — via joblib (mais simples, sem dependência extra):');
+      lines.push('python usar_modelo_joblib.py');
+      lines.push('');
+      lines.push('# Opção 2 — via MLflow (usa os metadados do formato MLmodel):');
+      lines.push('pip install mlflow');
+      lines.push('python usar_modelo_mlflow.py');
       lines.push('```');
       lines.push('');
-      lines.push('> Edite os valores de exemplo em `usar_modelo.py` para os seus dados.');
-      lines.push('> No modo comparação, cada modelo fica em `modelos/<nome>/` com seu `usar_modelo.py`.');
+      lines.push('> Edite os valores de exemplo nos `usar_modelo_*.py` para os seus dados.');
+      lines.push('> No modo comparação, cada modelo fica em `modelos/<nome>/` com seus `usar_modelo_*.py`.');
       lines.push('');
     }
 
