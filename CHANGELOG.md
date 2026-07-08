@@ -8,6 +8,28 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-08 (coleta: rótulo numérico + upload xlsx de teste; tutor por etapa; lanes; escopo do LLM)
+
+> Frontend `mestrado-iana` `bfce9c9`+`1640098` (bundle `main-SDFP4XFO.js`), portado p/ `master`
+> (`3b518b1`+`8db4281`, não implantado). Backend `3c5043a`. Verificação: 115/115 + build prod
+> (`mestrado-iana`), 108/108 + build prod (`master`), backend 342 passed + 3 testes novos.
+
+### Corrigido
+- **Coleta (modal):** classificação aceita coluna **Número** como rótulo (ex.: `Survived` 0/1 do
+  titanic.csv) — antes só Texto; upload de **xlsx de teste** funcionava só com o campo `file_teste`
+  que o front não envia → backend aceita `file` (mesmo campo do CSV); botões **+/−** do Total
+  Treino centralizados e com gap.
+- **Tutor do modal (wizard):** conteúdo agora **atualiza ao avançar/voltar de etapa** — o reset do
+  `tutorContexto` era pulado justamente no pré-processamento (condição do layout antigo) e o mapa
+  de chaves das etapas estava deslocado (faltava `pre_processamento`, tudo após a coleta pegava a
+  chave errada). Nova entrada `pipeline.pre_processamento` no `tutor.json` (título/descrição/
+  dicas/conceitos).
+- **Lanes do dashboard:** Coleta/Pré-proc/Treinamento/Métricas ocupam a **altura visível** da tela
+  (`:host` flex na cadeia, `grid-auto-rows: minmax(0,1fr)`, `min-height` de fallback na área de
+  drop) — antes encolhiam ao conteúdo e não havia para onde arrastar.
+- **Tutor LLM (backend):** system prompt com **escopo restrito** ao projeto (ML/plataforma/pipeline
+  do aluno), priorizando o pipeline atual; recusa educada fora do escopo.
+
 ## 2026-07-06/07 (Identidade H2IA + tela Sobre + a11y/QR + performance)
 
 > Sequência de deploys só-frontend em `mestrado-iana`; tudo portado para `master`
