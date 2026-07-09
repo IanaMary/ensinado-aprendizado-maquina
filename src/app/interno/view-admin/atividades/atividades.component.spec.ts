@@ -1,3 +1,4 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -22,6 +23,7 @@ describe('AtividadesComponent', () => {
     dash = jasmine.createSpyObj('DashboardService', ['listarUsuarios']);
     dash.listarUsuarios.and.returnValue(of([]));
     await TestBed.configureTestingModule({
+      schemas: [NO_ERRORS_SCHEMA],  // app-topbar (SharedModule) fora do escopo do spec
       declarations: [AtividadesComponent],
       imports: [CommonModule, FormsModule],
       providers: [

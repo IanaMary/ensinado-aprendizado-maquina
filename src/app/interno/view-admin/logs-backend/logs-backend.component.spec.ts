@@ -1,3 +1,4 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +13,7 @@ describe('LogsBackendComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      schemas: [NO_ERRORS_SCHEMA],  // app-topbar (SharedModule) fora do escopo do spec
       declarations: [LogsBackendComponent],
       imports: [HttpClientTestingModule, MatIconModule, MatProgressSpinnerModule, MatTableModule],
     }).compileComponents();

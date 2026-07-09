@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AtividadeService } from '../../../service/atividade/atividade.service';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
+import { AuthService } from '../../../service/auth/auth.service';
+import { roleMap } from '../../../models/item-coleta-dado.model';
 
 @Component({
   selector: 'app-atividades',
@@ -44,7 +46,12 @@ export class AtividadesComponent implements OnInit, OnDestroy {
   private refreshTimer: any = null;
   exportando = false;
 
-  constructor(private atividade: AtividadeService, private dashboard: DashboardService) {}
+  // Tela compartilhada admin/professor: o voltar da topbar vai à home do papel.
+  voltarPara = '/view-admin';
+
+  constructor(private atividade: AtividadeService, private dashboard: DashboardService, auth: AuthService) {
+    this.voltarPara = roleMap[auth.getUsuarioRole()] || '/view-admin';
+  }
 
   ngOnInit(): void {
     this.carregarUsuarios();

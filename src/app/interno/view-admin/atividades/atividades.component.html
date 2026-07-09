@@ -1,6 +1,7 @@
 <div class="atividades-container">
-  <h1>Atividades dos Usuários</h1>
-  <p class="sub">Telemetria da jornada dos alunos: ações do pipeline, navegação, chamadas, erros e uso do tutor.</p>
+  <app-topbar titulo="Atividades dos Usuários"
+    subtitulo="Telemetria da jornada dos alunos: ações do pipeline, navegação, chamadas, erros e uso do tutor."
+    [voltarPara]="voltarPara"></app-topbar>
 
   <!-- Cards de resumo -->
   <div class="cards-resumo" *ngIf="resumo" aria-live="polite">
