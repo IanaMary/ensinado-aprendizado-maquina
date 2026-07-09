@@ -18,7 +18,7 @@ export class BrandLogoComponent {
   private static readonly MAPA: Record<string, string> = {
     positivo: 'assets/brand/hub-ia-positivo.png',
     negativo: 'assets/brand/hub-ia-negativo.png',
-    marca: 'assets/brand/apple-touch-icon.png',
+    marca: 'assets/brand/simbolo-ia.png',
   };
 
   get src(): string {

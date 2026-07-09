@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../service/auth/auth.service';
+import { SobreComponent } from '../sobre/sobre.component';
 
 /**
  * Menu do usuário (avatar + dropdown + Sair) reutilizável. Encapsula o padrão que
@@ -19,7 +21,7 @@ export class UserMenuComponent {
   emailUsuario = '';
   roleUsuario = '';
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(private router: Router, private authService: AuthService, private dialog: MatDialog) {
     this.nomeUsuario = sessionStorage.getItem('name') || 'Usuario';
     this.emailUsuario = sessionStorage.getItem('email') || '';
     this.roleUsuario = this.authService.getUsuarioRole();
@@ -58,6 +60,21 @@ export class UserMenuComponent {
   navegarGerenciarTurmas(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-professor']); }
   navegarParaAdmin(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-admin']); }
   navegarParaUsuarios(): void { this.usuarioMenuAberto = false; this.router.navigate(['/view-admin/usuarios']); }
-  navegarParaSobre(): void { this.usuarioMenuAberto = false; this.router.navigate(['/sobre']); }
+  navegarParaManual(): void {
+    this.usuarioMenuAberto = false;
+    this.router.navigate(['/manual'], { queryParams: { tipo: this.roleUsuario || 'aluno' } });
+  }
+
+  // Usuário logado: o Sobre abre como modal (sem sair da tela atual).
+  abrirSobre(): void {
+    this.usuarioMenuAberto = false;
+    this.dialog.open(SobreComponent, {
+      width: 'min(960px, 95vw)',
+      maxHeight: '90vh',
+      autoFocus: false,
+      panelClass: 'sobre-dialog',
+    });
+  }
+
   sair(): void { this.authService.logout(); }
 }
