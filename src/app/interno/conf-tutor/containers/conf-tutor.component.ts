@@ -9,6 +9,7 @@ import { BodyTutor } from '../../../models/item-coleta-dado.model';
 
 // Mapeia o indice da aba para o slug "pipe" usado no backend/audit log.
 const TAB_PIPES = [
+  'inicio',              // texto de boas-vindas do tutor (area de trabalho)
   'coleta_dados',        // dados (catalogo)
   'pre_processamento',   // pre-processamento (catalogo)
   'modelos',             // modelos (catalogo)
@@ -20,6 +21,7 @@ const OPERACOES_LABEL: Record<string, string> = {
   atualizar_descricao: 'Atualização de texto',
   atualizar_modelos: 'Atualização de modelos',
   atualizar_chaves_fixas: 'Atualização de chaves',
+  atualizar_por_pipe: 'Atualização de texto',
 };
 
 @Component({
@@ -38,7 +40,7 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     tamanho_arq: 0
   };
 
-  tabs = [true, false, false, false, false];
+  tabs = [true, false, false, false, false, false];
 
   erroTutor = false;
 
@@ -85,7 +87,8 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
 
     this.formConfTutor2 = this.formBuilder.group({
       formConfTutorInicio: this.formBuilder.group({
-        explicacao: [null, [Validators.required]]
+        texto_pipe: ['', [Validators.required]],
+        explicacao: [null, []]
       }),
       formConfTutorColetaDados: this.formBuilder.group({
         planilha_treino: [null, [Validators.required]],
@@ -108,8 +111,13 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   }
 
 
+  // Texto de boas-vindas (pipe 'inicio')
+  carregandoInicio = false;
+  salvandoInicio = false;
+
   ngOnInit() {
     this.carregarHistorico(this.pipeAtual);
+    this.carregarInicio();
   }
 
   tabAtual(e: any) {
@@ -123,6 +131,43 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     if (this.pipeAtual === 'llm' && !this.modelosLLM.length) {
       this.carregarModelosLLM();
     }
+  }
+
+  // === Texto de boas-vindas do tutor (pipe 'inicio') ===
+
+  carregarInicio() {
+    this.carregandoInicio = true;
+    this.dashboardService.getTutorEditar({ pipe: 'inicio' }).subscribe({
+      next: (doc: any) => {
+        this.formConfTutorInicio.patchValue({
+          texto_pipe: doc?.texto_pipe || '',
+          explicacao: doc?.explicacao || null,
+        });
+        this.carregandoInicio = false;
+      },
+      error: () => { this.carregandoInicio = false; }
+    });
+  }
+
+  salvarInicio() {
+    if (this.formConfTutorInicio.invalid || this.salvandoInicio) return;
+    this.salvandoInicio = true;
+    const { texto_pipe, explicacao } = this.formConfTutorInicio.value;
+    this.dashboardService.putTutorPipe('inicio', { texto_pipe, explicacao }).subscribe({
+      next: () => {
+        this.salvandoInicio = false;
+        this.notificacao.sucesso('Texto de boas-vindas salvo com sucesso.');
+        this.carregarHistorico(this.pipeAtual);
+      },
+      error: (err: any) => {
+        this.salvandoInicio = false;
+        this.notificacao.erro(err.error?.detail || 'Erro ao salvar o texto de boas-vindas.');
+      }
+    });
+  }
+
+  get previewInicio(): string {
+    return this.formConfTutorInicio.value?.texto_pipe || '';
   }
 
   recarregarHistorico() {

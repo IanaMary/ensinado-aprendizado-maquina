@@ -498,3 +498,94 @@
   &.sem-resposta { background: rgba(#DC2626, 0.10); color: #B91C1C; }
   &.testando { background: rgba(#9CA3AF, 0.18); color: #6B7280; }
 }
+
+// === Aba Início (texto de boas-vindas do tutor) ===
+.inicio-config {
+  padding: 24px;
+}
+
+.cabecalho-inicio {
+  @extend .cabecalho-llm;
+}
+
+.desc-inicio {
+  margin: 0 0 20px 0;
+  font-size: 13px;
+  color: $cinza-escuro;
+  line-height: 1.5;
+
+  code {
+    background: rgba($roxo-claro, 0.25);
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-size: 12px;
+  }
+}
+
+.carregando-inicio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: $cinza-medio;
+  font-size: 13px;
+}
+
+.form-inicio {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 760px;
+
+  .label-campo {
+    font-size: 13px;
+    font-weight: 700;
+    color: $roxo-escuro;
+    margin-top: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    border: 1px solid rgba($roxo-claro, 0.8);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    line-height: 1.5;
+    resize: vertical;
+
+    &:focus-visible {
+      outline: none;
+      border-color: $roxo-medio;
+      box-shadow: 0 0 0 3px rgba($roxo-medio, 0.15);
+    }
+  }
+
+  .acoes-inicio {
+    margin-top: 12px;
+  }
+
+  .preview-inicio {
+    margin-top: 18px;
+    border: 1px dashed rgba($roxo-claro, 0.9);
+    border-radius: 10px;
+    padding: 14px 16px;
+
+    .preview-titulo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: $roxo-medio;
+
+      mat-icon { font-size: 18px; width: 18px; height: 18px; }
+    }
+
+    .preview-corpo {
+      font-size: 13px;
+      line-height: 1.5;
+      color: $cinza-escuro;
+    }
+  }
+}
