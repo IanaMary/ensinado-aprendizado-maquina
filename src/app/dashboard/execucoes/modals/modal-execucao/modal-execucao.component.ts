@@ -1,8 +1,9 @@
-import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { BodyTutor, ItemPipeline, MediaMetrica, ResultadoColetaDado, TipoArquivoDados } from '../../../../models/item-coleta-dado.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ScriptGeneratorService } from '../../../../service/script-generator.service';
+import { MetricaAvaliacaoComponent } from '../metrica-avaliacao/metrica-avaliacao.component';
 import { TutorContexto } from '../../../tutor/tutor.component';
 import tutor from '../../../../constants/tutor.json';
 
@@ -25,6 +26,17 @@ export class ModalExecucaoComponent implements OnInit {
 
   // Container rolável do corpo do modal — usado para voltar ao topo ao trocar de etapa.
   @ViewChild('modalConteudo') modalConteudo?: ElementRef<HTMLElement>;
+
+  // Etapa de avaliação (ngSwitch): o rodapé do modal delega "Baixar relatório" e
+  // "Gerar avaliações" ao filho. Setter + detectChanges evita NG0100 (o footer
+  // referencia um filho que só existe após o switch renderizar).
+  metricaAvaliacao?: MetricaAvaliacaoComponent;
+  @ViewChild(MetricaAvaliacaoComponent) set metricaAvaliacaoRef(c: MetricaAvaliacaoComponent | undefined) {
+    if (this.metricaAvaliacao !== c) {
+      this.metricaAvaliacao = c;
+      this.cdr.detectChanges();
+    }
+  }
 
   tutor = tutor;
 
@@ -79,6 +91,7 @@ export class ModalExecucaoComponent implements OnInit {
   constructor(
     private dashboardService: DashboardService,
     private scriptGenerator: ScriptGeneratorService,
+    private cdr: ChangeDetectorRef,
     public dialogRef: MatDialogRef<ModalExecucaoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {

@@ -93,7 +93,17 @@
           [disabled]="etapas[etapaAtual].proximo">
           {{ etapas[etapaAtual].botaoProximo ? etapas[etapaAtual].botaoProximo : 'Próximo'}}
         </button>
-        <button *ngIf="etapas[etapaAtual].indice === nEtapas - 1" mat-raised-button color="primary" (click)="fechar()">
+        <!-- Ações da etapa de avaliação (movidas do corpo p/ a barra do modal) -->
+        <ng-container *ngIf="etapas[etapaAtual].indice === nEtapas - 1">
+          <button mat-raised-button (click)="metricaAvaliacao?.baixarRelatorioAluno()"
+            [disabled]="!metricaAvaliacao?.metricsAvaliadas?.length">
+            Baixar relatório (PDF)
+          </button>
+          <button mat-raised-button color="primary" (click)="metricaAvaliacao?.postAvaliacao()">
+            Gerar avaliações
+          </button>
+        </ng-container>
+        <button *ngIf="etapas[etapaAtual].indice === nEtapas - 1" mat-raised-button (click)="fechar()">
           Fechar
         </button>
       </ng-container>

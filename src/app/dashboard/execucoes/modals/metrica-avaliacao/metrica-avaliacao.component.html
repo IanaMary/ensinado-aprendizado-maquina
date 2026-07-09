@@ -165,12 +165,6 @@
     </div>
   </div>
 
-  <section class="acoes">
-    <button mat-raised-button (click)="baixarRelatorioAluno()" [disabled]="!metricsAvaliadas.length">
-      Baixar relatório (PDF)
-    </button>
-    <button mat-raised-button color="primary" (click)="postAvaliacao()">
-      Gerar avaliações
-    </button>
-  </section>
+  <!-- Ações da etapa (Baixar relatório / Gerar avaliações) vivem na barra de
+       botões do modal (modal-execucao .modal-footer), via ViewChild. -->
 </nav>
