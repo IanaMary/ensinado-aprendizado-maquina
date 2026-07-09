@@ -594,12 +594,15 @@
             aria-label="Assistente de preenchimento">
       <mat-icon>smart_toy</mat-icon>
     </button>
-    <button mat-mini-fab type="button" class="fab-acao" *ngIf="fabAberto && podeCriarNaLane"
-            (click)="criarNaLane()"
-            [matTooltip]="rotuloCriar" matTooltipPosition="left"
-            [attr.aria-label]="rotuloCriar">
-      <mat-icon>add</mat-icon>
-    </button>
+    <span *ngIf="fabAberto"
+          [matTooltip]="podeCriarNaLane ? rotuloCriar : 'A lane Coleta não tem criação de elementos — troque de aba para criar'"
+          matTooltipPosition="left">
+      <button mat-mini-fab type="button" class="fab-acao"
+              (click)="criarNaLane()" [disabled]="!podeCriarNaLane"
+              [attr.aria-label]="rotuloCriar">
+        <mat-icon>add</mat-icon>
+      </button>
+    </span>
     <button mat-fab color="primary" type="button"
             (click)="fabAberto = !fabAberto"
             [matTooltip]="fabAberto ? 'Fechar menu' : 'Ações da tela'" matTooltipPosition="left"
