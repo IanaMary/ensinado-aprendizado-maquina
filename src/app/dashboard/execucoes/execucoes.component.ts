@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../services/dashboard.service';
 import { ItemPipeline, MediaMetrica, ResultadoColetaDado } from '../../models/item-coleta-dado.model';
@@ -58,9 +58,6 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   chatSugestoes: string[] = [];
   paramsTutor = '';
   etapaAtual = '';
-  usuarioMenuAberto = false;
-  nomeUsuario = 'Usuario';
-  emailUsuario = '';
   roleUsuario = '';
 
   itens: ItemPipeline[] = [];
@@ -97,8 +94,6 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.nomeUsuario = sessionStorage.getItem('name') || 'Usuario';
-    this.emailUsuario = sessionStorage.getItem('email') || '';
     this.roleUsuario = this.authService.getUsuarioRole();
 
     this.getTutor('inicio');
@@ -148,35 +143,6 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         this.carregarPipeline(params['pipeline']);
       }
     });
-  }
-
-  @HostListener('document:click', ['$event'])
-  fecharMenuAoClicarFora(event: Event): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.usuario-menu')) {
-      this.usuarioMenuAberto = false;
-    }
-  }
-
-  get iniciaisUsuario(): string {
-    const partes = this.nomeUsuario.trim().split(/\s+/).filter(Boolean);
-    if (partes.length >= 2) {
-      return `${partes[0][0]}${partes[partes.length - 1][0]}`.toUpperCase();
-    }
-    return (partes[0]?.substring(0, 2) || 'A').toUpperCase();
-  }
-
-  get papelUsuario(): string {
-    const papeis: Record<string, string> = {
-      aluno: 'Aluno',
-      professor: 'Professor',
-      admin: 'Admin'
-    };
-    return papeis[this.roleUsuario] || this.roleUsuario || 'Aluno';
-  }
-
-  get usuarioAdmin(): boolean {
-    return this.roleUsuario === 'admin';
   }
 
   getTituloColeta(item: ItemPipeline): string {
@@ -920,36 +886,6 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         this.atividade.registrar('pipeline', 'salvou_projeto', { contexto: 'classico', nome, publicado: publicar });
       });
     });
-  }
-
-  alternarMenuUsuario(event: Event): void {
-    event.stopPropagation();
-    this.usuarioMenuAberto = !this.usuarioMenuAberto;
-  }
-
-  navegarParaProjetos(): void {
-    this.usuarioMenuAberto = false;
-    this.router.navigate(['/projetos']);
-  }
-
-  navegarParaGaleria(): void {
-    this.usuarioMenuAberto = false;
-    this.router.navigate(['/galeria']);
-  }
-
-  navegarParaAdmin(): void {
-    this.usuarioMenuAberto = false;
-    this.router.navigate(['/view-admin']);
-  }
-
-  navegarParaUsuarios(): void {
-    this.usuarioMenuAberto = false;
-    this.router.navigate(['/view-admin/usuarios']);
-  }
-
-  sair(): void {
-    this.usuarioMenuAberto = false;
-    this.authService.logout();
   }
 
   atualizarTutorContexto(): void {

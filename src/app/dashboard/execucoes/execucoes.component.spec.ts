@@ -77,26 +77,6 @@ describe('ExecucoesComponent', () => {
     expect(component.itens.length).toBe(0);
   });
 
-  it('should toggle user menu and close when navigating', () => {
-    component.alternarMenuUsuario(new Event('click'));
-
-    expect(component.usuarioMenuAberto).toBeTrue();
-
-    component.navegarParaProjetos();
-
-    expect(component.usuarioMenuAberto).toBeFalse();
-    expect(router.navigate).toHaveBeenCalledWith(['/projetos']);
-  });
-
-  it('should logout from user menu', () => {
-    component.usuarioMenuAberto = true;
-
-    component.sair();
-
-    expect(component.usuarioMenuAberto).toBeFalse();
-    expect(authService.logout).toHaveBeenCalled();
-  });
-
   it('should summarize collection settings for a loaded file dataset', () => {
     component.resultadoColetaDado = {
       target: 'fruit_name',
