@@ -2,8 +2,8 @@
   <!-- Barra superior -->
   <header class="sobre-topo">
     <button type="button" class="btn-voltar" (click)="voltar()">
-      <mat-icon aria-hidden="true">arrow_back</mat-icon>
-      <span>Voltar</span>
+      <mat-icon aria-hidden="true">{{ emModal ? 'close' : 'arrow_back' }}</mat-icon>
+      <span>{{ emModal ? 'Fechar' : 'Voltar' }}</span>
     </button>
   </header>
 

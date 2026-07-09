@@ -723,3 +723,10 @@ body {
   }
   &.mat-focused .mdc-notched-outline > * { border-color: $roxo-medio; }
 }
+
+// Modal do "Sobre" (aberto pelo user-menu p/ usuário logado): a página inteira
+// rola dentro do painel do diálogo.
+.sobre-dialog .mat-mdc-dialog-surface {
+  overflow-y: auto;
+  border-radius: 14px;
+}

@@ -67,7 +67,14 @@
     </div>
 
     <div class="usuario-opcoes">
-      <button class="usuario-opcao" (click)="navegarParaSobre()">
+      <button class="usuario-opcao" (click)="navegarParaManual()">
+        <mat-icon>menu_book</mat-icon>
+        <div>
+          <strong>Manual</strong>
+          <span>Como usar a plataforma</span>
+        </div>
+      </button>
+      <button class="usuario-opcao" (click)="abrirSobre()">
         <mat-icon>info</mat-icon>
         <div>
           <strong>Sobre</strong>

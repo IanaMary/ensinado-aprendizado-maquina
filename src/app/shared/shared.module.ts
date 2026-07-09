@@ -10,6 +10,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialogModule } from '@angular/material/dialog';
 import { ShellComponent } from './shell/shell.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { UserMenuComponent } from './user-menu/user-menu.component';
@@ -36,7 +37,8 @@ import { MarkdownPipe } from '../dashboard/chat-tutor/markdown.pipe';
     MatTabsModule,
     MatSnackBarModule,
     MatTooltipModule,
-    MatDividerModule
+    MatDividerModule,
+    MatDialogModule
   ],
   exports: [
     CommonModule,
