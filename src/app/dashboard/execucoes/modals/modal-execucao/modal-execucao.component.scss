@@ -269,14 +269,19 @@
   padding: 16px;
   gap: 12px;
   transform: translateX(100%);
-  transition: transform 0.25s ease;
   // Fechado: fora da tela E sem capturar clique. Sem isto, o painel fixo (mesmo
   // deslocado) podia interceptar o clique nos controles do card de gráfico.
+  // visibility:hidden é o cinto-e-suspensório: garante que nem o painel nem os
+  // filhos recebam eventos mesmo se pointer-events for sobrescrito em outro lugar.
   pointer-events: none;
+  visibility: hidden;
+  transition: transform 0.25s ease, visibility 0s linear 0.25s;
 
   &.open {
     transform: translateX(0);
     pointer-events: auto;
+    visibility: visible;
+    transition: transform 0.25s ease;
   }
 
   // Conteúdo contextual: ocupa o espaço disponível e rola quando estoura a tela.

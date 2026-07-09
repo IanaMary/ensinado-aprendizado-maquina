@@ -679,14 +679,18 @@ $metrica-cor-escuro: #E65100;
   padding: 16px;
   gap: 12px;
   transform: translateX(100%);
-  transition: transform 0.25s ease;
   // Fechado: não captura clique (o painel fixo, mesmo deslocado, podia
-  // interceptar cliques nos controles atrás dele).
+  // interceptar cliques nos controles atrás dele). visibility:hidden garante
+  // isso mesmo se pointer-events for sobrescrito por outra regra.
   pointer-events: none;
+  visibility: hidden;
+  transition: transform 0.25s ease, visibility 0s linear 0.25s;
 
   &.open {
     transform: translateX(0);
     pointer-events: auto;
+    visibility: visible;
+    transition: transform 0.25s ease;
   }
 
   // Cor da borda segue o tema do item clicado
@@ -701,7 +705,9 @@ $metrica-cor-escuro: #E65100;
     gap: 12px;
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
     overflow-y: auto;
+    overflow-x: hidden; // linhas longas rolam dentro do bloco de código, não no drawer
   }
 
   app-tutor {
