@@ -8,6 +8,18 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-09 (tutor: conteúdo por etapa no modal, card por dataset, fences coloridos no chat)
+
+> Frontend `mestrado-iana` (bundle `main-WZTDYM2S.js`), portado p/ `master`. Backend inalterado.
+
+### Adicionado/Corrigido
+- **Drawer do modal** agora exibe o conteúdo por etapa editável do admin (`GET /tutor/?pipe=`,
+  cache por etapa) — resíduo conhecido desde o fix do tutor por etapa.
+- **Toy datasets:** ⓘ em cada card abre o conteúdo educacional do dataset no tutor
+  (`/toy_datasets/{name}/conteudo`; endpoint estava pronto desde 2026-06-26, sem UI).
+- **Chat:** code fences do markdown agora têm **highlight de Python** (diretiva
+  `appRealcarBlocos` + bloco escuro na paleta do tutor) — pendência antiga.
+
 ## 2026-07-09 (botões padrão nas topbars + manual enriquecido)
 
 > Frontend `mestrado-iana` (bundle `main-KWB7QOBM.js`), portado p/ `master`. Backend inalterado.
