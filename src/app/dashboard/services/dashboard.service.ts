@@ -81,6 +81,11 @@ export class DashboardService {
     return this.http.get<any>(`${this.url}toy_datasets/${nome}`);
   }
 
+  /** Conteúdo educacional de um dataset (Básico/Avançado/link), sem carregar os dados. */
+  getConteudoDataset(nome: string) {
+    return this.http.get<any>(`${this.url}toy_datasets/${nome}/conteudo`);
+  }
+
   private resultadoDataset = new Subject<any>();
   resultadoDataset$ = this.resultadoDataset.asObservable();
 
