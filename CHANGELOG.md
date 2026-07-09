@@ -8,6 +8,16 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-09 (topbar em todas as telas do admin)
+
+> Frontend `mestrado-iana` (bundle `main-AW73YJJJ.js`), portado p/ `master`. Backend inalterado.
+
+### Corrigido
+- A padronização da barra superior valia só p/ conf-pipeline/conf-tutor; agora **Gerenciar
+  Usuários** (sem nem user-menu antes), **Artefatos**, **Logs de Backend**, **Logs de Erros** e
+  **Atividades** usam o `<app-topbar>` (voltar à esquerda + marca + título + user-menu; em
+  Atividades o voltar vai à home do papel).
+
 ## 2026-07-09 (admin: topbar + FAB-menu c/ assistente; modal: Treinar no rodapé; robustez a chunk defasado)
 
 > Frontend `mestrado-iana` `ffee720`+`f2784ec` (bundle `main-4J2NDQLO.js`), portado p/ `master`.
