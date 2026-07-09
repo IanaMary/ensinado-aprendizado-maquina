@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ScriptGeneratorService } from '../../../../service/script-generator.service';
 import { MetricaAvaliacaoComponent } from '../metrica-avaliacao/metrica-avaliacao.component';
+import { ClasificadorComponent } from '../classificador/classificador.component';
 import { TutorContexto } from '../../../tutor/tutor.component';
 import tutor from '../../../../constants/tutor.json';
 
@@ -34,6 +35,15 @@ export class ModalExecucaoComponent implements OnInit {
   @ViewChild(MetricaAvaliacaoComponent) set metricaAvaliacaoRef(c: MetricaAvaliacaoComponent | undefined) {
     if (this.metricaAvaliacao !== c) {
       this.metricaAvaliacao = c;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Etapa de treinamento: o rodapé delega o "Treinar" ao filho (mesmo padrão acima).
+  classificador?: ClasificadorComponent;
+  @ViewChild(ClasificadorComponent) set classificadorRef(c: ClasificadorComponent | undefined) {
+    if (this.classificador !== c) {
+      this.classificador = c;
       this.cdr.detectChanges();
     }
   }

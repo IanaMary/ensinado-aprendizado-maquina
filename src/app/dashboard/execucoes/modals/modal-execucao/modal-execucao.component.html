@@ -93,6 +93,13 @@
           [disabled]="etapas[etapaAtual].proximo">
           {{ etapas[etapaAtual].botaoProximo ? etapas[etapaAtual].botaoProximo : 'Próximo'}}
         </button>
+        <!-- Ação da etapa de treinamento (movida do corpo p/ a barra do modal) -->
+        <button *ngIf="etapas[etapaAtual].indice === 3 && modeloSelecionado && classificador && !classificador.treinando"
+          mat-raised-button color="primary"
+          (click)="classificador.enviarParaClassificador(modeloSelecionado.valor)">
+          Treinar {{ modeloSelecionado.label }}
+        </button>
+
         <!-- Ações da etapa de avaliação (movidas do corpo p/ a barra do modal) -->
         <ng-container *ngIf="etapas[etapaAtual].indice === nEtapas - 1">
           <button mat-raised-button (click)="metricaAvaliacao?.baixarRelatorioAluno()"

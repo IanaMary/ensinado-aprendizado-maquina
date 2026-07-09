@@ -1,22 +1,13 @@
 <nav class="modal">
 
 
-  <!-- Botão para treinar o modelo atual -->
-  <section class="acoes" *ngIf="modeloSelecionado">
-    <ng-container *ngIf="treinando">
-      <span class="texto-informativo ">
-        Aguarde, treinando {{modeloSelecionado.label}}
-      </span>
-      <mat-spinner color="primary" mode="indeterminate" diameter="50"></mat-spinner>
-    </ng-container>
-
-    <ng-container *ngIf="!treinando">
-      <button mat-raised-button (click)="enviarParaClassificador(modeloSelecionado.valor)">
-        Treinar {{modeloSelecionado.label}}
-      </button>
-    </ng-container>
-
-
+  <!-- O botão "Treinar" vive na barra do modal (modal-execucao .modal-footer, via
+       ViewChild); aqui fica só o indicador de treinamento em andamento. -->
+  <section class="acoes" *ngIf="modeloSelecionado && treinando">
+    <span class="texto-informativo ">
+      Aguarde, treinando {{modeloSelecionado.label}}
+    </span>
+    <mat-spinner color="primary" mode="indeterminate" diameter="50"></mat-spinner>
   </section>
 
   <!-- Visualização dos detalhes para todos os modelos treinados -->

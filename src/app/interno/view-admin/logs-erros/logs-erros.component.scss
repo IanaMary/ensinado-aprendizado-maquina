@@ -1,23 +1,44 @@
 .logs-container {
   padding: 24px;
 
-  table {
+  // A tabela rola horizontalmente dentro do wrapper em telas estreitas,
+  // em vez de espremer as colunas (a URL quebrava letra a letra).
+  .tabela-wrapper {
     width: 100%;
-    margin-top: 16px;
+    overflow-x: auto;
   }
 
-  .mat-column-status {
-    width: 100px;
-    text-align: center;
+  table {
+    width: 100%;
+    min-width: 720px;
+    margin-top: 16px;
+    table-layout: fixed; // larguras previsíveis: URL e Mensagem dividem o espaço restante
+  }
+
+  th, td {
+    padding: 10px 12px;
+    vertical-align: top;
+    font-size: 13px;
+    line-height: 1.45;
   }
 
   .mat-column-timestamp {
-    width: 180px;
+    width: 150px;
+    white-space: nowrap;
+  }
+
+  .mat-column-status {
+    width: 90px;
+    text-align: center;
   }
 
   .mat-column-url {
-    width: 200px;
-    word-break: break-all;
+    width: 30%;
+    word-break: break-all; // URLs longas quebram dentro da célula (agora larga)
+  }
+
+  .mat-column-message {
+    overflow-wrap: anywhere; // mensagens longas quebram sem estourar a linha
   }
 
   .no-data {
