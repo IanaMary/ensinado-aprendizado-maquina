@@ -134,6 +134,12 @@
           <nav class="dataset-card-header">
             <mat-icon>science</mat-icon>
             <span class="dataset-nome">{{ ds.nome }}</span>
+            <button type="button" class="btn-info-dataset"
+              [matTooltip]="'Ver explicação no tutor'" matTooltipPosition="above"
+              [attr.aria-label]="'Ver explicação de ' + ds.nome + ' no tutor'"
+              (click)="pedirAjudaDataset(ds, $event)">
+              <mat-icon>info_outline</mat-icon>
+            </button>
           </nav>
           <nav class="dataset-descricao">{{ ds.descricao }}</nav>
           <nav class="dataset-missao" *ngIf="ds.missao">

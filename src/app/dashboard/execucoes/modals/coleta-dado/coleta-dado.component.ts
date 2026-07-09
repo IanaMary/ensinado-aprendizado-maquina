@@ -35,6 +35,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
   @Input() tipoArquivoSelecionado: TipoArquivoDados = 'csv';
   
   @Output() resultadoColetaDadoModificado = new EventEmitter<ResultadoColetaDado>();
+  /** Pede ajuda ao tutor do modal (ⓘ do card de toy dataset). */
+  @Output() ajudaItem = new EventEmitter<any>();
 
   tutor = tutor.resumos;
 
@@ -186,6 +188,24 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     if (fonte === 'dataset') {
       this.carregarDatasets();
     }
+  }
+
+  /** ⓘ do card: busca o conteúdo educacional do dataset e abre no tutor do modal. */
+  private conteudoDatasetCache: Record<string, any> = {};
+  pedirAjudaDataset(ds: any, event: Event) {
+    event.stopPropagation();
+    const emitir = (conteudo: any) =>
+      this.ajudaItem.emit({ label: ds.nome, valor: ds.id, tipoItem: 'coleta-dado', conteudo });
+    if (this.conteudoDatasetCache[ds.id]) { emitir(this.conteudoDatasetCache[ds.id]); return; }
+    this.dashboardService.getConteudoDataset(ds.id).subscribe({
+      next: (res: any) => {
+        const conteudo = res?.conteudo || res || null;
+        if (conteudo) this.conteudoDatasetCache[ds.id] = conteudo;
+        emitir(conteudo);
+      },
+      // Sem conteúdo específico: abre com a descrição do próprio card.
+      error: () => emitir({ titulo: ds.nome, descricao: ds.descricao || '' }),
+    });
   }
 
   selecionarDataset(ds: any) {

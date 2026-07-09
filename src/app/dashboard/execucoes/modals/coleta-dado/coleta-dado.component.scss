@@ -707,3 +707,22 @@ input[type="file"] {
 .url-etapa { font-size: 12px; color: #7C3AED; font-weight: 600; margin-bottom: 4px; }
 .url-bar { height: 6px; background: #E0D3F2; border-radius: 3px; overflow: hidden; }
 .url-fill { height: 100%; background: linear-gradient(90deg, #7C3AED, #A855F7); transition: width .25s; }
+
+// ⓘ do card de toy dataset (abre a explicação no tutor do modal)
+.dataset-card-header .btn-info-dataset {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: $roxo-medio;
+  cursor: pointer;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  &:hover { background: rgba($roxo-medio, 0.1); }
+}

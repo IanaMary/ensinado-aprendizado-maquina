@@ -47,7 +47,7 @@
     <!-- Mensagens -->
     <div class="msg" *ngFor="let m of mensagens" [class.user]="m.role === 'user'" [class.assistant]="m.role === 'assistant'">
       <div class="bolha" *ngIf="m.role === 'user'">{{ m.content }}</div>
-      <div class="bolha markdown" *ngIf="m.role === 'assistant'" [innerHTML]="m.content | markdown"></div>
+      <div class="bolha markdown" *ngIf="m.role === 'assistant'" appRealcarBlocos [innerHTML]="m.content | markdown"></div>
     </div>
 
     <!-- Resposta streaming em andamento -->

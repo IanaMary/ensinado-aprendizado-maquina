@@ -156,17 +156,21 @@
 
     ::ng-deep {
       .md-code {
-        background: rgba(0, 0, 0, 0.06);
+        // Bloco escuro (mesmo tema do .codigo-bloco do tutor) p/ os tokens coloridos
+        background: #1e1e2e;
+        color: #e6e6f0;
         border-radius: 6px;
         padding: 8px 10px;
         font-size: 12px;
-        font-family: 'Courier New', Courier, monospace;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         overflow-x: auto;
+        max-width: 100%;
         margin: 6px 0;
 
         code {
           background: none;
           padding: 0;
+          white-space: pre;
         }
       }
 
@@ -291,4 +295,29 @@
       border-color: $roxo-medio;
     }
   }
+}
+
+// Cores dos tokens (highlight.js) nos code fences do chat. Os spans .hljs-* entram
+// por innerHTML (diretiva appRealcarBlocos) e não recebem _ngcontent — por isso o
+// ::ng-deep, escopado às bolhas do markdown. Paleta = a do tutor (.codigo-bloco).
+::ng-deep .bolha.markdown .md-code code {
+  .hljs-keyword,
+  .hljs-selector-tag { color: #c792ea; }
+  .hljs-string,
+  .hljs-meta .hljs-string { color: #c3e88d; }
+  .hljs-number,
+  .hljs-literal { color: #f78c6c; }
+  .hljs-comment,
+  .hljs-quote { color: #676e95; font-style: italic; }
+  .hljs-built_in,
+  .hljs-class .hljs-title,
+  .hljs-type { color: #82aaff; }
+  .hljs-function .hljs-title,
+  .hljs-title.function_ { color: #82aaff; }
+  .hljs-params { color: #e6e6f0; }
+  .hljs-attr,
+  .hljs-attribute { color: #ffcb6b; }
+  .hljs-meta { color: #89ddff; }
+  .hljs-decorator,
+  .hljs-meta .hljs-keyword { color: #f78c6c; }
 }

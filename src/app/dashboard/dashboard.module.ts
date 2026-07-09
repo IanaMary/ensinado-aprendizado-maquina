@@ -43,6 +43,8 @@ import { NomearPipelineDialogComponent } from './execucoes/modals/nomear-pipelin
 import { VisualizacaoDadosComponent } from './execucoes/modals/visualizacao-dados/visualizacao-dados.component';
 import { ChatTutorComponent } from './chat-tutor/chat-tutor.component';
 import { SharedModule } from '../shared/shared.module';
+import { HighlightCodeDirective } from './tutor/highlight/highlight-code.directive';
+import { RealcarBlocosDirective } from './tutor/highlight/realcar-blocos.directive';
 import { SessionService } from '../service/sessao-store.service';
 
 
@@ -69,6 +71,8 @@ import { SessionService } from '../service/sessao-store.service';
     MetricaAvaliacaoComponent,
     TutorComponent,
     ChatTutorComponent,
+    HighlightCodeDirective,
+    RealcarBlocosDirective,
     CsvConfigComponent,
     NomearPipelineDialogComponent,
     VisualizacaoDadosComponent

@@ -26,6 +26,7 @@
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-backend-webgpu": "^4.22.0",
     "file-saver": "^2.0.5",
+    "highlight.js": "^11.11.1",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "jszip": "^3.10.1",

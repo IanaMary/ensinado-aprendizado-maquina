@@ -34,7 +34,8 @@
         <ng-container *ngSwitchCase="0">
           <app-coleta-dado [resultadoColetaDado]="resultadoColetaDado"
             [tipoArquivoSelecionado]="tipoArquivoSelecionado"
-            (resultadoColetaDadoModificado)="atualizarResultadoColeta($event)">
+            (resultadoColetaDadoModificado)="atualizarResultadoColeta($event)"
+            (ajudaItem)="abrirAjudaItem($event)">
           </app-coleta-dado>
         </ng-container>
 
@@ -146,6 +147,7 @@
 
       <app-tutor
         [contexto]="tutorContexto"
+        [tutorGeral]="tutorEtapaHtml"
         [explicacao]="explicacaoAgregacaoMetricas"
         [modeloSelecionado]="modeloSelecionado"
         [metricaSelecionada]="metricasSelecionadas[0]">
