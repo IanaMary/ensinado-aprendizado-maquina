@@ -8,6 +8,24 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-09 (admin: topbar + FAB-menu c/ assistente; modal: Treinar no rodapé; robustez a chunk defasado)
+
+> Frontend `mestrado-iana` `ffee720`+`f2784ec` (bundle `main-4J2NDQLO.js`), portado p/ `master`.
+> Backend `30f47a5`. Verificação: 115/115 + build prod; backend 353 passed.
+
+### Adicionado
+- **`<app-topbar>` compartilhada** (voltar à esquerda + marca + título + user-menu), aplicada em
+  conf-pipeline e conf-tutor (fim dos botões antigos/telas sem menu).
+- **FAB-menu (☰) no conf-pipeline:** criar elemento na lane atual + **assistente de preenchimento**
+  (chat com o guia versionado — db.tutor pipe `conf-pipeline` — como contexto).
+- **Auto-reload de chunk defasado:** `GlobalErrorHandler` recarrega a página uma vez quando um
+  chunk lazy some após deploy (guarda anti-loop); deploy passa a **preservar assets hasheados**.
+
+### Corrigido
+- **Modal:** botão **Treinar** movido para a barra do modal (etapa treinamento); bloco "Tipos de
+  colunas detectados" subiu para antes das transformações (pré-proc).
+- **Logs de Erros (admin):** tabela responsiva/legível (URL quebrava letra a letra).
+
 ## 2026-07-09 (UX: ações no rodapé do modal, código do tutor, identidade Hub no PDF/zip/Sobre, FABs)
 
 > Frontend `mestrado-iana` `7184e90`+`79c5e7c` (bundle `main-OCQSCJ5R.js`), portado p/ `master`.
