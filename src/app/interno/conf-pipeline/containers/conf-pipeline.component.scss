@@ -300,3 +300,62 @@
     padding: 8px 0;
   }
 }
+
+// === Campos do item (resumo/explicacao/grupo/tarefa/métricas) + exclusão ===
+.execucao-panel .execucao-grid {
+  .campo-wide {
+    grid-column: 1 / -1;
+  }
+
+  textarea {
+    padding: 8px 10px;
+    border: 1px solid $roxo-claro;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    background: #fff;
+    resize: vertical;
+
+    &:focus-visible {
+      outline: none;
+      border-color: $roxo-medio;
+      box-shadow: 0 0 0 3px rgba($roxo-medio, 0.15);
+    }
+  }
+}
+
+.metricas-compat {
+  margin-top: 14px;
+
+  strong {
+    font-size: 13px;
+    color: $roxo-escuro;
+  }
+
+  .metricas-dica {
+    margin: 2px 0 8px;
+    font-size: 11px;
+    color: $cinza-medio;
+  }
+
+  .metrica-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 14px 8px 0;
+    font-size: 13px;
+    color: $cinza-escuro;
+    cursor: pointer;
+
+    input { accent-color: $roxo-medio; }
+  }
+
+  .metricas-vazio {
+    font-size: 12px;
+    color: $cinza-medio;
+  }
+}
+
+.item-actions .btn-excluir mat-icon {
+  color: $erro;
+}

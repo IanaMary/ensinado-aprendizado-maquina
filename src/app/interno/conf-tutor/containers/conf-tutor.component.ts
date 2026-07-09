@@ -5,16 +5,12 @@ import { LoginService } from '../../../externo/autenticacao/login/services/login
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 import { NotificacaoService } from '../../../service/notificacao.service';
-import { BodyTutor } from '../../../models/item-coleta-dado.model';
 
 // Mapeia o indice da aba para o slug "pipe" usado no backend/audit log.
+// O catálogo (dados/pré-proc/modelos/métricas) é administrado no conf-pipeline.
 const TAB_PIPES = [
-  'inicio',              // texto de boas-vindas do tutor (area de trabalho)
-  'coleta_dados',        // dados (catalogo)
-  'pre_processamento',   // pre-processamento (catalogo)
-  'modelos',             // modelos (catalogo)
-  'metricas',            // metricas (catalogo)
-  'llm',                 // configuracao do LLM
+  'inicio',   // texto de boas-vindas do tutor (area de trabalho)
+  'llm',      // configuracao do LLM
 ];
 
 const OPERACOES_LABEL: Record<string, string> = {
@@ -34,18 +30,9 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
 
   role: string = sessionStorage.getItem('role') || '';
 
-  conteudo = '';
+  tabs = [true, false];
 
-  body: BodyTutor = {
-    tamanho_arq: 0
-  };
-
-  tabs = [true, false, false, false, false, false];
-
-  erroTutor = false;
-
-  formConfTutor: FormGroup;
-  formConfTutor2: FormGroup;
+  formConfTutorInicio: FormGroup;
 
   // Historico de edicoes
   historico: any[] = [];
@@ -76,37 +63,9 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     private readonly notificacao: NotificacaoService,
     private dashboardService: DashboardService) {
 
-    this.formConfTutor = this.formBuilder.group({
-      tamanho_arq: [0, [Validators.required]],
-      prever_categoria: [null, []],
-      dados_rotulados: [null, []],
-      num_categorias_conhecidas: [null, []],
-      prever_quantidade: [null, []],
-      apenas_olhando: [null, []],
-    });
-
-    this.formConfTutor2 = this.formBuilder.group({
-      formConfTutorInicio: this.formBuilder.group({
-        texto_pipe: ['', [Validators.required]],
-        explicacao: [null, []]
-      }),
-      formConfTutorColetaDados: this.formBuilder.group({
-        planilha_treino: [null, [Validators.required]],
-        planilha_teste: [null, [Validators.required]],
-        divisao_entre_treino_teste: [null, [Validators.required]],
-        target: [null, [Validators.required]],
-        atributos: [null, [Validators.required]]
-      }),
-      formConfTutorSelecaoModelo: this.formBuilder.group({
-        aprendizado_supervisionado: [null, [Validators.required]],
-        classificacao: [null, [Validators.required]],
-        modelos_classificacao: this.formBuilder.array([]),
-        regressao: [null, [Validators.required]],
-        modelos_regressao: this.formBuilder.array([]),
-        aprendizado_nao_supervisionado: [null, [Validators.required]],
-        reducao_dimensionalidade: [null, [Validators.required]],
-        agrupamento: [null, [Validators.required]]
-      })
+    this.formConfTutorInicio = this.formBuilder.group({
+      texto_pipe: ['', [Validators.required]],
+      explicacao: [null, []]
     });
   }
 
@@ -307,16 +266,8 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     return OPERACOES_LABEL[op] || op;
   }
 
-  get formConfTutorInicio(): FormGroup {
-    return this.formConfTutor2.get('formConfTutorInicio') as FormGroup;
-  }
-
-  get formConfTutorColetaDados(): FormGroup {
-    return this.formConfTutor2.get('formConfTutorColetaDados') as FormGroup;
-  }
-
-  get formConfTutorSelecaoModelo(): FormGroup {
-    return this.formConfTutor2.get('formConfTutorSelecaoModelo') as FormGroup;
+  irParaConfPipeline() {
+    this.router.navigate(['/view-admin/conf-pipeline']);
   }
 
   navegar(bool: boolean) {

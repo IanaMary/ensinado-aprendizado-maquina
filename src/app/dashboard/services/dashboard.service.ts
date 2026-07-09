@@ -394,12 +394,6 @@ export class DashboardService {
     );
   }
 
-  /** @deprecated Use fetchPreProcessamento(). Mantido por compat: os docs completos
-   *  ainda expõem `valor` e `habilitado`. */
-  fetchPreProcessamentoOverrides() {
-    return this.fetchPreProcessamento();
-  }
-
   // SERVIÇOS SEM LIGAÇÃO COM BANCO
 
   carregarItensColetasDados() {

@@ -17,13 +17,11 @@ import { MatSelectModule } from '@angular/material/select';
 
 import { ConfTutorRoutingModule } from './conf-tutor-routing.module';
 import { ConfTutorComponent } from './containers/conf-tutor.component';
-import { TutorElementosCatalogoComponent } from './components/tutor-elementos-catalogo/tutor-elementos-catalogo.component';
 
 
 @NgModule({
   declarations: [
-    ConfTutorComponent,
-    TutorElementosCatalogoComponent
+    ConfTutorComponent
   ],
   imports: [
     ConfTutorRoutingModule,

@@ -2,9 +2,13 @@
   <header class="cabecalho">
     <div class="titulo-bloco">
       <h2>Configuração do Tutor</h2>
-      <p>Edite os conteúdos educacionais do tutor exibidos em cada etapa do pipeline.</p>
+      <p>Texto de boas-vindas, modelo LLM do chat e histórico de edições. O catálogo do pipeline
+        (dados, pré-processamento, modelos e métricas) é administrado na Configuração do Pipeline.</p>
     </div>
     <div class="acoes-bloco">
+      <button mat-stroked-button color="primary" (click)="irParaConfPipeline()">
+        <mat-icon>tune</mat-icon> Configuração do Pipeline
+      </button>
       <button mat-stroked-button (click)="navegar(true)" *ngIf="role !== 'aluno'">
         <mat-icon>arrow_back</mat-icon> Voltar
       </button>
@@ -51,46 +55,6 @@
               <div class="preview-corpo" [innerHTML]="previewInicio"></div>
             </div>
           </form>
-        </div>
-      </mat-tab>
-      <mat-tab label="Dados">
-        <div class="box-coluna">
-          <app-tutor-elementos-catalogo
-            [atualizar]="tabs[1]"
-            tipoCatalogo="coleta_dados"
-            titulo="Datasets disponíveis"
-            icone="table_chart">
-          </app-tutor-elementos-catalogo>
-        </div>
-      </mat-tab>
-      <mat-tab label="Pré-processamento">
-        <div class="box-coluna">
-          <app-tutor-elementos-catalogo
-            [atualizar]="tabs[2]"
-            tipoCatalogo="pre_processamento"
-            titulo="Etapas de pré-processamento"
-            icone="transform">
-          </app-tutor-elementos-catalogo>
-        </div>
-      </mat-tab>
-      <mat-tab label="Modelos">
-        <div class="box-coluna">
-          <app-tutor-elementos-catalogo
-            [atualizar]="tabs[3]"
-            tipoCatalogo="modelos"
-            titulo="Modelos disponíveis"
-            icone="model_training">
-          </app-tutor-elementos-catalogo>
-        </div>
-      </mat-tab>
-      <mat-tab label="Métricas">
-        <div class="box-coluna">
-          <app-tutor-elementos-catalogo
-            [atualizar]="tabs[4]"
-            tipoCatalogo="metricas"
-            titulo="Métricas disponíveis"
-            icone="analytics">
-          </app-tutor-elementos-catalogo>
         </div>
       </mat-tab>
       <mat-tab label="LLM">
