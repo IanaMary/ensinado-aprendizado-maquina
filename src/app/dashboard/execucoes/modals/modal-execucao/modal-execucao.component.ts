@@ -108,7 +108,10 @@ export class ModalExecucaoComponent implements OnInit {
     this.atualizarVariaveis(data);
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    // Conteúdo por etapa do drawer já na etapa inicial (não só ao navegar).
+    this.atualizarTutorContexto();
+  }
 
   // Contexto do pipeline para o chatbot tutor. Memoizado: so reconstroi (e regera o
   // script Python, que e caro) quando algo relevante muda — getContextoChat() roda a
@@ -263,6 +266,34 @@ export class ModalExecucaoComponent implements OnInit {
     // Reset contexto quando muda de etapa; sem isso o <app-tutor> mantém a
     // referência anterior e não re-renderiza o conteúdo da nova etapa.
     this.tutorContexto = null;
+
+    this.carregarHtmlEtapa(idx);
+  }
+
+  // ---------- Conteúdo por etapa editável pelo admin (db.tutor, GET /tutor/?pipe=) ----------
+  // Exibido no drawer do modal quando nada está selecionado (antes só a página
+  // pai consumia esse HTML; o drawer do modal ficava só com o tutor.json).
+
+  tutorEtapaHtml = '';
+  private etapaHtmlCache: Record<string, string> = {};
+  private static readonly PIPE_POR_ETAPA = [
+    'coleta-dado', 'pre-processamento', 'selecao-modelo', 'treinamento', 'selecao-metricas', 'avaliacao',
+  ];
+
+  private carregarHtmlEtapa(idx: number): void {
+    const pipe = ModalExecucaoComponent.PIPE_POR_ETAPA[idx];
+    if (!pipe) { this.tutorEtapaHtml = ''; return; }
+    if (pipe in this.etapaHtmlCache) { this.tutorEtapaHtml = this.etapaHtmlCache[pipe]; return; }
+    this.tutorEtapaHtml = '';
+    this.dashboardService.getTutor(`pipe=${pipe}`).subscribe({
+      next: (res: any) => {
+        const html = (res?.descricao || '').replace(/&nbsp;/g, ' ');
+        this.etapaHtmlCache[pipe] = html;
+        // Aplica só se o usuário continua na mesma etapa (a resposta é assíncrona).
+        if (this.etapas[this.etapaAtual].indice === idx) this.tutorEtapaHtml = html;
+      },
+      error: () => { this.etapaHtmlCache[pipe] = ''; },  // sem doc (404): segue só com o tutor.json
+    });
   }
 
   private getPipelineKey(idx: number): string {
