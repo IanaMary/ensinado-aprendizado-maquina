@@ -1,6 +1,7 @@
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule, DomSanitizer } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { GlobalErrorHandler } from './service/global-error-handler';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MatIconRegistry } from '@angular/material/icon';
@@ -20,7 +21,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AtividadeInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    // Chunk lazy defasado após deploy -> recarrega a página uma vez (ver classe)
+    { provide: ErrorHandler, useClass: GlobalErrorHandler }
   ],
   bootstrap: [AppComponent],
 })

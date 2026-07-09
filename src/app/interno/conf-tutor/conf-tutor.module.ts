@@ -16,6 +16,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
 
 import { ConfTutorRoutingModule } from './conf-tutor-routing.module';
+import { SharedModule } from '../../shared/shared.module';
 import { ConfTutorComponent } from './containers/conf-tutor.component';
 
 
@@ -25,6 +26,7 @@ import { ConfTutorComponent } from './containers/conf-tutor.component';
   ],
   imports: [
     ConfTutorRoutingModule,
+    SharedModule,
     CommonModule,
     ReactiveFormsModule,
     FormsModule,

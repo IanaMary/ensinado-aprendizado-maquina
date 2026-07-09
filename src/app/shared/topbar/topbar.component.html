@@ -1,0 +1,18 @@
+<header class="topbar">
+  <button *ngIf="voltarPara" mat-icon-button type="button" class="topbar-voltar"
+          (click)="voltar()" matTooltip="Voltar" aria-label="Voltar">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <app-brand-logo variante="marca" [altura]="34" class="topbar-logo"></app-brand-logo>
+
+  <div class="topbar-info">
+    <h2>{{ titulo }}</h2>
+    <p *ngIf="subtitulo">{{ subtitulo }}</p>
+  </div>
+
+  <div class="topbar-acoes">
+    <ng-content></ng-content>
+    <app-user-menu></app-user-menu>
+  </div>
+</header>

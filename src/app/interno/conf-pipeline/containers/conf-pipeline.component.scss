@@ -1,27 +1,13 @@
 @use '../../../../styles/colores.scss' as *;
 
 .container {
-  padding: 24px;
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
 
-  .cabecalho {
-    margin-bottom: 16px;
+  app-topbar { display: block; margin-bottom: 8px; }
 
-    h2 {
-      margin: 0 0 6px 0;
-      font-size: 20px;
-      font-weight: 700;
-      color: $roxo-escuro;
-    }
-
-    p {
-      margin: 0;
-      font-size: 13px;
-      color: $cinza-escuro;
-    }
-  }
+  mat-tab-group { padding: 0 24px 24px; display: block; }
 }
 
 .lane {
@@ -356,9 +342,55 @@
 }
 
 // FAB de criação por lane (flutua no canto inferior direito da tela)
-.fab-novo {
+// FAB-menu flutuante (canto inferior direito): abre as ações da tela
+.fab-menu {
   position: fixed;
   right: 28px;
   bottom: 28px;
-  z-index: 20;
+  z-index: 900; // abaixo do CDK overlay (modais/tooltips)
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  .fab-acao {
+    background: $branco;
+    color: $roxo-medio;
+  }
+}
+
+// Assistente de preenchimento (chat do admin) — painel fixo à direita
+.chat-admin {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(420px, 92vw);
+  background: $branco;
+  border-left: 1px solid $roxo-claro;
+  box-shadow: -12px 0 36px rgba($roxo-escuro, 0.2);
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+
+  .chat-admin-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba($roxo-claro, 0.7);
+    color: $roxo-escuro;
+    font-weight: 700;
+    font-size: 14px;
+
+    > mat-icon { color: $roxo-medio; }
+    span { flex: 1; }
+  }
+
+  app-chat-tutor {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
 }

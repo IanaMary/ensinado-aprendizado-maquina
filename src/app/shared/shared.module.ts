@@ -11,7 +11,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 import { ShellComponent } from './shell/shell.component';
+import { TopbarComponent } from './topbar/topbar.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { UserMenuComponent } from './user-menu/user-menu.component';
 import { BrandLogoComponent } from './brand-logo/brand-logo.component';
@@ -23,6 +25,7 @@ import { MarkdownPipe } from '../dashboard/chat-tutor/markdown.pipe';
     BreadcrumbComponent,
     UserMenuComponent,
     BrandLogoComponent,
+    TopbarComponent,
     MarkdownPipe
   ],
   imports: [
@@ -38,7 +41,8 @@ import { MarkdownPipe } from '../dashboard/chat-tutor/markdown.pipe';
     MatSnackBarModule,
     MatTooltipModule,
     MatDividerModule,
-    MatDialogModule
+    MatDialogModule,
+    MatButtonModule
   ],
   exports: [
     CommonModule,
@@ -57,6 +61,7 @@ import { MarkdownPipe } from '../dashboard/chat-tutor/markdown.pipe';
     BreadcrumbComponent,
     UserMenuComponent,
     BrandLogoComponent,
+    TopbarComponent,
     MarkdownPipe
   ],
   providers: []

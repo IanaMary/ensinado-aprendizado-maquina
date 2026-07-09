@@ -1,10 +1,9 @@
 <div class="container">
-  <header class="cabecalho">
-    <h2>Configuração do Pipeline</h2>
-    <p>Habilite ou desabilite quais módulos ficam disponíveis para os alunos em cada lane do pipeline.</p>
-  </header>
+  <app-topbar titulo="Configuração do Pipeline"
+    subtitulo="Habilite, edite e crie os módulos disponíveis para os alunos em cada lane do pipeline."
+    voltarPara="/view-admin"></app-topbar>
 
-  <mat-tab-group animationDuration="200ms">
+  <mat-tab-group animationDuration="200ms" (selectedTabChange)="onTabChange($event)">
     <!-- COLETA -->
     <mat-tab label="Coleta">
       <div class="lane">
@@ -81,13 +80,6 @@
           <mat-icon>transform</mat-icon>
           <span>Itens disponíveis na lane <strong>Pré-processamento</strong>.</span>
         </div>
-
-        <button mat-fab color="primary" type="button" class="fab-novo"
-                (click)="novoItem('pre_processamento')"
-                matTooltip="Novo pré-processador" matTooltipPosition="left"
-                aria-label="Novo pré-processador">
-          <mat-icon>add</mat-icon>
-        </button>
 
         <div class="busca" *ngIf="!carregandoPreProc && itensPreProc.length">
           <mat-icon>search</mat-icon>
@@ -260,12 +252,6 @@
           <span>Modelos disponíveis na lane <strong>Treinamento</strong>.</span>
         </div>
 
-        <button mat-fab color="primary" type="button" class="fab-novo"
-                (click)="novoItem('modelos')"
-                matTooltip="Novo modelo" matTooltipPosition="left"
-                aria-label="Novo modelo">
-          <mat-icon>add</mat-icon>
-        </button>
 
         <div class="loading" *ngIf="carregandoModelos">
           <mat-spinner diameter="32"></mat-spinner>
@@ -461,12 +447,6 @@
           <span>Métricas disponíveis na lane <strong>Avaliação</strong>.</span>
         </div>
 
-        <button mat-fab color="primary" type="button" class="fab-novo"
-                (click)="novoItem('metricas')"
-                matTooltip="Nova métrica" matTooltipPosition="left"
-                aria-label="Nova métrica">
-          <mat-icon>add</mat-icon>
-        </button>
 
         <div class="loading" *ngIf="carregandoMetricas">
           <mat-spinner diameter="32"></mat-spinner>
@@ -605,4 +585,38 @@
     </mat-tab>
 
   </mat-tab-group>
+
+  <!-- FAB-menu: criar elemento na lane atual + assistente de preenchimento -->
+  <div class="fab-menu">
+    <button mat-mini-fab type="button" class="fab-acao" *ngIf="fabAberto"
+            (click)="abrirChatAdmin()"
+            matTooltip="Assistente de preenchimento" matTooltipPosition="left"
+            aria-label="Assistente de preenchimento">
+      <mat-icon>smart_toy</mat-icon>
+    </button>
+    <button mat-mini-fab type="button" class="fab-acao" *ngIf="fabAberto && podeCriarNaLane"
+            (click)="criarNaLane()"
+            [matTooltip]="rotuloCriar" matTooltipPosition="left"
+            [attr.aria-label]="rotuloCriar">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button mat-fab color="primary" type="button"
+            (click)="fabAberto = !fabAberto"
+            [matTooltip]="fabAberto ? 'Fechar menu' : 'Ações da tela'" matTooltipPosition="left"
+            aria-label="Menu de ações">
+      <mat-icon>{{ fabAberto ? 'close' : 'menu' }}</mat-icon>
+    </button>
+  </div>
+
+  <!-- Assistente do admin: chat com o guia de preenchimento como contexto -->
+  <aside class="chat-admin" *ngIf="chatAdminAberto">
+    <div class="chat-admin-header">
+      <mat-icon>smart_toy</mat-icon>
+      <span>Assistente de preenchimento</span>
+      <button mat-icon-button type="button" (click)="chatAdminAberto = false" aria-label="Fechar assistente">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <app-chat-tutor [contexto]="contextoChatAdmin" [sugestoesCustom]="sugestoesAdmin"></app-chat-tutor>
+  </aside>
 </div>
