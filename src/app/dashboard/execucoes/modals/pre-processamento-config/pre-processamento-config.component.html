@@ -15,6 +15,19 @@
     </ul>
   </div>
 
+  <!-- Informação sobre tipos de colunas (antes das transformações: contexto p/ configurar) -->
+  <div class="tipos-info" *ngIf="colunasNumericas.length > 0 || colunasCategoricas.length > 0">
+    <h4>Tipos de colunas detectados</h4>
+    <div class="tipo-item" *ngIf="colunasNumericas.length > 0">
+      <mat-icon>numbers</mat-icon>
+      <span><strong>Numéricas:</strong> {{ colunasNumericas.join(', ') }}</span>
+    </div>
+    <div class="tipo-item" *ngIf="colunasCategoricas.length > 0">
+      <mat-icon>text_fields</mat-icon>
+      <span><strong>Categóricas:</strong> {{ colunasCategoricas.join(', ') }}</span>
+    </div>
+  </div>
+
   <!-- Itens selecionados -->
   <div class="itens-selecionados" *ngIf="itensSelecionados.length > 0">
     <h4>Transformações configuradas</h4>
@@ -80,16 +93,4 @@
     <span>Todas as transformações foram adicionadas</span>
   </div>
 
-  <!-- Informação sobre tipos de colunas -->
-  <div class="tipos-info" *ngIf="colunasNumericas.length > 0 || colunasCategoricas.length > 0">
-    <h4>Tipos de colunas detectados</h4>
-    <div class="tipo-item" *ngIf="colunasNumericas.length > 0">
-      <mat-icon>numbers</mat-icon>
-      <span><strong>Numéricas:</strong> {{ colunasNumericas.join(', ') }}</span>
-    </div>
-    <div class="tipo-item" *ngIf="colunasCategoricas.length > 0">
-      <mat-icon>text_fields</mat-icon>
-      <span><strong>Categóricas:</strong> {{ colunasCategoricas.join(', ') }}</span>
-    </div>
-  </div>
 </div>

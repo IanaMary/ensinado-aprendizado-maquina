@@ -6,7 +6,8 @@
 
   <mat-spinner *ngIf="isLoading" diameter="40"></mat-spinner>
 
-  <table mat-table [dataSource]="erros" class="mat-elevation-z8" *ngIf="!isLoading && erros.length > 0">
+  <div class="tabela-wrapper" *ngIf="!isLoading && erros.length > 0">
+  <table mat-table [dataSource]="erros" class="mat-elevation-z8">
     <ng-container matColumnDef="timestamp">
       <th mat-header-cell *matHeaderCellDef> Data/Hora </th>
       <td mat-cell *matCellDef="let element"> {{element.timestamp | date:'dd/MM/yyyy HH:mm:ss'}} </td>
@@ -35,6 +36,7 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
+  </div>
 
   <div *ngIf="!isLoading && erros.length === 0" class="no-data">
     Nenhum erro registrado no sistema. Tudo tranquilo!
