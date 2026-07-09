@@ -1,15 +1,11 @@
 <div class="gerenciar-usuarios-container">
-  <!-- Header -->
-  <div class="usuarios-header">
-    <div class="header-info">
-      <h1>Gerenciar Usuários</h1>
-      <p>Crie usuários e envie convites por email</p>
-    </div>
+  <app-topbar titulo="Gerenciar Usuários" subtitulo="Crie usuários e envie convites por email"
+    voltarPara="/view-admin">
     <button class="btn-novo" (click)="abrirFormulario()">
       <mat-icon>person_add</mat-icon>
       Novo Usuário
     </button>
-  </div>
+  </app-topbar>
 
   <!-- Formulario de Criacao -->
   <div class="formulario-container" *ngIf="mostrarFormulario">

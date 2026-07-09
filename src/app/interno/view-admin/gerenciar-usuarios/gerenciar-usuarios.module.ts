@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { SharedModule } from '../../../shared/shared.module';
 import { GerenciarUsuariosComponent } from './gerenciar-usuarios.component';
 
 const routes: Routes = [
@@ -28,7 +29,8 @@ const routes: Routes = [
     MatIconModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    SharedModule
   ]
 })
 export class GerenciarUsuariosModule { }

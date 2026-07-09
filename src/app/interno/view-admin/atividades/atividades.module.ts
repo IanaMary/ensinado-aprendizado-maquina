@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { SharedModule } from '../../../shared/shared.module';
 import { AtividadesComponent } from './atividades.component';
 
 const routes: Routes = [
@@ -20,6 +21,7 @@ const routes: Routes = [
     FormsModule,
     RouterModule.forChild(routes),
     MatIconModule,
+    SharedModule,
   ],
 })
 export class AtividadesModule {}
