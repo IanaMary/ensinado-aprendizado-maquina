@@ -8,6 +8,24 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-08 (tutor: boas-vindas editáveis; menu: Manual + Sobre modal; logo símbolo com respiro)
+
+> Frontend `mestrado-iana` `1b37e26`+`725d972` (bundle `main-VEKLQ5CZ.js`), portado p/ `master`.
+> Backend `4ed7562`. Verificação: 115/115 + build prod; backend 349 passed (+4 testes novos).
+
+### Adicionado
+- **Texto inicial do tutor:** o drawer da área de trabalho mostra boas-vindas (pipe `inicio`,
+  editável) quando o aluno ainda não clicou em nada — antes ficava vazio. Fallback estático
+  quando o doc não existe. Nova aba **"Início"** no conf-tutor (edição com preview) salvando via
+  novo `PUT /tutor/pipe/{pipe}` (upsert, allowlist, auditoria).
+- **Menu do usuário:** opção **Manual** (`/manual?tipo=<papel>`) para todos os papéis; **Sobre**
+  agora abre como **modal** para usuário logado (`SobreComponent` com `MatDialogRef` opcional —
+  fecha em vez de navegar; a rota pública `/sobre` segue igual).
+
+### Corrigido
+- **Logo símbolo cortado:** novo asset `simbolo-ia.png` (recorte com margem do símbolo roxo do
+  `hub-ia-marca.png`); a variante `marca` usava o `apple-touch-icon` full-bleed e aparecia cortada.
+
 ## 2026-07-08 (login/marca/voltar: link Sobre único, logo símbolo nos cabeçalhos, voltar no Pipeline)
 
 > Frontend `mestrado-iana` `efd647e`+`6319f12` (bundle `main-JIBVUOCP.js`). `efd647e` portado p/
