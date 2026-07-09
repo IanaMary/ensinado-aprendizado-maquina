@@ -8,6 +8,40 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-08 (tutor: boas-vindas editáveis; menu: Manual + Sobre modal; logo símbolo com respiro)
+
+> Frontend `mestrado-iana` `1b37e26`+`725d972` (bundle `main-VEKLQ5CZ.js`), portado p/ `master`.
+> Backend `4ed7562`. Verificação: 115/115 + build prod; backend 349 passed (+4 testes novos).
+
+### Adicionado
+- **Texto inicial do tutor:** o drawer da área de trabalho mostra boas-vindas (pipe `inicio`,
+  editável) quando o aluno ainda não clicou em nada — antes ficava vazio. Fallback estático
+  quando o doc não existe. Nova aba **"Início"** no conf-tutor (edição com preview) salvando via
+  novo `PUT /tutor/pipe/{pipe}` (upsert, allowlist, auditoria).
+- **Menu do usuário:** opção **Manual** (`/manual?tipo=<papel>`) para todos os papéis; **Sobre**
+  agora abre como **modal** para usuário logado (`SobreComponent` com `MatDialogRef` opcional —
+  fecha em vez de navegar; a rota pública `/sobre` segue igual).
+
+### Corrigido
+- **Logo símbolo cortado:** novo asset `simbolo-ia.png` (recorte com margem do símbolo roxo do
+  `hub-ia-marca.png`); a variante `marca` usava o `apple-touch-icon` full-bleed e aparecia cortada.
+
+## 2026-07-08 (login/marca/voltar: link Sobre único, logo símbolo nos cabeçalhos, voltar no Pipeline)
+
+> Frontend `mestrado-iana` `efd647e`+`6319f12` (bundle `main-JIBVUOCP.js`). `efd647e` portado p/
+> `master`; `6319f12` é só-`mestrado-iana` (o dashboard do `master` mantém o voltar p/ `/inicio`).
+> Backend inalterado. Verificação: 115/115 + build prod.
+
+### Corrigido
+- **Login:** removido o link "Sobre este trabalho" duplicado no rodapé do formulário; o botão do
+  painel esquerdo virou o 4º card, com o mesmo visual/largura dos `feature-item`.
+- **Cabeçalhos Admin/Professor:** o logo completo (lockup com texto) a 34px era ilegível — trocado
+  pela variante `marca` (símbolo "iA") a 40px; a variante passa a usar `apple-touch-icon.png`
+  (180px, mais nítido que o favicon 64).
+- **Dashboard (`/view-admin/dashboard`):** restaurado o botão **voltar** no cabeçalho do Pipeline
+  (perdido na criação da branch `mestrado-iana` por apontar p/ `/inicio`); agora volta à home do
+  papel via `roleMap`.
+
 ## 2026-07-08 (exportação: usar_modelo em 2 versões — MLflow e joblib)
 
 > Frontend `mestrado-iana` `8443dbd` (bundle `main-AX4QGGHT.js`), portado p/ `master` (não
