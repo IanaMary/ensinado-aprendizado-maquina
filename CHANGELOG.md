@@ -8,6 +8,21 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-09 (consolidação: catálogo só no conf-pipeline; conf-tutor enxuto)
+
+> Frontend `mestrado-iana` `378e594` (bundle `main-UMKXYKDW.js`), portado p/ `master`.
+> Backend inalterado. Verificação: 115/115 + build prod. Saldo: −870 linhas.
+
+### Mudado
+- **conf-pipeline** vira o único administrador do catálogo: novo painel **"Campos do item"**
+  (resumo em todas as lanes; tipo de tarefa + explicação + métricas compatíveis nos modelos;
+  grupo + explicação nas métricas; grupo no pré-proc) e botão **Excluir** com confirmação
+  (exceto Coleta) — capacidades absorvidas do editor antigo antes de aposentá-lo.
+- **conf-tutor enxuto**: só Início (boas-vindas), LLM e histórico de auditoria; as 4 abas de
+  catálogo (que duplicavam o CRUD nas mesmas coleções com editor divergente) foram removidas
+  junto com `tutor-elementos-catalogo`, os forms órfãos e o `fetchPreProcessamentoOverrides`.
+  Cabeçalho linka a Configuração do Pipeline.
+
 ## 2026-07-08 (tutor: boas-vindas editáveis; menu: Manual + Sobre modal; logo símbolo com respiro)
 
 > Frontend `mestrado-iana` `1b37e26`+`725d972` (bundle `main-VEKLQ5CZ.js`), portado p/ `master`.
