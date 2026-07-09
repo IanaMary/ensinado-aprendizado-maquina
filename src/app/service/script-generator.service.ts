@@ -842,6 +842,8 @@ export class ScriptGeneratorService {
       '    le_alvo = LabelEncoder()',
       '    y_train = le_alvo.fit_transform(y_train)',
       '    y_test = le_alvo.transform(y_test)',
+      '    # Mapa classe -> número (use le_alvo.inverse_transform(...) para voltar aos nomes)',
+      '    print("Classes codificadas:", dict(zip(le_alvo.classes_, le_alvo.transform(le_alvo.classes_))))',
     ];
   }
 
