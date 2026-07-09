@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { slugificarNome } from './slug.util';
+import { RelatorioPdfService } from './relatorio-pdf.service';
 
 // Pré-processadores com template curado no gerador. Itens fora deste conjunto
 // (registrados pelo admin) são gerados de forma genérica a partir do bloco `execucao`.
@@ -20,7 +21,7 @@ const PRE_PROC_BUILTINS = new Set<string>([
 })
 export class ScriptGeneratorService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private relatorioPdf: RelatorioPdfService) { }
 
   /** Baixa o modelo treinado (id) e o mescla no bundle sob `<subpasta>/modelo/`,
    *  escrevendo também os exemplos `usar_modelo_mlflow.py` e `usar_modelo_joblib.py`.
@@ -162,6 +163,11 @@ export class ScriptGeneratorService {
       const subpasta = isMultiModelo ? `modelos/${slugificarNome(entry?.nome_modelo) || 'modelo'}` : undefined;
       await this.anexarModeloTreinado(folder, entry, resultadoColetaDado, subpasta);
     }
+
+    // PDF promocional do Hub de Inovação em IA (best-effort: o zip segue sem ele em caso de falha).
+    try {
+      folder.file('hub-ia.pdf', await this.relatorioPdf.gerarPromoHub());
+    } catch { /* segue sem o promocional */ }
 
     const content = await zip.generateAsync({ type: 'blob' });
     // Experimento salvo pelo aluno -> nome do arquivo usa o nome salvo
@@ -349,6 +355,7 @@ export class ScriptGeneratorService {
       lines.push('├── usar_modelo_mlflow.py # Carrega o modelo via MLflow e faz uma previsão');
       lines.push('├── usar_modelo_joblib.py # Carrega o modelo via joblib (sem MLflow) e faz uma previsão');
     }
+    lines.push('├── hub-ia.pdf           # Conheça o Hub de Inovação em IA (ia.ufpel.edu.br)');
     lines.push('└── README.md            # Este arquivo');
     lines.push('```');
     lines.push('');

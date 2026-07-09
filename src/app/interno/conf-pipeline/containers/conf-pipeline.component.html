@@ -82,11 +82,12 @@
           <span>Itens disponíveis na lane <strong>Pré-processamento</strong>.</span>
         </div>
 
-        <div class="lane-acoes">
-          <button mat-stroked-button color="primary" type="button" (click)="novoItem('pre_processamento')">
-            <mat-icon>add</mat-icon> Novo pré-processador
-          </button>
-        </div>
+        <button mat-fab color="primary" type="button" class="fab-novo"
+                (click)="novoItem('pre_processamento')"
+                matTooltip="Novo pré-processador" matTooltipPosition="left"
+                aria-label="Novo pré-processador">
+          <mat-icon>add</mat-icon>
+        </button>
 
         <div class="busca" *ngIf="!carregandoPreProc && itensPreProc.length">
           <mat-icon>search</mat-icon>
@@ -259,11 +260,12 @@
           <span>Modelos disponíveis na lane <strong>Treinamento</strong>.</span>
         </div>
 
-        <div class="lane-acoes">
-          <button mat-stroked-button color="primary" type="button" (click)="novoItem('modelos')">
-            <mat-icon>add</mat-icon> Novo modelo
-          </button>
-        </div>
+        <button mat-fab color="primary" type="button" class="fab-novo"
+                (click)="novoItem('modelos')"
+                matTooltip="Novo modelo" matTooltipPosition="left"
+                aria-label="Novo modelo">
+          <mat-icon>add</mat-icon>
+        </button>
 
         <div class="loading" *ngIf="carregandoModelos">
           <mat-spinner diameter="32"></mat-spinner>
@@ -459,11 +461,12 @@
           <span>Métricas disponíveis na lane <strong>Avaliação</strong>.</span>
         </div>
 
-        <div class="lane-acoes">
-          <button mat-stroked-button color="primary" type="button" (click)="novoItem('metricas')">
-            <mat-icon>add</mat-icon> Nova métrica
-          </button>
-        </div>
+        <button mat-fab color="primary" type="button" class="fab-novo"
+                (click)="novoItem('metricas')"
+                matTooltip="Nova métrica" matTooltipPosition="left"
+                aria-label="Nova métrica">
+          <mat-icon>add</mat-icon>
+        </button>
 
         <div class="loading" *ngIf="carregandoMetricas">
           <mat-spinner diameter="32"></mat-spinner>
