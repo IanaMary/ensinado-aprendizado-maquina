@@ -18,6 +18,21 @@ import { NotificacaoService } from '../../service/notificacao.service';
 
 const TIPOS_ARQUIVO_DADOS = ['csv', 'tsv', 'json', 'excel', 'xlxs'];
 
+// Boas-vindas padrão do tutor (estado inicial do drawer). É substituído pelo
+// conteúdo do pipe 'inicio' (db.tutor), editável pelo admin em conf-tutor.
+const TUTOR_BOAS_VINDAS = [
+  '<h4>Bem-vindo(a) à área de trabalho!</h4>',
+  '<p>Aqui você monta um <b>pipeline de Machine Learning</b> completo, passo a passo.</p>',
+  '<p><b>Por onde começar:</b></p>',
+  '<ul>',
+  '<li><b>1. Coleta:</b> clique no item da lane Coleta para carregar seus dados (arquivo, URL ou dataset de exemplo).</li>',
+  '<li><b>2. Pré-processamento:</b> prepare os dados (escala, categorias, valores faltantes) — opcional.</li>',
+  '<li><b>3. Treinamento:</b> arraste um modelo para a lane e treine.</li>',
+  '<li><b>4. Métricas:</b> escolha as métricas e veja como o modelo se saiu.</li>',
+  '</ul>',
+  '<p>Em cada item, o ícone <b>ⓘ</b> abre a explicação aqui no tutor. E se ficar com dúvida, é só perguntar no chat abaixo. 😊</p>',
+].join('');
+
 @Component({
   selector: 'app-execucoes',
   templateUrl: './execucoes.component.html',
@@ -34,7 +49,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   private carregandoProjeto = false;
   private treinoVistos = new Set<string>();
 
-  tutor: any;
+  tutor: any = TUTOR_BOAS_VINDAS;
   tutorPipelineInfo: any = null;
   tutorItemInfo: any = null;
   tutorTheme = 'default';

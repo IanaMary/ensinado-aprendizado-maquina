@@ -13,10 +13,50 @@
 
   <div class="conteudo">
     <mat-tab-group animationDuration="200ms" (selectedTabChange)="tabAtual($event)" class="conf-tutor-tabs">
+      <mat-tab label="Início">
+        <div class="box-coluna inicio-config">
+          <div class="cabecalho-inicio">
+            <mat-icon>waving_hand</mat-icon>
+            <h3>Texto de boas-vindas do tutor</h3>
+          </div>
+          <p class="desc-inicio">
+            Este texto aparece no painel do tutor da área de trabalho quando o aluno ainda não
+            clicou em nenhum item. Use-o para apresentar a ferramenta e indicar por onde começar.
+            Aceita HTML básico (<code>&lt;h4&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;b&gt;</code>, <code>&lt;ul&gt;&lt;li&gt;</code>).
+          </p>
+
+          <div class="carregando-inicio" *ngIf="carregandoInicio">
+            <mat-spinner diameter="24"></mat-spinner>
+            <span>Carregando texto atual...</span>
+          </div>
+
+          <form [formGroup]="formConfTutorInicio" *ngIf="!carregandoInicio" class="form-inicio">
+            <label class="label-campo" for="inicio-texto">Texto de boas-vindas</label>
+            <textarea id="inicio-texto" formControlName="texto_pipe" rows="10"
+              placeholder="<h4>Bem-vindo(a)!</h4><p>Aqui você monta um pipeline de Machine Learning...</p>"></textarea>
+
+            <label class="label-campo" for="inicio-explicacao">Explicação complementar (opcional)</label>
+            <textarea id="inicio-explicacao" formControlName="explicacao" rows="4"
+              placeholder="Texto adicional exibido logo abaixo das boas-vindas."></textarea>
+
+            <div class="acoes-inicio">
+              <button mat-flat-button color="primary" type="button"
+                [disabled]="formConfTutorInicio.invalid || salvandoInicio" (click)="salvarInicio()">
+                <mat-icon>save</mat-icon> {{ salvandoInicio ? 'Salvando...' : 'Salvar' }}
+              </button>
+            </div>
+
+            <div class="preview-inicio" *ngIf="previewInicio">
+              <h4 class="preview-titulo"><mat-icon>visibility</mat-icon> Pré-visualização</h4>
+              <div class="preview-corpo" [innerHTML]="previewInicio"></div>
+            </div>
+          </form>
+        </div>
+      </mat-tab>
       <mat-tab label="Dados">
         <div class="box-coluna">
           <app-tutor-elementos-catalogo
-            [atualizar]="tabs[0]"
+            [atualizar]="tabs[1]"
             tipoCatalogo="coleta_dados"
             titulo="Datasets disponíveis"
             icone="table_chart">
@@ -26,7 +66,7 @@
       <mat-tab label="Pré-processamento">
         <div class="box-coluna">
           <app-tutor-elementos-catalogo
-            [atualizar]="tabs[1]"
+            [atualizar]="tabs[2]"
             tipoCatalogo="pre_processamento"
             titulo="Etapas de pré-processamento"
             icone="transform">
@@ -36,7 +76,7 @@
       <mat-tab label="Modelos">
         <div class="box-coluna">
           <app-tutor-elementos-catalogo
-            [atualizar]="tabs[2]"
+            [atualizar]="tabs[3]"
             tipoCatalogo="modelos"
             titulo="Modelos disponíveis"
             icone="model_training">
@@ -46,7 +86,7 @@
       <mat-tab label="Métricas">
         <div class="box-coluna">
           <app-tutor-elementos-catalogo
-            [atualizar]="tabs[3]"
+            [atualizar]="tabs[4]"
             tipoCatalogo="metricas"
             titulo="Métricas disponíveis"
             icone="analytics">

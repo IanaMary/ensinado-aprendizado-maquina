@@ -142,6 +142,12 @@ export class DashboardService {
     return this.http.put(`${this.url}${this.endpointTutor}/${id}`, body);
   }
 
+  // Atualiza o conteúdo de uma etapa pelo slug do pipe (upsert no backend —
+  // funciona mesmo se o documento ainda não existir, ex.: pipe 'inicio').
+  putTutorPipe(pipe: string, contexto: any) {
+    return this.http.put(`${this.url}${this.endpointTutor}/pipe/${pipe}`, { contexto });
+  }
+
   // Auditoria: log de edicoes do tutor por pipe
   getTutorAudit(pipe?: string, limite = 20) {
     const params = new URLSearchParams();
