@@ -12,6 +12,8 @@ import { AuthService } from '../../../service/auth/auth.service';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 import { NotificacaoService } from '../../../service/notificacao.service';
 import { ConteudoEditorComponent } from '../components/conteudo-editor/conteudo-editor.component';
+import { SharedModule } from '../../../shared/shared.module';
+import { DashboardModule } from '../../../dashboard/dashboard.module';
 
 type Lane = 'coleta_dados' | 'modelos' | 'metricas' | 'pre_processamento';
 
@@ -87,6 +89,8 @@ export interface ItemCamposDraft {
     MatButtonModule,
     MatTooltipModule,
     ConteudoEditorComponent,
+    SharedModule,     // app-topbar / app-user-menu
+    DashboardModule,  // app-chat-tutor (assistente de preenchimento)
   ]
 })
 export class ConfPipelineComponent implements OnInit {
@@ -447,6 +451,78 @@ export class ConfPipelineComponent implements OnInit {
     else if (tipo === 'metricas') this.carregarMetricas();
     else if (tipo === 'pre_processamento') this.carregarPreProcessamento();
     else this.carregarColeta();
+  }
+
+  // ---------- FAB-menu (criar na lane atual + assistente do admin) ----------
+
+  private static readonly LANES_POR_ABA: Lane[] = ['coleta_dados', 'pre_processamento', 'modelos', 'metricas'];
+  private static readonly ROTULO_CRIAR: Record<string, string> = {
+    pre_processamento: 'Novo pré-processador',
+    modelos: 'Novo modelo',
+    metricas: 'Nova métrica',
+  };
+
+  fabAberto = false;
+  laneAtualIdx = 0;
+
+  onTabChange(e: any): void {
+    this.laneAtualIdx = e.index;
+    this.fabAberto = false;
+  }
+
+  get laneAtual(): Lane {
+    return ConfPipelineComponent.LANES_POR_ABA[this.laneAtualIdx] || 'coleta_dados';
+  }
+
+  /** Coleta não tem criação de elementos. */
+  get podeCriarNaLane(): boolean {
+    return this.laneAtual !== 'coleta_dados';
+  }
+
+  get rotuloCriar(): string {
+    return ConfPipelineComponent.ROTULO_CRIAR[this.laneAtual] || 'Novo elemento';
+  }
+
+  criarNaLane(): void {
+    if (!this.podeCriarNaLane) return;
+    this.fabAberto = false;
+    this.novoItem(this.laneAtual);
+  }
+
+  // ---------- Assistente de preenchimento (chat do admin) ----------
+
+  chatAdminAberto = false;
+  private kbAdmin = '';
+  contextoChatAdmin: any = null;
+  sugestoesAdmin = [
+    'Como preencho o bloco execução de um modelo novo?',
+    'Como declaro um hiperparâmetro do tipo enum?',
+    'Para que serve o campo grupo da métrica?',
+    'Quando marco métricas compatíveis no modelo?',
+    'O que vai em cada campo do conteúdo educacional?',
+  ];
+
+  abrirChatAdmin(): void {
+    this.fabAberto = false;
+    this.chatAdminAberto = true;
+    if (this.kbAdmin) return;
+    this.montarContextoChatAdmin();
+    // Guia de preenchimento (db.tutor, pipe 'conf-pipeline'; fallback versionado no backend)
+    this.dashboard.getTutor('pipe=conf-pipeline').subscribe({
+      next: (res: any) => {
+        this.kbAdmin = res?.descricao || '';
+        this.montarContextoChatAdmin();
+      },
+      error: () => this.montarContextoChatAdmin(),
+    });
+  }
+
+  private montarContextoChatAdmin(): void {
+    this.contextoChatAdmin = {
+      tela: 'Configuração do Pipeline (administração do catálogo)',
+      papel_do_usuario: 'admin/professor preenchendo os campos do catálogo',
+      guia_preenchimento: this.kbAdmin || 'Guia indisponível no momento.',
+    };
   }
 
   // ---------- Edição dos campos do item + exclusão ----------

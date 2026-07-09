@@ -17,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { QuillModule } from 'ngx-quill';
 
 import { ConfTutorRoutingModule } from './conf-tutor-routing.module';
+import { SharedModule } from '../../shared/shared.module';
 import { ConfTutorComponent } from './containers/conf-tutor.component';
 import { TutorColetaDadosComponent } from './components/tutor-coleta-dados/tutor-coleta-dados.component';
 import { TutorInicioComponent } from './components/tutor-inicio/tutor-inicio.component';
@@ -40,6 +41,7 @@ import { TtutorTiposAprendizadoComponent } from './components/tutor-tipos-aprend
   ],
   imports: [
     ConfTutorRoutingModule,
+    SharedModule,
     CommonModule,
     ReactiveFormsModule,
     FormsModule,

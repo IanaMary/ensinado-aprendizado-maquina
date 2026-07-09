@@ -1,0 +1,56 @@
+@use '../../../styles/colores.scss' as *;
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px clamp(16px, 3vw, 28px);
+  background: $branco;
+  border-bottom: 1px solid rgba($roxo-claro, 0.8);
+
+  .topbar-voltar {
+    flex-shrink: 0;
+    color: $roxo-medio;
+  }
+
+  .topbar-logo {
+    flex-shrink: 0;
+    padding-right: 14px;
+    border-right: 1px solid rgba($roxo-claro, 0.9);
+  }
+
+  .topbar-info {
+    flex: 1;
+    min-width: 0;
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: $roxo-escuro;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    p {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: $cinza-medio;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .topbar-acoes {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar .topbar-info p { display: none; }
+}

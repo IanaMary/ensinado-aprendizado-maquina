@@ -1,19 +1,11 @@
 <div class="container">
-  <header class="cabecalho">
-    <div class="titulo-bloco">
-      <h2>Configuração do Tutor</h2>
-      <p>Texto de boas-vindas, modelo LLM do chat e histórico de edições. O catálogo do pipeline
-        (dados, pré-processamento, modelos e métricas) é administrado na Configuração do Pipeline.</p>
-    </div>
-    <div class="acoes-bloco">
-      <button mat-stroked-button color="primary" (click)="irParaConfPipeline()">
-        <mat-icon>tune</mat-icon> Configuração do Pipeline
-      </button>
-      <button mat-stroked-button (click)="navegar(true)" *ngIf="role !== 'aluno'">
-        <mat-icon>arrow_back</mat-icon> Voltar
-      </button>
-    </div>
-  </header>
+  <app-topbar titulo="Configuração do Tutor"
+    subtitulo="Boas-vindas, modelo LLM do chat e histórico de edições — o catálogo vive na Configuração do Pipeline."
+    voltarPara="/view-admin">
+    <button mat-stroked-button color="primary" (click)="irParaConfPipeline()">
+      <mat-icon>tune</mat-icon> Configuração do Pipeline
+    </button>
+  </app-topbar>
 
   <div class="conteudo">
     <mat-tab-group animationDuration="200ms" (selectedTabChange)="tabAtual($event)" class="conf-tutor-tabs">
