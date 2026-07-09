@@ -8,6 +8,22 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-09 (UX: ações no rodapé do modal, código do tutor, identidade Hub no PDF/zip/Sobre, FABs)
+
+> Frontend `mestrado-iana` `7184e90`+`79c5e7c` (bundle `main-OCQSCJ5R.js`), portado p/ `master`.
+> Backend inalterado. Verificação: 115/115 + build prod.
+
+### Mudado/Corrigido
+- **Modal (avaliação):** "Baixar relatório (PDF)" e "Gerar avaliações" movidos do corpo da etapa
+  para a **barra de botões do modal**; drawers do tutor ganham `visibility:hidden` fechados
+  (defesa contra elemento invisível capturando cliques nos controles dos gráficos).
+- **Tutor:** bloco de código com **scroll próprio** (não estoura o drawer) e **cores do hljs**
+  de volta (tema em `::ng-deep` — os spans entram por innerHTML sem `_ngcontent`).
+- **Identidade Hub (ia.ufpel.edu.br):** logo+link no cabeçalho do relatório PDF; `hub-ia.pdf`
+  promocional dentro do zip do pipeline; capa do `/sobre` com símbolo branco **sem corte**
+  (novo `simbolo-ia-branco.png`) e bloco de identidade centralizado/clicável.
+- **conf-pipeline:** criação de elementos via **FAB** (mat-fab fixo, canto inferior direito).
+
 ## 2026-07-09 (consolidação: catálogo só no conf-pipeline; conf-tutor enxuto)
 
 > Frontend `mestrado-iana` `378e594` (bundle `main-UMKXYKDW.js`), portado p/ `master`.
