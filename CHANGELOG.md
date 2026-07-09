@@ -8,6 +8,17 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-09 (botões padrão nas topbars + manual enriquecido)
+
+> Frontend `mestrado-iana` (bundle `main-KWB7QOBM.js`), portado p/ `master`. Backend inalterado.
+
+### Mudado
+- **Botões padrão** `.btn-primario`/`.btn-secundario` viraram estilo global e substituem os botões
+  antigos nas topbars (Novo Usuário, Configuração do Pipeline, Atualizar dos logs).
+- **Manual** reescrito por papel, refletindo o sistema atual (coleta arquivo/URL/dataset, comparação
+  de modelos, tutor+chat, turmas/atividades/ranking, exportação zip/PDF, conf-pipeline com
+  assistente, artefatos MLflow, monitoramento).
+
 ## 2026-07-09 (topbar em todas as telas do admin)
 
 > Frontend `mestrado-iana` (bundle `main-AW73YJJJ.js`), portado p/ `master`. Backend inalterado.
