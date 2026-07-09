@@ -29,19 +29,47 @@
         <div class="vazio" *ngIf="!carregandoColeta && itensColeta.length && !itensColetaFiltrados.length">Nenhum item corresponde à busca.</div>
 
         <ul class="lista-itens" *ngIf="!carregandoColeta && itensColetaFiltrados.length">
-          <li class="item" *ngFor="let item of itensColetaFiltrados" [class.desabilitado]="!item.habilitado">
-            <div class="item-info">
-              <span class="item-label">{{ item.label || item.valor }}</span>
-              <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
-            </div>
-            <mat-slide-toggle
-              [checked]="item.habilitado"
-              [disabled]="!!item.salvando"
-              (change)="toggle('coleta_dados', item)"
-              color="primary">
-              {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
-            </mat-slide-toggle>
-          </li>
+          <ng-container *ngFor="let item of itensColetaFiltrados">
+            <li class="item" [class.desabilitado]="!item.habilitado">
+              <div class="item-info">
+                <span class="item-label">{{ item.label || item.valor }}</span>
+                <code class="item-valor" *ngIf="item.valor">{{ item.valor }}</code>
+              </div>
+              <div class="item-actions">
+                <button mat-icon-button type="button"
+                        (click)="alternarItemCampos('coleta_dados', item)"
+                        [attr.aria-label]="'Editar campos do item'" title="Campos do item (resumo)">
+                  <mat-icon>{{ item.itemExpandido ? 'expand_less' : 'edit_note' }}</mat-icon>
+                </button>
+                <mat-slide-toggle
+                  [checked]="item.habilitado"
+                  [disabled]="!!item.salvando"
+                  (change)="toggle('coleta_dados', item)"
+                  color="primary">
+                  {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
+                </mat-slide-toggle>
+              </div>
+            </li>
+
+            <li class="execucao-panel" *ngIf="item.itemExpandido && item.itemDraft">
+              <div class="execucao-grid">
+                <label class="campo-wide">
+                  <span>Resumo (texto curto exibido no card do item)</span>
+                  <textarea rows="2" [(ngModel)]="item.itemDraft.resumo"></textarea>
+                </label>
+              </div>
+              <div class="execucao-actions">
+                <button mat-button type="button" (click)="alternarItemCampos('coleta_dados', item)"
+                        [disabled]="!!item.salvandoItem">Cancelar</button>
+                <button mat-raised-button color="primary" type="button"
+                        (click)="salvarItemCampos('coleta_dados', item)"
+                        [disabled]="!!item.salvandoItem">
+                  <mat-spinner *ngIf="item.salvandoItem" diameter="16"></mat-spinner>
+                  <span *ngIf="!item.salvandoItem">Salvar campos</span>
+                </button>
+              </div>
+            </li>
+          </ng-container>
         </ul>
       </div>
     </mat-tab>
@@ -89,6 +117,11 @@
               </div>
               <div class="item-actions">
                 <button mat-icon-button type="button"
+                        (click)="alternarItemCampos('pre_processamento', item)"
+                        [attr.aria-label]="'Editar campos do item'" title="Campos do item (resumo, grupo)">
+                  <mat-icon>{{ item.itemExpandido ? 'expand_less' : 'edit_note' }}</mat-icon>
+                </button>
+                <button mat-icon-button type="button"
                         (click)="alternarConteudo(item)"
                         [attr.aria-label]="'Editar conteúdo educacional'" title="Conteúdo educacional">
                   <mat-icon>menu_book</mat-icon>
@@ -98,6 +131,11 @@
                         [attr.aria-label]="item.expandido ? 'Fechar execução' : 'Editar execução'">
                   <mat-icon>{{ item.expandido ? 'expand_less' : 'tune' }}</mat-icon>
                 </button>
+                <button mat-icon-button type="button" class="btn-excluir"
+                        (click)="excluirItem('pre_processamento', item)" [disabled]="!!item.excluindo"
+                        aria-label="Excluir item" title="Excluir item">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
                 <mat-slide-toggle
                   [checked]="item.habilitado"
                   [disabled]="!!item.salvando"
@@ -105,6 +143,32 @@
                   color="primary">
                   {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
                 </mat-slide-toggle>
+              </div>
+            </li>
+
+            <li class="execucao-panel" *ngIf="item.itemExpandido && item.itemDraft">
+              <div class="execucao-grid">
+                <label class="campo-wide">
+                  <span>Resumo (texto curto exibido no card do item)</span>
+                  <textarea rows="2" [(ngModel)]="item.itemDraft.resumo"></textarea>
+                </label>
+                <label>
+                  <span>Grupo</span>
+                  <select [(ngModel)]="item.itemDraft.grupo">
+                    <option value="">(sem grupo)</option>
+                    <option *ngFor="let g of gruposPreProc" [ngValue]="g">{{ g }}</option>
+                  </select>
+                </label>
+              </div>
+              <div class="execucao-actions">
+                <button mat-button type="button" (click)="alternarItemCampos('pre_processamento', item)"
+                        [disabled]="!!item.salvandoItem">Cancelar</button>
+                <button mat-raised-button color="primary" type="button"
+                        (click)="salvarItemCampos('pre_processamento', item)"
+                        [disabled]="!!item.salvandoItem">
+                  <mat-spinner *ngIf="item.salvandoItem" diameter="16"></mat-spinner>
+                  <span *ngIf="!item.salvandoItem">Salvar campos</span>
+                </button>
               </div>
             </li>
 
@@ -230,6 +294,11 @@
               </div>
               <div class="item-actions">
                 <button mat-icon-button type="button"
+                        (click)="alternarItemCampos('modelos', item)"
+                        [attr.aria-label]="'Editar campos do item'" title="Campos do item (resumo, tarefa, métricas)">
+                  <mat-icon>{{ item.itemExpandido ? 'expand_less' : 'edit_note' }}</mat-icon>
+                </button>
+                <button mat-icon-button type="button"
                         (click)="alternarConteudo(item)"
                         [attr.aria-label]="'Editar conteúdo educacional'" title="Conteúdo educacional">
                   <mat-icon>menu_book</mat-icon>
@@ -239,6 +308,11 @@
                         [attr.aria-label]="item.expandido ? 'Fechar execução' : 'Editar execução'">
                   <mat-icon>{{ item.expandido ? 'expand_less' : 'tune' }}</mat-icon>
                 </button>
+                <button mat-icon-button type="button" class="btn-excluir"
+                        (click)="excluirItem('modelos', item)" [disabled]="!!item.excluindo"
+                        aria-label="Excluir item" title="Excluir item">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
                 <mat-slide-toggle
                   [checked]="item.habilitado"
                   [disabled]="!!item.salvando"
@@ -246,6 +320,50 @@
                   color="primary">
                   {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
                 </mat-slide-toggle>
+              </div>
+            </li>
+
+            <li class="execucao-panel" *ngIf="item.itemExpandido && item.itemDraft">
+              <div class="execucao-grid">
+                <label class="campo-wide">
+                  <span>Resumo (texto curto exibido no card do item)</span>
+                  <textarea rows="2" [(ngModel)]="item.itemDraft.resumo"></textarea>
+                </label>
+                <label>
+                  <span>Tipo de tarefa</span>
+                  <select [(ngModel)]="item.itemDraft.categoria">
+                    <option ngValue="classificacao">Classificação</option>
+                    <option ngValue="regressao">Regressão</option>
+                    <option ngValue="agrupamento">Agrupamento</option>
+                  </select>
+                </label>
+                <label class="campo-wide">
+                  <span>Explicação (texto do tutor sobre este modelo)</span>
+                  <textarea rows="3" [(ngModel)]="item.itemDraft.explicacao"></textarea>
+                </label>
+              </div>
+
+              <div class="metricas-compat">
+                <strong>Métricas compatíveis</strong>
+                <p class="metricas-dica">Sem seleção, a compatibilidade é derivada pelo grupo da métrica.</p>
+                <label class="metrica-check" *ngFor="let m of metricasCompativeis(item)">
+                  <input type="checkbox" [(ngModel)]="item.itemDraft.metricas[m.valor!]" />
+                  <span>{{ m.label || m.valor }}</span>
+                </label>
+                <span class="metricas-vazio" *ngIf="!metricasCompativeis(item).length">
+                  Nenhuma métrica do grupo "{{ item.itemDraft.categoria }}" no catálogo.
+                </span>
+              </div>
+
+              <div class="execucao-actions">
+                <button mat-button type="button" (click)="alternarItemCampos('modelos', item)"
+                        [disabled]="!!item.salvandoItem">Cancelar</button>
+                <button mat-raised-button color="primary" type="button"
+                        (click)="salvarItemCampos('modelos', item)"
+                        [disabled]="!!item.salvandoItem">
+                  <mat-spinner *ngIf="item.salvandoItem" diameter="16"></mat-spinner>
+                  <span *ngIf="!item.salvandoItem">Salvar campos</span>
+                </button>
               </div>
             </li>
 
@@ -371,6 +489,11 @@
               </div>
               <div class="item-actions">
                 <button mat-icon-button type="button"
+                        (click)="alternarItemCampos('metricas', item)"
+                        [attr.aria-label]="'Editar campos do item'" title="Campos do item (resumo, grupo)">
+                  <mat-icon>{{ item.itemExpandido ? 'expand_less' : 'edit_note' }}</mat-icon>
+                </button>
+                <button mat-icon-button type="button"
                         (click)="alternarConteudo(item)"
                         [attr.aria-label]="'Editar conteúdo educacional'" title="Conteúdo educacional">
                   <mat-icon>menu_book</mat-icon>
@@ -380,6 +503,11 @@
                         [attr.aria-label]="item.expandido ? 'Fechar execução' : 'Editar execução'">
                   <mat-icon>{{ item.expandido ? 'expand_less' : 'tune' }}</mat-icon>
                 </button>
+                <button mat-icon-button type="button" class="btn-excluir"
+                        (click)="excluirItem('metricas', item)" [disabled]="!!item.excluindo"
+                        aria-label="Excluir item" title="Excluir item">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
                 <mat-slide-toggle
                   [checked]="item.habilitado"
                   [disabled]="!!item.salvando"
@@ -387,6 +515,37 @@
                   color="primary">
                   {{ item.habilitado ? 'Habilitado' : 'Desabilitado' }}
                 </mat-slide-toggle>
+              </div>
+            </li>
+
+            <li class="execucao-panel" *ngIf="item.itemExpandido && item.itemDraft">
+              <div class="execucao-grid">
+                <label class="campo-wide">
+                  <span>Resumo (texto curto exibido no card do item)</span>
+                  <textarea rows="2" [(ngModel)]="item.itemDraft.resumo"></textarea>
+                </label>
+                <label>
+                  <span>Grupo</span>
+                  <select [(ngModel)]="item.itemDraft.grupo">
+                    <option ngValue="classificacao">Classificação</option>
+                    <option ngValue="regressao">Regressão</option>
+                    <option ngValue="agrupamento">Agrupamento</option>
+                  </select>
+                </label>
+                <label class="campo-wide">
+                  <span>Explicação (texto do tutor sobre esta métrica)</span>
+                  <textarea rows="3" [(ngModel)]="item.itemDraft.explicacao"></textarea>
+                </label>
+              </div>
+              <div class="execucao-actions">
+                <button mat-button type="button" (click)="alternarItemCampos('metricas', item)"
+                        [disabled]="!!item.salvandoItem">Cancelar</button>
+                <button mat-raised-button color="primary" type="button"
+                        (click)="salvarItemCampos('metricas', item)"
+                        [disabled]="!!item.salvandoItem">
+                  <mat-spinner *ngIf="item.salvandoItem" diameter="16"></mat-spinner>
+                  <span *ngIf="!item.salvandoItem">Salvar campos</span>
+                </button>
               </div>
             </li>
 

@@ -48,6 +48,11 @@ interface ItemAdmin {
   conteudo?: any;
   conteudoExpandido?: boolean;
   salvandoConteudo?: boolean;
+  // Edicao dos campos do item (resumo/explicacao/grupo/tarefa/métricas)
+  itemExpandido?: boolean;
+  itemDraft?: ItemCamposDraft;
+  salvandoItem?: boolean;
+  excluindo?: boolean;
   // Criação de elemento novo (não edição)
   _novo?: boolean;
   categoria?: 'classificacao' | 'regressao' | 'agrupamento';
@@ -55,6 +60,16 @@ interface ItemAdmin {
 }
 
 const TIPOS_HIPERPARAM: HiperparamSchema['tipo'][] = ['int', 'float', 'str', 'bool', 'enum'];
+
+/** Campos do item editáveis fora dos blocos `execucao`/`conteudo` (antes editados
+ *  só pelo catálogo do conf-tutor, aposentado na consolidação). */
+export interface ItemCamposDraft {
+  resumo: string;
+  explicacao: string;
+  grupo: string;
+  categoria: 'classificacao' | 'regressao' | 'agrupamento';
+  metricas: Record<string, boolean>;  // valor da métrica -> selecionada
+}
 
 @Component({
   selector: 'app-conf-pipeline',
@@ -430,6 +445,102 @@ export class ConfPipelineComponent implements OnInit {
     else if (tipo === 'metricas') this.carregarMetricas();
     else if (tipo === 'pre_processamento') this.carregarPreProcessamento();
     else this.carregarColeta();
+  }
+
+  // ---------- Edição dos campos do item + exclusão ----------
+  // (absorvido do catálogo do conf-tutor, aposentado na consolidação)
+
+  gruposPreProc = ['scalers', 'encoders', 'imputers', 'transformers'];
+
+  /** Inverso do mapeamento usado na criação (dados_rotulados/prever_categoria -> categoria). */
+  private categoriaDoModelo(item: ItemAdmin): 'classificacao' | 'regressao' | 'agrupamento' {
+    const pc = item.preverCategoria ?? item['prever_categoria'];
+    const dr = item.dadosRotulados ?? item['dados_rotulados'];
+    if (dr === false) return 'agrupamento';
+    if (pc === true) return 'classificacao';
+    return 'regressao';
+  }
+
+  alternarItemCampos(tipo: Lane, item: ItemAdmin): void {
+    if (item.itemExpandido) {
+      item.itemExpandido = false;
+      item.itemDraft = undefined;
+      return;
+    }
+    const metricas: Record<string, boolean> = {};
+    (item['metricas'] || []).forEach((v: string) => { metricas[v] = true; });
+    item.itemDraft = {
+      resumo: item['resumo'] || '',
+      explicacao: item['explicacao'] || '',
+      grupo: item['grupo'] || (tipo === 'metricas' ? 'classificacao' : ''),
+      categoria: this.categoriaDoModelo(item),
+      metricas,
+    };
+    item.itemExpandido = true;
+  }
+
+  /** Métricas do catálogo compatíveis com a categoria do modelo em edição. */
+  metricasCompativeis(item: ItemAdmin): ItemAdmin[] {
+    const cat = item.itemDraft?.categoria || 'classificacao';
+    return this.itensMetricas.filter(m => (m['grupo'] || 'classificacao') === cat);
+  }
+
+  salvarItemCampos(tipo: Lane, item: ItemAdmin): void {
+    const d = item.itemDraft;
+    if (!d) return;
+    const body: any = { resumo: (d.resumo || '').trim() };
+    if (tipo === 'modelos') {
+      body.explicacao = (d.explicacao || '').trim();
+      // Mesmo mapeamento da criação (determinarTipoModelo no dashboard.service)
+      body.dados_rotulados = d.categoria !== 'agrupamento';
+      body.prever_categoria = d.categoria === 'classificacao';
+      body.metricas = Object.keys(d.metricas).filter(v => d.metricas[v]);
+    } else if (tipo === 'metricas') {
+      body.explicacao = (d.explicacao || '').trim();
+      body.grupo = d.grupo || 'classificacao';
+    } else if (tipo === 'pre_processamento') {
+      if (d.grupo) body.grupo = d.grupo;
+    }
+    item.salvandoItem = true;
+    const req = tipo === 'pre_processamento'
+      ? this.dashboard.putPreProcessamentoDoc(item.valor as string, body)
+      : this.dashboard.putCatalogoItem(tipo, item.id, body);
+    req.subscribe({
+      next: () => {
+        item['resumo'] = body.resumo;
+        if (body.explicacao !== undefined) item['explicacao'] = body.explicacao;
+        if (body.grupo !== undefined) item['grupo'] = body.grupo;
+        if (tipo === 'modelos') {
+          item.preverCategoria = body.prever_categoria;
+          item.dadosRotulados = body.dados_rotulados;
+          item['metricas'] = body.metricas;
+        }
+        item.salvandoItem = false;
+        item.itemExpandido = false;
+        item.itemDraft = undefined;
+        this.notificacao.sucesso(`Campos do item salvos: ${item.label || item.valor}`);
+      },
+      error: (err) => {
+        item.salvandoItem = false;
+        this.notificacao.erro(err?.error?.detail || 'Falha ao salvar os campos do item.');
+      }
+    });
+  }
+
+  excluirItem(tipo: Lane, item: ItemAdmin): void {
+    const nome = item.label || item.valor || 'este item';
+    if (!confirm(`Excluir "${nome}" do catálogo? Esta ação não pode ser desfeita.`)) return;
+    item.excluindo = true;
+    this.dashboard.deleteCatalogoItem(tipo, item.id).subscribe({
+      next: () => {
+        this.notificacao.sucesso(`Item excluído: ${nome}`);
+        this.recarregar(tipo);
+      },
+      error: (err) => {
+        item.excluindo = false;
+        this.notificacao.erro(err?.error?.detail || 'Falha ao excluir o item.');
+      }
+    });
   }
 
   // ---------- Edição do conteúdo educacional ----------
