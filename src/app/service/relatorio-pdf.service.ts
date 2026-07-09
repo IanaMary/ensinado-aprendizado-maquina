@@ -24,6 +24,8 @@ export interface RelatorioPdfInput {
 }
 
 const ROXO: [number, number, number] = [76, 29, 149];
+const HUB_URL = 'https://ia.ufpel.edu.br';
+const HUB_NOME = 'Hub de Inovação em Inteligência Artificial';
 
 /**
  * Gera o relatório PDF "completo" (capa, tabela de métricas, observações e,
@@ -45,6 +47,24 @@ export class RelatorioPdfService {
       })();
     }
     return this.libs;
+  }
+
+  // Símbolo branco do Hub (assets) como dataURL, memoizado; null se indisponível
+  // (o PDF segue sem logo em vez de quebrar).
+  private logoBranco?: Promise<string | null>;
+  private carregarLogoBranco(): Promise<string | null> {
+    if (!this.logoBranco) {
+      this.logoBranco = fetch('assets/brand/simbolo-ia-branco.png')
+        .then(r => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+        .then(b => new Promise<string>((res, rej) => {
+          const fr = new FileReader();
+          fr.onload = () => res(fr.result as string);
+          fr.onerror = rej;
+          fr.readAsDataURL(b);
+        }))
+        .catch(() => null);
+    }
+    return this.logoBranco;
   }
 
   async gerar(input: RelatorioPdfInput): Promise<void> {
@@ -76,13 +96,26 @@ export class RelatorioPdfService {
       y += opts.gap ?? 0;
     };
 
-    // Cabeçalho (faixa roxa) — só na 1ª página.
+    // Cabeçalho (faixa roxa) — só na 1ª página. Identidade H2IA: símbolo à
+    // direita e nome/site do Hub (com link) sob o título.
     doc.setFillColor(...ROXO);
     doc.rect(0, 0, W, 26, 'F');
+    const logo = await this.carregarLogoBranco();
+    if (logo) {
+      try {
+        const p = doc.getImageProperties(logo);
+        const lh = 14, lw = lh * (p.width / p.height);
+        doc.addImage(logo, 'PNG', W - M - lw, 6, lw, lh);
+        doc.link(W - M - lw, 6, lw, lh, { url: HUB_URL });
+      } catch { /* segue sem logo */ }
+    }
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
-    doc.text('Relatório do experimento', M, 16);
+    doc.text('Relatório do experimento', M, 14);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.textWithLink(`${HUB_NOME} — ia.ufpel.edu.br`, M, 21, { url: HUB_URL });
     y = 34;
 
     if (input.nomeExperimento) texto(`Experimento: ${input.nomeExperimento}`, { size: 13, style: 'bold', color: ROXO });
@@ -157,5 +190,61 @@ export class RelatorioPdfService {
 
     const slug = slugificarNome(input.nomeExperimento);
     doc.save(slug ? `relatorio_${slug}.pdf` : 'relatorio-experimento-ml.pdf');
+  }
+
+  /** PDF promocional do Hub (uma página, identidade H2IA) — incluído no zip do
+   *  "Baixar Pipeline". Retorna Blob para o JSZip. */
+  async gerarPromoHub(): Promise<Blob> {
+    const { jsPDF } = await this.load();
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const W = doc.internal.pageSize.getWidth();
+    const H = doc.internal.pageSize.getHeight();
+
+    // Fundo roxo integral
+    doc.setFillColor(...ROXO);
+    doc.rect(0, 0, W, H, 'F');
+
+    // Símbolo centralizado
+    const logo = await this.carregarLogoBranco();
+    let y = 60;
+    if (logo) {
+      try {
+        const p = doc.getImageProperties(logo);
+        const lw = 58, lh = lw * (p.height / p.width);
+        doc.addImage(logo, 'PNG', (W - lw) / 2, y, lw, lh);
+        doc.link((W - lw) / 2, y, lw, lh, { url: HUB_URL });
+        y += lh + 16;
+      } catch { y += 16; }
+    }
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    for (const ln of doc.splitTextToSize(HUB_NOME, W - 50)) {
+      doc.text(ln, W / 2, y, { align: 'center' });
+      y += 10;
+    }
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(13);
+    doc.text('H2IA · Universidade Federal de Pelotas', W / 2, y + 2, { align: 'center' });
+    y += 16;
+
+    doc.setFontSize(11);
+    const descricao =
+      'O H2IA reúne pesquisa, ensino e extensão em Inteligência Artificial na UFPel. ' +
+      'O H2IA Tutor — a plataforma que gerou este pipeline — nasceu aqui, para ensinar ' +
+      'aprendizado de máquina na prática, da coleta de dados à avaliação de modelos.';
+    for (const ln of doc.splitTextToSize(descricao, W - 60)) {
+      doc.text(ln, W / 2, y, { align: 'center' });
+      y += 6;
+    }
+
+    y += 12;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.textWithLink('Conheça: ia.ufpel.edu.br', W / 2 - 32, y, { url: HUB_URL });
+
+    return doc.output('blob');
   }
 }

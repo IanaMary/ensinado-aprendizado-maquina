@@ -294,11 +294,6 @@
     margin-top: 4px;
   }
 
-  .lane-acoes {
-    display: flex;
-    justify-content: flex-end;
-    padding: 8px 0;
-  }
 }
 
 // === Campos do item (resumo/explicacao/grupo/tarefa/métricas) + exclusão ===
@@ -358,4 +353,12 @@
 
 .item-actions .btn-excluir mat-icon {
   color: $erro;
+}
+
+// FAB de criação por lane (flutua no canto inferior direito da tela)
+.fab-novo {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 20;
 }
