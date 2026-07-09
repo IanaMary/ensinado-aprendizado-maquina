@@ -690,3 +690,27 @@ body {
   overflow-y: auto;
   border-radius: 14px;
 }
+
+/* Botões padrão do sistema (design da marca) — use em qualquer tela:
+   .btn-primario (ação principal) / .btn-secundario (ação secundária).
+   Promovidos a global na padronização das topbars (2026-07-09); as cópias
+   escopadas em componentes antigos continuam válidas e idênticas. */
+.btn-primario, .btn-secundario {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.18s ease, border-color 0.18s ease;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba($roxo-medio, 0.32); }
+}
+.btn-secundario {
+  background: rgba($roxo-medio, 0.08); color: $roxo-medio; border-color: rgba($roxo-medio, 0.2);
+  &:hover { background: rgba($roxo-medio, 0.14); border-color: rgba($roxo-medio, 0.4); }
+}
+.btn-primario {
+  background: $roxo-medio; color: $branco;
+  &:hover { background: $roxo-escuro; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
