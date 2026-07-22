@@ -1,43 +1,127 @@
-<div class="box-principal">
-  <div class="box">
-    <div class="box-linha titulo-principal-modal">
-      novo usuário
+<div class="login-page">
+  <!-- Left side - Branding -->
+  <div class="login-branding">
+    <div class="branding-content">
+      <div class="logo-container">
+        <app-brand-logo variante="negativo" [altura]="60"></app-brand-logo>
+      </div>
+      <h1 class="logo-text">H2IA Tutor</h1>
+      <p class="branding-subtitle">Plataforma de Ensino de Aprendizado de Máquina</p>
+      <div class="branding-features">
+        <div class="feature-item">
+          <mat-icon>school</mat-icon>
+          <span>Aprenda na prática com pipelines interativos</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>psychology</mat-icon>
+          <span>Tutor contextual para cada etapa</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>analytics</mat-icon>
+          <span>Métricas e visualizações em tempo real</span>
+        </div>
+      </div>
+
+      <a class="branding-sobre" routerLink="/sobre">
+        <mat-icon>info</mat-icon>
+        <span>Sobre este trabalho</span>
+      </a>
     </div>
+  </div>
 
-    <form [formGroup]="cadastroUsuarioForm" class="box-linha">
-      <mat-form-field appearance="outline" class="campos">
-        <mat-label>Nome</mat-label>
-        <input matInput placeholder="Nome" formControlName="nome_usuario">
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="campos">
-        <mat-label>Email</mat-label>
-        <input matInput placeholder="email@example.com" formControlName="email">
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="campos">
-        <mat-label>Instituição de Ensino</mat-label>
-        <input matInput placeholder="UFPel" formControlName="instituicao_ensino">
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="campos">
-        <mat-label>Senha</mat-label>
-        <input formControlName="senha" matInput [type]="hide ? 'password' : 'text'">
-        <button class="botao-icone " matSuffix (click)="hide = !hide">
-          <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+  <!-- Right side - Cadastro Form -->
+  <div class="login-form-section">
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Criar conta</h2>
+        <p>Preencha seus dados para começar a usar a plataforma</p>
+      </div>
+
+      <form [formGroup]="cadastroUsuarioForm" class="login-form">
+        <div class="field-group">
+          <label class="field-label">Nome</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">person</mat-icon>
+            <input
+              formControlName="nome_usuario"
+              matInput
+              placeholder="Seu nome completo"
+              class="form-input">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Email</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">email</mat-icon>
+            <input
+              formControlName="email"
+              matInput
+              placeholder="seu@email.com"
+              class="form-input">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Instituição de Ensino</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">school</mat-icon>
+            <input
+              formControlName="instituicao_ensino"
+              matInput
+              placeholder="UFPel"
+              class="form-input">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Senha</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">lock</mat-icon>
+            <input
+              formControlName="senha"
+              matInput
+              [type]="hide ? 'password' : 'text'"
+              placeholder="Mínimo 6 caracteres"
+              class="form-input">
+            <button type="button" class="btn-toggle-password" (click)="hide = !hide">
+              <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="field-group" *ngIf="cadastroUsuarioForm.value.role === 'professor'">
+          <label class="field-label">Verificador</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">vpn_key</mat-icon>
+            <input
+              formControlName="verificador"
+              matInput
+              placeholder="Código de verificação"
+              class="form-input">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Perfil</label>
+          <mat-radio-group class="role-group" (change)="roleAlterado()" formControlName="role">
+            <mat-radio-button [value]="'aluno'">Aluno</mat-radio-button>
+            <mat-radio-button [value]="'professor'">Professor</mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <button type="button" (click)="postCadastroUsuario()" class="btn-login" [disabled]="cadastroUsuarioForm.invalid">
+          <mat-icon>person_add</mat-icon>
+          Cadastrar
         </button>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="campos" *ngIf="cadastroUsuarioForm.value.role === 'professor'">
-        <mat-label>Verificador</mat-label>
-        <input formControlName="verificador" matInput>
-      </mat-form-field>
-      <mat-radio-group (change)="roleAlterado()" formControlName="role">
-        <mat-radio-button [value]="'aluno'">Aluno</mat-radio-button>
-        <mat-radio-button [value]="'professor'">Professor</mat-radio-button>
-      </mat-radio-group>
-    </form>
+      </form>
 
-    <div class="box-linha">
-      <button (click)="postCadastroUsuario()" class="botao-principal" [disabled]="cadastroUsuarioForm.invalid">
-        ENTRAR
-      </button>
+      <div class="form-footer">
+        <p>Já tem uma conta?</p>
+        <button type="button" class="btn-register" routerLink="/autenticacao/login">
+          Entrar
+        </button>
+      </div>
     </div>
   </div>
 </div>

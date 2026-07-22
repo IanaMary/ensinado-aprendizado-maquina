@@ -3296,7 +3296,7 @@
       "conceitos": [
         {
           "nome": "Generalização",
-          "descricao": "A capacidade do modelo de performar bem em dados que nunca viu. É o objetivo final do Machine Learning."
+          "descricao": "A capacidade do modelo de performar bem em dados que nunca viu. É o objetivo final do Aprendizado de Máquina."
         },
         {
           "nome": "Validação Cruzada",

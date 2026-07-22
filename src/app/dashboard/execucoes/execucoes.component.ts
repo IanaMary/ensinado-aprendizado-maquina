@@ -21,7 +21,7 @@ const TIPOS_ARQUIVO_DADOS = ['csv', 'tsv', 'json', 'excel', 'xlxs'];
 // conteúdo do pipe 'inicio' (db.tutor), editável pelo admin em conf-tutor.
 const TUTOR_BOAS_VINDAS = [
   '<h4>Bem-vindo(a) à área de trabalho!</h4>',
-  '<p>Aqui você monta um <b>pipeline de Machine Learning</b> completo, passo a passo.</p>',
+  '<p>Aqui você monta um <b>pipeline de Aprendizado de Máquina</b> completo, passo a passo.</p>',
   '<p><b>Por onde começar:</b></p>',
   '<ul>',
   '<li><b>1. Coleta:</b> clique no item da lane Coleta para carregar seus dados (arquivo, URL ou dataset de exemplo).</li>',
@@ -748,7 +748,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     if (tipo === 'treino-validacao-teste') {
       return {
         titulo: item.label,
-        descricao: item.resumo || 'Modelo de machine learning para treinamento.',
+        descricao: item.resumo || 'Modelo de aprendizado de máquina para treinamento.',
         dicas: ['Selecione o modelo e configure os hiperparametros', 'Clique em Treinar para iniciar o processo']
       };
     }

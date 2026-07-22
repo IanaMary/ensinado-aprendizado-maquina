@@ -189,7 +189,7 @@ export class ScriptGeneratorService {
     lines.push('#!/usr/bin/env python3');
     lines.push('# -*- coding: utf-8 -*-');
     lines.push('"""');
-    lines.push('Comparação de Modelos de Machine Learning — gerado pelo Iana');
+    lines.push('Comparação de Modelos de Aprendizado de Máquina — gerado pelo Iana');
     lines.push('Data: ' + new Date().toLocaleDateString('pt-BR'));
     lines.push('Modelos: ' + modelosTreinados.map(m => m.nome_modelo).join(', '));
     lines.push('"""');
@@ -336,7 +336,7 @@ export class ScriptGeneratorService {
 
   private generateReadme(modelo: ItemPipeline | undefined, resultado: ResultadoColetaDado | undefined, modelosTreinados?: any[], temModelo = false): string {
     const lines: string[] = [];
-    lines.push('# Pipeline de Machine Learning - Iana');
+    lines.push('# Pipeline de Aprendizado de Máquina - Iana');
     lines.push('');
     lines.push('## Estrutura do Projeto');
     lines.push('');
@@ -422,7 +422,7 @@ export class ScriptGeneratorService {
     }
 
     lines.push('---');
-    lines.push('*Gerado automaticamente pelo Iana - Plataforma de Ensino de Machine Learning*');
+    lines.push('*Gerado automaticamente pelo Iana - Plataforma de Ensino de Aprendizado de Máquina*');
 
     return lines.join('\n');
   }
@@ -440,7 +440,7 @@ export class ScriptGeneratorService {
     lines.push('#!/usr/bin/env python3');
     lines.push('# -*- coding: utf-8 -*-');
     lines.push('"""');
-    lines.push('Pipeline de Machine Learning gerado pelo Iana');
+    lines.push('Pipeline de Aprendizado de Máquina gerado pelo Iana');
     lines.push('Data: ' + new Date().toLocaleDateString('pt-BR'));
     lines.push('"""');
     lines.push('');
@@ -1065,7 +1065,7 @@ export class ScriptGeneratorService {
     } else {
       lines.push('def treinar_modelo(X_train, y_train):');
     }
-    lines.push('    """Configura e treina o modelo de machine learning."""');
+    lines.push('    """Configura e treina o modelo de aprendizado de máquina."""');
 
     if (!modelo) {
       lines.push('    # Configure e treine o modelo');

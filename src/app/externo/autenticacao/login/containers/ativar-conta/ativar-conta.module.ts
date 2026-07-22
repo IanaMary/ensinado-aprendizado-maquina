@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { SharedModule } from '../../../../../shared/shared.module';
 import { AtivarContaComponent } from './ativar-conta.component';
 
 const routes: Routes = [
@@ -23,7 +24,8 @@ const routes: Routes = [
     ReactiveFormsModule,
     RouterModule.forChild(routes),
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    SharedModule
   ]
 })
 export class AtivarContaModule { }
