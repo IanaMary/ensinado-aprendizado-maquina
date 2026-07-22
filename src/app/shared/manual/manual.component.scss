@@ -267,6 +267,28 @@
       font-size: 13px;
       color: $roxo-escuro;
     }
+
+    // Capturas de tela ilustrativas
+    .manual-figura {
+      margin: 12px 0 28px;
+
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border: 1px solid darken($cinza-claro, 6%);
+        border-radius: 10px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      figcaption {
+        margin-top: 8px;
+        font-size: 13px;
+        color: $cinza-medio;
+        font-style: italic;
+        text-align: center;
+      }
+    }
   }
 }
 

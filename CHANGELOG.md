@@ -8,6 +8,22 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-22b (capturas de tela no Manual)
+
+> Só frontend. Backend inalterado.
+
+### Adicionado
+- **Capturas de tela ilustrativas no `/manual`** (todas as três abas). 19 imagens em
+  `src/assets/manual/` inseridas nas seções via `<figure class="manual-figura">` com legenda:
+  - **Aluno:** área de trabalho, menu, login (Visão Geral); assistente de coleta; seleção de
+    modelo, seleção de métricas, avaliação e Yellowbrick (Treinar e Avaliar); painel do tutor;
+    Meus Projetos, Galeria e Minhas Turmas.
+  - **Professor:** painel e menu; detalhe da turma (código + QR); galeria; telemetria.
+  - **Admin:** painel de administração; página de ativação e cadastro (Gerenciar Usuários).
+- Estilo `.manual-figura` em `manual.component.scss` (imagem responsiva com borda/sombra + legenda).
+
+---
+
 ## 2026-07-22 (marca H2IA Tutor + terminologia "Aprendizado de Máquina" + redesign do cadastro)
 
 > Frontend `mestrado-iana`, portado p/ `master`. Backend: e-mail de convite (repo back).

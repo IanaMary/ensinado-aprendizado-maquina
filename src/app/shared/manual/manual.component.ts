@@ -102,6 +102,18 @@ export class ManualComponent implements OnInit {
               <li><strong>Menu do usuário</strong> (avatar no canto): Meus Projetos, Galeria, Minhas turmas, Manual e Sobre.</li>
               <li><strong>Robô flutuante</strong> (borda direita): abre o painel do tutor + chat.</li>
             </ul>
+            <figure class="manual-figura">
+              <img src="assets/manual/area-trabalho.jpg" alt="Área de Trabalho com as quatro lanes do pipeline">
+              <figcaption>Área de Trabalho: as lanes Coleta → Pré-processamento → Treinamento → Métricas.</figcaption>
+            </figure>
+            <figure class="manual-figura">
+              <img src="assets/manual/aluno-menu.jpg" alt="Menu do usuário do aluno">
+              <figcaption>Menu do usuário (avatar no canto): Meus Projetos, Galeria, Minhas turmas, Manual e Sobre.</figcaption>
+            </figure>
+            <figure class="manual-figura">
+              <img src="assets/manual/login.jpg" alt="Tela de login do H2IA Tutor">
+              <figcaption>Tela de entrada: acesse com seu e-mail e senha.</figcaption>
+            </figure>
           `
         },
         {
@@ -130,6 +142,10 @@ export class ManualComponent implements OnInit {
             </ul>
             <p><strong>Dica:</strong> a primeira linha do arquivo deve conter os nomes das colunas; dados limpos
             geram modelos melhores.</p>
+            <figure class="manual-figura">
+              <img src="assets/manual/coleta.jpg" alt="Assistente de coleta de dados com datasets de exemplo">
+              <figcaption>Assistente de coleta: abas Arquivos / Toy Datasets / URL — aqui os datasets de exemplo (Iris, Wine…).</figcaption>
+            </figure>
           `
         },
         {
@@ -179,6 +195,22 @@ export class ManualComponent implements OnInit {
             <p>Clique em <strong>Gerar avaliações</strong> (barra inferior) para calcular. Cada gráfico tem ações de
             <strong>ampliar</strong>, <strong>documentação</strong> e <strong>dica didática</strong> (explicada em modo
             Básico/Avançado).</p>
+            <figure class="manual-figura">
+              <img src="assets/manual/selecao-modelo.jpg" alt="Seleção do modelo e hiperparâmetros">
+              <figcaption>Etapa 3: escolha o algoritmo e ajuste os hiperparâmetros.</figcaption>
+            </figure>
+            <figure class="manual-figura">
+              <img src="assets/manual/selecao-metricas.jpg" alt="Seleção das métricas de avaliação">
+              <figcaption>Etapa 5: escolha as métricas e a forma de agregação (Weighted/Macro/Micro).</figcaption>
+            </figure>
+            <figure class="manual-figura">
+              <img src="assets/manual/avaliacao.jpg" alt="Resultado da avaliação com tabela de métricas e matriz de confusão">
+              <figcaption>Etapa 6: tabela de métricas e matriz de confusão do modelo treinado.</figcaption>
+            </figure>
+            <figure class="manual-figura">
+              <img src="assets/manual/yellowbrick.jpg" alt="Visualização Yellowbrick da matriz de confusão">
+              <figcaption>Visualizações Yellowbrick geradas na avaliação (matriz de confusão, relatório…).</figcaption>
+            </figure>
           `
         },
         {
@@ -202,6 +234,10 @@ export class ManualComponent implements OnInit {
             hiperparâmetros, métricas e até o código gerado). Use as perguntas sugeridas ou escreva a sua.
             O tutor responde só sobre Aprendizado de Máquina e a plataforma — e nunca inventa números que não estão
             nos seus resultados.</p>
+            <figure class="manual-figura">
+              <img src="assets/manual/tutor.jpg" alt="Painel do tutor com conteúdo didático e chat com IA">
+              <figcaption>Painel do tutor: conteúdo didático (Básico/Avançado) acima e o chat com IA embaixo.</figcaption>
+            </figure>
           `
         },
         {
@@ -224,6 +260,18 @@ export class ManualComponent implements OnInit {
             <p>Entre numa turma com o <strong>código</strong> (ou QR) que o professor compartilhar. Atividades da
             turma abrem a Área de Trabalho com um banner indicando a tarefa — monte o pipeline e
             <strong>salve para enviar sua submissão</strong> (ela entra no ranking da atividade).</p>
+            <figure class="manual-figura">
+              <img src="assets/manual/aluno-projetos.jpg" alt="Tela Meus Projetos">
+              <figcaption>Meus Projetos: seus pipelines salvos, com busca e filtros por status.</figcaption>
+            </figure>
+            <figure class="manual-figura">
+              <img src="assets/manual/galeria.jpg" alt="Galeria de pipelines compartilhados">
+              <figcaption>Galeria: pipelines compartilhados que você pode abrir e copiar para a sua conta.</figcaption>
+            </figure>
+            <figure class="manual-figura">
+              <img src="assets/manual/aluno-turmas.jpg" alt="Tela Minhas Turmas do aluno">
+              <figcaption>Minhas Turmas: entre com o código do professor e faça as atividades.</figcaption>
+            </figure>
           `
         },
         {
@@ -281,6 +329,14 @@ python usar_modelo_joblib.py  # usa o modelo já treinado</code></pre>
             </ul>
             <p>Acesse pelo <strong>Painel do Professor</strong> (home do seu papel) — cada tela tem a barra
             superior com o botão de voltar e o menu do usuário.</p>
+            <figure class="manual-figura">
+              <img src="assets/manual/prof-painel.jpg" alt="Painel do Professor">
+              <figcaption>Painel do Professor: criar turma, lista de turmas e atalho para as atividades dos alunos.</figcaption>
+            </figure>
+            <figure class="manual-figura">
+              <img src="assets/manual/prof-menu.jpg" alt="Menu do usuário do professor">
+              <figcaption>Menu do professor: Meus Projetos, Galeria, Minhas turmas, Gerenciar turmas, Manual e Sobre.</figcaption>
+            </figure>
           `
         },
         {
@@ -302,6 +358,10 @@ python usar_modelo_joblib.py  # usa o modelo já treinado</code></pre>
               <li><strong>Chat dos alunos:</strong> transcript das conversas com o tutor (auditado e restrito
                 às suas turmas — os alunos são menores de idade, trate com cuidado)</li>
             </ul>
+            <figure class="manual-figura">
+              <img src="assets/manual/prof-turma.jpg" alt="Detalhe da turma com código, QR, alunos, atividades e progresso">
+              <figcaption>Detalhe da turma: código + QR de entrada, alunos, atividades (com dataset e métrica) e progresso.</figcaption>
+            </figure>
           `
         },
         {
@@ -341,6 +401,10 @@ python usar_modelo_joblib.py  # usa o modelo já treinado</code></pre>
               <li><strong>Pré-processamento mínimo</strong> no começo; acrescente complexidade aos poucos</li>
               <li><strong>Métricas variadas</strong> para ensinar avaliação (não só acurácia)</li>
             </ul>
+            <figure class="manual-figura">
+              <img src="assets/manual/galeria.jpg" alt="Galeria de pipelines">
+              <figcaption>Galeria: pipelines publicados por professores, filtráveis por nível e turma.</figcaption>
+            </figure>
           `
         },
         {
@@ -357,6 +421,10 @@ python usar_modelo_joblib.py  # usa o modelo já treinado</code></pre>
               <li><strong>Acesso restrito</strong> a professor e admin; os dados expiram automaticamente
                 (retenção padrão de 90 dias — público menor de idade, LGPD)</li>
             </ul>
+            <figure class="manual-figura">
+              <img src="assets/manual/prof-telemetria.jpg" alt="Tela Atividades dos Usuários (telemetria)">
+              <figcaption>Atividades dos Usuários: resumo (eventos, erros, ativos), filtros e a jornada por aluno.</figcaption>
+            </figure>
           `
         }
       ]
@@ -387,6 +455,10 @@ python usar_modelo_joblib.py  # usa o modelo já treinado</code></pre>
               <li><strong>Atividades / Logs:</strong> telemetria e monitoramento</li>
             </ul>
             <p>Todas as telas têm a <strong>barra superior padrão</strong>: voltar à esquerda, título e menu do usuário.</p>
+            <figure class="manual-figura">
+              <img src="assets/manual/painel-admin.jpg" alt="Painel de Administração">
+              <figcaption>Painel de Administração: Pipeline ML, Gerenciar Usuários, Turmas, Config. Pipeline/Tutor, Artefatos e Logs.</figcaption>
+            </figure>
           `
         },
         {
@@ -407,6 +479,14 @@ python usar_modelo_joblib.py  # usa o modelo já treinado</code></pre>
             </ul>
             <p><strong>Papéis:</strong> aluno usa a plataforma; professor ganha turmas/atividades/publicação;
             admin ganha as telas de configuração e monitoramento.</p>
+            <figure class="manual-figura">
+              <img src="assets/manual/ativacao.jpg" alt="Página de ativação de conta aberta pelo link do e-mail">
+              <figcaption>O convidado abre o link do e-mail e cria a própria senha nesta página de ativação.</figcaption>
+            </figure>
+            <figure class="manual-figura">
+              <img src="assets/manual/cadastro.jpg" alt="Tela de cadastro de usuário">
+              <figcaption>Cadastro: alternativa de auto-registro (nome, e-mail, instituição, senha e perfil).</figcaption>
+            </figure>
           `
         },
         {
