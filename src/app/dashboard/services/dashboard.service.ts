@@ -381,6 +381,10 @@ export class DashboardService {
     return this.http.put<any>(`${this.url}${this.endpointConfPipeline}pre_processamento_doc/${valor}`, body);
   }
 
+  deletePreProcessamentoDoc(valor: string) {
+    return this.http.delete<any>(`${this.url}${this.endpointConfPipeline}pre_processamento_doc/${valor}`);
+  }
+
   // Catalogo de pre-processamento vive em db.pre_processamento (com execucao +
   // conteudo). O JSON do front (itens-coletas-dados.json) serve de fallback quando
   // o banco ainda nao foi semeado.

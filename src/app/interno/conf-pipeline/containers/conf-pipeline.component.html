@@ -52,6 +52,10 @@
 
             <li class="execucao-panel" *ngIf="item.itemExpandido && item.itemDraft">
               <div class="execucao-grid">
+                <label>
+                  <span>Nome (exibição)</span>
+                  <input type="text" [(ngModel)]="item.itemDraft.label" placeholder="ex.: Arquivo CSV" />
+                </label>
                 <label class="campo-wide">
                   <span>Resumo (texto curto exibido no card do item)</span>
                   <textarea rows="2" [(ngModel)]="item.itemDraft.resumo"></textarea>
@@ -141,6 +145,10 @@
 
             <li class="execucao-panel" *ngIf="item.itemExpandido && item.itemDraft">
               <div class="execucao-grid">
+                <label>
+                  <span>Nome (exibição)</span>
+                  <input type="text" [(ngModel)]="item.itemDraft.label" placeholder="ex.: Standard Scaler" />
+                </label>
                 <label class="campo-wide">
                   <span>Resumo (texto curto exibido no card do item)</span>
                   <textarea rows="2" [(ngModel)]="item.itemDraft.resumo"></textarea>
@@ -313,6 +321,10 @@
 
             <li class="execucao-panel" *ngIf="item.itemExpandido && item.itemDraft">
               <div class="execucao-grid">
+                <label>
+                  <span>Nome (exibição)</span>
+                  <input type="text" [(ngModel)]="item.itemDraft.label" placeholder="ex.: Random Forest" />
+                </label>
                 <label class="campo-wide">
                   <span>Resumo (texto curto exibido no card do item)</span>
                   <textarea rows="2" [(ngModel)]="item.itemDraft.resumo"></textarea>
@@ -503,6 +515,10 @@
 
             <li class="execucao-panel" *ngIf="item.itemExpandido && item.itemDraft">
               <div class="execucao-grid">
+                <label>
+                  <span>Nome (exibição)</span>
+                  <input type="text" [(ngModel)]="item.itemDraft.label" placeholder="ex.: Acurácia" />
+                </label>
                 <label class="campo-wide">
                   <span>Resumo (texto curto exibido no card do item)</span>
                   <textarea rows="2" [(ngModel)]="item.itemDraft.resumo"></textarea>

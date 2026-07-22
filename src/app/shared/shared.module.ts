@@ -26,7 +26,6 @@ import { MarkdownPipe } from '../dashboard/chat-tutor/markdown.pipe';
     UserMenuComponent,
     BrandLogoComponent,
     TopbarComponent,
-    MarkdownPipe
   ],
   imports: [
     CommonModule,
@@ -42,7 +41,8 @@ import { MarkdownPipe } from '../dashboard/chat-tutor/markdown.pipe';
     MatTooltipModule,
     MatDividerModule,
     MatDialogModule,
-    MatButtonModule
+    MatButtonModule,
+    MarkdownPipe,
   ],
   exports: [
     CommonModule,

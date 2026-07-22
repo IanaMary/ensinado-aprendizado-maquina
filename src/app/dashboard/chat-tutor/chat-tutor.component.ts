@@ -1,7 +1,13 @@
 import { Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subscription } from 'rxjs';
 import { DashboardService } from '../services/dashboard.service';
 import { AtividadeService } from '../../service/atividade/atividade.service';
+import { MarkdownPipe } from './markdown.pipe';
+import { RealcarBlocosDirective } from '../tutor/highlight/realcar-blocos.directive';
 
 interface MensagemChat {
   role: 'user' | 'assistant';
@@ -19,7 +25,15 @@ interface HistoricoItem {
   selector: 'app-chat-tutor',
   templateUrl: './chat-tutor.component.html',
   styleUrls: ['./chat-tutor.component.scss'],
-  standalone: false
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatIconModule,
+    MatTooltipModule,
+    MarkdownPipe,
+    RealcarBlocosDirective,
+  ],
 })
 export class ChatTutorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() contexto: any = null;

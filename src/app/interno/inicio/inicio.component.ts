@@ -56,7 +56,7 @@ export class InicioComponent implements OnInit {
     },
     {
       id: 'trilha', emoji: '🧭', titulo: 'Trilha de ML',
-      descricao: 'Monte seu pipeline de machine learning em uma trilha visual.',
+      descricao: 'Monte seu pipeline de aprendizado de máquina em uma trilha visual.',
       rota: '/trilha', cor: '#3B82F6',
     },
     {

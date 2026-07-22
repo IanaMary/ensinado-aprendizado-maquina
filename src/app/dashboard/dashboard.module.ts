@@ -41,10 +41,10 @@ import { TutorComponent } from './tutor/tutor.component';
 import { CsvConfigComponent } from './execucoes/modals/csv-config/csv-config.component';
 import { NomearPipelineDialogComponent } from './execucoes/modals/nomear-pipeline-dialog/nomear-pipeline-dialog.component';
 import { VisualizacaoDadosComponent } from './execucoes/modals/visualizacao-dados/visualizacao-dados.component';
-import { ChatTutorComponent } from './chat-tutor/chat-tutor.component';
 import { SharedModule } from '../shared/shared.module';
 import { HighlightCodeDirective } from './tutor/highlight/highlight-code.directive';
 import { RealcarBlocosDirective } from './tutor/highlight/realcar-blocos.directive';
+import { ChatTutorComponent } from './chat-tutor/chat-tutor.component';
 import { SessionService } from '../service/sessao-store.service';
 
 
@@ -70,15 +70,15 @@ import { SessionService } from '../service/sessao-store.service';
     MetricasComponent,
     MetricaAvaliacaoComponent,
     TutorComponent,
-    ChatTutorComponent,
     HighlightCodeDirective,
-    RealcarBlocosDirective,
     CsvConfigComponent,
     NomearPipelineDialogComponent,
     VisualizacaoDadosComponent
   ],
   imports: [CommonModule,
     SharedModule,
+    RealcarBlocosDirective,
+    ChatTutorComponent,
     DragDropModule,
     MatCardModule,
     MatDialogModule,
@@ -98,7 +98,7 @@ import { SessionService } from '../service/sessao-store.service';
     MatFormFieldModule,
     NgxMaskDirective
   ],
-  exports: [DashboardComponent, TutorComponent, ChatTutorComponent],
+  exports: [DashboardComponent, TutorComponent],
   providers: [
     provideNgxMask()
   ]

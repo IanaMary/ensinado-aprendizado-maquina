@@ -8,7 +8,7 @@ import { HighlightService } from './highlight.service';
  */
 @Directive({
   selector: '[appRealcarBlocos]',
-  standalone: false,
+  standalone: true,
 })
 export class RealcarBlocosDirective implements AfterViewChecked {
   constructor(private el: ElementRef<HTMLElement>, private highlightService: HighlightService) {}

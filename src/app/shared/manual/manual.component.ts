@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { roleMap } from '../../models/item-coleta-dado.model';
 
 interface SecaoManual {
   id: string;
@@ -59,7 +60,8 @@ export class ManualComponent implements OnInit {
   }
 
   voltar(): void {
-    this.router.navigate(['/interno']);
+    const role = sessionStorage.getItem('role') || '';
+    this.router.navigateByUrl((role && (roleMap as any)[role]) || '/autenticacao/login');
   }
 
   private carregarManuais(): void {
@@ -74,7 +76,7 @@ export class ManualComponent implements OnInit {
     return {
       tipo: 'aluno',
       titulo: 'Manual do Aluno',
-      descricao: 'Aprenda a montar, treinar e avaliar pipelines de Machine Learning no H2IA Tutor',
+      descricao: 'Aprenda a montar, treinar e avaliar pipelines de Aprendizado de Máquina no H2IA Tutor',
       icone: 'school',
       secoes: [
         {
@@ -83,7 +85,7 @@ export class ManualComponent implements OnInit {
           icone: 'info',
           conteudo: `
             <h2>Bem-vindo(a) ao H2IA Tutor!</h2>
-            <p>Aqui você monta um <strong>pipeline de Machine Learning</strong> completo — dos dados à avaliação —
+            <p>Aqui você monta um <strong>pipeline de Aprendizado de Máquina</strong> completo — dos dados à avaliação —
             com um tutor que explica cada passo. O que você pode fazer:</p>
             <ul>
               <li><strong>Carregar dados</strong> (arquivo, URL ou dataset de exemplo) e configurar a divisão treino/teste</li>
@@ -198,7 +200,7 @@ export class ManualComponent implements OnInit {
             <h3>Chat com IA</h3>
             <p>Abaixo do conteúdo há um <strong>chat</strong> que conhece o seu pipeline (dataset, modelos,
             hiperparâmetros, métricas e até o código gerado). Use as perguntas sugeridas ou escreva a sua.
-            O tutor responde só sobre Machine Learning e a plataforma — e nunca inventa números que não estão
+            O tutor responde só sobre Aprendizado de Máquina e a plataforma — e nunca inventa números que não estão
             nos seus resultados.</p>
           `
         },

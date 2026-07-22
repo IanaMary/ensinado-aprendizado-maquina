@@ -189,7 +189,7 @@ export class RelatorioPdfService {
     }
 
     const slug = slugificarNome(input.nomeExperimento);
-    doc.save(slug ? `relatorio_${slug}.pdf` : 'relatorio-experimento-ml.pdf');
+    doc.save(slug ? `relatorio_${slug}.pdf` : 'relatorio-experimento-aprendizado-maquina.pdf');
   }
 
   /** PDF promocional do Hub (uma página, identidade H2IA) — incluído no zip do

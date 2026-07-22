@@ -8,6 +8,28 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-22 (marca H2IA Tutor + terminologia "Aprendizado de Máquina" + redesign do cadastro)
+
+> Frontend `mestrado-iana`, portado p/ `master`. Backend: e-mail de convite (repo back).
+
+### Corrigido
+- **Marca desatualizada:** a página aberta pelo link do e-mail (`/ativar-conta`) mostrava
+  "Mestrado Iana" com um logo de texto "IA"; agora usa a **logo oficial** (`<app-brand-logo>`)
+  e **"H2IA Tutor"**, espelhando a tela de login. Mesma limpeza no `shell` (sidebar).
+- **Terminologia:** "Machine Learning" → **"Aprendizado de Máquina"** nas telas (login,
+  ativação, admin, início, conf-tutor, meus-projetos, manual, área de trabalho, `tutor.json`)
+  e no conteúdo exportado (scripts `.py`/`.ipynb` e nome do PDF). Preservado o nome próprio
+  **"UCI Machine Learning Repository"**.
+- **Redesign do cadastro (`/autenticacao/login/cadastro-usuario`):** trocada a caixa Material
+  genérica pelo padrão da tela de login (duas colunas com gradiente roxo, coluna de marca,
+  campos custom com ícones, botões em gradiente). Lógica do componente intacta.
+
+### Observação
+- O deploy incluiu também trabalho em andamento não relacionado (chat-tutor, conf-pipeline,
+  global-error-handler) por decisão de publicar toda a árvore de trabalho.
+
+---
+
 ## 2026-07-09 (tutor: conteúdo por etapa no modal, card por dataset, fences coloridos no chat)
 
 > Frontend `mestrado-iana` (bundle `main-WZTDYM2S.js`), portado p/ `master`. Backend inalterado.

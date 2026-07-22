@@ -13,7 +13,7 @@ import { DashboardService } from '../../../dashboard/services/dashboard.service'
 import { NotificacaoService } from '../../../service/notificacao.service';
 import { ConteudoEditorComponent } from '../components/conteudo-editor/conteudo-editor.component';
 import { SharedModule } from '../../../shared/shared.module';
-import { DashboardModule } from '../../../dashboard/dashboard.module';
+import { ChatTutorComponent } from '../../../dashboard/chat-tutor/chat-tutor.component';
 
 type Lane = 'coleta_dados' | 'modelos' | 'metricas' | 'pre_processamento';
 
@@ -67,10 +67,14 @@ const TIPOS_HIPERPARAM: HiperparamSchema['tipo'][] = ['int', 'float', 'str', 'bo
 /** Campos do item editáveis fora dos blocos `execucao`/`conteudo` (antes editados
  *  só pelo catálogo do conf-tutor, aposentado na consolidação). */
 export interface ItemCamposDraft {
+  label: string;
   resumo: string;
   explicacao: string;
   grupo: string;
   categoria: 'classificacao' | 'regressao' | 'agrupamento';
+  /** Categoria original do modelo ao abrir o painel — usada para NÃO regravar
+   *  prever_categoria/dados_rotulados em modelos legados sem esses campos. */
+  categoriaOriginal?: 'classificacao' | 'regressao' | 'agrupamento';
   metricas: Record<string, boolean>;  // valor da métrica -> selecionada
 }
 
@@ -90,7 +94,7 @@ export interface ItemCamposDraft {
     MatTooltipModule,
     ConteudoEditorComponent,
     SharedModule,     // app-topbar / app-user-menu
-    DashboardModule,  // app-chat-tutor (assistente de preenchimento)
+    ChatTutorComponent,  // app-chat-tutor (assistente de preenchimento)
   ]
 })
 export class ConfPipelineComponent implements OnInit {
@@ -547,31 +551,47 @@ export class ConfPipelineComponent implements OnInit {
     }
     const metricas: Record<string, boolean> = {};
     (item['metricas'] || []).forEach((v: string) => { metricas[v] = true; });
+    const cat = this.categoriaDoModelo(item);
     item.itemDraft = {
+      label: item['label'] || '',
       resumo: item['resumo'] || '',
       explicacao: item['explicacao'] || '',
       grupo: item['grupo'] || (tipo === 'metricas' ? 'classificacao' : ''),
-      categoria: this.categoriaDoModelo(item),
+      categoria: cat,
+      categoriaOriginal: cat,
       metricas,
     };
     item.itemExpandido = true;
   }
 
-  /** Métricas do catálogo compatíveis com a categoria do modelo em edição. */
+  /** Todas as métricas do catálogo — a seleção não é mais filtrada por grupo.
+   *  Métricas de grupo divergente são exibidas com o grupo indicado para o admin
+   *  decidir. (Fix #5) */
   metricasCompativeis(item: ItemAdmin): ItemAdmin[] {
+    return this.itensMetricas;
+  }
+  /** Métrica compatível com a categoria do modelo em edição (para destaque visual). */
+  metricaCompativel(item: ItemAdmin, metrica: ItemAdmin): boolean {
     const cat = item.itemDraft?.categoria || 'classificacao';
-    return this.itensMetricas.filter(m => (m['grupo'] || 'classificacao') === cat);
+    return (metrica['grupo'] || 'classificacao') === cat;
   }
 
   salvarItemCampos(tipo: Lane, item: ItemAdmin): void {
     const d = item.itemDraft;
     if (!d) return;
-    const body: any = { resumo: (d.resumo || '').trim() };
+    const body: any = {};
+    // Label (renomear item existente — Fix #3)
+    if (d.label && d.label.trim() && d.label.trim() !== (item['label'] || '')) {
+      body.label = d.label.trim();
+    }
+    body.resumo = (d.resumo || '').trim();
     if (tipo === 'modelos') {
       body.explicacao = (d.explicacao || '').trim();
-      // Mesmo mapeamento da criação (determinarTipoModelo no dashboard.service)
-      body.dados_rotulados = d.categoria !== 'agrupamento';
-      body.prever_categoria = d.categoria === 'classificacao';
+      // Fix #4: só regrava prever_categoria/dados_rotulados se o admin trocou a tarefa
+      if (d.categoria !== d.categoriaOriginal) {
+        body.dados_rotulados = d.categoria !== 'agrupamento';
+        body.prever_categoria = d.categoria === 'classificacao';
+      }
       body.metricas = Object.keys(d.metricas).filter(v => d.metricas[v]);
     } else if (tipo === 'metricas') {
       body.explicacao = (d.explicacao || '').trim();
@@ -579,18 +599,23 @@ export class ConfPipelineComponent implements OnInit {
     } else if (tipo === 'pre_processamento') {
       if (d.grupo) body.grupo = d.grupo;
     }
+    if (Object.keys(body).length === 0) {
+      this.notificacao.erro('Nenhum campo alterado.');
+      return;
+    }
     item.salvandoItem = true;
     const req = tipo === 'pre_processamento'
       ? this.dashboard.putPreProcessamentoDoc(item.valor as string, body)
       : this.dashboard.putCatalogoItem(tipo, item.id, body);
     req.subscribe({
       next: () => {
+        if (body.label !== undefined) item['label'] = body.label;
         item['resumo'] = body.resumo;
         if (body.explicacao !== undefined) item['explicacao'] = body.explicacao;
         if (body.grupo !== undefined) item['grupo'] = body.grupo;
         if (tipo === 'modelos') {
-          item.preverCategoria = body.prever_categoria;
-          item.dadosRotulados = body.dados_rotulados;
+          if (body.prever_categoria !== undefined) item.preverCategoria = body.prever_categoria;
+          if (body.dados_rotulados !== undefined) item.dadosRotulados = body.dados_rotulados;
           item['metricas'] = body.metricas;
         }
         item.salvandoItem = false;
@@ -609,7 +634,10 @@ export class ConfPipelineComponent implements OnInit {
     const nome = item.label || item.valor || 'este item';
     if (!confirm(`Excluir "${nome}" do catálogo? Esta ação não pode ser desfeita.`)) return;
     item.excluindo = true;
-    this.dashboard.deleteCatalogoItem(tipo, item.id).subscribe({
+    const req = tipo === 'pre_processamento'
+      ? this.dashboard.deletePreProcessamentoDoc(item.valor as string)
+      : this.dashboard.deleteCatalogoItem(tipo, item.id);
+    req.subscribe({
       next: () => {
         this.notificacao.sucesso(`Item excluído: ${nome}`);
         this.recarregar(tipo);
