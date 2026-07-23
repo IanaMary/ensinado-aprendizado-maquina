@@ -8,6 +8,18 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-22c (Manual: desfoque de dados sensíveis nas capturas)
+
+> Só frontend (3 assets estáticos). Backend inalterado.
+
+### Corrigido
+- Pixelização (LGPD) das regiões com dados reais nas capturas do `/manual`:
+  **login** e **cadastro** (campos de e-mail e senha preenchidos) e **detalhe da turma**
+  (código, QR code, link de entrada e e-mail do aluno). Assets regravados em
+  `src/assets/manual/` a partir dos originais.
+
+---
+
 ## 2026-07-22b (capturas de tela no Manual)
 
 > Só frontend. Backend inalterado.
