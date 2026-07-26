@@ -26,7 +26,28 @@ export class TurmaDetalheComponent implements OnInit {
 
   // criar atividade
   criandoAtiv = false;
-  novaAtiv = { titulo: '', descricao: '', datasetNome: '', metrica: 'accuracy_score', ordem: 'desc' };
+  novaAtiv = {
+    titulo: '', descricao: '', datasetNome: '', metrica: 'accuracy_score', ordem: 'desc',
+    // Desafio de montagem: tarefa + características da base descritas no enunciado
+    // (o desafio não executa nada, então são essas flags que ligam as regras da rubrica).
+    tipo: 'pipeline' as 'pipeline' | 'montagem',
+    tarefa: 'classificacao' as 'classificacao' | 'regressao' | 'agrupamento',
+    dificuldade: 'medio' as 'facil' | 'medio' | 'dificil',
+    exigePreProcessamento: false,
+    faltantes: false,
+    texto: false,
+    escalasDiferentes: false,
+  };
+  tarefas = [
+    { valor: 'classificacao', label: 'Classificação (qual categoria?)' },
+    { valor: 'regressao', label: 'Regressão (qual número?)' },
+    { valor: 'agrupamento', label: 'Agrupamento (que grupos existem?)' },
+  ];
+  dificuldades = [
+    { valor: 'facil', label: 'Fácil (2 peças que não servem)' },
+    { valor: 'medio', label: 'Médio (4 peças que não servem)' },
+    { valor: 'dificil', label: 'Difícil (6 peças que não servem)' },
+  ];
   datasets: { nome: string; label?: string }[] = [];
   metricas = [
     { valor: 'accuracy_score', label: 'Acurácia (classificação)', ordem: 'desc' },
@@ -102,20 +123,59 @@ export class TurmaDetalheComponent implements OnInit {
   criarAtividade(): void {
     if (!this.novaAtiv.titulo.trim()) return;
     const met = this.metricas.find(m => m.valor === this.novaAtiv.metrica);
+    const ehMontagem = this.novaAtiv.tipo === 'montagem';
     this.criandoAtiv = true;
     this.turmaService.criarAtividade(this.turmaId, {
       titulo: this.novaAtiv.titulo.trim(),
       descricao: this.novaAtiv.descricao.trim() || undefined,
-      template: { datasetNome: this.novaAtiv.datasetNome || undefined },
+      tipo: this.novaAtiv.tipo,
+      template: ehMontagem ? {} : { datasetNome: this.novaAtiv.datasetNome || undefined },
+      gabarito: ehMontagem ? this.montarGabarito() : undefined,
       criterio: { metrica: this.novaAtiv.metrica, ordem: met?.ordem || 'desc' },
     }).subscribe({
       next: (a) => {
         this.atividades.unshift(a); this.criandoAtiv = false;
-        this.novaAtiv = { titulo: '', descricao: '', datasetNome: '', metrica: 'accuracy_score', ordem: 'desc' };
-        this.snackBar.open('Atividade criada.', 'Fechar', { duration: 3000 });
+        this.resetarNovaAtividade();
+        this.snackBar.open(ehMontagem ? 'Desafio criado.' : 'Atividade criada.', 'Fechar',
+                           { duration: 3000 });
       },
       error: () => { this.criandoAtiv = false; },
     });
+  }
+
+  /** Gabarito do desafio: o que a rubrica vai cobrar (não é a solução). */
+  private montarGabarito() {
+    const exige: ('coleta' | 'pre_processamento' | 'modelo' | 'metrica')[] = ['coleta', 'modelo', 'metrica'];
+    // Só exigimos a lane de pré-processamento quando o professor marca — ou quando a base
+    // descrita obriga (dado faltante/texto precisam de bloco, senão a regra seria injusta).
+    if (this.novaAtiv.exigePreProcessamento || this.novaAtiv.faltantes || this.novaAtiv.texto) {
+      exige.splice(1, 0, 'pre_processamento');
+    }
+    return {
+      tarefa: this.novaAtiv.tarefa,
+      exige,
+      dados: {
+        faltantes: this.novaAtiv.faltantes,
+        texto: this.novaAtiv.texto,
+        escalas_diferentes: this.novaAtiv.escalasDiferentes,
+      },
+      dificuldade: this.novaAtiv.dificuldade,
+      regras: [],
+      fixar: [],
+      vetar: [],
+    };
+  }
+
+  private resetarNovaAtividade(): void {
+    this.novaAtiv = {
+      titulo: '', descricao: '', datasetNome: '', metrica: 'accuracy_score', ordem: 'desc',
+      tipo: 'pipeline', tarefa: 'classificacao', dificuldade: 'medio',
+      exigePreProcessamento: false, faltantes: false, texto: false, escalasDiferentes: false,
+    };
+  }
+
+  ehDesafio(a?: Atividade): boolean {
+    return a?.tipo === 'montagem';
   }
 
   excluirAtividade(a: Atividade): void {
@@ -125,7 +185,9 @@ export class TurmaDetalheComponent implements OnInit {
   }
 
   verRanking(a: Atividade): void {
-    this.rankingAtiv = a; this.ranking = []; this.rankingMetrica = a.criterio?.metrica || '';
+    this.rankingAtiv = a; this.ranking = [];
+    // Desafio ranqueia por NOTA (0–10) e traz tentativas; pipeline segue pela métrica.
+    this.rankingMetrica = this.ehDesafio(a) ? 'nota' : (a.criterio?.metrica || '');
     this.turmaService.ranking(this.turmaId, a.id).subscribe({
       next: (r) => { this.ranking = r?.ranking || []; this.rankingMetrica = r?.metrica || this.rankingMetrica; },
     });

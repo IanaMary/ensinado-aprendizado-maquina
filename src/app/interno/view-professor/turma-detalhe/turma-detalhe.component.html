@@ -51,41 +51,102 @@
 
       <div class="nova-ativ">
         <div class="campo-form">
+          <label class="campo-label" for="ativ-tipo">Tipo</label>
+          <div class="campo-input-wrapper">
+            <mat-icon class="campo-icon" aria-hidden="true">category</mat-icon>
+            <select id="ativ-tipo" class="campo-input" [(ngModel)]="novaAtiv.tipo">
+              <option value="pipeline">Pipeline real (o aluno treina e submete)</option>
+              <option value="montagem">Desafio de montagem (quebra-cabeça, sem executar)</option>
+            </select>
+          </div>
+        </div>
+        <div class="campo-form">
           <label class="campo-label" for="ativ-titulo">Título</label>
           <div class="campo-input-wrapper">
             <mat-icon class="campo-icon" aria-hidden="true">title</mat-icon>
             <input id="ativ-titulo" class="campo-input" [(ngModel)]="novaAtiv.titulo" placeholder="Ex: Classificar flores">
           </div>
         </div>
-        <div class="campo-form">
-          <label class="campo-label" for="ativ-dataset">Dataset inicial</label>
+        <div class="campo-form" *ngIf="novaAtiv.tipo === 'montagem'">
+          <label class="campo-label" for="ativ-enunciado">Enunciado do problema</label>
           <div class="campo-input-wrapper">
-            <mat-icon class="campo-icon" aria-hidden="true">dataset</mat-icon>
-            <select id="ativ-dataset" class="campo-input" [(ngModel)]="novaAtiv.datasetNome">
-              <option value="">(o aluno escolhe)</option>
-              <option *ngFor="let d of datasets" [value]="d.nome">{{ d.label }}</option>
-            </select>
+            <mat-icon class="campo-icon" aria-hidden="true">help_outline</mat-icon>
+            <input id="ativ-enunciado" class="campo-input" [(ngModel)]="novaAtiv.descricao"
+                   placeholder="Ex: temos fotos de flores medidas; descubra a espécie">
           </div>
         </div>
-        <div class="campo-form">
-          <label class="campo-label" for="ativ-metrica">Métrica do ranking</label>
-          <div class="campo-input-wrapper">
-            <mat-icon class="campo-icon" aria-hidden="true">leaderboard</mat-icon>
-            <select id="ativ-metrica" class="campo-input" [(ngModel)]="novaAtiv.metrica">
-              <option *ngFor="let m of metricas" [value]="m.valor">{{ m.label }}</option>
-            </select>
+
+        <!-- Pipeline real -->
+        <ng-container *ngIf="novaAtiv.tipo !== 'montagem'">
+          <div class="campo-form">
+            <label class="campo-label" for="ativ-dataset">Dataset inicial</label>
+            <div class="campo-input-wrapper">
+              <mat-icon class="campo-icon" aria-hidden="true">dataset</mat-icon>
+              <select id="ativ-dataset" class="campo-input" [(ngModel)]="novaAtiv.datasetNome">
+                <option value="">(o aluno escolhe)</option>
+                <option *ngFor="let d of datasets" [value]="d.nome">{{ d.label }}</option>
+              </select>
+            </div>
           </div>
-        </div>
+          <div class="campo-form">
+            <label class="campo-label" for="ativ-metrica">Métrica do ranking</label>
+            <div class="campo-input-wrapper">
+              <mat-icon class="campo-icon" aria-hidden="true">leaderboard</mat-icon>
+              <select id="ativ-metrica" class="campo-input" [(ngModel)]="novaAtiv.metrica">
+                <option *ngFor="let m of metricas" [value]="m.valor">{{ m.label }}</option>
+              </select>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Desafio de montagem -->
+        <ng-container *ngIf="novaAtiv.tipo === 'montagem'">
+          <div class="campo-form">
+            <label class="campo-label" for="ativ-tarefa">Tarefa</label>
+            <div class="campo-input-wrapper">
+              <mat-icon class="campo-icon" aria-hidden="true">psychology</mat-icon>
+              <select id="ativ-tarefa" class="campo-input" [(ngModel)]="novaAtiv.tarefa">
+                <option *ngFor="let t of tarefas" [value]="t.valor">{{ t.label }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="campo-form">
+            <label class="campo-label" for="ativ-dificuldade">Dificuldade</label>
+            <div class="campo-input-wrapper">
+              <mat-icon class="campo-icon" aria-hidden="true">speed</mat-icon>
+              <select id="ativ-dificuldade" class="campo-input" [(ngModel)]="novaAtiv.dificuldade">
+                <option *ngFor="let d of dificuldades" [value]="d.valor">{{ d.label }}</option>
+              </select>
+            </div>
+          </div>
+          <fieldset class="campo-form dados-base">
+            <legend class="campo-label">Como é a base descrita no enunciado</legend>
+            <label><input type="checkbox" [(ngModel)]="novaAtiv.faltantes"> Tem células vazias (exige preencher)</label>
+            <label><input type="checkbox" [(ngModel)]="novaAtiv.texto"> Tem colunas de texto (exige codificar)</label>
+            <label><input type="checkbox" [(ngModel)]="novaAtiv.escalasDiferentes"> Colunas em escalas bem diferentes</label>
+            <label><input type="checkbox" [(ngModel)]="novaAtiv.exigePreProcessamento"> Exigir a etapa de pré-processamento</label>
+          </fieldset>
+        </ng-container>
+
         <button class="btn-primario" (click)="criarAtividade()" [disabled]="criandoAtiv || !novaAtiv.titulo.trim()">
-          <mat-icon>add</mat-icon> Criar atividade
+          <mat-icon>add</mat-icon>
+          {{ novaAtiv.tipo === 'montagem' ? 'Criar desafio' : 'Criar atividade' }}
         </button>
       </div>
 
       <ul class="ativ-lista">
         <li *ngFor="let a of atividades">
           <div class="ativ-info">
-            <strong>{{ a.titulo }}</strong>
-            <span>métrica: {{ a.criterio?.metrica }}<span *ngIf="a.template?.datasetNome"> · dataset: {{ a.template?.datasetNome }}</span></span>
+            <strong>
+              {{ a.titulo }}
+              <span class="selo-desafio" *ngIf="ehDesafio(a)">
+                <mat-icon aria-hidden="true">extension</mat-icon> Desafio
+              </span>
+            </strong>
+            <span *ngIf="ehDesafio(a)">
+              montagem · {{ a.gabarito?.tarefa }} · {{ a.gabarito?.dificuldade }}
+            </span>
+            <span *ngIf="!ehDesafio(a)">métrica: {{ a.criterio?.metrica }}<span *ngIf="a.template?.datasetNome"> · dataset: {{ a.template?.datasetNome }}</span></span>
           </div>
           <div class="ativ-acoes">
             <button class="btn-mini" (click)="verRanking(a)" matTooltip="Ranking" [attr.aria-label]="'Ver ranking de ' + a.titulo"><mat-icon aria-hidden="true">leaderboard</mat-icon></button>
@@ -101,13 +162,21 @@
         <div class="tabela-wrap">
           <table>
             <thead>
-              <tr><th scope="col">#</th><th scope="col">Aluno</th><th scope="col">{{ rankingMetrica }}</th></tr>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Aluno</th>
+                <th scope="col">{{ rankingMetrica }}</th>
+                <th scope="col" *ngIf="ehDesafio(rankingAtiv)">Tentativas</th>
+              </tr>
             </thead>
             <tbody>
               <tr *ngFor="let r of ranking; let i = index">
                 <td>{{ i + 1 }}</td><td>{{ r.aluno_nome }}</td><td>{{ fmtValor(r.valor) }}</td>
+                <td *ngIf="ehDesafio(rankingAtiv)">{{ r.tentativas ?? '—' }}</td>
               </tr>
-              <tr *ngIf="!ranking.length"><td colspan="3" class="vazio">Sem submissões avaliadas ainda.</td></tr>
+              <tr *ngIf="!ranking.length">
+                <td [attr.colspan]="ehDesafio(rankingAtiv) ? 4 : 3" class="vazio">Sem submissões avaliadas ainda.</td>
+              </tr>
             </tbody>
           </table>
         </div>

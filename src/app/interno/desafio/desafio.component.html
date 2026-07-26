@@ -1,0 +1,123 @@
+<div class="desafio-page">
+  <header class="desafio-header">
+    <button class="btn-voltar" type="button" (click)="voltar()" aria-label="Voltar">
+      <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    </button>
+    <div class="titulo-bloco">
+      <h1>{{ tabuleiro?.atividade?.titulo || 'Desafio' }}</h1>
+      <p class="enunciado" *ngIf="tabuleiro?.atividade?.descricao">
+        {{ tabuleiro?.atividade?.descricao }}
+      </p>
+    </div>
+    <div class="placar" *ngIf="tabuleiro">
+      <span class="chip">Tentativa {{ tabuleiro.tentativa }}</span>
+      <span class="chip melhor" *ngIf="tabuleiro.melhor_nota !== null">
+        Melhor nota: {{ tabuleiro.melhor_nota }}
+      </span>
+    </div>
+  </header>
+
+  <div class="estado" *ngIf="carregando">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Preparando as peças…</p>
+  </div>
+
+  <div class="estado erro" *ngIf="!carregando && erro">
+    <mat-icon aria-hidden="true">error_outline</mat-icon>
+    <p>{{ erro }}</p>
+  </div>
+
+  <!-- ============================ Montagem ============================ -->
+  <ng-container *ngIf="!carregando && !erro && !resultado">
+    <section class="bandeja" aria-label="Peças disponíveis">
+      <div class="bandeja-titulo">
+        <mat-icon aria-hidden="true">extension</mat-icon>
+        <span>Peças</span>
+        <small>Arraste para a coluna certa (ou clique na peça)</small>
+      </div>
+      <div class="bandeja-pecas" cdkDropList id="bandeja" [cdkDropListData]="disponiveis"
+           [cdkDropListConnectedTo]="idsLanes" (cdkDropListDropped)="soltar($event)">
+        <div class="item-card peca" *ngFor="let peca of disponiveis" cdkDrag
+             (click)="usarPeca(peca)" [attr.aria-label]="'Usar ' + peca.nome">
+          <mat-icon aria-hidden="true">drag_indicator</mat-icon>
+          <span>{{ peca.nome }}</span>
+        </div>
+        <p class="bandeja-vazia" *ngIf="!disponiveis.length">
+          Todas as peças foram usadas — mas nem toda peça precisava ser usada.
+        </p>
+      </div>
+    </section>
+
+    <div class="lanes">
+      <div class="column" *ngFor="let lane of lanes" [ngClass]="lane.id">
+        <div class="column-header">
+          <div class="column-icon">
+            <mat-icon aria-hidden="true">{{ lane.icone }}</mat-icon>
+          </div>
+          <span>{{ lane.titulo }}</span>
+        </div>
+        <div class="column-content" cdkDropList [id]="'lane-' + lane.id"
+             [cdkDropListData]="pecasDaLane(lane.id)" [cdkDropListConnectedTo]="idsLanes"
+             (cdkDropListDropped)="soltar($event)">
+          <div class="item-card" *ngFor="let peca of pecasDaLane(lane.id); let i = index" cdkDrag
+               [class.lane-errada]="laneErrada(lane.id, peca)">
+            <span class="ordem" *ngIf="lane.id === 'pre_processamento'">{{ i + 1 }}</span>
+            <span>{{ peca.nome }}</span>
+            <mat-icon class="tirar" (click)="devolverPeca(lane.id, i)"
+                      [attr.aria-label]="'Tirar ' + peca.nome">close</mat-icon>
+            <mat-icon class="alerta" *ngIf="laneErrada(lane.id, peca)"
+                      matTooltip="Esta peça não é desta etapa">warning_amber</mat-icon>
+          </div>
+          <p class="lane-dica" *ngIf="!pecasDaLane(lane.id).length">{{ lane.dica }}</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="barra-acoes">
+      <p class="aviso" *ngIf="lanesVazias.length">
+        Ainda sem peça em: {{ lanesVazias.length }} etapa(s).
+      </p>
+      <button class="btn-primario" type="button" [disabled]="!podeSubmeter" (click)="submeter()">
+        <mat-icon aria-hidden="true">check</mat-icon>
+        {{ enviando ? 'Enviando…' : 'Enviar montagem' }}
+      </button>
+    </footer>
+  </ng-container>
+
+  <!-- ============================ Resultado ============================ -->
+  <section class="resultado" *ngIf="resultado" aria-live="polite">
+    <div class="nota-bloco" [class.perfeito]="resultado.acertou_tudo">
+      <div class="nota">{{ resultado.nota }}<small>/{{ resultado.nota_max }}</small></div>
+      <p class="nota-legenda">
+        {{ resultado.pontos }} de {{ resultado.pontos_max }} pontos
+        · tentativa {{ resultado.tentativa }}
+      </p>
+      <p class="parabens" *ngIf="resultado.acertou_tudo">
+        Montagem correta! Tu escolheste peças que combinam entre si.
+      </p>
+    </div>
+
+    <div class="regras" *ngIf="regrasErradas.length">
+      <h2><mat-icon aria-hidden="true">priority_high</mat-icon> O que revisar</h2>
+      <article class="regra ruim" *ngFor="let r of regrasErradas">
+        <h3>{{ r.titulo }}</h3>
+        <p>{{ r.texto }}</p>
+      </article>
+    </div>
+
+    <div class="regras" *ngIf="regrasCertas.length">
+      <h2><mat-icon aria-hidden="true">check_circle</mat-icon> O que já está certo</h2>
+      <article class="regra boa" *ngFor="let r of regrasCertas">
+        <h3>{{ r.titulo }}</h3>
+        <p>{{ r.texto }}</p>
+      </article>
+    </div>
+
+    <footer class="barra-acoes">
+      <button class="btn-secundario" type="button" (click)="voltar()">Voltar</button>
+      <button class="btn-primario" type="button" (click)="tentarNovamente()">
+        <mat-icon aria-hidden="true">refresh</mat-icon> Tentar de novo (peças novas)
+      </button>
+    </footer>
+  </section>
+</div>

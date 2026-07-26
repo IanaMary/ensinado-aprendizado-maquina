@@ -34,3 +34,10 @@
   li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px;
        border: 1px solid rgba($roxo-claro, 0.6); border-radius: 10px;
        .ativ-info { min-width: 0; strong { display: block; color: $cinza-escuro; } span { display: block; font-size: 12px; color: $cinza-medio; } } } }
+
+// Selo do desafio de montagem (fica dentro do <strong> do título, então volta a inline).
+.selo-desafio { display: inline-flex !important; align-items: center; gap: 3px; margin-left: 8px;
+  padding: 2px 8px; border-radius: 999px; background: $roxo-fundo; color: $roxo-escuro !important;
+  font-size: 10px !important; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  vertical-align: middle;
+  mat-icon { font-size: 13px; width: 13px; height: 13px; } }

@@ -12,10 +12,10 @@ import { roleMap } from '../../../app/models/item-coleta-dado.model';
 // navega para `view-aluno`, e sem isto o guard mandava admin/professor para o login
 // (parecia "deslogar") ao carregar um pipeline.
 const ROTAS_POR_PAPEL: Record<string, string[]> = {
-  aluno: ['view-aluno'],
-  professor: ['view-professor', 'view-aluno', 'atividades'],
+  aluno: ['view-aluno', 'desafio'],
+  professor: ['view-professor', 'view-aluno', 'atividades', 'desafio'],
   // Admin herda as capacidades de professor (Turmas & Atividades) além do painel admin.
-  admin: ['view-admin', 'view-professor', 'view-aluno', 'atividades'],
+  admin: ['view-admin', 'view-professor', 'view-aluno', 'atividades', 'desafio'],
 };
 
 @Injectable({

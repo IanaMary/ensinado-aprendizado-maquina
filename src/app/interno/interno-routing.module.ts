@@ -24,6 +24,13 @@ const routes: Routes = [
     data: { breadcrumb: 'Atividades' }
   },
   {
+    // Desafio de montagem (quebra-cabeça avaliado). Aberto pela lista de atividades da
+    // turma, com ?turma=&atividade= — o aluno não chega aqui digitando a URL.
+    path: 'desafio',
+    loadComponent: () => import('../interno/desafio/desafio.component').then(m => m.DesafioComponent),
+    data: { breadcrumb: 'Desafio' }
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'view-aluno'

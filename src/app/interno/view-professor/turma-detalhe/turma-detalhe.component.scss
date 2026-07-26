@@ -83,3 +83,15 @@
   .msg { margin: 6px 0; .quem { font-size: 11px; font-weight: 700; color: $roxo-medio; }
          .texto { background: rgba($roxo-medio,.06); border-radius: 8px; padding: 8px 10px; white-space: pre-wrap; font-size: 13px; color: $cinza-escuro; }
          &.user .texto { background: rgba($cinza-medio,.1); } } }
+
+// Desafio de montagem: selo na lista e o bloco de características da base no form.
+.selo-desafio { display: inline-flex; align-items: center; gap: 3px; margin-left: 8px;
+  padding: 2px 8px; border-radius: 999px; background: $roxo-fundo; color: $roxo-escuro;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; vertical-align: middle;
+  mat-icon { font-size: 13px; width: 13px; height: 13px; } }
+
+.dados-base { border: 1px solid rgba($roxo-claro, 0.7); border-radius: 10px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px; grid-column: 1 / -1;
+  legend { padding: 0 4px; }
+  label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: $cinza-escuro; cursor: pointer; }
+  input[type="checkbox"] { accent-color: $roxo-medio; width: 15px; height: 15px; } }

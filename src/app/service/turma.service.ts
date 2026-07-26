@@ -15,15 +15,67 @@ export interface Turma {
   criado_em?: string;
 }
 
+/** Lanes do desafio — espelham as colunas do dashboard (backend: app/desafios/catalogo.py). */
+export type LaneDesafio = 'coleta' | 'pre_processamento' | 'modelo' | 'metrica';
+
+export interface GabaritoMontagem {
+  tarefa: 'classificacao' | 'regressao' | 'agrupamento';
+  exige: LaneDesafio[];
+  dados: { faltantes: boolean; texto: boolean; escalas_diferentes: boolean };
+  regras?: { id: string; peso?: number }[];
+  fixar?: string[];
+  vetar?: string[];
+  dificuldade: 'facil' | 'medio' | 'dificil';
+}
+
 export interface Atividade {
   id: string;
   turma_id: string;
   titulo: string;
   descricao?: string;
+  /** 'pipeline' = completar e executar um pipeline real; 'montagem' = desafio de blocos. */
+  tipo?: 'pipeline' | 'montagem';
   template?: any;
+  /** Só chega para professor/admin — o backend omite para o aluno. */
+  gabarito?: GabaritoMontagem;
   criterio?: { metrica: string; ordem: string };
   prazo?: string | null;
   criado_em?: string;
+}
+
+export interface PecaDesafio {
+  valor: string;
+  nome: string;
+  lane: LaneDesafio;
+}
+
+export interface TabuleiroDesafio {
+  atividade: { id: string; titulo: string; descricao?: string; tipo: 'montagem' };
+  tentativa: number;
+  tentativas: number;
+  melhor_nota: number | null;
+  lanes: LaneDesafio[];
+  pecas: PecaDesafio[];
+}
+
+export interface RegraAvaliada {
+  id: string;
+  titulo: string;
+  ok: boolean;
+  peso: number;
+  texto: string;
+}
+
+export interface ResultadoMontagem {
+  id: string;
+  tentativa: number;
+  nota: number;
+  nota_max: number;
+  pontos: number;
+  pontos_max: number;
+  acertou_tudo: boolean;
+  melhor_nota: number;
+  regras: RegraAvaliada[];
 }
 
 /** Cliente do subsistema de Turmas & Atividades (professor + aluno). */
@@ -74,6 +126,18 @@ export class TurmaService {
   }
   progresso(turmaId: string): Observable<any> {
     return this.http.get<any>(`${this.base}/${turmaId}/progresso`);
+  }
+
+  // ---- desafio de montagem (quebra-cabeça, sem execução)
+  /** Peças embaralhadas da tentativa atual. Não traz gabarito nem o papel das peças. */
+  obterTabuleiro(turmaId: string, atividadeId: string): Observable<TabuleiroDesafio> {
+    return this.http.get<TabuleiroDesafio>(
+      `${this.base}/${turmaId}/atividades/${atividadeId}/tabuleiro`);
+  }
+  submeterMontagem(turmaId: string, atividadeId: string,
+                   montagem: Record<string, string[]>): Observable<ResultadoMontagem> {
+    return this.http.post<ResultadoMontagem>(
+      `${this.base}/${turmaId}/atividades/${atividadeId}/submeter-montagem`, { montagem });
   }
 
   // ---- aluno
