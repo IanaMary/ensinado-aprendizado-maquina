@@ -589,3 +589,55 @@
     }
   }
 }
+
+// Instrução de sistema do chat (aba LLM). O texto vale em toda pergunta, então
+// o editor fica visualmente separado da escolha do modelo.
+.prompt-sistema {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba($roxo-claro, 0.7);
+
+  .selo-prompt {
+    margin-left: auto;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: $roxo-medio;
+    color: $branco;
+    font-size: 11px;
+    font-weight: 700;
+
+    &.padrao { background: $branco; color: $roxo-escuro; border: 1px solid rgba($roxo-claro, 0.9); }
+  }
+
+  .prompt-editor {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid rgba($roxo-claro, 0.9);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    color: $cinza-escuro;
+    resize: vertical;
+
+    &:focus-visible { outline: 2px solid $roxo-medio; outline-offset: 1px; }
+    &:disabled { background: $roxo-fundo; color: $cinza-medio; }
+  }
+
+  .prompt-acoes {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+
+    .prompt-contador {
+      margin-right: auto;
+      font-size: 12px;
+      color: $cinza-medio;
+
+      &.excedeu { color: #C62828; font-weight: 700; }
+    }
+  }
+}

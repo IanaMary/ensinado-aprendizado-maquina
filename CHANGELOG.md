@@ -8,7 +8,17 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
-## 2026-07-26j (criar desafio a partir de um dataset de exemplo) — porte
+## 2026-07-26k (editor da instrução do tutor no conf-tutor) — porte
+
+> Frontend `master` (não implantado; produção roda a `mestrado-iana`). Backend `master` `7d40bed`.
+
+- Editor da **instrução de sistema** do chat na aba LLM do conf-tutor (texto vigente, selo
+  padrão/personalizado, contador, Salvar e Voltar ao padrão).
+- `DashboardService.getSystemPrompt()` / `putSystemPrompt(texto)`.
+- Testes: 153/153 + build de produção.
+
+---
+
 
 > Frontend `master` (não implantado; produção roda a `mestrado-iana`). Backend `master` `a1f6f61`.
 

@@ -1,7 +1,8 @@
 # Documentação do Projeto Iana / H2IA Tutor
 
-Plataforma educacional para ensinar **Machine Learning** de forma interativa, com público-alvo de
-**ensino fundamental e médio**. O aluno monta um pipeline de ML (dados → pré-processamento → modelo →
+Plataforma educacional para ensinar **Aprendizado de Máquina** de forma interativa. O público-alvo
+são os estudantes da **ONIA** (Olimpíada Nacional de Inteligência Artificial), que vão do **8º ano do
+Ensino Fundamental ao primeiro ano do Ensino Superior**. O aluno monta um pipeline de ML (dados → pré-processamento → modelo →
 métricas), treina modelos de verdade (scikit-learn no servidor), vê as métricas e visualizações, e conta
 com um tutor (cards didáticos + chatbot com LLM) durante todo o caminho.
 
