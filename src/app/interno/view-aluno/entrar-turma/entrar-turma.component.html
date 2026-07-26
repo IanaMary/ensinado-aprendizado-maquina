@@ -2,8 +2,8 @@
   <div class="et-header">
     <button class="btn-voltar" (click)="voltar()"><mat-icon>arrow_back</mat-icon></button>
     <div class="header-info">
-      <h2>Minhas turmas</h2>
-      <p>Entre em uma turma com o código do professor e faça as atividades.</p>
+      <h2>Turmas e desafios</h2>
+      <p>Entre em uma turma com o código do professor e faça as atividades e os desafios.</p>
     </div>
     <app-user-menu></app-user-menu>
   </div>
@@ -45,10 +45,18 @@
             </span>
           </strong>
           <span *ngIf="a.descricao">{{ a.descricao }}</span>
+          <span class="ativ-historico" *ngIf="a.tipo === 'montagem' && historicoDesafio[a.id]">
+            <ng-container *ngIf="historicoDesafio[a.id].tentativas; else naoTentado">
+              {{ historicoDesafio[a.id].tentativas }}
+              tentativa{{ historicoDesafio[a.id].tentativas > 1 ? 's' : '' }} ·
+              melhor nota {{ historicoDesafio[a.id].melhor_nota }}
+            </ng-container>
+            <ng-template #naoTentado>Você ainda não tentou este desafio.</ng-template>
+          </span>
         </div>
         <button class="btn-primario" (click)="fazerAtividade(t, a)">
           <mat-icon>{{ a.tipo === 'montagem' ? 'extension' : 'play_arrow' }}</mat-icon>
-          {{ a.tipo === 'montagem' ? 'Montar' : 'Fazer' }}
+          {{ a.tipo === 'montagem' ? (historicoDesafio[a.id]?.tentativas ? 'Tentar de novo' : 'Montar') : 'Fazer' }}
         </button>
       </li>
       <li *ngIf="!atividadesPorTurma[t.id]?.length" class="vazio">Nenhuma atividade nesta turma ainda.</li>

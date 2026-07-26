@@ -7,6 +7,7 @@ import { of, Subject } from 'rxjs';
 import { ExecucoesComponent } from './execucoes.component';
 import { AuthService } from '../../service/auth/auth.service';
 import { DashboardService } from '../services/dashboard.service';
+import { TurmaService } from '../../service/turma.service';
 
 describe('ExecucoesComponent', () => {
   let component: ExecucoesComponent;
@@ -15,6 +16,7 @@ describe('ExecucoesComponent', () => {
   let router: jasmine.SpyObj<Router>;
   let itensSubject: Subject<any[]>;
   let dashboardStub: any;
+  let turmaStub: any;
 
   beforeEach(async () => {
     authService = jasmine.createSpyObj('AuthService', ['getUsuarioRole', 'logout']);
@@ -34,6 +36,14 @@ describe('ExecucoesComponent', () => {
       limparItensExecucao: jasmine.createSpy('limparItensExecucao'),
     };
 
+    turmaStub = {
+      // Um desafio já tentado e um pendente: só o pendente deve virar aviso.
+      meusDesafios: jasmine.createSpy('meusDesafios').and.returnValue(of([
+        { atividade_id: 'a1', titulo: 'Feito', turma_id: 't1', tentativas: 2, melhor_nota: 9.4 },
+        { atividade_id: 'a2', titulo: 'Pendente', turma_id: 't1', tentativas: 0, melhor_nota: null },
+      ])),
+    };
+
     await TestBed.configureTestingModule({
       declarations: [ExecucoesComponent],
       imports: [HttpClientTestingModule],
@@ -43,6 +53,7 @@ describe('ExecucoesComponent', () => {
         { provide: MatDialog, useValue: { open: jasmine.createSpy('open'), closeAll: jasmine.createSpy('closeAll') } },
         { provide: AuthService, useValue: authService },
         { provide: DashboardService, useValue: dashboardStub },
+        { provide: TurmaService, useValue: turmaStub },
       ],
     })
     .overrideComponent(ExecucoesComponent, { set: { template: '' } })
@@ -79,6 +90,27 @@ describe('ExecucoesComponent', () => {
 
   // O menu do usuário agora é o componente compartilhado <app-user-menu>
   // (coberto por user-menu.component.spec); os testes do menu inline saíram daqui.
+
+  it('avisa apenas dos desafios que o aluno ainda não tentou', () => {
+    expect(turmaStub.meusDesafios).toHaveBeenCalled();
+    expect(component.desafiosPendentes.length).toBe(1);
+    expect(component.desafiosPendentes[0].titulo).toBe('Pendente');
+  });
+
+  it('abre direto o desafio quando há apenas um pendente', () => {
+    component.abrirDesafios();
+    expect(router.navigate).toHaveBeenCalledWith(['/desafio'],
+      { queryParams: { atividade: 'a2', turma: 't1' } });
+  });
+
+  it('com vários desafios pendentes, leva à lista de turmas', () => {
+    component.desafiosPendentes = [
+      { atividade_id: 'a2', titulo: 'P1', turma_id: 't1', tentativas: 0, melhor_nota: null },
+      { atividade_id: 'a3', titulo: 'P2', turma_id: 't1', tentativas: 0, melhor_nota: null },
+    ] as any;
+    component.abrirDesafios();
+    expect(router.navigate).toHaveBeenCalledWith(['/view-aluno/entrar']);
+  });
 
   it('should summarize collection settings for a loaded file dataset', () => {
     component.resultadoColetaDado = {

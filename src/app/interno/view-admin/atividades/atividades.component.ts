@@ -48,9 +48,11 @@ export class AtividadesComponent implements OnInit, OnDestroy {
 
   // Tela compartilhada admin/professor: o voltar da topbar vai à home do papel.
   voltarPara = '/view-admin';
+  private papel = '';
 
   constructor(private atividade: AtividadeService, private dashboard: DashboardService, auth: AuthService) {
-    this.voltarPara = roleMap[auth.getUsuarioRole()] || '/view-admin';
+    this.papel = auth.getUsuarioRole();
+    this.voltarPara = roleMap[this.papel] || '/view-admin';
   }
 
   ngOnInit(): void {
@@ -65,7 +67,11 @@ export class AtividadesComponent implements OnInit, OnDestroy {
   }
 
   private carregarUsuarios(): void {
-    // Conveniência para o seletor; falha silenciosa (ex.: papel sem acesso à lista).
+    // Só o admin pode listar usuários (GET /usuario/ é admin-only). Chamar como professor
+    // devolvia 403 e os interceptors globais mostravam "Acesso negado" ao simplesmente abrir
+    // a tela. O seletor é conveniência: sem a lista, o professor filtra por usuário clicando
+    // na linha (verJornada) e a tabela segue mostrando nome/e-mail (vêm da telemetria).
+    if (this.papel !== 'admin') { this.usuarios = []; return; }
     this.dashboard.listarUsuarios().subscribe({
       next: (us) => {
         this.usuarios = (us || []).map((u: any) => ({ id: u.id, nome: u.nome, email: u.email }));

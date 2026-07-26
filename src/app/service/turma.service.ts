@@ -57,6 +57,17 @@ export interface TabuleiroDesafio {
   pecas: PecaDesafio[];
 }
 
+/** Desafio de montagem visto pelo aluno, de qualquer turma dele, com o histórico dele. */
+export interface DesafioDoAluno {
+  atividade_id: string;
+  titulo: string;
+  descricao?: string;
+  turma_id: string;
+  turma_nome?: string;
+  tentativas: number;
+  melhor_nota: number | null;
+}
+
 export interface RegraAvaliada {
   id: string;
   titulo: string;
@@ -145,6 +156,10 @@ export class TurmaService {
   }
   minhasTurmas(): Observable<Turma[]> {
     return this.http.get<Turma[]>(`${this.base}/minhas`);
+  }
+  /** Desafios de todas as turmas do aluno numa chamada (o dashboard não pode fazer 1+N). */
+  meusDesafios(): Observable<DesafioDoAluno[]> {
+    return this.http.get<DesafioDoAluno[]>(`${this.base}/minhas/desafios`);
   }
 
   // ---- chat do aluno (professor)
