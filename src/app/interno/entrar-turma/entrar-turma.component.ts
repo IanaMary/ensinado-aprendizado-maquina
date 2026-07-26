@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TurmaService, Turma, Atividade } from '../../service/turma.service';
+import { TurmaService, Turma, Atividade, DesafioDoAluno } from '../../service/turma.service';
 
 @Component({
   selector: 'app-entrar-turma',
@@ -16,6 +16,8 @@ export class EntrarTurmaComponent implements OnInit {
   confirmarCodigo = false;
   turmas: Turma[] = [];
   atividadesPorTurma: Record<string, Atividade[]> = {};
+  /** Histórico do aluno por desafio (tentativas e melhor nota), indexado por atividade. */
+  historicoDesafio: Record<string, DesafioDoAluno> = {};
   carregando = true;
 
   constructor(
@@ -62,11 +64,21 @@ export class EntrarTurmaComponent implements OnInit {
       next: (ts) => {
         this.turmas = ts || []; this.carregando = false;
         this.turmas.forEach(t => this.turmaService.listarAtividades(t.id).subscribe({
-          next: (a) => this.atividadesPorTurma[t.id] = a || [],
+          // Desafio primeiro: é o que o aluno vem fazer quando o professor manda um.
+          next: (a) => this.atividadesPorTurma[t.id] = this.desafiosPrimeiro(a || []),
         }));
       },
       error: () => { this.carregando = false; },
     });
+    // Tentativas e melhor nota de cada desafio, numa chamada só.
+    this.turmaService.meusDesafios().subscribe({
+      next: (ds) => (ds || []).forEach(d => this.historicoDesafio[d.atividade_id] = d),
+      error: () => { this.historicoDesafio = {}; },
+    });
+  }
+
+  private desafiosPrimeiro(as: Atividade[]): Atividade[] {
+    return [...as].sort((x, y) => Number(y.tipo === 'montagem') - Number(x.tipo === 'montagem'));
   }
 
   fazerAtividade(t: Turma, a: Atividade): void {

@@ -35,6 +35,9 @@
        border: 1px solid rgba($roxo-claro, 0.6); border-radius: 10px;
        .ativ-info { min-width: 0; strong { display: block; color: $cinza-escuro; } span { display: block; font-size: 12px; color: $cinza-medio; } } } }
 
+// Histórico do aluno no desafio (tentativas / melhor nota).
+.ativ-historico { color: $roxo-escuro !important; font-weight: 600; }
+
 // Selo do desafio de montagem (fica dentro do <strong> do título, então volta a inline).
 .selo-desafio { display: inline-flex !important; align-items: center; gap: 3px; margin-left: 8px;
   padding: 2px 8px; border-radius: 999px; background: $roxo-fundo; color: $roxo-escuro !important;

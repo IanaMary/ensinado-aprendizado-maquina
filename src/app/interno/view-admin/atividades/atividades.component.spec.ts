@@ -13,7 +13,25 @@ describe('AtividadesComponent', () => {
   let svc: jasmine.SpyObj<AtividadeService>;
   let dash: jasmine.SpyObj<DashboardService>;
 
+  /** Monta o componente com o papel informado (o construtor lê o papel da sessão). */
+  async function montar(papel: string): Promise<void> {
+    sessionStorage.setItem('role', papel);
+    TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      schemas: [NO_ERRORS_SCHEMA],
+      declarations: [AtividadesComponent],
+      imports: [CommonModule, FormsModule],
+      providers: [
+        { provide: AtividadeService, useValue: svc },
+        { provide: DashboardService, useValue: dash },
+      ],
+    }).compileComponents();
+    fixture = TestBed.createComponent(AtividadesComponent);
+    comp = fixture.componentInstance;
+  }
+
   beforeEach(async () => {
+    sessionStorage.removeItem('role');
     svc = jasmine.createSpyObj('AtividadeService', ['listar', 'resumo', 'tempoPreso']);
     svc.listar.and.returnValue(of({ total: 0, itens: [] }));
     svc.resumo.and.returnValue(
@@ -46,6 +64,22 @@ describe('AtividadesComponent', () => {
     comp.aplicarFiltros();
     const filtros = svc.listar.calls.mostRecent().args[0] as any;
     expect(filtros.data_inicio).toMatch(/Z$/);
+  });
+
+  it('não lista usuários quando o papel é professor (GET /usuario/ é admin-only → 403)', async () => {
+    await montar('professor');
+    comp.ngOnInit();
+    expect(dash.listarUsuarios).not.toHaveBeenCalled();
+    expect(comp.usuarios).toEqual([]);
+    expect(svc.listar).toHaveBeenCalled();   // o resto da tela segue funcionando
+  });
+
+  it('lista usuários quando o papel é admin', async () => {
+    dash.listarUsuarios.and.returnValue(of([{ id: '1', nome: 'Ana', email: 'a@x.com' }]));
+    await montar('admin');
+    comp.ngOnInit();
+    expect(dash.listarUsuarios).toHaveBeenCalled();
+    expect(comp.usuarios.length).toBe(1);
   });
 
   it('paginação respeita os limites', () => {

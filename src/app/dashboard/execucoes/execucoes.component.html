@@ -10,6 +10,24 @@
     </div>
   </div>
 
+  <!-- Desafios de montagem ainda não tentados: o aluno descobre sem procurar turma por turma -->
+  <div class="atividade-banner" *ngIf="desafiosPendentes.length">
+    <mat-icon>extension</mat-icon>
+    <span *ngIf="desafiosPendentes.length === 1">
+      Você tem um <strong>desafio de montagem</strong> para fazer:
+      <strong>{{ desafiosPendentes[0].titulo }}</strong>
+      <ng-container *ngIf="desafiosPendentes[0].turma_nome"> ({{ desafiosPendentes[0].turma_nome }})</ng-container>.
+      Nele você monta o pipeline como um quebra-cabeça e recebe uma nota com o retorno de cada ponto.
+    </span>
+    <span *ngIf="desafiosPendentes.length > 1">
+      Você tem <strong>{{ desafiosPendentes.length }} desafios de montagem</strong> para fazer
+      nas suas turmas — monte o pipeline como um quebra-cabeça e receba a nota com o retorno.
+    </span>
+    <button class="banner-acao" (click)="abrirDesafios()">
+      <mat-icon>extension</mat-icon> {{ desafiosPendentes.length === 1 ? 'Fazer o desafio' : 'Ver desafios' }}
+    </button>
+  </div>
+
   <!-- Columns -->
   <div class="execucoes-columns">
     <!-- Coleta -->

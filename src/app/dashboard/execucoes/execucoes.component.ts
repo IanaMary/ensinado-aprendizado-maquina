@@ -14,22 +14,19 @@ import { NomearPipelineDialogComponent, NomearPipelineDialogData, NomearPipeline
 import { AuthService } from '../../service/auth/auth.service';
 import { AtividadeService } from '../../service/atividade/atividade.service';
 import { NotificacaoService } from '../../service/notificacao.service';
+import { TurmaService, DesafioDoAluno } from '../../service/turma.service';
 
 const TIPOS_ARQUIVO_DADOS = ['csv', 'tsv', 'json', 'excel', 'xlxs'];
 
-// Boas-vindas padrão do tutor (estado inicial do drawer). É substituído pelo
-// conteúdo do pipe 'inicio' (db.tutor), editável pelo admin em conf-tutor.
+// Fallback das boas-vindas do tutor, para quando o servidor não responde.
+// A FONTE é o backend: pipe 'inicio' (db.tutor), semeado de
+// app/conteudo/kb_tutor_inicio.py e editável pelo admin em conf-tutor → Início.
+// Mantenha isto curto de propósito: duas cópias longas divergem.
 const TUTOR_BOAS_VINDAS = [
-  '<h4>Bem-vindo(a) à área de trabalho!</h4>',
-  '<p>Aqui você monta um <b>pipeline de Aprendizado de Máquina</b> completo, passo a passo.</p>',
-  '<p><b>Por onde começar:</b></p>',
-  '<ul>',
-  '<li><b>1. Coleta:</b> clique no item da lane Coleta para carregar seus dados (arquivo, URL ou dataset de exemplo).</li>',
-  '<li><b>2. Pré-processamento:</b> prepare os dados (escala, categorias, valores faltantes) — opcional.</li>',
-  '<li><b>3. Treinamento:</b> arraste um modelo para a lane e treine.</li>',
-  '<li><b>4. Métricas:</b> escolha as métricas e veja como o modelo se saiu.</li>',
-  '</ul>',
-  '<p>Em cada item, o ícone <b>ⓘ</b> abre a explicação aqui no tutor. E se ficar com dúvida, é só perguntar no chat abaixo. 😊</p>',
+  '<h4>Olá! Eu sou o seu tutor. 👋</h4>',
+  '<p>Monte o pipeline pelas colunas, na ordem: <b>Coleta</b> → <b>Pré-processamento</b> → ',
+  '<b>Treinamento</b> → <b>Métricas</b>. O ícone <b>ⓘ</b> de cada item abre a explicação aqui, ',
+  'e o <b>chat</b> abaixo responde dúvidas sobre o seu pipeline. 😊</p>',
 ].join('');
 
 @Component({
@@ -58,6 +55,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   chatSugestoes: string[] = [];
   paramsTutor = '';
   etapaAtual = '';
+  /** Desafios de montagem ainda não tentados (aviso no topo da área de trabalho). */
+  desafiosPendentes: DesafioDoAluno[] = [];
   roleUsuario = '';
 
   itens: ItemPipeline[] = [];
@@ -90,13 +89,15 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService: AuthService,
     private atividade: AtividadeService,
-    private notificacao: NotificacaoService
+    private notificacao: NotificacaoService,
+    private turmaService: TurmaService
   ) { }
 
   ngOnInit(): void {
     this.roleUsuario = this.authService.getUsuarioRole();
 
     this.getTutor('inicio');
+    this.carregarDesafiosPendentes();
     this.dashboardService.getItemsEmExecucao().pipe(takeUntil(this.destroy$)).subscribe(itens => {
       this.itens = [...itens];
       this.colunaColeta = itens.filter(i => i.tipoItem === 'coleta-dado');
@@ -143,6 +144,28 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
         this.carregarPipeline(params['pipeline']);
       }
     });
+  }
+
+
+  /** Desafios de montagem que o aluno ainda não tentou, para o aviso do topo.
+   *  Uma chamada só (o endpoint agrega as turmas) e falha silenciosa: quem não é aluno de
+   *  turma nenhuma simplesmente não vê o aviso. */
+  private carregarDesafiosPendentes(): void {
+    this.turmaService.meusDesafios().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (ds) => { this.desafiosPendentes = (ds || []).filter(d => !d.tentativas); },
+      error: () => { this.desafiosPendentes = []; },
+    });
+  }
+
+  /** Um desafio pendente abre direto; vários, a lista de turmas (o aluno escolhe). */
+  abrirDesafios(): void {
+    const unico = this.desafiosPendentes.length === 1 ? this.desafiosPendentes[0] : null;
+    if (unico) {
+      this.router.navigate(['/desafio'],
+        { queryParams: { atividade: unico.atividade_id, turma: unico.turma_id } });
+      return;
+    }
+    this.router.navigate(['/entrar']);
   }
 
   getTituloColeta(item: ItemPipeline): string {
