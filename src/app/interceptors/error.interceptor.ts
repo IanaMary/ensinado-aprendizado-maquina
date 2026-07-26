@@ -27,7 +27,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           if (error.status === 401) {
             errorMessage = 'Sessão expirada ou não autorizada. Faça login novamente.';
           } else if (error.status === 403) {
-            errorMessage = 'Acesso negado.';
+            errorMessage = 'Você não tem permissão para esta ação.';
           } else if (error.error && error.error.detail) {
              if (typeof error.error.detail === 'string') {
                  errorMessage = error.error.detail;

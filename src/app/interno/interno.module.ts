@@ -1,12 +1,11 @@
 import { NgModule } from '@angular/core';
 import { InternoRoutingModule } from './interno-routing.module';
-import { InternoComponent } from './interno.component';
 import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
-  declarations: [
-    InternoComponent,
-  ],
+  // Sem componentes próprios: este módulo só agrupa as rotas internas (o layout de cada
+  // tela é do próprio componente de rota).
+  declarations: [],
   imports: [
     InternoRoutingModule,
     SharedModule

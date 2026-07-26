@@ -169,6 +169,8 @@
     <!-- Conteúdo educacional (em cima): rola quando estoura a tela -->
     <div class="tutor-conteudo">
       <app-tutor *ngIf="tutorItemInfo || tutorPipelineInfo || tutor"
+        [permitirInicio]="true"
+        (voltarInicio)="voltarAoInicioDoTutor()"
         [tutorGeral]="tutor"
         [modeloSelecionado]="modeloSelecionado"
         [metricaSelecionada]="metricasSelecionadas[0]"
