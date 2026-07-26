@@ -18,6 +18,8 @@ const OPERACOES_LABEL: Record<string, string> = {
   atualizar_modelos: 'Atualização de modelos',
   atualizar_chaves_fixas: 'Atualização de chaves',
   atualizar_por_pipe: 'Atualização de texto',
+  editou: 'Edição da instrução do tutor',
+  restaurou_padrao: 'Instrução do tutor restaurada ao padrão',
 };
 
 @Component({
@@ -45,6 +47,14 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   modeloLLMAtual = '';
   carregandoModelos = false;
   salvandoModelo = false;
+
+  // Instrução de sistema do chat (o banco prevalece; o versionado é o padrão)
+  promptTexto = '';
+  promptPadrao = '';
+  promptPersonalizado = false;
+  promptLimite = 6000;
+  carregandoPrompt = false;
+  salvandoPrompt = false;
 
   // Health-check dos modelos (testado em segundo plano no backend)
   saudeModelos: Record<string, { responde: boolean; latencia_ms?: number; erro?: string }> = {};
@@ -87,6 +97,9 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     this.pipeAtual = TAB_PIPES[idx] || TAB_PIPES[0];
     this.carregarHistorico(this.pipeAtual);
 
+    if (this.pipeAtual === 'llm' && !this.promptTexto) {
+      this.carregarPrompt();
+    }
     if (this.pipeAtual === 'llm' && !this.modelosLLM.length) {
       this.carregarModelosLLM();
     }
@@ -144,6 +157,62 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
         this.historico = [];
         this.carregandoHistorico = false;
       }
+    });
+  }
+
+  // === Instrução de sistema do chat ===
+
+  carregarPrompt(): void {
+    this.carregandoPrompt = true;
+    this.dashboardService.getSystemPrompt().subscribe({
+      next: (res: any) => {
+        this.promptTexto = res?.texto || '';
+        this.promptPadrao = res?.padrao || '';
+        this.promptPersonalizado = !!res?.personalizado;
+        this.promptLimite = res?.limite || this.promptLimite;
+        this.carregandoPrompt = false;
+      },
+      error: (err: any) => {
+        this.notificacao.erro(err?.error?.detail || 'Erro ao carregar a instrução do tutor.');
+        this.carregandoPrompt = false;
+      },
+    });
+  }
+
+  salvarPrompt(): void {
+    const texto = this.promptTexto.trim();
+    if (!texto || texto.length > this.promptLimite) return;
+    this.salvandoPrompt = true;
+    this.dashboardService.putSystemPrompt(texto).subscribe({
+      next: (res: any) => {
+        this.promptTexto = res?.texto || texto;
+        this.promptPersonalizado = !!res?.personalizado;
+        this.salvandoPrompt = false;
+        this.notificacao.sucesso('Instrução do tutor salva. Vale já na próxima pergunta.');
+        this.carregarHistorico(this.pipeAtual);
+      },
+      error: (err: any) => {
+        this.notificacao.erro(err?.error?.detail || 'Erro ao salvar a instrução do tutor.');
+        this.salvandoPrompt = false;
+      },
+    });
+  }
+
+  /** Texto vazio no PUT = sem personalização: o backend volta a usar o versionado. */
+  restaurarPromptPadrao(): void {
+    this.salvandoPrompt = true;
+    this.dashboardService.putSystemPrompt('').subscribe({
+      next: (res: any) => {
+        this.promptTexto = res?.texto || this.promptPadrao;
+        this.promptPersonalizado = false;
+        this.salvandoPrompt = false;
+        this.notificacao.sucesso('Instrução do tutor de volta ao padrão do sistema.');
+        this.carregarHistorico(this.pipeAtual);
+      },
+      error: (err: any) => {
+        this.notificacao.erro(err?.error?.detail || 'Erro ao restaurar a instrução do tutor.');
+        this.salvandoPrompt = false;
+      },
     });
   }
 

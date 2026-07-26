@@ -142,6 +142,37 @@
             <mat-icon>info</mat-icon>
             <span>Modelo ativo: <strong>{{ modeloLLMAtual }}</strong></span>
           </div>
+
+          <!-- Instrução de sistema: vai em TODA pergunta, antes do contexto do pipeline -->
+          <div class="prompt-sistema">
+            <div class="cabecalho-llm">
+              <mat-icon>psychology</mat-icon>
+              <h3>Instrução do tutor (prompt de sistema)</h3>
+              <span class="selo-prompt" *ngIf="promptPersonalizado">personalizado</span>
+              <span class="selo-prompt padrao" *ngIf="!promptPersonalizado">padrão do sistema</span>
+            </div>
+            <p class="desc-llm">
+              Este texto é enviado ao modelo em <strong>toda</strong> pergunta, antes do contexto do
+              pipeline e da base de conhecimento. Define quem é o público, o tom e o que o tutor
+              deve recusar.
+            </p>
+            <textarea class="prompt-editor" rows="12" [(ngModel)]="promptTexto"
+                      [disabled]="carregandoPrompt || salvandoPrompt"
+                      aria-label="Instrução de sistema do tutor"></textarea>
+            <div class="prompt-acoes">
+              <span class="prompt-contador" [class.excedeu]="promptTexto.length > promptLimite">
+                {{ promptTexto.length }} / {{ promptLimite }} caracteres
+              </span>
+              <button class="btn-secundario" type="button" (click)="restaurarPromptPadrao()"
+                      [disabled]="salvandoPrompt || (!promptPersonalizado && promptTexto === promptPadrao)">
+                <mat-icon>restart_alt</mat-icon> Voltar ao padrão
+              </button>
+              <button class="btn-primario" type="button" (click)="salvarPrompt()"
+                      [disabled]="salvandoPrompt || !promptTexto.trim() || promptTexto.length > promptLimite">
+                <mat-icon>save</mat-icon> Salvar instrução
+              </button>
+            </div>
+          </div>
         </div>
       </mat-tab>
     </mat-tab-group>

@@ -8,6 +8,24 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26k (editor da instrução do tutor no conf-tutor)
+
+> Frontend `mestrado-iana` **`<pendente>`** (bundle `main-E6W5LFEI.js`) / Backend `master` `7d40bed`.
+
+### Adicionado
+- **Editor da instrução de sistema** do chat na aba **LLM** do conf-tutor, abaixo da escolha do
+  modelo: textarea com o texto vigente, selo "padrão do sistema"/"personalizado", contador com o
+  teto de 6000 caracteres, **Salvar** e **Voltar ao padrão**. A edição aparece no histórico da
+  própria aba.
+- `DashboardService.getSystemPrompt()` / `putSystemPrompt(texto)`.
+
+### Notas
+- O texto é enviado ao modelo em toda pergunta, antes do contexto do pipeline e da base de
+  conhecimento — a tela diz isso, para o admin saber o que está mexendo.
+- Testes: 162/162 + build de produção.
+
+---
+
 ## 2026-07-26j (criar desafio a partir de um dataset de exemplo)
 
 > Frontend `mestrado-iana` **`<pendente>`** (bundle `main-A75CCYTF.js`) / Backend `master` `a1f6f61`.

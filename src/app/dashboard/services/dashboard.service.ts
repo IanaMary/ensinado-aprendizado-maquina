@@ -248,6 +248,20 @@ export class DashboardService {
   }
 
   // Configuração do modelo LLM
+  /** Instrução de sistema do chat do tutor: texto vigente, padrão versionado e limite. */
+  getSystemPrompt() {
+    return this.http.get<{ texto: string; padrao: string; personalizado: boolean; limite: number }>(
+      `${this.url}${this.endpointTutor}/system-prompt`
+    );
+  }
+
+  /** Grava a instrução (admin). Texto vazio remove a personalização e volta ao versionado. */
+  putSystemPrompt(texto: string) {
+    return this.http.put<{ texto: string; personalizado: boolean }>(
+      `${this.url}${this.endpointTutor}/system-prompt`, { texto }
+    );
+  }
+
   listarModelosLLM() {
     return this.http.get<{ modelos: { id: string; owned_by: string }[]; modelo_atual: string }>(
       `${this.url}${this.endpointTutor}/modelos`
