@@ -8,6 +8,30 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26i (voltar às boas-vindas, um toast por erro, código morto removido)
+
+> Frontend `mestrado-iana` **`fb784c8`** (bundle `main-JE2Q5PDD.js`). Backend inalterado.
+
+### Corrigido
+- **As boas-vindas do tutor não voltavam.** O primeiro clique num item as escondia para sempre
+  (`tutorGeral` exige `!contexto && !tutorItemInfo`, e nada revertia esses estados — selecionar
+  um modelo já bastava). Novo botão **"Voltar ao início"** no painel: o componente limpa o
+  `contexto` que ele mesmo constrói e o pai limpa item/pipeline/sugestões e recarrega o pipe
+  `inicio` (zerando a guarda de dedupe do `getTutor`).
+- **Dois toasts para o mesmo erro.** `AuthInterceptor` e `ErrorInterceptor` avisavam o mesmo
+  403 com textos diferentes. O aviso ficou só no `ErrorInterceptor` (com a mensagem melhor);
+  o `AuthInterceptor` cuida apenas do logout no 401. Novo `error.interceptor.spec.ts`.
+
+### Removido
+- `ShellComponent` (barra lateral) e `BreadcrumbComponent`: **código morto** — só o
+  `InternoComponent` os renderizava e ele nunca foi roteado. `InternoComponent` saiu junto.
+  Os `data: { breadcrumb }` das rotas ficaram sem consumidor (mantidos).
+
+### Notas
+- Testes 156/156; bundle 571,17 kB (−0,83 kB).
+
+---
+
 ## 2026-07-26h (aviso de desafio + boas-vindas do tutor + contas da banca)
 
 > Frontend `mestrado-iana` **`ac512ff`** (bundle `main-5ZEHBTUF.js`) / Backend `master` `c3faae2`.
