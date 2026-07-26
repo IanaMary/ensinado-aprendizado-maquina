@@ -8,6 +8,38 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26 (desafio de montagem de pipeline — Fase 1)
+
+> Frontend `mestrado-iana` `a440695` (bundle **`main-GT47M2MG.js`**), portado p/ `master`
+> `fdb1c46`. Backend `master` **`e6e90a5`**. Backup `/home/ubuntu/backups/deploy-20260726-044207`.
+
+### Adicionado
+- **Desafio de montagem (quebra-cabeça avaliado, sem executar nada).** O professor cria uma
+  atividade de tipo **montagem** na turma (tarefa, dificuldade e como é a base descrita no
+  enunciado); o aluno recebe as peças embaralhadas — úteis + **distratoras** — e monta nas
+  mesmas 4 lanes do dashboard. A correção é uma **rubrica de regras com peso** (não um
+  gabarito de sequência única, porque vários pipelines resolvem o mesmo problema) e cada
+  regra violada devolve um texto didático, que é o material que o tutor vai reusar.
+- Tela nova `interno/desafio/` (standalone, rota lazy `desafio`): bandeja de peças, clique
+  ou arrasto para as lanes, aviso local de peça na lane errada, resultado com nota 0–10,
+  "o que revisar" e "o que já está certo", e **"Tentar de novo" com peças novas**.
+- `turma-detalhe`: seletor de tipo (pipeline real × desafio), campos do desafio e ranking
+  com **nota + tentativas**; `entrar-turma` abre o desafio na tela própria (selo "Desafio").
+- `src/styles/_lanes.scss`: cores por etapa + esqueleto das lanes/cards, antes presos no
+  `execucoes.component.scss`. O dashboard clássico **não** foi reescrito (tela mais carregada
+  da produção, sem teste de UI) — o parcial é a fonte para telas novas.
+
+### Notas
+- As regras derivam do **catálogo** (`db.modelos`/`db.metricas`/`db.pre_processamento`), então
+  um item novo cadastrado pelo admin já participa dos desafios sem mudança de código.
+- Verificado ponta a ponta contra backend real (Mongo em Docker): montagem errada → 0/10 com
+  6 explicações, re-sorteio a cada tentativa, criação pelo professor e ranking. 123/123 na
+  `mestrado-iana`, 114/114 na `master`.
+- **Próximas fases (não implantadas):** F2 pontuação relativa de qualidade do pipeline real
+  (chute burro + evolução na mesma base) e F3 perfil do aluno + narrativa para o professor.
+
+---
+
 ## 2026-07-25 (logo do Hub em tamanho legível no convite e no cadastro)
 
 > Só frontend (`mestrado-iana` `25a189b`, portado p/ `master` `7668235`; bundle
