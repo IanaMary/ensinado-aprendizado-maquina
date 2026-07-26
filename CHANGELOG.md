@@ -8,6 +8,35 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26f (aviso quando não dá para estratificar + bateria de testes da divisão)
+
+> Frontend `mestrado-iana` `3cec11c` (bundle **`main-PTQJ6V2W.js`**), portado p/ `master`
+> `94970d7`. Backend `master` **`bf91612`**. Backup `/home/ubuntu/backups/deploy-20260726-115357`.
+
+### Adicionado
+- No caso estranho (categoria com um único exemplo), a caixa "Separar treino/teste com
+  estratificação" **desmarca sozinha** e o aluno recebe a explicação. O alerta ficou em
+  `preencherDados`, por onde passam as respostas de **todas** as portas de entrada (CSV,
+  XLSX, URL e redivisão) — antes só a redivisão avisava.
+- Backend devolve `stratify` **efetivo** + `aviso_estratificacao` nas quatro portas.
+
+### Corrigido
+- **URL:** o pedido de estratificação era ignorado em silêncio e a config ainda gravava
+  `stratify: true` — mentia sobre o que fez. Agora usa o mesmo divisor e grava o efetivo.
+
+### Testes
+- `tests/test_divisao_treino_teste.py` (16 novos), em três níveis: **unidade** de
+  `dividir_dataframe` (disjunção, proporções, fallback, override, erro claro);
+  **regressão do vazamento** dos datasets de exemplo (treino+teste = total, nenhuma linha de
+  teste no treino, proporções preservadas, `content_completo_base64` gravado);
+  **integração** da redivisão (redividir 2× não encolhe o dataset, aviso e valor efetivo
+  chegam ao cliente, regressão não estratifica, escolha do aluno prevalece).
+- Backend **441 passed, 1 skipped**; frontend 147/147 (`mestrado-iana`) e 138/138 (`master`).
+- Verificado no navegador com CSV de 7 linhas (6 "gato", 1 "raro"): caixa desmarcou e o aviso
+  apareceu; com base saudável (4/4), estratificou e o teste saiu 2 de cada categoria.
+
+---
+
 ## 2026-07-26e (estratificação por padrão em classificação + fim do vazamento nos datasets de exemplo)
 
 > Frontend `mestrado-iana` `de8301b` (bundle **`main-OP3WGDPI.js`**), portado p/ `master`
