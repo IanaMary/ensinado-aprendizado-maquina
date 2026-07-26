@@ -497,3 +497,67 @@
     font-size: 12px;
   }
 }
+// Evolução do aluno nesta base — leitura sempre relativa (chute burro + tentativa anterior).
+.evolucao-base {
+  border: 1px solid rgba($roxo-claro, 0.8);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  background: $branco;
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: $roxo-escuro;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+    small { font-weight: 500; color: $cinza-medio; }
+  }
+
+  .evolucao-linhas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .evolucao-item {
+    flex: 1 1 140px;
+    border: 1px solid rgba($roxo-claro, 0.7);
+    border-radius: 10px;
+    padding: 8px 10px;
+
+    .rotulo { display: block; font-size: 11px; color: $cinza-medio; }
+    .valor { font-size: 18px; font-weight: 700; color: $cinza-escuro; }
+
+    &.destaque { border-color: $roxo-medio; background: $roxo-fundo;
+      .valor { color: $roxo-escuro; } }
+  }
+
+  .evolucao-frase {
+    margin: 0;
+    font-size: 13px;
+    color: $cinza-escuro;
+    line-height: 1.5;
+
+    .subiu { color: #1B5E20; }
+    .desceu { color: $erro; }
+  }
+
+  .evolucao-historico {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    border-top: 1px dashed rgba($roxo-claro, 0.9);
+    padding-top: 8px;
+
+    li { display: flex; gap: 10px; align-items: baseline; font-size: 12px; padding: 2px 0; }
+    .hist-data { color: $cinza-medio; min-width: 44px; }
+    .hist-valor { font-weight: 700; color: $cinza-escuro; min-width: 56px; }
+    .hist-mudanca { color: $cinza-medio; font-style: italic; }
+  }
+}

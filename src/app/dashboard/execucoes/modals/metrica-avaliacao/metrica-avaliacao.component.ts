@@ -5,6 +5,7 @@ import { DashboardService } from '../../../services/dashboard.service';
 import { ScriptGeneratorService } from '../../../../service/script-generator.service';
 import { ItemPipeline, MediaMetrica, nomeMetricas, ResultadoColetaDado } from '../../../../models/item-coleta-dado.model';
 import { RelatorioPdfService } from '../../../../service/relatorio-pdf.service';
+import { EvolucaoBase, PipelineService } from '../../../../service/pipeline.service';
 
 @Component({
   selector: 'app-metrica-avaliacao',
@@ -36,13 +37,18 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
 
   tooltipInfo: { linha: number; coluna: number; valor: number; tipo: string; classeReal: string; classePredita: string } | null = null;
 
+  /** Histórico do aluno NESTA base (só as tentativas já salvas). */
+  evolucaoBase: EvolucaoBase | null = null;
+  private baseCarregada = '';
+
   private mapaLabel = new Map<string, string>();
 
   constructor(
     private dashboardService: DashboardService,
     private scriptGenerator: ScriptGeneratorService,
     private snackBar: MatSnackBar,
-    private relatorioPdf: RelatorioPdfService
+    private relatorioPdf: RelatorioPdfService,
+    private pipelineService: PipelineService
   ) { }
   cont = 0;
 
@@ -50,12 +56,80 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     if (changes['resultadosDasAvaliacoes']) {
       this.atualizarVariaveis();
     }
+    // O modal é criado no início do assistente, quando o aluno ainda NÃO escolheu os dados:
+    // por isso a evolução é buscada quando a coleta chega, não só no ngOnInit.
+    if (changes['resultadoColetaDado']) {
+      this.carregarEvolucao();
+    }
   }
 
   ngOnInit(): void {
     this.atualizarVariaveis();
+    // A evolução é buscada no ngOnChanges (quando a coleta chega) — não aqui.
   }
 
+
+  // ------------------------------------------------- evolução do aluno nesta base
+  /**
+   * Busca a trajetória do aluno e fica com a da base atual. Nada de nota absoluta: a
+   * comparação é sempre com o chute burro e com a melhor tentativa anterior dele — acurácia
+   * 0,92 é fraca no iris e ótima no titanic.
+   */
+  private carregarEvolucao(): void {
+    const coleta = this.resultadoColetaDado;
+    if (!coleta) { return; }
+    // Manda TODOS os nomes que conhecemos da base; quem decide a identidade é o servidor
+    // (`app/pipelines_evolucao.py:chave_da_base`) — duplicar essa regra aqui foi o que fez
+    // o bloco não casar com o histórico na primeira versão.
+    const candidatos = [coleta.nomeDataset, coleta.treino?.nomeArquivo, coleta.datasetId]
+      .filter((d): d is string => !!d);
+    if (!candidatos.length) { return; }
+    const chave = `${candidatos.join('~')}|${coleta.target || ''}`;
+    if (chave === this.baseCarregada) { return; }   // evita refetch a cada ciclo de mudança
+    this.baseCarregada = chave;
+    this.pipelineService.evolucao(candidatos, coleta.target || undefined).subscribe({
+      next: (r) => { this.evolucaoBase = (r?.bases || [])[0] || null; },
+      error: () => { /* sem histórico não é erro: a tela segue sem o bloco */ },
+    });
+  }
+
+  /** Valor da métrica principal na avaliação ABERTA agora (ainda não salva). */
+  get valorAtual(): number | null {
+    const base = this.evolucaoBase;
+    if (!base) { return null; }
+    const label = this.mapaLabel.get(base.metrica) || nomeMetricas[base.metrica] || base.metrica;
+    const porModelo = this.resultadosDasAvaliacoes?.[label] || this.resultadosDasAvaliacoes?.[base.metrica];
+    const valores = Object.values(porModelo || {}).filter(v => this.isNumber(v)) as number[];
+    if (!valores.length) { return null; }
+    return base.ordem === 'asc' ? Math.min(...valores) : Math.max(...valores);
+  }
+
+  /** Diferença para a melhor tentativa anterior, com sinal positivo = melhorou. */
+  get ganhoVsAnterior(): number | null {
+    const atual = this.valorAtual;
+    if (atual === null || !this.evolucaoBase) { return null; }
+    const sinal = this.evolucaoBase.ordem === 'asc' ? -1 : 1;
+    return (atual - this.evolucaoBase.melhor) * sinal;
+  }
+
+  get ganhoVsChuteBurro(): number | null {
+    const atual = this.valorAtual;
+    const baseline = this.evolucaoBase?.baseline;
+    if (atual === null || baseline === null || baseline === undefined) { return null; }
+    const sinal = this.evolucaoBase!.ordem === 'asc' ? -1 : 1;
+    return (atual - baseline) * sinal;
+  }
+
+  /** Em pontos percentuais quando a métrica é uma proporção (0–1). */
+  formatarGanho(valor: number | null): string {
+    if (valor === null) { return '—'; }
+    const proporcao = this.evolucaoBase?.metrica !== 'mean_absolute_error'
+      && this.evolucaoBase?.metrica !== 'mean_squared_error'
+      && this.evolucaoBase?.metrica !== 'root_mean_squared_error';
+    const n = proporcao ? valor * 100 : valor;
+    const sufixo = proporcao ? 'pp' : '';
+    return `${n >= 0 ? '+' : ''}${n.toFixed(1)}${sufixo}`;
+  }
 
   async postAvaliacao() {
     if (!this.resultadoTreinamento || Object.keys(this.resultadoTreinamento).length === 0) {
