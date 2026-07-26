@@ -25,8 +25,15 @@
     align-items: center;
     margin-bottom: 16px;
 
-    ::ng-deep img {
+    // O limite percentual vai no HOST do componente: se ficasse no <img>, ele se resolveria
+    // contra o próprio <app-brand-logo> (que tem a largura da imagem) e encolheria o logo 8%.
+    app-brand-logo {
+      display: block;
       max-width: 92%;
+    }
+
+    ::ng-deep img {
+      max-width: 100%;
       display: block;
     }
   }
@@ -264,7 +271,7 @@
 
     // Logo compacto em celulares (o max-width limita a largura inline do lockup).
     .logo-container ::ng-deep img {
-      max-width: 200px;
+      max-width: 133px;
       margin: 0 auto;
     }
 

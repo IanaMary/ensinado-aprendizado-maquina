@@ -16,9 +16,12 @@ export class BrandLogoComponent {
   @Input() altura = 32;
   /**
    * Largura em px. Quando informada, prevalece sobre `altura` (a altura passa a ser
-   * automática). Útil para os lockups `positivo`/`negativo`: o PNG tem muita margem
-   * transparente (arte em 876×248 de uma tela 1367×768), então dimensionar pela altura
-   * do arquivo deixa a arte visível ~3× menor do que se espera.
+   * automática). É a forma natural de dimensionar os lockups `positivo`/`negativo`, que
+   * são bem mais largos que altos (906×278).
+   *
+   * Os PNGs foram recortados em 2026-07-26: antes vinham numa tela 16:9 com 79% de
+   * transparência, e `altura` mentia (60px do arquivo rendiam ~19px de arte). Hoje as duas
+   * medidas são honestas — se voltar a trocar o asset, confira o `getbbox()` do alfa.
    */
   @Input() largura?: number;
 
