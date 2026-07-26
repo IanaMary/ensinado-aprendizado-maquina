@@ -873,3 +873,16 @@ $metrica-cor-escuro: #E65100;
 
   .doc-yellowbrick-link { margin-left: 8px; }
 }
+
+// Retorno às boas-vindas (só na Área de Trabalho, via [permitirInicio]).
+.tutor-inicio {
+  align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 8px; padding: 5px 10px;
+  border: 1px solid rgba($roxo-claro, 0.9); border-radius: 999px;
+  background: $branco; color: $roxo-escuro;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+
+  &:hover { background: $roxo-fundo; }
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}

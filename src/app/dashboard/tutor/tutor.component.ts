@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import tutor from '../../constants/tutor.json';
 
 export interface TutorContexto {
@@ -65,6 +65,10 @@ export class TutorComponent implements OnChanges {
   @Input() tutorPipelineInfo: any = null;
   @Input() tutorItemInfo: TutorItemInfo | null = null;
   @Input() tutorTheme = 'default';
+  /** Mostra o botão "Voltar ao início" (só a Área de Trabalho tem boas-vindas para voltar). */
+  @Input() permitirInicio = false;
+  /** O pai limpa o que é dele (item/pipeline) e recarrega o texto de boas-vindas. */
+  @Output() voltarInicio = new EventEmitter<void>();
 
   tutor = tutor;
   objectKeys = Object.keys;
@@ -115,6 +119,14 @@ export class TutorComponent implements OnChanges {
       .replace(/\bhiperpar[aâ]metros?\b/gi, 'ajustes do modelo')
       .replace(/\bclassifica\b/gi, 'separa em grupos')
       .replace(/\bpredi[cç][aã]o\b/gi, 'palpite do modelo');
+  }
+
+  /** Volta ao estado inicial do painel. O `contexto` é construído AQUI dentro a partir de
+   *  modeloSelecionado/metricaSelecionada, então só este componente pode limpá-lo — o resto
+   *  é do pai (que também recarrega as boas-vindas). */
+  irParaInicio(): void {
+    this.contexto = null;
+    this.voltarInicio.emit();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

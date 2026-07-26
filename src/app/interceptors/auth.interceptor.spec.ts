@@ -74,15 +74,16 @@ describe('AuthInterceptor', () => {
     expect(authService.logout).not.toHaveBeenCalled();
   });
 
-  it('should notify the user on 403 response', () => {
-    // Regressão: o 403 só ia para o console e o aluno não recebia feedback
+  it('não desloga nem toasta no 403 (o aviso é do ErrorInterceptor)', () => {
+    // O usuário CONTINUA sendo avisado — a mensagem passou a sair só do ErrorInterceptor,
+    // porque os dois interceptors toastavam o mesmo 403 com textos diferentes.
     authService.getToken.and.returnValue('valid-token');
     httpClient.get('/test').subscribe({ error: () => { } });
 
     const req = httpMock.expectOne('/test');
     req.flush({}, { status: 403, statusText: 'Forbidden' });
 
-    expect(notificacao.erro).toHaveBeenCalledWith('Você não tem permissão para esta ação.');
+    expect(notificacao.erro).not.toHaveBeenCalled();
     expect(authService.logout).not.toHaveBeenCalled();
   });
 });

@@ -168,6 +168,20 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Volta o painel do tutor ao texto de boas-vindas.
+   *  O `getTutor` guarda os últimos params para não repetir requisição; ao avançar etapas no
+   *  assistente esses params mudam, então é preciso zerar a guarda para o 'inicio' voltar. */
+  voltarAoInicioDoTutor(): void {
+    this.tutorItemInfo = null;
+    this.tutorPipelineInfo = null;
+    this.chatSugestoes = [];
+    this.tutorTheme = 'default';
+    this.tutorThemeClass = 'theme-default';
+    this.tutor = TUTOR_BOAS_VINDAS;   // resposta imediata; o texto do servidor substitui
+    this.paramsTutor = '';
+    this.getTutor('inicio');
+  }
+
   /** Um desafio pendente abre direto; vários, a lista de turmas (o aluno escolhe). */
   abrirDesafios(): void {
     const unico = this.desafiosPendentes.length === 1 ? this.desafiosPendentes[0] : null;

@@ -20,6 +20,14 @@
       </button>
     </div>
 
+    <!-- Volta às boas-vindas: sem isto, o primeiro clique num item escondia o texto
+         inicial para sempre (não havia caminho de retorno). -->
+    <button type="button" class="tutor-inicio"
+      *ngIf="permitirInicio && (tutorItemInfo || contexto || tutorPipelineInfo)"
+      (click)="irParaInicio()">
+      <mat-icon>home</mat-icon> Voltar ao início
+    </button>
+
     <div *ngIf="getExplicacaoBasica() && !modoAvancado && !tutorItemInfo" class="section basic-section">
       <div class="section-header">
         <mat-icon>lightbulb</mat-icon>
