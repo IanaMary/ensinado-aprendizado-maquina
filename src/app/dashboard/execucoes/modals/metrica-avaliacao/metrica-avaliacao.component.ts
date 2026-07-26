@@ -71,7 +71,7 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
 
   ngOnInit(): void {
     this.atualizarVariaveis();
-    this.carregarEvolucao();
+    // A evolução é buscada no ngOnChanges (quando a coleta chega) — não aqui.
     // Conteúdo educacional dos gráficos (DB-driven). Indexa por slug (valor).
     this.dashboardService.getConteudoGraficos().subscribe({
       next: (docs) => {
