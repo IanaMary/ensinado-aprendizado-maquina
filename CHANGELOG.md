@@ -8,7 +8,18 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
-## 2026-07-26i (voltar às boas-vindas, um toast por erro, código morto) — porte
+## 2026-07-26j (criar desafio a partir de um dataset de exemplo) — porte
+
+> Frontend `master` (não implantado; produção roda a `mestrado-iana`). Backend `master` `a1f6f61`.
+
+- Criação do desafio começa pela **base de dados** (dataset de exemplo): tarefa derivada,
+  enunciado sugerido e as três características da base lidas do dataframe (ajustáveis).
+- **Peças**: sortear (padrão) ou escolher uma a uma, filtradas pela tarefa da base.
+- Aluno vê a base como chip no tabuleiro.
+- Testes: 153/153 + build de produção.
+
+---
+
 
 > Frontend `master` (não implantado; produção roda a `mestrado-iana`).
 

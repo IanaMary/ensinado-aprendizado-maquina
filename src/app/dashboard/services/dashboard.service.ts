@@ -82,6 +82,12 @@ export class DashboardService {
   }
 
   /** Conteúdo educacional de um dataset (Básico/Avançado/link), sem carregar os dados. */
+  /** Perfil do dataset para criar um desafio de montagem (professor/admin): tarefa derivada,
+   *  textos do enunciado e as características da base lidas do dataframe. */
+  getPerfilDesafioDataset(nome: string) {
+    return this.http.get<any>(`${this.url}toy_datasets/${nome}/perfil-desafio`);
+  }
+
   getConteudoDataset(nome: string) {
     return this.http.get<any>(`${this.url}toy_datasets/${nome}/conteudo`);
   }

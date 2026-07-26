@@ -60,6 +60,34 @@
             </select>
           </div>
         </div>
+        <!-- Desafio começa pela BASE: dela saem a tarefa, o enunciado e as peças compatíveis. -->
+        <div class="campo-form" *ngIf="novaAtiv.tipo === 'montagem'">
+          <label class="campo-label" for="ativ-base">Base de dados do desafio</label>
+          <div class="campo-input-wrapper">
+            <mat-icon class="campo-icon" aria-hidden="true">dataset</mat-icon>
+            <select id="ativ-base" class="campo-input" [(ngModel)]="novaAtiv.dataset"
+                    (ngModelChange)="onDatasetDesafioChange()">
+              <option value="">Escolha um dataset de exemplo…</option>
+              <option *ngFor="let d of datasets" [value]="d.id">{{ d.label }}</option>
+            </select>
+          </div>
+          <small class="campo-dica" *ngIf="carregandoPerfil">Lendo a base…</small>
+        </div>
+
+        <!-- Descrição da tarefa, derivada da base (o professor não precisa saber o vocabulário) -->
+        <div class="perfil-base" *ngIf="novaAtiv.tipo === 'montagem' && perfil">
+          <div class="perfil-linha">
+            <span class="chip-tarefa">{{ rotulosTarefa[perfil.tarefa] || perfil.tarefa }}</span>
+            <span class="chip-base">{{ perfil.nome }}<span *ngIf="perfil.n_amostras"> · {{ perfil.n_amostras }} exemplos</span></span>
+          </div>
+          <p class="perfil-pergunta" *ngIf="perfil.pergunta">{{ perfil.pergunta }}</p>
+          <p class="perfil-desc" *ngIf="perfil.descricao">{{ perfil.descricao }}</p>
+          <ul class="perfil-detalhes">
+            <li *ngIf="perfil.alvo"><strong>O que prever:</strong> {{ perfil.alvo }}</li>
+            <li *ngIf="perfil.atributos"><strong>Pistas disponíveis:</strong> {{ perfil.atributos }}</li>
+          </ul>
+        </div>
+
         <div class="campo-form">
           <label class="campo-label" for="ativ-titulo">Título</label>
           <div class="campo-input-wrapper">
@@ -102,15 +130,6 @@
         <!-- Desafio de montagem -->
         <ng-container *ngIf="novaAtiv.tipo === 'montagem'">
           <div class="campo-form">
-            <label class="campo-label" for="ativ-tarefa">Tarefa</label>
-            <div class="campo-input-wrapper">
-              <mat-icon class="campo-icon" aria-hidden="true">psychology</mat-icon>
-              <select id="ativ-tarefa" class="campo-input" [(ngModel)]="novaAtiv.tarefa">
-                <option *ngFor="let t of tarefas" [value]="t.valor">{{ t.label }}</option>
-              </select>
-            </div>
-          </div>
-          <div class="campo-form">
             <label class="campo-label" for="ativ-dificuldade">Dificuldade</label>
             <div class="campo-input-wrapper">
               <mat-icon class="campo-icon" aria-hidden="true">speed</mat-icon>
@@ -119,17 +138,38 @@
               </select>
             </div>
           </div>
-          <div class="campo-form">
-            <label class="campo-label" for="ativ-fixar">Peças que devem aparecer (opcional)</label>
-            <div class="campo-input-wrapper">
-              <mat-icon class="campo-icon" aria-hidden="true">push_pin</mat-icon>
-              <select id="ativ-fixar" class="campo-input" multiple size="4" [(ngModel)]="novaAtiv.fixar">
-                <option *ngFor="let p of pecas" [value]="p.valor">{{ p.label }}</option>
-              </select>
+
+          <fieldset class="campo-form modo-pecas">
+            <legend class="campo-label">Peças do tabuleiro</legend>
+            <label>
+              <input type="radio" name="modoPecas" value="sortear" [(ngModel)]="novaAtiv.modoPecas">
+              Sortear as peças (variam entre alunos e tentativas)
+            </label>
+            <label>
+              <input type="radio" name="modoPecas" value="escolher" [(ngModel)]="novaAtiv.modoPecas">
+              Escolher as peças
+            </label>
+            <small class="campo-dica">
+              O sistema garante que o tabuleiro sempre permita uma solução: se faltar coleta,
+              modelo ou métrica compatível com a tarefa, ele completa.
+            </small>
+          </fieldset>
+
+          <div class="escolher-pecas" *ngIf="novaAtiv.modoPecas === 'escolher'">
+            <div class="lane-pecas" *ngFor="let l of lanesDesafio">
+              <h5>{{ l.titulo }}</h5>
+              <label *ngFor="let p of pecasDaLane(l.lane)">
+                <input type="checkbox" [checked]="pecaEscolhida(p.valor)" (change)="alternarPeca(p.valor)">
+                {{ p.label }}
+              </label>
+              <small class="campo-dica" *ngIf="!pecasDaLane(l.lane).length">
+                Nenhuma peça compatível no catálogo.
+              </small>
             </div>
           </div>
+
           <div class="campo-form">
-            <label class="campo-label" for="ativ-vetar">Peças que nunca aparecem (opcional)</label>
+            <label class="campo-label" for="ativ-vetar">Nunca mostrar estas peças (opcional)</label>
             <div class="campo-input-wrapper">
               <mat-icon class="campo-icon" aria-hidden="true">block</mat-icon>
               <select id="ativ-vetar" class="campo-input" multiple size="4" [(ngModel)]="novaAtiv.vetar">
@@ -137,8 +177,9 @@
               </select>
             </div>
           </div>
+
           <fieldset class="campo-form dados-base">
-            <legend class="campo-label">Como é a base descrita no enunciado</legend>
+            <legend class="campo-label">O que a base exige (lido do dataset — ajuste se quiser)</legend>
             <label><input type="checkbox" [(ngModel)]="novaAtiv.faltantes"> Tem células vazias (exige preencher)</label>
             <label><input type="checkbox" [(ngModel)]="novaAtiv.texto"> Tem colunas de texto (exige codificar)</label>
             <label><input type="checkbox" [(ngModel)]="novaAtiv.escalasDiferentes"> Colunas em escalas bem diferentes</label>
@@ -146,7 +187,7 @@
           </fieldset>
         </ng-container>
 
-        <button class="btn-primario" (click)="criarAtividade()" [disabled]="criandoAtiv || !novaAtiv.titulo.trim()">
+        <button class="btn-primario" (click)="criarAtividade()" [disabled]="criandoAtiv || !podeCriarAtividade">
           <mat-icon>add</mat-icon>
           {{ novaAtiv.tipo === 'montagem' ? 'Criar desafio' : 'Criar atividade' }}
         </button>
@@ -162,7 +203,7 @@
               </span>
             </strong>
             <span *ngIf="ehDesafio(a)">
-              montagem · {{ a.gabarito?.tarefa }} · {{ a.gabarito?.dificuldade }}
+              montagem · {{ a.gabarito?.tarefa }} · {{ a.gabarito?.dificuldade }}<ng-container *ngIf="a.gabarito?.dataset"> · base: {{ nomeDataset(a.gabarito?.dataset) }}</ng-container>
             </span>
             <span *ngIf="!ehDesafio(a)">métrica: {{ a.criterio?.metrica }}<span *ngIf="a.template?.datasetNome"> · dataset: {{ a.template?.datasetNome }}</span></span>
           </div>

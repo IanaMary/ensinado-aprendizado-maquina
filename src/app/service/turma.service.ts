@@ -19,12 +19,32 @@ export interface Turma {
 export type LaneDesafio = 'coleta' | 'pre_processamento' | 'modelo' | 'metrica';
 
 export interface GabaritoMontagem {
+  /** Dataset de exemplo que origina o enunciado. Com ele, o SERVIDOR define a `tarefa`. */
+  dataset?: string | null;
   tarefa: 'classificacao' | 'regressao' | 'agrupamento';
   exige: LaneDesafio[];
   dados: { faltantes: boolean; texto: boolean; escalas_diferentes: boolean };
+  /** false = valem as peças escolhidas pelo professor (`fixar`) + o mínimo garantido. */
+  sortear_pecas?: boolean;
   fixar?: string[];
   vetar?: string[];
   dificuldade: 'facil' | 'medio' | 'dificil';
+}
+
+/** Perfil de um dataset de exemplo para criar o desafio (GET /toy_datasets/{id}/perfil-desafio). */
+export interface PerfilDatasetDesafio {
+  dataset: string;
+  nome: string;
+  tarefa: 'classificacao' | 'regressao' | 'agrupamento';
+  fonte?: string;
+  n_amostras?: number;
+  pergunta?: string;
+  descricao?: string;
+  alvo?: string;
+  atributos?: string;
+  modelo_recomendado?: string;
+  enunciado_sugerido?: string;
+  dados: { faltantes: boolean; texto: boolean; escalas_diferentes: boolean };
 }
 
 export interface Atividade {
@@ -50,6 +70,8 @@ export interface PecaDesafio {
 
 export interface TabuleiroDesafio {
   atividade: { id: string; titulo: string; descricao?: string; tipo: 'montagem' };
+  /** Nome da base do enunciado (null em desafios criados antes dos datasets). */
+  dataset_nome?: string | null;
   tentativa: number;
   tentativas: number;
   melhor_nota: number | null;
