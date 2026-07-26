@@ -45,7 +45,8 @@
     margin-bottom: 20px;
 
     .brand-logo {
-      width: 360px;
+      // 239px do PNG recortado = a mesma arte que 360px rendiam na versão com moldura.
+      width: 239px;
       max-width: 92%;
       height: auto;
       display: block;
@@ -359,7 +360,7 @@
     .logo-container {
       margin-bottom: 6px;
 
-      .brand-logo { width: 200px; }
+      .brand-logo { width: 133px; }
     }
 
     .logo-text { font-size: 18px; }
