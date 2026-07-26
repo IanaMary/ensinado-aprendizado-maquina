@@ -8,6 +8,22 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-25 (logo do Hub em tamanho legível no convite e no cadastro)
+
+> Só frontend (`mestrado-iana` `25a189b`, portado p/ `master` `7668235`; bundle
+> `main-3BTTSO7Z.js`). Backend inalterado. Backup `/home/ubuntu/backups/deploy-20260726-020757-frontend`.
+
+### Corrigido
+- **Logo do Hub aparecia ~3× menor** nas telas de **ativação de convite** (`/ativar-conta`) e
+  **cadastro**. Causa: o lockup `hub-ia-*.png` tem muita margem transparente (arte em 876×248
+  numa tela de 1367×768), então dimensionar pela **altura do arquivo** (`[altura]="60"`) rendia
+  só ~19px de arte visível — a tela de login não sofria porque usa `width: 360px` no `<img>`.
+- `BrandLogoComponent` ganhou `@Input largura` (quando informada prevalece sobre `altura`, com
+  `height: auto`); as duas telas passaram a usar `[largura]="360"`, igual ao login. Clamp em
+  celulares via `max-width: 200px` no `.logo-container` (≤768px).
+
+---
+
 ## 2026-07-22c (Manual: desfoque de dados sensíveis nas capturas)
 
 > Só frontend (3 assets estáticos). Backend inalterado.
