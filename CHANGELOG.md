@@ -8,6 +8,24 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26h (aviso de desafio + boas-vindas do tutor) — porte da `mestrado-iana`
+
+> Frontend `master` **`d9c4c59`** (não implantado; produção roda a `mestrado-iana`).
+> Backend `master` `c3faae2` (implantado).
+
+- **Aviso de desafio pendente** na Área de Trabalho, indo direto ao desafio quando é o único
+  (aqui a lista de turmas é `/entrar`, não `/view-aluno/entrar`); nesta branch o dashboard não
+  tem banner de atividade de turma, então o estilo `.atividade-banner` foi adicionado ao SCSS.
+- Lista de turmas: **desafios primeiro** + "N tentativas · melhor nota X"; menu do avatar e
+  título da tela viraram **"Turmas e desafios"**.
+- **Boas-vindas do tutor** vêm do backend (pipe `inicio`); no componente ficou só um fallback
+  curto.
+- **`/atividades`** não mostra mais "Acesso negado" para professor (`GET /usuario/` só admin).
+- Testes: 144/144 + build de produção (exigiu `npm install`: o `package.json` da `master` tem
+  tfjs e a instalação vinha da outra branch).
+
+---
+
 ## 2026-07-26g (documentação das 3 funcionalidades + 2 correções vistas nas capturas)
 
 > Frontend `mestrado-iana` `11888e4` (bundle **`main-EDMYYQK2.js`**), portado p/ `master`
