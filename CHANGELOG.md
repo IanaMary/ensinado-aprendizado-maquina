@@ -8,6 +8,19 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26i (voltar às boas-vindas, um toast por erro, código morto) — porte
+
+> Frontend `master` (não implantado; produção roda a `mestrado-iana`).
+
+- **"Voltar ao início"** no painel do tutor (as boas-vindas não voltavam depois do primeiro
+  clique num item).
+- **Um toast por erro**: o aviso do 403 ficou só no `ErrorInterceptor`; novo
+  `error.interceptor.spec.ts`.
+- **Removidos** `ShellComponent` e `BreadcrumbComponent` — sem consumidor nesta branch.
+- Testes 147/147.
+
+---
+
 ## 2026-07-26h (aviso de desafio + boas-vindas do tutor) — porte da `mestrado-iana`
 
 > Frontend `master` **`d9c4c59`** (não implantado; produção roda a `mestrado-iana`).
