@@ -90,6 +90,28 @@
   font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; vertical-align: middle;
   mat-icon { font-size: 13px; width: 13px; height: 13px; } }
 
+// Seleção múltipla de peças (fixar/vetar): o `.campo-input-wrapper` global tem altura
+// fixa de campo de uma linha, que corta a lista — aqui o wrapper cresce com o `size`.
+.campo-form:has(select[multiple]) .campo-input-wrapper {
+  height: auto;
+  align-items: flex-start;
+  padding-top: 8px;
+  padding-bottom: 8px;
+
+  .campo-icon { margin-top: 2px; }
+
+  select[multiple].campo-input {
+    height: auto;
+    min-height: 96px;
+    appearance: listbox;
+    -webkit-appearance: listbox;
+    cursor: default;
+
+    option { padding: 3px 4px; border-radius: 4px; }
+    option:checked { background: $roxo-fundo; color: $roxo-escuro; font-weight: 600; }
+  }
+}
+
 .dados-base { border: 1px solid rgba($roxo-claro, 0.7); border-radius: 10px; padding: 10px 12px;
   display: flex; flex-direction: column; gap: 6px; grid-column: 1 / -1;
   legend { padding: 0 4px; }

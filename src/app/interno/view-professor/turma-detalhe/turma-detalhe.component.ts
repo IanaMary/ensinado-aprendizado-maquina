@@ -37,7 +37,11 @@ export class TurmaDetalheComponent implements OnInit {
     faltantes: false,
     texto: false,
     escalasDiferentes: false,
+    fixar: [] as string[],
+    vetar: [] as string[],
   };
+  /** Peças do catálogo para fixar/vetar no sorteio (mesma fonte do dashboard). */
+  pecas: { valor: string; label: string }[] = [];
   tarefas = [
     { valor: 'classificacao', label: 'Classificação (qual categoria?)' },
     { valor: 'regressao', label: 'Regressão (qual número?)' },
@@ -82,6 +86,27 @@ export class TurmaDetalheComponent implements OnInit {
       next: (ds: any[]) => this.datasets = (ds || []).map(d => ({ nome: d.nome || d, label: d.label || d.nome || d })),
       error: () => {},
     });
+    this.carregarPecas();
+  }
+
+  /** Peças que o professor pode fixar/vetar. Reusa os catálogos já publicados pelo
+   * DashboardService (mesma lista que o aluno vê no pipeline). */
+  private carregarPecas(): void {
+    const acumular = (itens: any[]) => {
+      const novas = (itens || [])
+        .filter(i => i?.valor && i?.habilitado !== false)
+        // `label` é o rótulo do catálogo; `nome` cobre docs antigos; o slug é último recurso.
+        .map(i => ({ valor: i.valor as string, label: (i.label || i.nome || i.valor) as string }));
+      const vistos = new Set(this.pecas.map(p => p.valor));
+      this.pecas = [...this.pecas, ...novas.filter(p => !vistos.has(p.valor))]
+        .sort((a, b) => a.label.localeCompare(b.label));
+    };
+    this.dashboard.carregarItensPreProcessamento();
+    this.dashboard.carregarItensModelos();
+    this.dashboard.carregarItensMetricas();
+    this.dashboard.getItensPreProcessamento().subscribe({ next: acumular, error: () => {} });
+    this.dashboard.getModelos().subscribe({ next: acumular, error: () => {} });
+    this.dashboard.getItensMetricas().subscribe({ next: acumular, error: () => {} });
   }
 
   carregar(): void {
@@ -160,9 +185,9 @@ export class TurmaDetalheComponent implements OnInit {
         escalas_diferentes: this.novaAtiv.escalasDiferentes,
       },
       dificuldade: this.novaAtiv.dificuldade,
-      regras: [],
-      fixar: [],
-      vetar: [],
+      // Trava do professor: peça fixada sempre entra no tabuleiro; vetada nunca aparece.
+      fixar: [...this.novaAtiv.fixar],
+      vetar: [...this.novaAtiv.vetar],
     };
   }
 
@@ -171,6 +196,7 @@ export class TurmaDetalheComponent implements OnInit {
       titulo: '', descricao: '', datasetNome: '', metrica: 'accuracy_score', ordem: 'desc',
       tipo: 'pipeline', tarefa: 'classificacao', dificuldade: 'medio',
       exigePreProcessamento: false, faltantes: false, texto: false, escalasDiferentes: false,
+      fixar: [], vetar: [],
     };
   }
 

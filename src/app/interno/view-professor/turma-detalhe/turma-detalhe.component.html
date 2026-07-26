@@ -119,6 +119,24 @@
               </select>
             </div>
           </div>
+          <div class="campo-form">
+            <label class="campo-label" for="ativ-fixar">Peças que devem aparecer (opcional)</label>
+            <div class="campo-input-wrapper">
+              <mat-icon class="campo-icon" aria-hidden="true">push_pin</mat-icon>
+              <select id="ativ-fixar" class="campo-input" multiple size="4" [(ngModel)]="novaAtiv.fixar">
+                <option *ngFor="let p of pecas" [value]="p.valor">{{ p.label }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="campo-form">
+            <label class="campo-label" for="ativ-vetar">Peças que nunca aparecem (opcional)</label>
+            <div class="campo-input-wrapper">
+              <mat-icon class="campo-icon" aria-hidden="true">block</mat-icon>
+              <select id="ativ-vetar" class="campo-input" multiple size="4" [(ngModel)]="novaAtiv.vetar">
+                <option *ngFor="let p of pecas" [value]="p.valor">{{ p.label }}</option>
+              </select>
+            </div>
+          </div>
           <fieldset class="campo-form dados-base">
             <legend class="campo-label">Como é a base descrita no enunciado</legend>
             <label><input type="checkbox" [(ngModel)]="novaAtiv.faltantes"> Tem células vazias (exige preencher)</label>
@@ -189,17 +207,23 @@
       <div class="tabela-wrap">
         <table class="progresso-tabela">
           <thead>
-            <tr><th scope="col">Aluno</th><th scope="col">Submissões</th><th scope="col">Chats</th><th scope="col">Último acesso</th><th scope="col"><span class="sr-only">Ações</span></th></tr>
+            <tr><th scope="col">Aluno</th><th scope="col">Pipelines</th><th scope="col">Desafios</th><th scope="col">Chats</th><th scope="col">Último acesso</th><th scope="col"><span class="sr-only">Ações</span></th></tr>
           </thead>
           <tbody>
             <tr *ngFor="let p of progresso">
               <td>{{ p.aluno_nome }}</td>
-              <td>{{ p.submissoes }} / {{ p.total_atividades }}</td>
+              <td>{{ p.submissoes }}</td>
+              <td>
+                {{ p.desafios || 0 }}
+                <small *ngIf="p.melhor_nota_desafio !== null && p.melhor_nota_desafio !== undefined">
+                  (melhor nota {{ p.melhor_nota_desafio }})
+                </small>
+              </td>
               <td>{{ p.chats }}</td>
               <td>{{ p.ultimo_acesso ? (p.ultimo_acesso | date:'dd/MM HH:mm') : '—' }}</td>
               <td><button class="btn-mini" (click)="verChats(p.aluno_id, p.aluno_nome)" matTooltip="Ver conversas do chat" [attr.aria-label]="'Ver conversas de ' + p.aluno_nome"><mat-icon aria-hidden="true">forum</mat-icon></button></td>
             </tr>
-            <tr *ngIf="!progresso.length"><td colspan="5" class="vazio">Sem alunos/dados ainda.</td></tr>
+            <tr *ngIf="!progresso.length"><td colspan="6" class="vazio">Sem alunos/dados ainda.</td></tr>
           </tbody>
         </table>
       </div>

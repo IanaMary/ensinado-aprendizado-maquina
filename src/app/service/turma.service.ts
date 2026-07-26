@@ -22,7 +22,6 @@ export interface GabaritoMontagem {
   tarefa: 'classificacao' | 'regressao' | 'agrupamento';
   exige: LaneDesafio[];
   dados: { faltantes: boolean; texto: boolean; escalas_diferentes: boolean };
-  regras?: { id: string; peso?: number }[];
   fixar?: string[];
   vetar?: string[];
   dificuldade: 'facil' | 'medio' | 'dificil';
