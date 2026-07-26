@@ -203,5 +203,39 @@ describe('ColetaDadoComponent', () => {
       });
       expect(component.resultColetaDadoL.estratificarDados).toBeTrue();
     });
+    it('desmarca a caixa e avisa quando o servidor não conseguiu estratificar (upload)', () => {
+      component.onTipoPredicaoChange('classificacao');
+      expect(component.resultColetaDadoL.estratificarDados).toBeTrue();
+
+      // Resposta de qualquer porta de entrada (CSV, XLSX, URL) passa por preencherDados.
+      component.preencherDados({
+        atributos: { x: true, classe: false }, num_linhas_total: 6,
+        stratify: false,
+        aviso_estratificacao: 'Não foi possível estratificar: alguma categoria tem menos de 2 exemplos.',
+      });
+
+      expect(component.resultColetaDadoL.estratificarDados).toBeFalse();
+      expect(notificacao.aviso).toHaveBeenCalledWith(
+        'Não foi possível estratificar: alguma categoria tem menos de 2 exemplos.');
+    });
+
+    it('não avisa quando a estratificação deu certo', () => {
+      component.onTipoPredicaoChange('classificacao');
+      component.preencherDados({ atributos: { x: true }, num_linhas_total: 20, stratify: true });
+      expect(component.resultColetaDadoL.estratificarDados).toBeTrue();
+      expect(notificacao.aviso).not.toHaveBeenCalled();
+    });
+
+    it('dataset de exemplo respeita o que o servidor conseguiu fazer', () => {
+      component.processarResultadoDataset({
+        dados: [], total_dados: 6, nome_dataset: 'Estranho', colunas: ['a', 'target'],
+        colunas_detalhes: [{ nome_coluna: 'a', tipo_coluna: 'Número' },
+                           { nome_coluna: 'target', tipo_coluna: 'Texto' }],
+        target: 'target', prever_categoria: true, dados_rotulados: true, tipo_target: 'Texto',
+        stratify: false, aviso_estratificacao: 'Não foi possível estratificar.',
+      });
+      expect(component.resultColetaDadoL.estratificarDados).toBeFalse();
+      expect(notificacao.aviso).toHaveBeenCalledWith('Não foi possível estratificar.');
+    });
   });
 });
