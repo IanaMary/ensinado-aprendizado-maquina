@@ -5,6 +5,53 @@
     <span>Melhor modelo nesta avaliação: <strong>{{ melhor }}</strong></span>
   </div>
 
+  <!-- Sua evolução nesta base: comparação relativa (chute burro + tentativa anterior) -->
+  <section class="evolucao-base" *ngIf="evolucaoBase && valorAtual !== null">
+    <h4>
+      <mat-icon aria-hidden="true">trending_up</mat-icon>
+      Sua evolução em <strong>{{ evolucaoBase.dataset }}</strong>
+      <small *ngIf="evolucaoBase.alvo">(alvo: {{ evolucaoBase.alvo }})</small>
+    </h4>
+
+    <div class="evolucao-linhas">
+      <div class="evolucao-item" *ngIf="evolucaoBase.baseline !== null">
+        <span class="rotulo">Chute burro desta base</span>
+        <span class="valor">{{ evolucaoBase.baseline | number: '1.2-4' }}</span>
+      </div>
+      <div class="evolucao-item">
+        <span class="rotulo">Sua melhor até agora</span>
+        <span class="valor">{{ evolucaoBase.melhor | number: '1.2-4' }}</span>
+      </div>
+      <div class="evolucao-item destaque">
+        <span class="rotulo">Esta avaliação</span>
+        <span class="valor">{{ valorAtual | number: '1.2-4' }}</span>
+      </div>
+    </div>
+
+    <p class="evolucao-frase">
+      <ng-container *ngIf="ganhoVsAnterior !== null">
+        <strong [class.subiu]="ganhoVsAnterior > 0" [class.desceu]="ganhoVsAnterior < 0">
+          {{ formatarGanho(ganhoVsAnterior) }}
+        </strong>
+        em relação à sua melhor tentativa nesta base
+      </ng-container>
+      <ng-container *ngIf="ganhoVsChuteBurro !== null">
+        · <strong [class.subiu]="ganhoVsChuteBurro > 0" [class.desceu]="ganhoVsChuteBurro < 0">
+          {{ formatarGanho(ganhoVsChuteBurro) }}
+        </strong>
+        em relação a sempre chutar a resposta mais comum
+      </ng-container>
+    </p>
+
+    <ul class="evolucao-historico" *ngIf="evolucaoBase.tentativas.length > 1">
+      <li *ngFor="let t of evolucaoBase.tentativas">
+        <span class="hist-data">{{ t.data | date: 'dd/MM' }}</span>
+        <span class="hist-valor">{{ t.valor | number: '1.2-4' }}</span>
+        <span class="hist-mudanca" *ngIf="t.mudancas.length">{{ t.mudancas.join(', ') }}</span>
+      </li>
+    </ul>
+  </section>
+
   <!-- Tabela de métricas escalares -->
   <div class="table-container" *ngIf="metricsAvaliadas.length">
     <table>
