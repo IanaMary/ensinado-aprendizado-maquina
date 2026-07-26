@@ -274,8 +274,13 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     } else {
       this.tipoPredicao = 'exploratorio';
     }
-    // Dataset de exemplo de classificação também vem estratificado por padrão.
-    this.resultColetaDadoL.estratificarDados = this.tipoPredicao === 'classificacao';
+    // Dataset de exemplo de classificação já vem estratificado — mas quem manda é o que o
+    // servidor conseguiu fazer (`stratify` na resposta), não a suposição da tela.
+    this.resultColetaDadoL.estratificarDados =
+      resultado.stratify ?? (this.tipoPredicao === 'classificacao');
+    if (resultado.aviso_estratificacao) {
+      this.notificacao.aviso(resultado.aviso_estratificacao);
+    }
 
     // Marcar todos os atributos exceto target
     this.att = {};
@@ -474,7 +479,14 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     this.resultColetaDadoL.preverCategoria = res.prever_categoria;
     this.resultColetaDadoL.dadosRotulados = res.dados_rotulados || res.daods_rotulados;
     this.resultColetaDadoL.embaralharDados = res.shuffle ?? this.resultColetaDadoL.embaralharDados ?? true;
+    // `stratify` da resposta é o que o servidor CONSEGUIU fazer: se o dataset tem uma
+    // categoria com exemplos de menos, ele divide sem estratificar e a caixa desmarca aqui.
     this.resultColetaDadoL.estratificarDados = res.stratify ?? this.resultColetaDadoL.estratificarDados ?? false;
+    // Um único ponto de alerta para as quatro portas (CSV, XLSX, URL, dataset de exemplo):
+    // todas as respostas passam por aqui.
+    if (res.aviso_estratificacao) {
+      this.notificacao.aviso(res.aviso_estratificacao);
+    }
 
 
     this.resultColetaDadoL.colunasDetalhes = res.colunas_detalhes;
@@ -819,12 +831,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
         res.tipo_target = estadoAtual.tipoTarget;
         res.prever_categoria = estadoAtual.preverCategoria;
         res.dados_rotulados = estadoAtual.dadosRotulados;
-        this.preencherDados(res);
-        // O servidor pode não conseguir estratificar (categoria com exemplos de menos): ele
-        // divide sem estratificar e avisa — o aluno precisa saber, senão acha que estratificou.
-        if (res.aviso_estratificacao) {
-          this.notificacao.aviso(res.aviso_estratificacao);
-        }
+        this.preencherDados(res);   // desmarca a caixa e avisa se não deu para estratificar
       }),
       catchError((err) => {
         this.redivisaoEmAndamento = false;
