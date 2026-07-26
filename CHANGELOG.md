@@ -8,6 +8,29 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26h (aviso de desafio + boas-vindas do tutor + contas da banca)
+
+> Frontend `mestrado-iana` **`ac512ff`** (bundle `main-5ZEHBTUF.js`) / Backend `master` `c3faae2`.
+
+### Corrigido
+- **Boas-vindas do tutor**: o painel mostrava uma frase só. O texto longo saiu do
+  `execucoes.component.ts` (ficou um fallback curto) e a fonte passou a ser o backend
+  (pipe `inicio`, versionado e editável pelo admin em conf-tutor).
+- **`/atividades` como professor** não mostra mais o toast "Acesso negado" ao abrir:
+  `GET /usuario/` (admin-only) era chamado só para preencher o seletor do filtro.
+
+### Adicionado
+- **Aviso de desafio pendente** na Área de Trabalho (uma chamada a
+  `GET /turmas/minhas/desafios`, falha silenciosa); com um único desafio, o botão abre direto.
+- Lista de turmas: **desafios primeiro**, com "N tentativas · melhor nota X" e botão
+  "Tentar de novo"; a tela e o item do menu do avatar viraram **"Turmas e desafios"**.
+
+### Notas
+- `ShellComponent` (barra lateral Home/Pipeline/Resultados) é **código morto** nesta branch:
+  `InternoComponent` (`<app-shell>`) não é roteado. Não foi removido — só registrado.
+
+---
+
 ## 2026-07-26g (documentação das 3 funcionalidades + 2 correções vistas nas capturas)
 
 > Frontend `mestrado-iana` `11888e4` (bundle **`main-EDMYYQK2.js`**), portado p/ `master`
