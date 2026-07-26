@@ -274,6 +274,8 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     } else {
       this.tipoPredicao = 'exploratorio';
     }
+    // Dataset de exemplo de classificação também vem estratificado por padrão.
+    this.resultColetaDadoL.estratificarDados = this.tipoPredicao === 'classificacao';
 
     // Marcar todos os atributos exceto target
     this.att = {};
@@ -538,7 +540,10 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     this.resultColetaDadoL.target = '';
-    this.resultColetaDadoL.estratificarDados = false;
+    // Classificação estratifica por padrão: mantém a mesma proporção de classes no treino e
+    // no teste, senão uma classe pouco frequente pode ficar de fora do teste e a métrica
+    // engana. O aluno ainda pode desmarcar. (Regressão/exploratório não estratificam.)
+    this.resultColetaDadoL.estratificarDados = tipo === 'classificacao';
     this.putConfiguracaoTreino();
     this.redividirDados();
   }
@@ -815,6 +820,11 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
         res.prever_categoria = estadoAtual.preverCategoria;
         res.dados_rotulados = estadoAtual.dadosRotulados;
         this.preencherDados(res);
+        // O servidor pode não conseguir estratificar (categoria com exemplos de menos): ele
+        // divide sem estratificar e avisa — o aluno precisa saber, senão acha que estratificou.
+        if (res.aviso_estratificacao) {
+          this.notificacao.aviso(res.aviso_estratificacao);
+        }
       }),
       catchError((err) => {
         this.redivisaoEmAndamento = false;

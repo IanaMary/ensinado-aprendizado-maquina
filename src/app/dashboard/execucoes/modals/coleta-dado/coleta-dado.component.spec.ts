@@ -140,4 +140,68 @@ describe('ColetaDadoComponent', () => {
       expect(dashboardService.redividirColeta).toHaveBeenCalledTimes(2);
     }));
   });
+  // ------------------------------------------------- estratificação por padrão
+  describe('estratificação', () => {
+    beforeEach(() => {
+      component.idConfigurcacaoTreinamento = 'cfg1';
+      dashboardService.putColetaConfig.and.returnValue(of({}));
+      dashboardService.redividirColeta.and.returnValue(of({ atributos: {} }));
+    });
+
+    it('liga por padrão ao escolher classificação', () => {
+      component.onTipoPredicaoChange('classificacao');
+      expect(component.resultColetaDadoL.estratificarDados).toBeTrue();
+      expect(component.resultColetaDadoL.preverCategoria).toBeTrue();
+    });
+
+    it('não liga em regressão nem em exploratório', () => {
+      component.onTipoPredicaoChange('regressao');
+      expect(component.resultColetaDadoL.estratificarDados).toBeFalse();
+
+      component.onTipoPredicaoChange('exploratorio');
+      expect(component.resultColetaDadoL.estratificarDados).toBeFalse();
+    });
+
+    it('desligar embaralhar desliga a estratificação (ela depende do embaralhamento)', () => {
+      component.onTipoPredicaoChange('classificacao');
+      component.resultColetaDadoL.embaralharDados = false;
+      component.onDivisaoDadosChange();
+      expect(component.resultColetaDadoL.estratificarDados).toBeFalse();
+    });
+
+    it('envia o pedido de estratificação na redivisão', fakeAsync(() => {
+      component.onTipoPredicaoChange('classificacao');
+      component.resultColetaDadoL.target = 'classe';
+      component.redividirDados();
+      tick(300);
+
+      const corpo = dashboardService.redividirColeta.calls.mostRecent().args[2] as any;
+      expect(corpo.stratify).toBeTrue();
+      expect(corpo.target).toBe('classe');
+    }));
+
+    it('reflete o que o servidor conseguiu fazer e avisa quando não estratificou', fakeAsync(() => {
+      component.onTipoPredicaoChange('classificacao');
+      dashboardService.redividirColeta.and.returnValue(of({
+        atributos: {}, stratify: false,
+        aviso_estratificacao: 'Não foi possível estratificar: alguma categoria tem menos de 2 exemplos.',
+      }));
+
+      component.redividirDados();
+      tick(300);
+
+      expect(component.resultColetaDadoL.estratificarDados).toBeFalse();
+      expect(notificacao.aviso).toHaveBeenCalled();
+    }));
+
+    it('dataset de exemplo de classificação já vem estratificado', () => {
+      component.processarResultadoDataset({
+        dados: [], total_dados: 10, nome_dataset: 'Iris', colunas: ['a', 'target'],
+        colunas_detalhes: [{ nome_coluna: 'a', tipo_coluna: 'Número' },
+                           { nome_coluna: 'target', tipo_coluna: 'Texto' }],
+        target: 'target', prever_categoria: true, dados_rotulados: true, tipo_target: 'Texto',
+      });
+      expect(component.resultColetaDadoL.estratificarDados).toBeTrue();
+    });
+  });
 });
