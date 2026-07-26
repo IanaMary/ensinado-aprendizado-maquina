@@ -8,6 +8,38 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26e (estratificação por padrão em classificação + fim do vazamento nos datasets de exemplo)
+
+> Frontend `mestrado-iana` `de8301b` (bundle **`main-OP3WGDPI.js`**), portado p/ `master`
+> `e9507fd`. Backend `master` **`4a6ef48`**. Backup `/home/ubuntu/backups/deploy-20260726-110345`.
+
+### Alterado
+- **Classificação estratifica treino/teste por padrão.** Sem isso, uma categoria pouco
+  frequente pode ficar de fora do teste e a métrica engana o aluno. Regressão e exploratório
+  seguem sem estratificar (não faz sentido); o aluno ainda pode desmarcar, e o assistente
+  explica por que já vem ligada.
+- Quando o dataset **não permite** estratificar (categoria com um único exemplo), a divisão é
+  feita sem estratificar e a tela avisa — antes o upload era recusado com **400**, o que com o
+  padrão ligado viraria parede para CSV real de aluno.
+- Uploads CSV/XLSX passaram a usar o mesmo divisor da redivisão (menos duplicação).
+
+### Corrigido
+- **Vazamento treino/teste nos datasets de exemplo.** `content_treino` recebia o dataframe
+  INTEIRO e `content_teste` a cauda de 25%: o teste era subconjunto do treino e, sem
+  embaralhar, a cauda de um dataset ordenado por classe (iris, wine) só tinha uma categoria.
+  Agora há divisão real e estratificada, e o doc guarda `content_completo_base64` (a
+  redivisão relê dele; sem isso o dataset encolheria a cada mudança de proporção).
+  Verificado no iris: 112 treino / 38 teste, **0 linha de teste dentro do treino**, proporções
+  de classe preservadas nos dois lados.
+
+### Notas
+- `stratify` virou opcional na redivisão: `None` = "o cliente não opinou", e o servidor liga
+  quando a config diz classificação. A resposta traz o valor **efetivo** + `aviso_estratificacao`.
+- 8 testes novos no backend (425 passed) e 6 no frontend (144/144; 135/135 na `master`).
+  Dois testes que codificavam o contrato antigo foram atualizados com o porquê.
+
+---
+
 ## 2026-07-26d (Fase 2: evolução do aluno na mesma base)
 
 > Frontend `mestrado-iana` `bda1294`+`93d1872` (bundle **`main-5OWPTQIF.js`**), portado p/
