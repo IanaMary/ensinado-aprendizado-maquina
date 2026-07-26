@@ -8,6 +8,28 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26c (recorte dos lockups do Hub + clamp que encolhia o logo)
+
+> Só frontend: `mestrado-iana` `1fd7e52` (bundle **`main-TYN6VZGN.js`**), portado p/ `master`
+> `30ca59b`. Backend inalterado. Backup `/home/ubuntu/backups/deploy-20260726-084815-frontend`.
+
+### Alterado
+- **`hub-ia-{positivo,negativo}.png` recortados**: 1367×768 (79% de transparência, resto de
+  export 16:9) → **906×278**, com área de respiro deliberada de 6% da altura da arte. Com
+  isso `altura` volta a significar altura real em qualquer call site — a classe de bug
+  "logo pequeno" morre na fonte, em vez de depender de cada tela lembrar de usar `largura`.
+  Arquivos ~30% menores (16,5 KB → 11,4 KB).
+- Call sites reajustados pelo fator 0,663 (login `360→239`, convite/cadastro `largura`
+  `360→239`, clamp mobile `200→133`): a arte renderizada segue **231×65**, idêntica.
+
+### Corrigido
+- **Clamp que encolhia o logo em 8%** no convite e no cadastro (239 → 220): o
+  `max-width: 92%` estava no `<img>`, cujo pai é o próprio `<app-brand-logo>` — a
+  porcentagem se resolvia contra a largura da própria imagem. O limite passou para o host.
+  Só apareceu porque a conferência pós-recorte mediu o elemento em vez de olhar a tela.
+
+---
+
 ## 2026-07-26b (desafio: trava do professor + progresso separado)
 
 > Frontend `mestrado-iana` `0260394` (bundle **`main-7ZCANP7T.js`**), portado p/ `master`
