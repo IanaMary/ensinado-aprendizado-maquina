@@ -189,7 +189,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let r of ranking; let i = index">
-                <td>{{ i + 1 }}</td><td>{{ r.aluno_nome }}</td><td>{{ fmtValor(r.valor) }}</td>
+                <td>{{ i + 1 }}</td><td>{{ r.aluno_nome }}</td><td>{{ fmtRanking(r.valor) }}</td>
                 <td *ngIf="ehDesafio(rankingAtiv)">{{ r.tentativas ?? '—' }}</td>
               </tr>
               <tr *ngIf="!ranking.length">
