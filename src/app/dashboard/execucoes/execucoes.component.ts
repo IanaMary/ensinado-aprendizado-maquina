@@ -970,7 +970,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       colunasDetalhes: colunasDetalhes,
       porcentagemTreino: 70,
       embaralharDados: true,
-      estratificarDados: false,
+      // Classificação estratifica por padrão (o backend já divide assim ao carregar o dataset).
+      estratificarDados: preverCategoria && dadosRotulados,
       tipoTarget: tipoTarget,
       atributos: att,
       tipos: {},

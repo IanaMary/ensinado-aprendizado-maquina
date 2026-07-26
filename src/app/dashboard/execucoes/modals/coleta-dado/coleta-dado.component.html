@@ -251,6 +251,10 @@
               (change)="onDivisaoDadosChange()">
               Separar treino/teste com estratificação
             </mat-checkbox>
+            <mat-hint *ngIf="!teste.nomeArquivo && resultColetaDadoL.preverCategoria" class="divisao-hint">
+              Em classificação já vem ligada: treino e teste ficam com a mesma proporção de
+              categorias, senão uma categoria pouco frequente pode não aparecer no teste.
+            </mat-hint>
             <mat-hint *ngIf="teste.nomeArquivo" class="divisao-hint">
               A divisão automática fica desativada quando uma planilha de teste é enviada.
             </mat-hint>
