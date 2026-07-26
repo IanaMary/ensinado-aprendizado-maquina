@@ -262,6 +262,12 @@
       text-align: center;
     }
 
+    // Logo compacto em celulares (o max-width limita a largura inline do lockup).
+    .logo-container ::ng-deep img {
+      max-width: 200px;
+      margin: 0 auto;
+    }
+
     .branding-features {
       display: none;
     }
