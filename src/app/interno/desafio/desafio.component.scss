@@ -1,0 +1,283 @@
+// Variáveis-only (colores) + esqueleto de lanes compartilhado com o dashboard.
+// NUNCA importar `styles.scss` aqui: ele é global e seria re-emitido escopado no componente.
+@use '../../../styles/colores.scss' as *;
+@use '../../../styles/lanes' as lanes;
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: $branco-gelado;
+}
+
+.desafio-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.desafio-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  .btn-voltar {
+    background: $branco;
+    border: 1px solid rgba($roxo-claro, 0.8);
+    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: $roxo-escuro;
+    flex-shrink: 0;
+
+    &:hover { background: $roxo-fundo; }
+    &:focus-visible { outline: 2px solid $roxo-vibrante; outline-offset: 2px; }
+  }
+
+  .titulo-bloco { flex: 1; min-width: 0; }
+
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: $roxo-escuro;
+  }
+
+  .enunciado {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: $cinza-escuro;
+    line-height: 1.45;
+  }
+
+  .placar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    background: $roxo-fundo;
+    color: $roxo-escuro;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    &.melhor { background: $sucesso-claro; color: #1B5E20; }
+  }
+}
+
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 16px;
+  color: $cinza-escuro;
+
+  &.erro {
+    color: $erro;
+    mat-icon { font-size: 34px; width: 34px; height: 34px; }
+  }
+}
+
+// -------------------------------------------------------------------- bandeja
+.bandeja {
+  background: $branco;
+  border: 1px dashed rgba($roxo-medio, 0.45);
+  border-radius: 12px;
+  padding: 10px 12px 12px;
+
+  .bandeja-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    mat-icon { color: $roxo-medio; font-size: 20px; width: 20px; height: 20px; }
+    span { font-size: 13px; font-weight: 700; color: $roxo-escuro; text-transform: uppercase; letter-spacing: 0.5px; }
+    small { color: $cinza-medio; font-size: 11px; }
+  }
+
+  .bandeja-pecas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 56px;
+  }
+
+  .item-card.peca {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    background: $branco;
+    border: 1px solid rgba($roxo-claro, 0.9);
+    border-radius: 8px;
+    cursor: grab;
+    transition: all 0.15s ease;
+
+    span { font-size: 12px; font-weight: 600; color: $cinza-escuro; }
+    mat-icon { color: $cinza-medio; font-size: 16px; width: 16px; height: 16px; }
+
+    &:hover { border-color: $roxo-medio; box-shadow: 0 2px 8px rgba($roxo-escuro, 0.08); }
+  }
+
+  .bandeja-vazia {
+    margin: 6px 2px;
+    font-size: 12px;
+    color: $cinza-medio;
+  }
+}
+
+// -------------------------------------------------------------------- lanes
+.lanes {
+  @include lanes.esqueleto;
+
+  .item-card {
+    position: relative;
+    cursor: grab;
+
+    .ordem {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: $cinza-claro;
+      color: $roxo-escuro;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    span { flex: 1; }
+
+    .tirar,
+    .alerta {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .tirar { color: $cinza-medio; &:hover { color: $erro; } }
+    .alerta { color: $aviso; cursor: help; }
+
+    &.lane-errada {
+      border-color: $aviso;
+      background: $aviso-claro;
+    }
+  }
+
+  .lane-dica {
+    margin: 6px 2px;
+    font-size: 11px;
+    color: $cinza-medio;
+    line-height: 1.3;
+  }
+}
+
+// -------------------------------------------------------------------- ações
+.barra-acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .aviso {
+    margin: 0;
+    margin-right: auto;
+    font-size: 12px;
+    color: $aviso;
+    font-weight: 600;
+  }
+}
+
+// -------------------------------------------------------------------- resultado
+.resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  .nota-bloco {
+    background: $branco;
+    border: 1px solid rgba($roxo-claro, 0.8);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+
+    &.perfeito { border-color: $sucesso; background: $sucesso-claro; }
+  }
+
+  .nota {
+    font-size: 44px;
+    font-weight: 800;
+    color: $roxo-escuro;
+    line-height: 1;
+
+    small { font-size: 18px; font-weight: 600; color: $cinza-medio; }
+  }
+
+  .nota-legenda {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: $cinza-medio;
+  }
+
+  .parabens {
+    margin: 8px 0 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1B5E20;
+  }
+
+  .regras h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: $roxo-escuro;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    mat-icon { font-size: 20px; width: 20px; height: 20px; }
+  }
+
+  .regra {
+    background: $branco;
+    border: 1px solid rgba($roxo-claro, 0.8);
+    border-left-width: 4px;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+
+    h3 { margin: 0 0 4px; font-size: 13px; font-weight: 700; color: $preto; }
+    p { margin: 0; font-size: 13px; line-height: 1.5; color: $cinza-escuro; }
+
+    &.ruim { border-left-color: $aviso; }
+    &.boa { border-left-color: $sucesso; }
+  }
+}
+
+@media (max-width: 900px) {
+  .lanes { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 560px) {
+  .lanes { grid-template-columns: 1fr; }
+  .desafio-header { flex-wrap: wrap; }
+}

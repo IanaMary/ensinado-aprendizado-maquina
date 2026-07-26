@@ -1,0 +1,133 @@
+// Lanes do pipeline: cores por etapa + esqueleto visual (colunas, cabeçalho, cards).
+//
+// Por que existe: o desafio de montagem tem de parecer o MESMO tabuleiro do dashboard,
+// senão o aluno não transfere o que aprendeu para a tela real. Antes disso viver aqui, as
+// cores e o esqueleto só existiam dentro de `dashboard/execucoes/execucoes.component.scss`.
+//
+// Uso (em componentes; NUNCA importe `styles.scss`, que duplicaria todo o CSS global):
+//   @use '../../../styles/colores.scss' as *;
+//   @use '../../../styles/lanes' as lanes;
+//   .minhas-colunas { @include lanes.esqueleto; }
+//
+// O dashboard clássico segue com a sua própria cópia dessas regras: ele é a tela mais
+// carregada da produção e não tem teste de UI, então não foi reescrito junto. Ao mexer
+// nas duas, mantenha-as em paridade (ou migre o dashboard para este mixin).
+@use 'colores' as *;
+
+$coleta-cor: #4CAF50;
+$coleta-cor-claro: #E8F5E9;
+$coleta-cor-escuro: #2E7D32;
+
+$preprocessamento-cor: #9C27B0;
+$preprocessamento-cor-claro: #F3E5F5;
+$preprocessamento-cor-escuro: #7B1FA2;
+
+$treino-cor: #2196F3;
+$treino-cor-claro: #E3F2FD;
+$treino-cor-escuro: #1565C0;
+
+$metrica-cor: #FF9800;
+$metrica-cor-claro: #FFF3E0;
+$metrica-cor-escuro: #E65100;
+
+/// Fundo do cabeçalho e gradiente do ícone de cada lane.
+@mixin tema-lane($nome, $cor, $claro, $escuro) {
+  &.#{$nome} {
+    .column-header { background: rgba($claro, 0.5); }
+    .column-icon { background: linear-gradient(135deg, $cor, $escuro); }
+  }
+}
+
+/// Esqueleto compartilhado: grid de colunas, coluna, cabeçalho, área de drop e card.
+@mixin esqueleto {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+
+  .column {
+    background: $branco;
+    border-radius: 12px;
+    border: 1px solid rgba($roxo-claro, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba($roxo-escuro, 0.04);
+
+    @include tema-lane(coleta, $coleta-cor, $coleta-cor-claro, $coleta-cor-escuro);
+    @include tema-lane(pre_processamento, $preprocessamento-cor, $preprocessamento-cor-claro, $preprocessamento-cor-escuro);
+    @include tema-lane(modelo, $treino-cor, $treino-cor-claro, $treino-cor-escuro);
+    @include tema-lane(metrica, $metrica-cor, $metrica-cor-claro, $metrica-cor-escuro);
+  }
+
+  .column-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba($roxo-claro, 0.4);
+
+    .column-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: $branco;
+      }
+    }
+
+    span {
+      font-size: 13px;
+      font-weight: 700;
+      color: $roxo-escuro;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .column-content {
+    flex: 1;
+    min-height: 180px;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb {
+      background: $roxo-claro;
+      border-radius: 4px;
+    }
+  }
+
+  .item-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: $branco;
+    border: 1px solid rgba($roxo-claro, 0.5);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    span {
+      font-size: 12px;
+      font-weight: 500;
+      color: $cinza-escuro;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

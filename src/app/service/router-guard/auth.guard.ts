@@ -11,9 +11,9 @@ import { roleMap } from '../../../app/models/item-coleta-dado.model';
 // abrir um projeto salvo navega para lá, e sem isto o guard mandava-os ao login
 // (parecia "deslogar") ao carregar um pipeline.
 const ROTAS_POR_PAPEL: Record<string, string[]> = {
-  aluno: ['inicio', 'treine-robo', 'leo-mundo-real', 'trilha', 'projetos', 'galeria', 'entrar'],
-  professor: ['view-professor', 'atividades', 'projetos', 'trilha', 'galeria', 'entrar'],
-  admin: ['view-admin', 'view-professor', 'atividades', 'projetos', 'trilha', 'galeria', 'entrar'],
+  aluno: ['inicio', 'treine-robo', 'leo-mundo-real', 'trilha', 'projetos', 'galeria', 'entrar', 'desafio'],
+  professor: ['view-professor', 'atividades', 'projetos', 'trilha', 'galeria', 'entrar', 'desafio'],
+  admin: ['view-admin', 'view-professor', 'atividades', 'projetos', 'trilha', 'galeria', 'entrar', 'desafio'],
 };
 
 @Injectable({

@@ -38,11 +38,17 @@
     <ul class="ativ-lista">
       <li *ngFor="let a of atividadesPorTurma[t.id]">
         <div class="ativ-info">
-          <strong>{{ a.titulo }}</strong>
+          <strong>
+            {{ a.titulo }}
+            <span class="selo-desafio" *ngIf="a.tipo === 'montagem'">
+              <mat-icon aria-hidden="true">extension</mat-icon> Desafio
+            </span>
+          </strong>
           <span *ngIf="a.descricao">{{ a.descricao }}</span>
         </div>
         <button class="btn-primario" (click)="fazerAtividade(t, a)">
-          <mat-icon>play_arrow</mat-icon> Fazer
+          <mat-icon>{{ a.tipo === 'montagem' ? 'extension' : 'play_arrow' }}</mat-icon>
+          {{ a.tipo === 'montagem' ? 'Montar' : 'Fazer' }}
         </button>
       </li>
       <li *ngIf="!atividadesPorTurma[t.id]?.length" class="vazio">Nenhuma atividade nesta turma ainda.</li>

@@ -70,6 +70,12 @@ export class EntrarTurmaComponent implements OnInit {
   }
 
   fazerAtividade(t: Turma, a: Atividade): void {
+    // Desafio de montagem: quebra-cabeça avaliado por rubrica, em tela própria (não executa
+    // nada, então o dashboard não serve).
+    if (a.tipo === 'montagem') {
+      this.router.navigate(['/desafio'], { queryParams: { atividade: a.id, turma: t.id } });
+      return;
+    }
     // No master, o dashboard do aluno é a Trilha; abre já vinculado à atividade.
     this.router.navigate(['/trilha'], {
       queryParams: { atividade: a.id, turma: t.id, dataset: a.template?.datasetNome || undefined },
