@@ -262,6 +262,12 @@ export class TurmaDetalheComponent implements OnInit {
     else if (this.chatAlunoId) this.fecharChats(); // fecha o modal
   }
 
+  /** Valor da linha do ranking: nota de desafio é 0–10 (1 decimal); métrica mantém 4. */
+  fmtRanking(v: any): string {
+    if (!this.ehDesafio(this.rankingAtiv)) { return this.fmtValor(v); }
+    return typeof v === 'number' ? v.toFixed(1) : '—';
+  }
+
   fmtValor(v: any): string {
     if (typeof v !== 'number') return '—';
     return Number.isInteger(v) ? String(v) : v.toFixed(4);

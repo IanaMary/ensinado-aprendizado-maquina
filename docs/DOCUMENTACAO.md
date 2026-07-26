@@ -136,6 +136,7 @@ flowchart LR
 | `funcoes_genericas/` | Utilitários (`converter_numpy`, `validar_object_id`, base64 ↔ DataFrame) |
 | `coleta_dados/` | Ingestão CSV/Excel/URL (anti-SSRF) e split treino/teste |
 | `modelos_custom/` | Estimadores customizados permitidos na allowlist |
+| `desafios/` | Desafios de montagem: catálogo de peças, biblioteca de regras da rubrica, sorteio do tabuleiro e avaliação |
 
 ### 3.4 Fluxo de treino
 
@@ -187,6 +188,11 @@ Pontos-chave:
 
 ### 3.8 Coleta de dados
 - Upload **CSV/Excel** e ingestão por **URL**. A URL passa por **anti-SSRF**: só `http(s)`, resolve o host e bloqueia IPs privados/loopback/link-local/reservados; download server-side com `follow_redirects=False`, teto de 50 MB e timeout. O resultado é igual ao do upload (preview, colunas, split).
+- **Divisão treino/teste** passa por um único `dividir_dataframe` (`coleta_dados/configuracao_treinamento.py`), usado pelas quatro portas de entrada e pela redivisão. **Classificação estratifica por padrão**; se alguma categoria tem menos de 2 exemplos, cai para divisão simples, grava o valor efetivo e devolve `aviso_estratificacao` (a tela desmarca a caixa e explica). Ver [`divisao-treino-teste.md`](divisao-treino-teste.md).
+
+### 3.9 Avaliação da aprendizagem
+- **Desafios de montagem** (`app/desafios/`, rotas em `routers/turmas.py`): o aluno monta o pipeline como quebra-cabeça e a montagem é corrigida por **rubrica de regras com peso**, sem executar nada. `GET …/tabuleiro` entrega as peças da tentativa (sem gabarito nem o papel de cada peça); `POST …/submeter-montagem` corrige e grava em `submissoes_montagem`. Ver [`desafios-montagem.md`](desafios-montagem.md).
+- **Evolução do aluno** (`app/pipelines_evolucao.py`, `app/metricas/resultado.py`): `GET /pipelines/evolucao` devolve a trajetória do próprio aluno por base, sempre **relativa** ao "chute burro" e à melhor tentativa anterior — nunca nota absoluta. Ver [`evolucao-aluno.md`](evolucao-aluno.md).
 
 ---
 
@@ -362,7 +368,7 @@ erDiagram
 | `modelo_treinado` | binary | `joblib` do `sklearn.Pipeline` |
 | `checksum` | string | SHA256 de integridade |
 
-### 5.3 Projetos salvos
+### 5.3 Projetos salvos e avaliação da aprendizagem
 
 **`pipelines`** (1) — projeto do aluno (estado completo, abre nas duas visões).
 
@@ -377,6 +383,33 @@ erDiagram
 | `resultadoTreinamento`, `resultadosDasAvaliacoes` | object | Saídas de treino e avaliação |
 | `is_public`, `dificuldade`, `tags`, `professor_id` | — | Publicação na galeria do professor |
 | `dataCriacao`, `dataModificacao` | datetime | Auditoria |
+
+**`atividades`** — atividade proposta pelo professor a uma turma. Dois tipos:
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `turma_id`, `professor_id`, `titulo`, `descricao`, `prazo` | — | Identificação |
+| `tipo` | string | **`pipeline`** (o aluno completa e executa; default quando ausente) ou **`montagem`** (desafio de quebra-cabeça avaliado por rubrica, sem executar) |
+| `template` | object | Pipeline parcial que o aluno abre (tipo `pipeline`) |
+| `gabarito` | object | Requisitos da rubrica (tipo `montagem`): `tarefa`, `exige[]`, `dados{faltantes,texto,escalas_diferentes}`, `dificuldade`, `fixar[]`, `vetar[]`. **Nunca é enviado ao aluno** |
+| `criterio` | object | `{metrica, ordem}` — métrica do ranking e do cálculo de evolução |
+
+**`submissoes_montagem`** — uma tentativa de desafio por documento. **Sem TTL** (é registro de
+avaliação, diferente da telemetria de `atividade_usuario`, que expira em 90 dias).
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `user_id`, `turma_id`, `atividade_id` | string | Vínculos |
+| `tentativa` | int | Sequencial por aluno/atividade (cada tentativa re-sorteia as peças) |
+| `montagem` | object | Peças por lane, na ordem escolhida pelo aluno |
+| `nota`, `nota_max`, `pontos`, `pontos_max` | number | Nota 0–10 e a fração de pesos que a gerou |
+| `regras` | array | `{id, titulo, ok, peso, texto}` — o texto didático que o tutor reusa |
+| `criado_em` | datetime | — |
+
+> Detalhes de arquitetura: [`desafios-montagem.md`](desafios-montagem.md),
+> [`evolucao-aluno.md`](evolucao-aluno.md) e [`divisao-treino-teste.md`](divisao-treino-teste.md).
+> Descrição das funcionalidades com telas: `docs/dissertacao/04-desafios-avaliacao-e-divisao.md`
+> (repositório do workspace).
 
 ### 5.4 Usuários, tutor e config
 

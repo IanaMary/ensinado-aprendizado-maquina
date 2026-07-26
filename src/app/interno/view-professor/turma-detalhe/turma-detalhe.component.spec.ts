@@ -122,4 +122,14 @@ describe('TurmaDetalheComponent — desafio de montagem', () => {
                       criterio: { metrica: 'accuracy_score', ordem: 'desc' } } as any);
     expect(comp.rankingMetrica).toBe('accuracy_score');
   });
+  it('formata nota de desafio com 1 casa e métrica com 4', () => {
+    turma.ranking.and.returnValue(of({ ranking: [], metrica: 'nota' }));
+    comp.verRanking({ id: 'a1', turma_id: 't1', titulo: 'D', tipo: 'montagem' } as any);
+    expect(comp.fmtRanking(5.3)).toBe('5.3');          // nota 0–10, não "5.3000"
+    expect(comp.fmtRanking(10)).toBe('10.0');
+
+    turma.ranking.and.returnValue(of({ ranking: [], metrica: 'accuracy_score' }));
+    comp.verRanking({ id: 'a2', turma_id: 't1', titulo: 'P' } as any);
+    expect(comp.fmtRanking(0.7812)).toBe('0.7812');    // métrica mantém 4 casas
+  });
 });
