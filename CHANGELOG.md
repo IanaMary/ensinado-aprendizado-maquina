@@ -8,6 +8,36 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26b (desafio: trava do professor + progresso separado)
+
+> Frontend `mestrado-iana` `0260394` (bundle **`main-7ZCANP7T.js`**), portado p/ `master`
+> `5697c6f`. Backend `master` **`f17dfb8`**. Backup `/home/ubuntu/backups/deploy-20260726-052138`.
+
+Revisão do que subiu horas antes, contra as *karpathy-guidelines*.
+
+### Adicionado
+- **Trava do professor no sorteio**: dois selects múltiplos ("peças que devem aparecer" e
+  "que nunca aparecem"), alimentados pelos catálogos que o `DashboardService` já publica —
+  sem endpoint novo. Era decisão da grelha que tinha ficado só no backend, sem tela.
+
+### Alterado
+- **Progresso separa Pipelines e Desafios.** `submissoes` voltou a significar apenas
+  pipelines submetidos (número que o professor já lia); desafios ganharam coluna própria
+  com a melhor nota. A fração `/ total_atividades` saiu — o denominador mistura os tipos.
+- Removida a seleção/repesagem de regras por atividade (`gabarito.regras`): nenhuma tela
+  alcançava, e a rubrica sempre usou o conjunto completo. Os pesos seguem na biblioteca.
+
+### Corrigido
+- Select múltiplo era cortado em uma linha (o `.campo-input-wrapper` global tem altura de
+  campo simples); agora cresce com o `size`. Rótulo da peça cai para `nome` antes do slug.
+
+### Testes
+- Spec novo do `turma-detalhe` (8 casos) cobrindo o gabarito enviado ao backend — era a
+  única lógica de decisão da tela sem cobertura. 131/131 na `mestrado-iana`, 122/122 na
+  `master`; backend 396 passed. `fixar`/`vetar` verificados contra backend real.
+
+---
+
 ## 2026-07-26 (desafio de montagem de pipeline — Fase 1)
 
 > Frontend `mestrado-iana` `a440695` (bundle **`main-GT47M2MG.js`**), portado p/ `master`
