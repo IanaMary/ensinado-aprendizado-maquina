@@ -8,6 +8,30 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26g (documentação das 3 funcionalidades + 2 correções vistas nas capturas)
+
+> Frontend `mestrado-iana` `11888e4` (bundle **`main-EDMYYQK2.js`**), portado p/ `master`
+> `7273a76`. Backend `master` **`a7c133e`**. Backup `/home/ubuntu/backups/deploy-20260726-125237`.
+
+### Adicionado
+- **Documento para a dissertação** com 7 capturas de tela e a justificativa de cada decisão:
+  `docs/dissertacao/04-desafios-avaliacao-e-divisao.md` (+ `figuras/` e blocos ABNT em
+  `latex/figuras-abnt.tex`). Repositório do workspace (local).
+- Documentação de arquitetura no backend: `docs/desafios-montagem.md`, `docs/evolucao-aluno.md`,
+  `docs/divisao-treino-teste.md`; `docs/DOCUMENTACAO.md` (nos dois repos) com as coleções
+  `atividades`/`submissoes_montagem` e as seções 3.8/3.9.
+
+### Corrigido
+- **Nota do desafio aparecia como "5.3000"** no ranking: reusava o formatador de métrica
+  (4 casas). Agora 1 casa para nota, 4 para métrica de pipeline.
+- **Histórico de evolução fragmentado**: o mesmo dataset chega como `Iris` pelo assistente e
+  `Iris.xlsx` por outros caminhos, e o filtro comparava nome cru — o aluno não veria evolução.
+  O servidor passou a comparar nomes normalizados (minúsculas, sem extensão).
+
+> Ambos os defeitos apareceram ao montar as capturas para a dissertação, não nos testes.
+
+---
+
 ## 2026-07-26f (aviso quando não dá para estratificar + bateria de testes da divisão)
 
 > Frontend `mestrado-iana` `3cec11c` (bundle **`main-PTQJ6V2W.js`**), portado p/ `master`
