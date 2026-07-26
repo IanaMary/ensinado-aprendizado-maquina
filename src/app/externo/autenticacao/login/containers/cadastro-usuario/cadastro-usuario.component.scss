@@ -346,6 +346,11 @@
     padding: 24px;
     min-height: 200px;
 
+    // Logo compacto em celulares (o max-width limita a largura inline do lockup).
+    .logo-container ::ng-deep img {
+      max-width: 200px;
+    }
+
     .branding-features {
       display: none;
     }

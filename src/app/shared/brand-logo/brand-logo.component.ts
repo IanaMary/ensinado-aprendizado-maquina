@@ -14,6 +14,13 @@ import { Component, Input } from '@angular/core';
 export class BrandLogoComponent {
   @Input() variante: 'positivo' | 'negativo' | 'marca' = 'positivo';
   @Input() altura = 32;
+  /**
+   * Largura em px. Quando informada, prevalece sobre `altura` (a altura passa a ser
+   * automática). Útil para os lockups `positivo`/`negativo`: o PNG tem muita margem
+   * transparente (arte em 876×248 de uma tela 1367×768), então dimensionar pela altura
+   * do arquivo deixa a arte visível ~3× menor do que se espera.
+   */
+  @Input() largura?: number;
 
   private static readonly MAPA: Record<string, string> = {
     positivo: 'assets/brand/hub-ia-positivo.png',
