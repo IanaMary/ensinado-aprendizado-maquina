@@ -8,6 +8,36 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26d (Fase 2: evolução do aluno na mesma base)
+
+> Frontend `mestrado-iana` `bda1294`+`93d1872` (bundle **`main-5OWPTQIF.js`**), portado p/
+> `master` `11646f8`. Backend `master` **`4204bc0`**. Backup `/home/ubuntu/backups/deploy-20260726-102325`.
+
+### Adicionado
+- **"Sua evolução nesta base"** no topo do resultado da avaliação: chute burro da base, a
+  melhor tentativa do aluno e a avaliação atual, com a diferença em pontos percentuais.
+  A leitura é sempre **relativa** — métrica crua não é comparável entre bases (acurácia 0,92
+  é fraca no iris e ótima no titanic), então nunca há nota absoluta.
+- **Chute burro** derivado do que já estava gravado, sem reprocessar dados: proporção da
+  classe majoritária lida das somas das linhas da matriz de confusão; R² = 0 por definição;
+  nas demais métricas não há baseline barato e o bloco simplesmente omite a comparação.
+- `GET /pipelines/evolucao` (só os próprios pipelines) agrupa por `(dataset, alvo)`
+  atravessando atividades e projetos livres, com o que mudou entre tentativas
+  ("trocou o modelo", "acrescentou pré-processamento"). Aceita `dataset` (repetível) e
+  `alvo`: o cliente manda os nomes que conhece e **o servidor decide a identidade**.
+- `app/metricas/resultado.py`: leitura dos resultados extraída de `turmas.py` — ranking e
+  evolução precisavam da mesma resolução rótulo × slug e não devem ter duas cópias.
+
+### Notas
+- A identidade da base **não** usa `datasetId` primeiro: ele é o id do arquivo criado a cada
+  carregamento, e preferi-lo fragmentaria a história (cada recarregamento viraria base nova).
+- "Melhorou" tem sinal positivo também em métricas de menor-é-melhor (MAE).
+- Verificado no navegador com o fluxo real (Iris → treinar → avaliar): *"Sua melhor até agora
+  0.88 · Esta avaliação 1.00 · +12.0pp"*. Backend 420 passed; front 138/138 e 129/129 (master).
+- **Fase 3 (perfil do aluno + narrativa) não implementada.**
+
+---
+
 ## 2026-07-26c (recorte dos lockups do Hub + clamp que encolhia o logo)
 
 > Só frontend: `mestrado-iana` `1fd7e52` (bundle **`main-TYN6VZGN.js`**), portado p/ `master`
