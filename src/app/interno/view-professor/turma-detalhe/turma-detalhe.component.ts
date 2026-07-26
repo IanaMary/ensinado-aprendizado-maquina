@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as QRCode from 'qrcode';
-import { TurmaService, Turma, Atividade } from '../../../service/turma.service';
+import { TurmaService, Turma, Atividade, LaneDesafio, PerfilDatasetDesafio } from '../../../service/turma.service';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 
 @Component({
@@ -28,11 +28,14 @@ export class TurmaDetalheComponent implements OnInit {
   criandoAtiv = false;
   novaAtiv = {
     titulo: '', descricao: '', datasetNome: '', metrica: 'accuracy_score', ordem: 'desc',
-    // Desafio de montagem: tarefa + características da base descritas no enunciado
-    // (o desafio não executa nada, então são essas flags que ligam as regras da rubrica).
+    // Desafio de montagem: nasce de um dataset de exemplo. A tarefa vem dele (o servidor
+    // decide), e as características da base são lidas do dataframe — o professor ajusta.
     tipo: 'pipeline' as 'pipeline' | 'montagem',
+    dataset: '',
     tarefa: 'classificacao' as 'classificacao' | 'regressao' | 'agrupamento',
     dificuldade: 'medio' as 'facil' | 'medio' | 'dificil',
+    // 'sortear': o sistema escolhe as peças úteis; 'escolher': valem as do professor.
+    modoPecas: 'sortear' as 'sortear' | 'escolher',
     exigePreProcessamento: false,
     faltantes: false,
     texto: false,
@@ -40,19 +43,28 @@ export class TurmaDetalheComponent implements OnInit {
     fixar: [] as string[],
     vetar: [] as string[],
   };
-  /** Peças do catálogo para fixar/vetar no sorteio (mesma fonte do dashboard). */
-  pecas: { valor: string; label: string }[] = [];
-  tarefas = [
-    { valor: 'classificacao', label: 'Classificação (qual categoria?)' },
-    { valor: 'regressao', label: 'Regressão (qual número?)' },
-    { valor: 'agrupamento', label: 'Agrupamento (que grupos existem?)' },
+  /** Peças do catálogo, com a lane e a compatibilidade (para filtrar pela tarefa). */
+  pecas: { valor: string; label: string; lane: LaneDesafio; tarefa?: string; grupo?: string }[] = [];
+  /** Perfil do dataset escolhido: descreve a tarefa e a base para o professor. */
+  perfil?: PerfilDatasetDesafio;
+  carregandoPerfil = false;
+  lanesDesafio: { lane: LaneDesafio; titulo: string }[] = [
+    { lane: 'coleta', titulo: 'Coleta' },
+    { lane: 'pre_processamento', titulo: 'Pré-processamento' },
+    { lane: 'modelo', titulo: 'Modelo' },
+    { lane: 'metrica', titulo: 'Métrica' },
   ];
+  rotulosTarefa: Record<string, string> = {
+    classificacao: 'Classificação (prever uma categoria)',
+    regressao: 'Regressão (prever um número)',
+    agrupamento: 'Agrupamento (descobrir grupos)',
+  };
   dificuldades = [
     { valor: 'facil', label: 'Fácil (2 peças que não servem)' },
     { valor: 'medio', label: 'Médio (4 peças que não servem)' },
     { valor: 'dificil', label: 'Difícil (6 peças que não servem)' },
   ];
-  datasets: { nome: string; label?: string }[] = [];
+  datasets: { id: string; nome: string; label?: string; tipo?: string }[] = [];
   metricas = [
     { valor: 'accuracy_score', label: 'Acurácia (classificação)', ordem: 'desc' },
     { valor: 'f1_score', label: 'F1 (classificação)', ordem: 'desc' },
@@ -83,20 +95,34 @@ export class TurmaDetalheComponent implements OnInit {
     this.turmaId = this.route.snapshot.paramMap.get('id') || '';
     this.carregar();
     this.dashboard.getToyDatasets().subscribe({
-      next: (ds: any[]) => this.datasets = (ds || []).map(d => ({ nome: d.nome || d, label: d.label || d.nome || d })),
+      next: (ds: any[]) => this.datasets = (ds || []).map(d => ({
+        id: d.id || d.valor || d.nome || d,
+        nome: d.nome || d,
+        label: d.label || d.nome || d,
+        tipo: d.tipo,
+      })),
       error: () => {},
     });
     this.carregarPecas();
   }
 
-  /** Peças que o professor pode fixar/vetar. Reusa os catálogos já publicados pelo
-   * DashboardService (mesma lista que o aluno vê no pipeline). */
+  /** Peças que o professor pode escolher (ou vetar). Reusa os catálogos já publicados pelo
+   * DashboardService — a mesma lista que o aluno vê no pipeline — guardando a lane e a
+   * compatibilidade de cada peça, para filtrar pela tarefa do dataset. */
   private carregarPecas(): void {
-    const acumular = (itens: any[]) => {
+    const acumular = (lane: LaneDesafio) => (itens: any[]) => {
       const novas = (itens || [])
         .filter(i => i?.valor && i?.habilitado !== false)
         // `label` é o rótulo do catálogo; `nome` cobre docs antigos; o slug é último recurso.
-        .map(i => ({ valor: i.valor as string, label: (i.label || i.nome || i.valor) as string }));
+        .map(i => ({
+          valor: i.valor as string,
+          label: (i.label || i.nome || i.valor) as string,
+          lane,
+          // Mesma convenção do backend (app/desafios/catalogo.py): sem rótulo é agrupamento,
+          // senão o tipo do alvo decide.
+          tarefa: lane === 'modelo' ? this.tarefaDoModelo(i) : undefined,
+          grupo: lane === 'metrica' ? (i.grupo || undefined) : undefined,
+        }));
       const vistos = new Set(this.pecas.map(p => p.valor));
       this.pecas = [...this.pecas, ...novas.filter(p => !vistos.has(p.valor))]
         .sort((a, b) => a.label.localeCompare(b.label));
@@ -104,9 +130,72 @@ export class TurmaDetalheComponent implements OnInit {
     this.dashboard.carregarItensPreProcessamento();
     this.dashboard.carregarItensModelos();
     this.dashboard.carregarItensMetricas();
-    this.dashboard.getItensPreProcessamento().subscribe({ next: acumular, error: () => {} });
-    this.dashboard.getModelos().subscribe({ next: acumular, error: () => {} });
-    this.dashboard.getItensMetricas().subscribe({ next: acumular, error: () => {} });
+    // Coleta vem da rota do catálogo (o observable do dashboard colapsa tudo num item "Dados").
+    this.dashboard.fetchItensColetasDados().subscribe({ next: acumular('coleta'), error: () => {} });
+    this.dashboard.getItensPreProcessamento().subscribe({ next: acumular('pre_processamento'), error: () => {} });
+    this.dashboard.getModelos().subscribe({ next: acumular('modelo'), error: () => {} });
+    this.dashboard.getItensMetricas().subscribe({ next: acumular('metrica'), error: () => {} });
+  }
+
+  private tarefaDoModelo(doc: any): string {
+    const rotulados = doc?.dadosRotulados ?? doc?.dados_rotulados;
+    if (rotulados === false) return 'agrupamento';
+    const categoria = doc?.preverCategoria ?? doc?.prever_categoria ?? true;
+    return categoria ? 'classificacao' : 'regressao';
+  }
+
+  /** Peças de uma lane que fazem sentido para a tarefa do dataset escolhido. */
+  pecasDaLane(lane: LaneDesafio): { valor: string; label: string }[] {
+    return this.pecas.filter(p => {
+      if (p.lane !== lane) return false;
+      if (lane === 'modelo') return p.tarefa === this.novaAtiv.tarefa;
+      // Métrica sem `grupo` no catálogo entra: o backend a trata como compatível.
+      if (lane === 'metrica') return !p.grupo || p.grupo === this.novaAtiv.tarefa;
+      return true;
+    });
+  }
+
+  pecaEscolhida(valor: string): boolean {
+    return this.novaAtiv.fixar.includes(valor);
+  }
+
+  alternarPeca(valor: string): void {
+    this.novaAtiv.fixar = this.pecaEscolhida(valor)
+      ? this.novaAtiv.fixar.filter(v => v !== valor)
+      : [...this.novaAtiv.fixar, valor];
+  }
+
+  /** Dataset escolhido → tarefa, enunciado sugerido e características da base.
+   *  O servidor é a fonte: ele lê o dataframe e derivará a tarefa de novo ao salvar. */
+  onDatasetDesafioChange(): void {
+    const id = this.novaAtiv.dataset;
+    this.perfil = undefined;
+    // Peças escolhidas para outra tarefa deixam de fazer sentido.
+    this.novaAtiv.fixar = [];
+    if (!id) return;
+    this.carregandoPerfil = true;
+    this.dashboard.getPerfilDesafioDataset(id).subscribe({
+      next: (p: PerfilDatasetDesafio) => {
+        this.carregandoPerfil = false;
+        this.perfil = p;
+        this.novaAtiv.tarefa = p.tarefa;
+        this.novaAtiv.faltantes = !!p.dados?.faltantes;
+        this.novaAtiv.texto = !!p.dados?.texto;
+        this.novaAtiv.escalasDiferentes = !!p.dados?.escalas_diferentes;
+        // Não sobrescreve o que o professor já escreveu.
+        if (!this.novaAtiv.descricao.trim() && p.enunciado_sugerido) {
+          this.novaAtiv.descricao = p.enunciado_sugerido;
+        }
+        if (!this.novaAtiv.titulo.trim()) {
+          this.novaAtiv.titulo = `Desafio: ${p.nome}`;
+        }
+      },
+      error: () => {
+        this.carregandoPerfil = false;
+        this.snackBar.open('Não foi possível ler o dataset agora. Você pode seguir e ajustar à mão.',
+                           'Fechar', { duration: 4000 });
+      },
+    });
   }
 
   carregar(): void {
@@ -146,7 +235,7 @@ export class TurmaDetalheComponent implements OnInit {
   }
 
   criarAtividade(): void {
-    if (!this.novaAtiv.titulo.trim()) return;
+    if (!this.podeCriarAtividade) return;
     const met = this.metricas.find(m => m.valor === this.novaAtiv.metrica);
     const ehMontagem = this.novaAtiv.tipo === 'montagem';
     this.criandoAtiv = true;
@@ -169,7 +258,7 @@ export class TurmaDetalheComponent implements OnInit {
   }
 
   /** Gabarito do desafio: o que a rubrica vai cobrar (não é a solução). */
-  private montarGabarito() {
+  montarGabarito() {
     const exige: ('coleta' | 'pre_processamento' | 'modelo' | 'metrica')[] = ['coleta', 'modelo', 'metrica'];
     // Só exigimos a lane de pré-processamento quando o professor marca — ou quando a base
     // descrita obriga (dado faltante/texto precisam de bloco, senão a regra seria injusta).
@@ -177,6 +266,8 @@ export class TurmaDetalheComponent implements OnInit {
       exige.splice(1, 0, 'pre_processamento');
     }
     return {
+      // O servidor deriva a tarefa deste dataset; mandamos a nossa só como fallback.
+      dataset: this.novaAtiv.dataset || null,
       tarefa: this.novaAtiv.tarefa,
       exige,
       dados: {
@@ -185,23 +276,39 @@ export class TurmaDetalheComponent implements OnInit {
         escalas_diferentes: this.novaAtiv.escalasDiferentes,
       },
       dificuldade: this.novaAtiv.dificuldade,
-      // Trava do professor: peça fixada sempre entra no tabuleiro; vetada nunca aparece.
+      // 'escolher' = valem só as peças do professor (+ o mínimo que o servidor garante).
+      sortear_pecas: this.novaAtiv.modoPecas === 'sortear',
+      // Peça escolhida sempre entra no tabuleiro; vetada nunca aparece.
       fixar: [...this.novaAtiv.fixar],
       vetar: [...this.novaAtiv.vetar],
     };
   }
 
+  /** Desafio precisa de uma base: é dela que saem tarefa, enunciado e peças compatíveis. */
+  get podeCriarAtividade(): boolean {
+    if (!this.novaAtiv.titulo.trim()) return false;
+    return this.novaAtiv.tipo !== 'montagem' || !!this.novaAtiv.dataset;
+  }
+
   private resetarNovaAtividade(): void {
     this.novaAtiv = {
       titulo: '', descricao: '', datasetNome: '', metrica: 'accuracy_score', ordem: 'desc',
-      tipo: 'pipeline', tarefa: 'classificacao', dificuldade: 'medio',
+      tipo: 'pipeline', dataset: '', tarefa: 'classificacao', dificuldade: 'medio',
+      modoPecas: 'sortear',
       exigePreProcessamento: false, faltantes: false, texto: false, escalasDiferentes: false,
       fixar: [], vetar: [],
     };
+    this.perfil = undefined;
   }
 
   ehDesafio(a?: Atividade): boolean {
     return a?.tipo === 'montagem';
+  }
+
+  /** Nome legível da base de um desafio já criado (o gabarito guarda o id). */
+  nomeDataset(id?: string | null): string {
+    if (!id) return '';
+    return this.datasets.find(d => d.id === id)?.nome || id;
   }
 
   excluirAtividade(a: Atividade): void {

@@ -10,7 +10,8 @@
       </p>
     </div>
     <div class="placar" *ngIf="tabuleiro">
-      <span class="chip">Tentativa {{ tabuleiro.tentativa }}</span>
+      <span class="chip base" *ngIf="tabuleiro.dataset_nome">Base: {{ tabuleiro.dataset_nome }}</span>
+    <span class="chip">Tentativa {{ tabuleiro.tentativa }}</span>
       <span class="chip melhor" *ngIf="tabuleiro.melhor_nota !== null">
         Melhor nota: {{ tabuleiro.melhor_nota }}
       </span>

@@ -8,6 +8,27 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-26j (criar desafio a partir de um dataset de exemplo)
+
+> Frontend `mestrado-iana` **`<pendente>`** (bundle `main-A75CCYTF.js`) / Backend `master` `a1f6f61`.
+
+### Adicionado
+- **A criação do desafio começa pela base**: novo campo "Base de dados do desafio" (datasets de
+  exemplo) como primeiro passo. Ao escolher, a tela mostra um bloco com a **tarefa derivada**, a
+  pergunta-guia, a descrição, o alvo e as pistas — e pré-preenche título e enunciado (editáveis).
+- **Peças do tabuleiro**: "Sortear as peças" (padrão) ou "Escolher as peças", com lista agrupada
+  por lane e filtrada pela tarefa da base (só modelos/métricas compatíveis).
+- As três caixas "o que a base exige" vêm **lidas do dataset** e seguem ajustáveis; o select de
+  tarefa saiu (é derivado). A lista de atividades mostra a base do desafio.
+- Tela do aluno: chip **"Base: Iris"** no tabuleiro, ao lado de "Tentativa N".
+
+### Notas
+- `DashboardService.getPerfilDesafioDataset`; `GabaritoMontagem` ganhou `dataset` e
+  `sortear_pecas`; `TabuleiroDesafio` ganhou `dataset_nome`.
+- Testes: 162/162 (novos casos no spec de `turma-detalhe`) + build de produção.
+
+---
+
 ## 2026-07-26i (voltar às boas-vindas, um toast por erro, código morto removido)
 
 > Frontend `mestrado-iana` **`fb784c8`** (bundle `main-JE2Q5PDD.js`). Backend inalterado.

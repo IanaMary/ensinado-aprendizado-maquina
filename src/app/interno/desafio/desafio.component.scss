@@ -72,6 +72,8 @@
     white-space: nowrap;
 
     &.melhor { background: $sucesso-claro; color: #1B5E20; }
+    // Base do enunciado: o aluno precisa saber sobre quais dados está pensando.
+    &.base { background: $branco; border: 1px solid rgba($roxo-claro, 0.9); }
   }
 }
 

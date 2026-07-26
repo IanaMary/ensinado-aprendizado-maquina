@@ -117,3 +117,32 @@
   legend { padding: 0 4px; }
   label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: $cinza-escuro; cursor: pointer; }
   input[type="checkbox"] { accent-color: $roxo-medio; width: 15px; height: 15px; } }
+
+// Descrição da tarefa derivada da base escolhida (read-only).
+.perfil-base { grid-column: 1 / -1; border: 1px solid rgba($roxo-claro, 0.7); border-radius: 10px;
+  background: $roxo-fundo; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;
+  .perfil-linha { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip-tarefa, .chip-base { padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .chip-tarefa { background: $roxo-medio; color: $branco; }
+  .chip-base { background: $branco; color: $roxo-escuro; border: 1px solid rgba($roxo-claro, 0.9); }
+  .perfil-pergunta { margin: 0; font-size: 13px; font-weight: 600; color: $roxo-escuro; }
+  .perfil-desc { margin: 0; font-size: 12px; color: $cinza-escuro; }
+  .perfil-detalhes { margin: 0; padding-left: 16px; font-size: 12px; color: $cinza-medio;
+    strong { color: $cinza-escuro; } } }
+
+// Sortear × escolher as peças, e a lista por lane quando o professor escolhe.
+.modo-pecas { border: 1px solid rgba($roxo-claro, 0.7); border-radius: 10px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px; grid-column: 1 / -1;
+  legend { padding: 0 4px; }
+  label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: $cinza-escuro; cursor: pointer; }
+  input[type="radio"] { accent-color: $roxo-medio; } }
+
+.escolher-pecas { grid-column: 1 / -1; display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  .lane-pecas { border: 1px solid rgba($roxo-claro, 0.6); border-radius: 10px; padding: 8px 10px;
+    display: flex; flex-direction: column; gap: 4px;
+    h5 { margin: 0 0 2px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: $roxo-escuro; }
+    label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: $cinza-escuro; cursor: pointer; }
+    input[type="checkbox"] { accent-color: $roxo-medio; width: 14px; height: 14px; } } }
+
+.campo-dica { font-size: 11px; color: $cinza-medio; }

@@ -17,6 +17,7 @@ describe('TurmaDetalheComponent — desafio de montagem', () => {
   let fixture: ComponentFixture<TurmaDetalheComponent>;
   let comp: TurmaDetalheComponent;
   let turma: jasmine.SpyObj<TurmaService>;
+  let dash: any;
 
   beforeEach(async () => {
     turma = jasmine.createSpyObj('TurmaService', [
@@ -27,11 +28,25 @@ describe('TurmaDetalheComponent — desafio de montagem', () => {
     turma.progresso.and.returnValue(of({ alunos: [] }));
     turma.criarAtividade.and.returnValue(of({ id: 'a1', turma_id: 't1', titulo: 'X' } as any));
 
-    const dash = jasmine.createSpyObj('DashboardService', [
+    dash = jasmine.createSpyObj('DashboardService', [
       'getToyDatasets', 'carregarItensPreProcessamento', 'carregarItensModelos',
       'carregarItensMetricas', 'getItensPreProcessamento', 'getModelos', 'getItensMetricas',
+      'fetchItensColetasDados', 'getPerfilDesafioDataset',
     ]);
-    dash.getToyDatasets.and.returnValue(of([]));
+    dash.getToyDatasets.and.returnValue(of([
+      { id: 'iris', nome: 'Iris', tipo: 'classificacao' },
+      { id: 'gen_sorvete', nome: 'Sorvetes 🍦', tipo: 'regressao' },
+    ]));
+    dash.fetchItensColetasDados.and.returnValue(of([
+      { valor: 'arquivo', nome: 'Arquivo', habilitado: true },
+    ]));
+    dash.getPerfilDesafioDataset.and.returnValue(of({
+      dataset: 'iris', nome: 'Iris', tarefa: 'classificacao', n_amostras: 150,
+      pergunta: 'Será que medidas simples bastam?', descricao: 'Três espécies de flores.',
+      alvo: 'Espécie da flor', atributos: 'Medidas das pétalas',
+      enunciado_sugerido: 'Será que medidas simples bastam? Três espécies de flores.',
+      dados: { faltantes: false, texto: false, escalas_diferentes: true },
+    }));
     dash.getItensPreProcessamento.and.returnValue(of([
       { valor: 'minmax_scaler', label: 'MinMaxScaler', habilitado: true },
     ]));
@@ -62,14 +77,69 @@ describe('TurmaDetalheComponent — desafio de montagem', () => {
   });
 
   function criarDesafio(extra: Partial<any> = {}) {
-    Object.assign(comp.novaAtiv, { tipo: 'montagem', titulo: 'Desafio' }, extra);
+    Object.assign(comp.novaAtiv, { tipo: 'montagem', titulo: 'Desafio', dataset: 'iris' }, extra);
     comp.criarAtividade();
     return turma.criarAtividade.calls.mostRecent().args[1] as any;
   }
 
-  it('lista as peças habilitadas do catálogo para fixar/vetar', () => {
-    expect(comp.pecas.map(p => p.valor)).toEqual(['accuracy_score', 'knn', 'minmax_scaler']);
+  it('lista as peças habilitadas do catálogo, com a lane de cada uma', () => {
+    expect(comp.pecas.map(p => p.valor).sort())
+      .toEqual(['accuracy_score', 'arquivo', 'knn', 'minmax_scaler']);
     expect(comp.pecas.some(p => p.valor === 'oculto')).toBeFalse();  // desabilitada no admin
+    expect(comp.pecas.find(p => p.valor === 'knn')?.lane).toBe('modelo');
+    expect(comp.pecas.find(p => p.valor === 'arquivo')?.lane).toBe('coleta');
+  });
+
+  it('escolher a base define a tarefa, o enunciado e o que a base exige', () => {
+    comp.novaAtiv.tipo = 'montagem';
+    comp.novaAtiv.dataset = 'iris';
+    comp.onDatasetDesafioChange();
+
+    expect(dash.getPerfilDesafioDataset).toHaveBeenCalledWith('iris');
+    expect(comp.novaAtiv.tarefa).toBe('classificacao');
+    expect(comp.novaAtiv.escalasDiferentes).toBeTrue();       // lido do dataframe
+    expect(comp.novaAtiv.faltantes).toBeFalse();
+    expect(comp.novaAtiv.descricao).toContain('Três espécies');
+    expect(comp.perfil?.nome).toBe('Iris');
+  });
+
+  it('não sobrescreve enunciado que o professor já escreveu', () => {
+    comp.novaAtiv.descricao = 'Meu enunciado';
+    comp.novaAtiv.dataset = 'iris';
+    comp.onDatasetDesafioChange();
+    expect(comp.novaAtiv.descricao).toBe('Meu enunciado');
+  });
+
+  it('só oferece peças compatíveis com a tarefa da base', () => {
+    comp.novaAtiv.tarefa = 'classificacao';
+    expect(comp.pecasDaLane('modelo').map(p => p.valor)).toEqual(['knn']);
+    comp.novaAtiv.tarefa = 'regressao';
+    expect(comp.pecasDaLane('modelo')).toEqual([]);           // k-NN é de classificação
+    expect(comp.pecasDaLane('coleta').map(p => p.valor)).toEqual(['arquivo']);
+  });
+
+  it('desafio exige uma base para poder ser criado', () => {
+    Object.assign(comp.novaAtiv, { tipo: 'montagem', titulo: 'Desafio', dataset: '' });
+    expect(comp.podeCriarAtividade).toBeFalse();
+    comp.novaAtiv.dataset = 'iris';
+    expect(comp.podeCriarAtividade).toBeTrue();
+  });
+
+  it('manda a base e o modo das peças no gabarito', () => {
+    const sorteado = criarDesafio();
+    expect(sorteado.gabarito.dataset).toBe('iris');
+    expect(sorteado.gabarito.sortear_pecas).toBeTrue();
+
+    const curado = criarDesafio({ modoPecas: 'escolher', fixar: ['knn'] });
+    expect(curado.gabarito.sortear_pecas).toBeFalse();
+    expect(curado.gabarito.fixar).toEqual(['knn']);
+  });
+
+  it('trocar a base descarta as peças escolhidas para a tarefa anterior', () => {
+    comp.novaAtiv.fixar = ['knn'];
+    comp.novaAtiv.dataset = 'gen_sorvete';
+    comp.onDatasetDesafioChange();
+    expect(comp.novaAtiv.fixar).toEqual([]);
   });
 
   it('não exige pré-processamento quando a base não pede nada', () => {
@@ -91,7 +161,7 @@ describe('TurmaDetalheComponent — desafio de montagem', () => {
     expect(corpo.gabarito.dados).toEqual({ faltantes: false, texto: false, escalas_diferentes: false });
   });
 
-  it('envia fixar/vetar escolhidos pelo professor', () => {
+  it('envia peças escolhidas e vetadas pelo professor', () => {
     const corpo = criarDesafio({ fixar: ['minmax_scaler'], vetar: ['knn'] });
     expect(corpo.gabarito.fixar).toEqual(['minmax_scaler']);
     expect(corpo.gabarito.vetar).toEqual(['knn']);
@@ -110,6 +180,8 @@ describe('TurmaDetalheComponent — desafio de montagem', () => {
     expect(comp.novaAtiv.tipo).toBe('pipeline');
     expect(comp.novaAtiv.faltantes).toBeFalse();
     expect(comp.novaAtiv.fixar).toEqual([]);
+    expect(comp.novaAtiv.dataset).toBe('');
+    expect(comp.perfil).toBeUndefined();
   });
 
   it('ranking do desafio é por nota; o de pipeline segue a métrica', () => {
