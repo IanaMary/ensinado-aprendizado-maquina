@@ -15,6 +15,7 @@ import { AuthService } from '../../service/auth/auth.service';
 import { AtividadeService } from '../../service/atividade/atividade.service';
 import { NotificacaoService } from '../../service/notificacao.service';
 import { TurmaService, DesafioDoAluno } from '../../service/turma.service';
+import { NivelTutorService } from '../../service/nivel-tutor.service';
 
 const TIPOS_ARQUIVO_DADOS = ['csv', 'tsv', 'json', 'excel', 'xlxs'];
 
@@ -90,7 +91,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private atividade: AtividadeService,
     private notificacao: NotificacaoService,
-    private turmaService: TurmaService
+    private turmaService: TurmaService,
+    private nivelTutor: NivelTutorService
   ) { }
 
   ngOnInit(): void {
@@ -481,6 +483,9 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       || (treinados[0] ? { valor: (treinados[0] as any).modelo, label: (treinados[0] as any).nome_modelo } : null);
 
     return {
+      // Profundidade escolhida pelo aluno: o backend monta a ficha do catálogo nesse nível e a
+      // instrução de sistema manda adaptar a resposta.
+      nivel: this.nivelTutor.nivel,
       etapaAtual: this.etapaAtual || null,
       itemSelecionado: item ? { tipo: item.tipoItem, valor: item.valor, label: item.label } : null,
       infoSelecionada: info || null,

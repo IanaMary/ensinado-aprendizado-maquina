@@ -8,7 +8,16 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
-## 2026-07-26k (editor da instrução do tutor no conf-tutor) — porte
+## 2026-07-27 (nível do tutor no perfil + blocos Fundamentos / Na prática) — porte
+
+> Frontend `master` (não implantado; produção roda a `mestrado-iana`). Backend `master` `a9c2eba`.
+
+- Toggle Básico/Avançado vira preferência de perfil (`NivelTutorService`): vale nos painéis,
+  sobrevive ao recarregar e vai no contexto do chat.
+- Card ganha **Fundamentos** e **Na prática** no modo Avançado; editor do admin idem.
+
+---
+
 
 > Frontend `master` (não implantado; produção roda a `mestrado-iana`). Backend `master` `7d40bed`.
 

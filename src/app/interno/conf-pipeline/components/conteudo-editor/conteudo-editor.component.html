@@ -25,6 +25,33 @@
   <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Vantagens', lista: draft.vantagens }"></ng-container>
   <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Desvantagens', lista: draft.desvantagens }"></ng-container>
 
+  <!-- Modo Avançado: Fundamentos (formal) -->
+  <fieldset class="bloco">
+    <legend>Fundamentos (modo Avançado)</legend>
+    <label><span>Fórmula / objetivo</span>
+      <input type="text" [(ngModel)]="draft.fundamentos.formula"
+        placeholder="ex.: min ½‖w‖² + C·Σ ξ_i" /></label>
+    <label><span>O que otimiza</span>
+      <input type="text" [(ngModel)]="draft.fundamentos.otimiza"
+        placeholder="ex.: maximiza a margem entre as classes" /></label>
+    <label><span>Complexidade (treino / predição)</span>
+      <input type="text" [(ngModel)]="draft.fundamentos.complexidade"
+        placeholder="ex.: treino O(n·d² ); predição O(d)" /></label>
+    <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Pressupostos', lista: draft.fundamentos.pressupostos }"></ng-container>
+    <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Leitura de referência', lista: draft.fundamentos.leitura }"></ng-container>
+  </fieldset>
+
+  <!-- Modo Avançado: Na prática (operacional) -->
+  <fieldset class="bloco">
+    <legend>Na prática (modo Avançado)</legend>
+    <label><span>Código de referência (pipeline completo)</span>
+      <textarea rows="6" class="mono" [(ngModel)]="draft.pratica.codigo"
+        placeholder="from sklearn.pipeline import Pipeline&#10;from sklearn.model_selection import GridSearchCV&#10;..."></textarea></label>
+    <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'O que ajustar primeiro', lista: draft.pratica.tuning }"></ng-container>
+    <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Armadilhas', lista: draft.pratica.armadilhas }"></ng-container>
+    <ng-container *ngTemplateOutlet="listaStr; context: { titulo: 'Como perceber que deu errado', lista: draft.pratica.diagnostico }"></ng-container>
+  </fieldset>
+
   <!-- Conceitos -->
   <div class="bloco">
     <div class="bloco-header"><strong>Conceitos</strong>
