@@ -8,6 +8,16 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-27b (manual descreve o Avançado atual)
+
+> Frontend `mestrado-iana` **`<pendente>`** (bundle `main-7ITTBJMV.js`). Backend `master` `ee69abf`.
+
+- O manual do aluno dizia apenas "Avançado (técnico, com fórmula e hiperparâmetros)". Agora
+  descreve os blocos **Fundamentos** e **Na prática** e explica que a escolha do nível fica
+  guardada no perfil e vale também para o chat.
+
+---
+
 ## 2026-07-27 (nível do tutor no perfil + blocos Fundamentos / Na prática)
 
 > Frontend `mestrado-iana` **`<pendente>`** / Backend `master` `a9c2eba`.

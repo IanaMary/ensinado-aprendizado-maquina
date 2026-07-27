@@ -226,8 +226,13 @@ export class ManualComponent implements OnInit {
               <li>Clique no <strong>ⓘ</strong> de qualquer item (modelo, métrica, pré-processador, dados) para ver a
                 ficha completa: descrição, intuição, exemplo, <strong>código Python colorido</strong>, quando usar/evitar,
                 vantagens/desvantagens e links para a documentação oficial.</li>
-              <li>Alterne entre <strong>Básico</strong> (linguagem simples) e <strong>Avançado</strong> (técnico, com fórmula
-                e hiperparâmetros).</li>
+              <li>Alterne entre <strong>Básico</strong> (linguagem simples) e <strong>Avançado</strong>. No Avançado
+                aparecem a fórmula, os hiperparâmetros com o efeito de cada um e dois blocos a mais:
+                <strong>Fundamentos</strong> (o que o método otimiza, pressupostos, custo computacional e leitura de
+                referência) e <strong>Na prática</strong> (código completo com validação cruzada, o que ajustar primeiro,
+                armadilhas e como perceber que deu errado).</li>
+              <li>A escolha do nível fica <strong>guardada no seu perfil</strong>: vale em todos os painéis do tutor,
+                continua valendo quando você voltar — e o <strong>chat responde na mesma profundidade</strong>.</li>
             </ul>
             <h3>Chat com IA</h3>
             <p>Abaixo do conteúdo há um <strong>chat</strong> que conhece o seu pipeline (dataset, modelos,
