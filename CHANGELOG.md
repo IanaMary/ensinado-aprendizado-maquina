@@ -8,7 +8,13 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
-## 2026-07-27 (nível do tutor no perfil + blocos Fundamentos / Na prática) — porte
+## 2026-07-27b (manual descreve o Avançado atual) — porte
+
+> Frontend `master` (não implantado). O manual passa a descrever os blocos Fundamentos e Na
+> prática e a preferência de nível guardada no perfil.
+
+---
+
 
 > Frontend `master` (não implantado; produção roda a `mestrado-iana`). Backend `master` `a9c2eba`.
 
