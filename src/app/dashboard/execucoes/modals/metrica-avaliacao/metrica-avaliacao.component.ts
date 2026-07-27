@@ -213,10 +213,11 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     if (conteudo) {
       return conteudoParaItemInfo(conteudo, visualizacao.titulo);
     }
+    // Só `descricao`: o Básico já cai nela quando não há `resumo_basico`. Duplicar o mesmo
+    // texto nos dois campos fingia dois registros de linguagem que não existem no fallback.
     return {
       titulo: visualizacao.titulo,
       descricao: this.getDescricaoVisualizacao(visualizacao.titulo),
-      resumo_basico: this.getDescricaoVisualizacao(visualizacao.titulo),
       link_yellowbrick: this.getLinkVisualizacao(visualizacao.titulo),
     };
   }

@@ -4,26 +4,22 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './auth.interceptor';
 import { AuthService } from '../service/auth/auth.service';
 import { NotificacaoService } from '../service/notificacao.service';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
 describe('AuthInterceptor', () => {
   let httpMock: HttpTestingController;
   let httpClient: HttpClient;
   let authService: jasmine.SpyObj<AuthService>;
-  let router: jasmine.SpyObj<Router>;
   let notificacao: jasmine.SpyObj<NotificacaoService>;
 
   beforeEach(() => {
     authService = jasmine.createSpyObj('AuthService', ['getToken', 'logout']);
-    router = jasmine.createSpyObj('Router', ['navigate']);
     notificacao = jasmine.createSpyObj('NotificacaoService', ['sucesso', 'erro', 'aviso']);
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         { provide: AuthService, useValue: authService },
-        { provide: Router, useValue: router },
         { provide: NotificacaoService, useValue: notificacao },
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
       ],
