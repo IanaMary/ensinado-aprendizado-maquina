@@ -886,3 +886,25 @@ $metrica-cor-escuro: #E65100;
   &:hover { background: $roxo-fundo; }
   mat-icon { font-size: 16px; width: 16px; height: 16px; }
 }
+
+// Blocos exclusivos do modo Avançado: Fundamentos (formal) e Na prática (operacional).
+.bloco-avancado {
+  border: 1px solid rgba($roxo-claro, 0.8);
+  border-radius: 10px;
+  padding: 12px;
+  background: $branco;
+
+  .bloco-subtitulo {
+    display: block;
+    margin: 10px 0 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: $roxo-escuro;
+  }
+
+  .desc-text { margin: 6px 0; }
+  .codigo-bloco { margin-top: 6px; }
+  ol.info-list { padding-left: 18px; }
+}

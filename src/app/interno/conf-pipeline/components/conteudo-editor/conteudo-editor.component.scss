@@ -35,6 +35,13 @@
     border-radius: 8px;
     padding: 8px 10px;
 
+    // Blocos do modo Avançado usam <fieldset>/<legend> (o resto usa .bloco-header).
+    legend {
+      padding: 0 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
     .bloco-header {
       display: flex;
       align-items: center;

@@ -8,6 +8,26 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-27 (nível do tutor no perfil + blocos Fundamentos / Na prática)
+
+> Frontend `mestrado-iana` **`<pendente>`** / Backend `master` `a9c2eba`.
+
+### Alterado
+- O toggle **Básico/Avançado** deixou de ser estado de tela: `NivelTutorService` guarda a
+  escolha no perfil do aluno, ela vale nos três painéis do tutor, **sobrevive ao recarregar** e
+  vai no **contexto do chat** — o tutor responde na profundidade que o aluno está lendo.
+
+### Adicionado
+- Dois blocos no card, só em Avançado: **Fundamentos** (fórmula, o que otimiza, pressupostos,
+  complexidade, leitura de referência) e **Na prática** (pipeline sklearn completo com
+  highlight, ordem de ajuste, armadilhas, diagnóstico). Editáveis no conf-pipeline.
+
+### Notas
+- `nivel_tutor` chega no login e é gravado na sessão; falha ao salvar não derruba a escolha.
+- Testes: 167/167 (novo `nivel-tutor.service.spec.ts`) + build de produção.
+
+---
+
 ## 2026-07-26k (editor da instrução do tutor no conf-tutor)
 
 > Frontend `mestrado-iana` **`<pendente>`** (bundle `main-E6W5LFEI.js`) / Backend `master` `7d40bed`.

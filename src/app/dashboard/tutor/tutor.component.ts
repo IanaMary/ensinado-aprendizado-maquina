@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import tutor from '../../constants/tutor.json';
+import { NivelTutor, NivelTutorService } from '../../service/nivel-tutor.service';
 
 export interface TutorContexto {
   titulo: string;
@@ -25,6 +26,23 @@ export interface TutorMidia {
   fonte?: string;
 }
 
+/** Bloco formal do modo Avançado. */
+export interface TutorFundamentos {
+  formula?: string;
+  otimiza?: string;
+  pressupostos?: string[];
+  complexidade?: string;
+  leitura?: string[];
+}
+
+/** Bloco operacional do modo Avançado. */
+export interface TutorPratica {
+  codigo?: string;
+  tuning?: string[];
+  armadilhas?: string[];
+  diagnostico?: string[];
+}
+
 export interface TutorItemInfo {
   titulo: string;
   descricao: string;
@@ -44,6 +62,9 @@ export interface TutorItemInfo {
   link_sklearn?: string;
   /** Link para a documentação do Yellowbrick (gráficos e modelos com visualização). */
   link_yellowbrick?: string;
+  /** Só no modo Avançado: o que o método é (formal) e como usá-lo sem se enganar. */
+  fundamentos?: TutorFundamentos;
+  pratica?: TutorPratica;
   midia?: TutorMidia[];
   referencias?: TutorReferencia[];
 }
@@ -73,6 +94,8 @@ export class TutorComponent implements OnChanges {
   tutor = tutor;
   objectKeys = Object.keys;
 
+  constructor(private nivelTutor: NivelTutorService) { }
+
   /** Resolve o src de uma mídia: URL direta ou data-URI a partir de base64. */
   midiaSrc(m: TutorMidia): string {
     if (m?.url) return m.url;
@@ -81,7 +104,15 @@ export class TutorComponent implements OnChanges {
     }
     return '';
   }
-  modoTutor: 'basico' | 'avancado' = 'basico';
+  /** Profundidade escolhida pelo aluno. Preferência de perfil (NivelTutorService), não estado
+   *  de tela: vale nos três painéis do tutor e sobrevive ao recarregar. */
+  get modoTutor(): NivelTutor {
+    return this.nivelTutor.nivel;
+  }
+
+  set modoTutor(valor: NivelTutor) {
+    this.nivelTutor.definir(valor);
+  }
 
   get themeClass(): string {
     return 'theme-' + this.tutorTheme;

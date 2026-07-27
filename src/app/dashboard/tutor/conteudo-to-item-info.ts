@@ -44,6 +44,8 @@ export function conteudoParaItemInfo(conteudo: any, fallbackLabel = ''): TutorIt
     exemplo_codigo: conteudo.exemplo_codigo,
     link_sklearn: conteudo.link_sklearn,
     link_yellowbrick: conteudo.link_yellowbrick,
+    fundamentos: conteudo.fundamentos,
+    pratica: conteudo.pratica,
     midia: conteudo.midia,
     referencias: conteudo.referencias,
     hiperparametros,

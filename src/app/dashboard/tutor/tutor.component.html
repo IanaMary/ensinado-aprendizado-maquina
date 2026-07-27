@@ -120,6 +120,58 @@
         <pre class="codigo-bloco"><code [appHighlightCode]="tutorItemInfo.exemplo_codigo" lang="python"></code></pre>
       </div>
 
+      <!-- Avançado: os dois blocos que aprofundam de verdade -->
+      <div class="section bloco-avancado fundamentos" *ngIf="modoAvancado && tutorItemInfo.fundamentos as f">
+        <div class="section-header">
+          <mat-icon>functions</mat-icon>
+          <span>Fundamentos</span>
+        </div>
+        <div class="formula-card" *ngIf="f.formula">
+          <span class="formula-label">Fórmula</span>
+          <code class="formula-value">{{ f.formula }}</code>
+        </div>
+        <p class="desc-text" *ngIf="f.otimiza"><strong>O que otimiza:</strong> {{ f.otimiza }}</p>
+        <p class="desc-text" *ngIf="f.complexidade"><strong>Custo:</strong> {{ f.complexidade }}</p>
+        <div *ngIf="f.pressupostos?.length">
+          <span class="bloco-subtitulo">Pressupostos</span>
+          <ul class="info-list">
+            <li *ngFor="let p of f.pressupostos">{{ p }}</li>
+          </ul>
+        </div>
+        <div *ngIf="f.leitura?.length">
+          <span class="bloco-subtitulo">Leitura de referência</span>
+          <ul class="info-list">
+            <li *ngFor="let l of f.leitura">{{ l }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section bloco-avancado pratica" *ngIf="modoAvancado && tutorItemInfo.pratica as pr">
+        <div class="section-header">
+          <mat-icon>science</mat-icon>
+          <span>Na prática</span>
+        </div>
+        <pre class="codigo-bloco" *ngIf="pr.codigo"><code [appHighlightCode]="pr.codigo" lang="python"></code></pre>
+        <div *ngIf="pr.tuning?.length">
+          <span class="bloco-subtitulo">O que ajustar primeiro</span>
+          <ol class="info-list">
+            <li *ngFor="let t of pr.tuning">{{ t }}</li>
+          </ol>
+        </div>
+        <div *ngIf="pr.armadilhas?.length">
+          <span class="bloco-subtitulo">Armadilhas</span>
+          <ul class="info-list">
+            <li *ngFor="let a of pr.armadilhas">{{ a }}</li>
+          </ul>
+        </div>
+        <div *ngIf="pr.diagnostico?.length">
+          <span class="bloco-subtitulo">Como perceber que deu errado</span>
+          <ul class="info-list">
+            <li *ngFor="let d of pr.diagnostico">{{ d }}</li>
+          </ul>
+        </div>
+      </div>
+
       <!-- Hiperparametros (para modelos) -->
       <div class="section" *ngIf="tutorItemInfo.hiperparametros && objectKeys(tutorItemInfo.hiperparametros).length && modoAvancado">
         <div class="section-header">

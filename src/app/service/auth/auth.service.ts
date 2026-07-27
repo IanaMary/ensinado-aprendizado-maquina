@@ -42,6 +42,10 @@ export class AuthService {
     sessionStorage.setItem('token', usuario.access_token);
     sessionStorage.setItem('name', usuario?.usuario?.nome_usuario || usuario?.usuario?.name);
     sessionStorage.setItem('role', usuario?.usuario?.role);
+    // Preferência de profundidade do tutor: vem do perfil no login para o painel já abrir
+    // no nível certo (sem esperar uma chamada extra).
+    sessionStorage.setItem('nivel_tutor',
+      usuario?.usuario?.nivel_tutor === 'avancado' ? 'avancado' : 'basico');
     return Promise.resolve(true);
   }
 

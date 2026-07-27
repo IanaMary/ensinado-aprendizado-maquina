@@ -10,6 +10,16 @@ interface HiperDoc { nome: string; descricao?: string; default?: any; tipo?: str
 interface Referencia { titulo: string; autor?: string; url?: string; tipo?: string; citacao?: string; }
 interface Midia { tipo?: string; url?: string; legenda?: string; fonte?: string; }
 
+/** Bloco formal do modo Avançado (o card mostra como "Fundamentos"). */
+interface FundamentosDraft {
+  formula: string; otimiza: string; complexidade: string;
+  pressupostos: string[]; leitura: string[];
+}
+/** Bloco operacional do modo Avançado (o card mostra como "Na prática"). */
+interface PraticaDraft {
+  codigo: string; tuning: string[]; armadilhas: string[]; diagnostico: string[];
+}
+
 interface ConteudoDraft {
   titulo: string;
   descricao: string;
@@ -27,6 +37,8 @@ interface ConteudoDraft {
   desvantagens: string[];
   conceitos: Conceito[];
   hiperparametros_doc: HiperDoc[];
+  fundamentos: FundamentosDraft;
+  pratica: PraticaDraft;
   referencias: Referencia[];
   midia: Midia[];
 }
@@ -69,6 +81,19 @@ export class ConteudoEditorComponent implements OnChanges {
       link_sklearn: c.link_sklearn || '',
       link_yellowbrick: c.link_yellowbrick || '',
       formula: c.formula || '',
+      fundamentos: {
+        formula: c.fundamentos?.formula || '',
+        otimiza: c.fundamentos?.otimiza || '',
+        complexidade: c.fundamentos?.complexidade || '',
+        pressupostos: [...(c.fundamentos?.pressupostos || [])],
+        leitura: [...(c.fundamentos?.leitura || [])],
+      },
+      pratica: {
+        codigo: c.pratica?.codigo || '',
+        tuning: [...(c.pratica?.tuning || [])],
+        armadilhas: [...(c.pratica?.armadilhas || [])],
+        diagnostico: [...(c.pratica?.diagnostico || [])],
+      },
       dicas: [...(c.dicas || [])],
       quandoUsar: [...(c.quandoUsar || [])],
       naoUsarQuando: [...(c.naoUsarQuando || [])],
@@ -134,6 +159,21 @@ export class ConteudoEditorComponent implements OnChanges {
         return out;
       });
     if (hipers.length) conteudo.hiperparametros_doc = hipers;
+    const fundamentos: any = {};
+    if (d.fundamentos.formula.trim()) fundamentos.formula = d.fundamentos.formula.trim();
+    if (d.fundamentos.otimiza.trim()) fundamentos.otimiza = d.fundamentos.otimiza.trim();
+    if (d.fundamentos.complexidade.trim()) fundamentos.complexidade = d.fundamentos.complexidade.trim();
+    const press = limparStr(d.fundamentos.pressupostos); if (press.length) fundamentos.pressupostos = press;
+    const leitura = limparStr(d.fundamentos.leitura); if (leitura.length) fundamentos.leitura = leitura;
+    if (Object.keys(fundamentos).length) conteudo.fundamentos = fundamentos;
+
+    const pratica: any = {};
+    if (d.pratica.codigo.trim()) pratica.codigo = d.pratica.codigo.trim();
+    const tuning = limparStr(d.pratica.tuning); if (tuning.length) pratica.tuning = tuning;
+    const armadilhas = limparStr(d.pratica.armadilhas); if (armadilhas.length) pratica.armadilhas = armadilhas;
+    const diagnostico = limparStr(d.pratica.diagnostico); if (diagnostico.length) pratica.diagnostico = diagnostico;
+    if (Object.keys(pratica).length) conteudo.pratica = pratica;
+
     const refs = d.referencias.filter(r => (r.titulo || '').trim());
     if (refs.length) conteudo.referencias = refs;
     const midia = d.midia.filter(m => (m.url || '').trim());

@@ -3,6 +3,7 @@ import { BodyTutor, ItemPipeline, MediaMetrica, ResultadoColetaDado, TipoArquivo
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ScriptGeneratorService } from '../../../../service/script-generator.service';
+import { NivelTutorService } from '../../../../service/nivel-tutor.service';
 import { MetricaAvaliacaoComponent } from '../metrica-avaliacao/metrica-avaliacao.component';
 import { ClasificadorComponent } from '../classificador/classificador.component';
 import { TutorContexto } from '../../../tutor/tutor.component';
@@ -101,6 +102,7 @@ export class ModalExecucaoComponent implements OnInit {
   constructor(
     private dashboardService: DashboardService,
     private scriptGenerator: ScriptGeneratorService,
+    private nivelTutor: NivelTutorService,
     private cdr: ChangeDetectorRef,
     public dialogRef: MatDialogRef<ModalExecucaoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
@@ -129,6 +131,7 @@ export class ModalExecucaoComponent implements OnInit {
       av: Object.keys(this.resultadosDasAvaliacoes || {}),
       tr: treinados.map((r: any) => r?.modelo),
       if: this.itemFoco?.valor,
+      nv: this.nivelTutor.nivel,
     });
     if (assinatura === this.contextoChatAssinatura && this.contextoChatCache) {
       return this.contextoChatCache;
@@ -150,6 +153,9 @@ export class ModalExecucaoComponent implements OnInit {
       || (treinados[0] ? { valor: (treinados[0] as any).modelo, label: (treinados[0] as any).nome_modelo } : null);
     const modeloInfo = (tutor.modelos as any)?.[base?.valor || ''];
     this.contextoChatCache = {
+      // Mesmo nível do painel do tutor (preferência do perfil): o backend usa para escolher
+      // entre a ficha básica e a técnica.
+      nivel: this.nivelTutor.nivel,
       dataset: {
         nome: this.resultadoColetaDado?.nomeDataset || this.resultadoColetaDado?.treino?.nomeArquivo || null,
         target: this.resultadoColetaDado?.target || null,
