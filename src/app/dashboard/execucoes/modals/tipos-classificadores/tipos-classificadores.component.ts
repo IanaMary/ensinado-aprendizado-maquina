@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { ItemPipeline } from '../../../../models/item-coleta-dado.model';
 import tutor from '../../../../constants/tutor.json'
+import { NivelTutorService } from '../../../../service/nivel-tutor.service';
 
 
 @Component({
@@ -10,6 +11,10 @@ import tutor from '../../../../constants/tutor.json'
   standalone: false
 })
 export class TiposClassificadoresComponent implements OnChanges {
+
+  constructor(nivelTutor: NivelTutorService) {
+    this.mostrarAvancados = nivelTutor.avancado;
+  }
 
   @Input() modeloSelecionado: ItemPipeline | undefined;
   @Input() modelosDisponiveis: ItemPipeline[] = [];
@@ -28,6 +33,8 @@ export class TiposClassificadoresComponent implements OnChanges {
   modeloValor: string | undefined;
   hiperparametrosArray: any[] = [];
   hiperparametrosAvancados: any[] = [];
+  /** Seção recolhível dos hiperparâmetros avançados. Começa ABERTA para quem escolheu o nível
+   *  Avançado no tutor — antes ela ignorava a preferência do aluno e vinha sempre fechada. */
   mostrarAvancados = false;
   // Grupos de preditores colapsáveis (auto-colapsa os totalmente incompatíveis).
   gruposColapsados: Record<string, boolean> = {};
