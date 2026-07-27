@@ -8,6 +8,27 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-27c (nível do aluno nos hiperparâmetros avançados + limpezas)
+
+> Frontend `mestrado-iana` **`72ca7e5`** (bundle `main-Q6M4OQ5U.js`) / Backend `master` `823e4b4`.
+
+### Corrigido
+- A seção recolhível **"Avançado (n)"** dos hiperparâmetros (modal de seleção do modelo) tinha
+  a própria noção de "avançado" e ignorava a preferência do aluno: vinha sempre fechada. Agora
+  abre sozinha para quem escolheu o nível Avançado no tutor.
+- O **fallback do card de gráfico** preenchia `descricao` e `resumo_basico` com o mesmo texto,
+  fingindo dois registros de linguagem que não existem ali.
+- `Router` não usado no `AuthInterceptor` (removido também do spec) e o comentário do schema que
+  dizia que `exemplo_codigo` era só do Avançado — ele aparece nos dois níveis.
+
+### Notas
+- Testes: 168/168 + build de produção.
+- Os `data: { breadcrumb }` das rotas seguem sem consumidor (o BreadcrumbComponent saiu em
+  2026-07-26i). Mantidos de propósito: são metadados inertes e removê-los tocaria 12 arquivos
+  nas duas branches sem mudar comportamento.
+
+---
+
 ## 2026-07-27b (manual descreve o Avançado atual)
 
 > Frontend `mestrado-iana` **`<pendente>`** (bundle `main-7ITTBJMV.js`). Backend `master` `ee69abf`.
