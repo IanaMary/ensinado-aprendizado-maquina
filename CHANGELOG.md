@@ -8,6 +8,32 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-28 (a tela do desafio não corrige mais a raia errada)
+
+> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-EARQSDDB.js`**.
+> Backend: nova regra da rubrica e tabuleiro sem `lane` (ver changelog do backend).
+
+### Corrigido
+- **A peça fica na coluna em que o aluno a colocou.** Saíram as duas correções automáticas da
+  tela do desafio: o **realce laranja + ícone de alerta** ("Esta peça não é desta etapa"), que
+  apontava o erro na hora, e o **clique único**, que mandava a peça para a coluna correta
+  sozinho — ou seja, respondia a pergunta que o desafio faz. Quem avalia agora é só a rubrica,
+  depois do envio.
+
+### Alterado
+- A alternativa ao arrastar (importante no celular) virou de **dois toques**: o primeiro escolhe
+  a peça, o segundo diz a coluna. Todas as quatro colunas oferecem "Colocar … aqui", sem
+  distinção — nenhuma pista de qual é a certa.
+- `PecaDesafio` não tem mais `lane`: o backend não envia a etapa da peça, então nem a tela nem o
+  DevTools têm a resposta. `MatTooltipModule` saiu do componente (ficou órfão com o alerta).
+
+### Verificação
+- 169/169 + build de produção. **Verificado no navegador** sobre o build (Mongo em Docker +
+  API local): k-NN colocado na coluna Métrica permanece lá, sem aviso; o envio devolve 4,4/10
+  com as duas regras explicando o erro. Sem erros no console.
+
+---
+
 ## 2026-07-27c (nível do aluno nos hiperparâmetros avançados + limpezas)
 
 > Frontend `mestrado-iana` **`72ca7e5`** (bundle `main-Q6M4OQ5U.js`) / Backend `master` `823e4b4`.

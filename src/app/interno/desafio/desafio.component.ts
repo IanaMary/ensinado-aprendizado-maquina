@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
@@ -30,7 +29,9 @@ const LANES: LaneInfo[] = [
 /**
  * Desafio de montagem: o aluno recebe um problema e peças embaralhadas (algumas que NÃO
  * servem) e monta o pipeline arrastando, sem executar nada. A nota e as explicações vêm do
- * backend — aqui não existe gabarito, só avisos locais de compatibilidade óbvia.
+ * backend — aqui não existe gabarito nem correção: **a peça fica na coluna em que o aluno a
+ * colocou**, mesmo que seja a errada, porque saber a que etapa cada bloco pertence é parte
+ * do que o desafio mede. O tabuleiro nem recebe a etapa das peças (o backend não a envia).
  *
  * Cada tentativa recebe um tabuleiro novo (o backend re-sorteia), então não dá para
  * consertar item por item até fechar 10 sem entender o motivo.
@@ -39,7 +40,7 @@ const LANES: LaneInfo[] = [
   selector: 'app-desafio',
   standalone: true,
   imports: [
-    CommonModule, DragDropModule, MatIconModule, MatTooltipModule,
+    CommonModule, DragDropModule, MatIconModule,
     MatSnackBarModule, MatProgressSpinnerModule,
   ],
   templateUrl: './desafio.component.html',
@@ -57,6 +58,8 @@ export class DesafioComponent implements OnInit {
   tabuleiro?: TabuleiroDesafio;
   /** Peças ainda na bandeja (não usadas). */
   disponiveis: PecaDesafio[] = [];
+  /** Peça tocada na bandeja, esperando o aluno escolher a coluna. */
+  pecaSelecionada?: PecaDesafio;
   /** Peças colocadas em cada lane, na ordem escolhida pelo aluno. */
   montagem: Record<LaneDesafio, PecaDesafio[]> = {
     coleta: [], pre_processamento: [], modelo: [], metrica: [],
@@ -92,6 +95,7 @@ export class DesafioComponent implements OnInit {
       next: (t) => {
         this.tabuleiro = t;
         this.disponiveis = [...t.pecas];
+        this.pecaSelecionada = undefined;
         this.montagem = { coleta: [], pre_processamento: [], modelo: [], metrica: [] };
         this.carregando = false;
       },
@@ -118,12 +122,22 @@ export class DesafioComponent implements OnInit {
                       evento.previousIndex, evento.currentIndex);
   }
 
-  /** Clique também move a peça (mais fácil que arrastar no celular). */
-  usarPeca(peca: PecaDesafio): void {
-    const destino = this.montagem[peca.lane];
-    if (!destino) { return; }
+  /**
+   * Alternativa ao arrastar, para quem está no celular: um toque escolhe a peça, o toque
+   * seguinte diz em que coluna ela entra. São dois passos de propósito — o clique único
+   * mandava a peça para a coluna certa sozinho, ou seja, respondia a pergunta do desafio.
+   */
+  selecionar(peca: PecaDesafio): void {
+    this.pecaSelecionada = this.pecaSelecionada?.valor === peca.valor ? undefined : peca;
+  }
+
+  /** Coloca a peça escolhida na coluna que o ALUNO indicou — certa ou errada. */
+  colocarNaLane(lane: LaneDesafio): void {
+    const peca = this.pecaSelecionada;
+    if (!peca) { return; }
+    this.pecaSelecionada = undefined;
     this.disponiveis = this.disponiveis.filter((p) => p.valor !== peca.valor);
-    destino.push(peca);
+    this.montagem[lane].push(peca);
   }
 
   devolverPeca(lane: LaneDesafio, indice: number): void {
@@ -133,14 +147,6 @@ export class DesafioComponent implements OnInit {
 
   pecasDaLane(lane: LaneDesafio): PecaDesafio[] {
     return this.montagem[lane];
-  }
-
-  /**
-   * Aviso local: a peça está numa lane que não é a dela. Só isso — o que decide a nota
-   * (compatibilidade com a tarefa, distratores, ordem) fica no servidor de propósito.
-   */
-  laneErrada(lane: LaneDesafio, peca: PecaDesafio): boolean {
-    return peca.lane !== lane;
   }
 
   get lanesVazias(): LaneInfo[] {

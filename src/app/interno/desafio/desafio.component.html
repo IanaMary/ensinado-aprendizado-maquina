@@ -34,12 +34,14 @@
       <div class="bandeja-titulo">
         <mat-icon aria-hidden="true">extension</mat-icon>
         <span>Peças</span>
-        <small>Arraste para a coluna certa (ou clique na peça)</small>
+        <small>Arraste cada peça para a coluna que tu achas certa (ou toque na peça e depois na coluna)</small>
       </div>
       <div class="bandeja-pecas" cdkDropList id="bandeja" [cdkDropListData]="disponiveis"
            [cdkDropListConnectedTo]="idsLanes" (cdkDropListDropped)="soltar($event)">
         <div class="item-card peca" *ngFor="let peca of disponiveis" cdkDrag
-             (click)="usarPeca(peca)" [attr.aria-label]="'Usar ' + peca.nome">
+             [class.selecionada]="pecaSelecionada?.valor === peca.valor"
+             (click)="selecionar(peca)" [attr.aria-label]="'Escolher ' + peca.nome"
+             [attr.aria-pressed]="pecaSelecionada?.valor === peca.valor">
           <mat-icon aria-hidden="true">drag_indicator</mat-icon>
           <span>{{ peca.nome }}</span>
         </div>
@@ -60,16 +62,18 @@
         <div class="column-content" cdkDropList [id]="'lane-' + lane.id"
              [cdkDropListData]="pecasDaLane(lane.id)" [cdkDropListConnectedTo]="idsLanes"
              (cdkDropListDropped)="soltar($event)">
-          <div class="item-card" *ngFor="let peca of pecasDaLane(lane.id); let i = index" cdkDrag
-               [class.lane-errada]="laneErrada(lane.id, peca)">
+          <div class="item-card" *ngFor="let peca of pecasDaLane(lane.id); let i = index" cdkDrag>
             <span class="ordem" *ngIf="lane.id === 'pre_processamento'">{{ i + 1 }}</span>
             <span>{{ peca.nome }}</span>
             <mat-icon class="tirar" (click)="devolverPeca(lane.id, i)"
                       [attr.aria-label]="'Tirar ' + peca.nome">close</mat-icon>
-            <mat-icon class="alerta" *ngIf="laneErrada(lane.id, peca)"
-                      matTooltip="Esta peça não é desta etapa">warning_amber</mat-icon>
           </div>
-          <p class="lane-dica" *ngIf="!pecasDaLane(lane.id).length">{{ lane.dica }}</p>
+          <p class="lane-dica" *ngIf="!pecasDaLane(lane.id).length && !pecaSelecionada">{{ lane.dica }}</p>
+          <button class="lane-colocar" type="button" *ngIf="pecaSelecionada"
+                  (click)="colocarNaLane(lane.id)">
+            <mat-icon aria-hidden="true">south</mat-icon>
+            Colocar “{{ pecaSelecionada.nome }}” aqui
+          </button>
         </div>
       </div>
     </div>
