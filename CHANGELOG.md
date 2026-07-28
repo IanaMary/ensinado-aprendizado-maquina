@@ -8,6 +8,34 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-28 (a tela do desafio não corrige mais a raia errada) — porte
+
+> Branch `master` (não implantada; produção roda a `mestrado-iana`).
+> Backend `master` `1898d2d`: nova regra da rubrica e tabuleiro sem `lane`.
+
+### Corrigido
+- **A peça fica na coluna em que o aluno a colocou.** Saíram as duas correções automáticas da
+  tela do desafio: o realce laranja + ícone de alerta ("Esta peça não é desta etapa"), que
+  apontava o erro na hora, e o clique único, que mandava a peça para a coluna correta sozinho
+  — ou seja, respondia a pergunta que o desafio faz. Quem avalia é a rubrica, depois do envio.
+
+### Alterado
+- A alternativa ao arrastar (importante no celular) virou de dois toques: peça, depois coluna.
+  As quatro colunas oferecem "Colocar … aqui", sem pista de qual é a certa.
+- `PecaDesafio` não tem mais `lane` (o backend não envia a etapa da peça).
+
+---
+
+## 2026-07-27c (nível do aluno nos hiperparâmetros avançados) — porte
+
+> Branch `master` (não implantada). O fallback do card de gráfico não se aplica aqui: a dica do
+> gráfico via `<app-tutor>` nunca foi portada para esta branch.
+
+- Seção "Avançado" dos hiperparâmetros abre sozinha para quem escolheu o nível Avançado.
+- `Router` órfão fora do `AuthInterceptor` (o toast de 403 é do `ErrorInterceptor`).
+
+---
+
 ## 2026-07-27b (manual descreve o Avançado atual) — porte
 
 > Frontend `master` (não implantado). O manual passa a descrever os blocos Fundamentos e Na

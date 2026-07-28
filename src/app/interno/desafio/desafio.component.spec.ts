@@ -12,11 +12,12 @@ const TABULEIRO: TabuleiroDesafio = {
   tentativas: 0,
   melhor_nota: null,
   lanes: ['coleta', 'pre_processamento', 'modelo', 'metrica'],
+  // Sem `lane`: o backend não diz a que etapa a peça pertence (é o que o desafio avalia).
   pecas: [
-    { valor: 'arquivo', nome: 'Arquivo', lane: 'coleta' },
-    { valor: 'minmax_scaler', nome: 'MinMax', lane: 'pre_processamento' },
-    { valor: 'knn', nome: 'k-NN', lane: 'modelo' },
-    { valor: 'accuracy_score', nome: 'Acurácia', lane: 'metrica' },
+    { valor: 'arquivo', nome: 'Arquivo' },
+    { valor: 'minmax_scaler', nome: 'MinMax' },
+    { valor: 'knn', nome: 'k-NN' },
+    { valor: 'accuracy_score', nome: 'Acurácia' },
   ],
 };
 
@@ -66,31 +67,49 @@ describe('DesafioComponent', () => {
     expect(turma.obterTabuleiro).not.toHaveBeenCalled();
   });
 
-  it('clicar na peça move para a lane dela e devolver volta para a bandeja', () => {
+  it('toque escolhe a peça e o toque na coluna a coloca; devolver volta para a bandeja', () => {
     montar();
     const knn = comp.disponiveis.find((p) => p.valor === 'knn')!;
-    comp.usarPeca(knn);
+    comp.selecionar(knn);
+    expect(comp.pecaSelecionada?.valor).toBe('knn');
+    comp.colocarNaLane('modelo');
     expect(comp.pecasDaLane('modelo').map((p) => p.valor)).toEqual(['knn']);
     expect(comp.disponiveis.some((p) => p.valor === 'knn')).toBeFalse();
+    expect(comp.pecaSelecionada).toBeUndefined();
 
     comp.devolverPeca('modelo', 0);
     expect(comp.pecasDaLane('modelo').length).toBe(0);
     expect(comp.disponiveis.some((p) => p.valor === 'knn')).toBeTrue();
   });
 
+  it('tocar de novo na peça escolhida desfaz a escolha', () => {
+    montar();
+    const knn = comp.disponiveis.find((p) => p.valor === 'knn')!;
+    comp.selecionar(knn);
+    comp.selecionar(knn);
+    expect(comp.pecaSelecionada).toBeUndefined();
+    comp.colocarNaLane('modelo');
+    expect(comp.pecasDaLane('modelo').length).toBe(0);   // sem peça escolhida, nada acontece
+  });
+
   it('só habilita o envio depois de usar alguma peça', () => {
     montar();
     expect(comp.podeSubmeter).toBeFalse();
-    comp.usarPeca(comp.disponiveis[0]);
+    comp.selecionar(comp.disponiveis[0]);
+    expect(comp.podeSubmeter).toBeFalse();               // escolher não é montar
+    comp.colocarNaLane('coleta');
     expect(comp.podeSubmeter).toBeTrue();
   });
 
   it('envia a montagem por lane, na ordem escolhida', () => {
     montar();
-    const porValor = (v: string) => comp.disponiveis.find((p) => p.valor === v)!;
-    comp.usarPeca(porValor('arquivo'));
-    comp.usarPeca(porValor('minmax_scaler'));
-    comp.usarPeca(porValor('knn'));
+    const usar = (v: string, lane: 'coleta' | 'pre_processamento' | 'modelo' | 'metrica') => {
+      comp.selecionar(comp.disponiveis.find((p) => p.valor === v)!);
+      comp.colocarNaLane(lane);
+    };
+    usar('arquivo', 'coleta');
+    usar('minmax_scaler', 'pre_processamento');
+    usar('knn', 'modelo');
     comp.submeter();
     expect(turma.submeterMontagem).toHaveBeenCalledWith('t1', 'a1', {
       coleta: ['arquivo'],
@@ -105,7 +124,8 @@ describe('DesafioComponent', () => {
 
   it('tentar de novo busca um tabuleiro novo e limpa o resultado', () => {
     montar();
-    comp.usarPeca(comp.disponiveis[0]);
+    comp.selecionar(comp.disponiveis[0]);
+    comp.colocarNaLane('coleta');
     comp.submeter();
     expect(comp.resultado).toBeTruthy();
 
@@ -116,11 +136,20 @@ describe('DesafioComponent', () => {
     expect(comp.pecasDaLane('coleta').length).toBe(0);
   });
 
-  it('marca peça fora da lane dela como aviso local', () => {
+  it('NÃO corrige a coluna errada: a peça fica onde o aluno a colocou', () => {
+    // O desafio mede se o aluno sabe a que etapa cada bloco pertence — mover a peça para a
+    // coluna certa (ou avisar na hora) entregaria a resposta.
     montar();
     const knn = comp.disponiveis.find((p) => p.valor === 'knn')!;
-    expect(comp.laneErrada('modelo', knn)).toBeFalse();
-    expect(comp.laneErrada('metrica', knn)).toBeTrue();
+    comp.selecionar(knn);
+    comp.colocarNaLane('metrica');
+    expect(comp.pecasDaLane('metrica').map((p) => p.valor)).toEqual(['knn']);
+    expect(comp.pecasDaLane('modelo').length).toBe(0);
+
+    comp.submeter();
+    expect(turma.submeterMontagem).toHaveBeenCalledWith('t1', 'a1', {
+      coleta: [], pre_processamento: [], modelo: [], metrica: ['knn'],
+    });
   });
 
   it('mostra mensagem amigável quando o desafio não existe', () => {

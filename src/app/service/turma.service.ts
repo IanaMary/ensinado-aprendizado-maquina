@@ -62,10 +62,14 @@ export interface Atividade {
   criado_em?: string;
 }
 
+/**
+ * Peça do tabuleiro do aluno. **Sem `lane`**: descobrir a que etapa a peça pertence é o que
+ * o desafio avalia, então o backend não manda essa informação (nem para a tela, nem para
+ * quem abre o DevTools).
+ */
 export interface PecaDesafio {
   valor: string;
   nome: string;
-  lane: LaneDesafio;
 }
 
 export interface TabuleiroDesafio {
