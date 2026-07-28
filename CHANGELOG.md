@@ -10,7 +10,7 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-07-28 (a tela do desafio não corrige mais a raia errada)
 
-> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-EARQSDDB.js`**.
+> Frontend `mestrado-iana` **`ec3680c`** · bundle **`main-EARQSDDB.js`**.
 > Backend: nova regra da rubrica e tabuleiro sem `lane` (ver changelog do backend).
 
 ### Corrigido
