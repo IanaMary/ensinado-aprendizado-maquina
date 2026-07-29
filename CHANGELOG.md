@@ -10,7 +10,7 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-07-29 (aba LLM mostra o estado de versão da instrução do tutor)
 
-> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-CGLQE76V.js`**.
+> Frontend `mestrado-iana` **`fd7e836`** · bundle **`main-CGLQE76V.js`**.
 > Backend: a instrução passou a ser persistida e versionada (ver changelog do backend).
 
 ### Adicionado
