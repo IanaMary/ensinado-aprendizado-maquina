@@ -1,10 +1,20 @@
-# Changelog — Mestrado Iana / H2IA Tutor
+# Changelog — H2IA Tutor
 
 Histórico de deploys em produção (`https://absapt.tk/h2ia/`). Formato inspirado em
 [Keep a Changelog](https://keepachangelog.com); datas em AAAA-MM-DD. Cada entrada cita os
 commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Historical Production Reference_.
 
 > Frontend: `IanaMary/ensinado-aprendizado-maquina` · Backend: `IanaMary/ensinado-aprendizado-maquina-back`.
+
+---
+
+## 2026-07-29b (marca H2IA Tutor no material exportado) — porte
+
+> Branch `master` (não implantada). Backend `master` `8abf375`.
+
+- O `.zip` do pipeline e o `.ipynb` da Trilha (só desta branch) diziam "gerado pelo Iana".
+- Card da galeria: "Professor Iana" → "Professor" no fallback.
+- Preservados o nome da autora e as entradas históricas da mudança de marca.
 
 ---
 

@@ -725,7 +725,7 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     const linhas = script.split('\n');
     return JSON.stringify({
       cells: [
-        { cell_type: 'markdown', metadata: {}, source: [`# ${titulo}\n`, 'Pipeline gerado pela Trilha de ML (Iana).'] },
+        { cell_type: 'markdown', metadata: {}, source: [`# ${titulo}\n`, 'Pipeline gerado pela Trilha de ML (H2IA Tutor).'] },
         { cell_type: 'code', execution_count: null, metadata: {}, outputs: [], source: linhas.map((l, i) => i < linhas.length - 1 ? l + '\n' : l) },
       ],
       metadata: { kernelspec: { name: 'python3', display_name: 'Python 3' }, language_info: { name: 'python' } },
