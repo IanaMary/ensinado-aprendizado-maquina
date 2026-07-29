@@ -10,7 +10,8 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-07-29c (aba Provedores, busca de modelo e listagem por fornecedor)
 
-> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-Y4RSIG3U.js`**.
+> **Implantado em 29/07/2026 17h53.** Frontend `mestrado-iana` **`7d3c6d1`** · bundle
+> **`main-Y4RSIG3U.js`**.
 > Backend: provedores de LLM (ver changelog do backend).
 
 ### Adicionado
