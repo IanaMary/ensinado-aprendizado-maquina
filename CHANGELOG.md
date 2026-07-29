@@ -8,6 +8,36 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-29d (editor de texto rico nas boas-vindas do tutor)
+
+> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-PJ3RSM34.js`**. Backend inalterado.
+
+### Adicionado
+- **Editor visual** (Quill) no lugar do `<textarea>` de HTML cru da aba Início. Barra limitada ao
+  que o painel do tutor renderiza: título, negrito, itálico, listas e link — oferecer formatação
+  que desaparece na tela do aluno seria pior que não oferecer. Modo **Código HTML** para quem
+  quiser conferir ou colar o texto exato.
+- `html-boas-vindas.ts`: converte a saída do editor para o subconjunto suportado (16 testes).
+- **Nenhuma dependência nova:** `quill`/`ngx-quill` já estavam no `package.json` e o
+  `quill.snow.css` no `angular.json`, sobrando da versão antiga desta tela. Cai no chunk do admin.
+
+### Corrigido / evitado
+- **Lista com marcador apareceria numerada para o aluno:** o Quill 2 emite
+  `<ol><li data-list="bullet">`, e o `data-list` só desenha marcador com o CSS do Quill, que o
+  painel do aluno não carrega. Convertido para `<ul><li>`.
+- **`&nbsp;` em todo espaço:** o Quill converte os espaços vizinhos de quebra de linha do HTML de
+  origem, e o texto versionado é quebrado em ~95 colunas. Com espaço inquebrável o parágrafo
+  deixaria de quebrar linha e transbordaria. **Encontrado na tela, não nos testes.**
+- **Abrir a aba não conta como edição:** o editor reserializa o HTML ao carregar, então um Salvar
+  sem intenção marcaria o texto como "do admin" — o que o faz parar de receber as atualizações dos
+  deploys (mecanismo de 29/07b). O Salvar só habilita quando o conteúdo muda, com aviso explicando.
+- O botão Salvar era `mat-flat-button` (span de foco que destoa) → `.btn-primario`.
+
+### Verificação
+201/201 + build de produção. Verificado no navegador com o texto real de produção.
+
+---
+
 ## 2026-07-29c (aba Provedores, busca de modelo e listagem por fornecedor)
 
 > **Implantado em 29/07/2026 17h53.** Frontend `mestrado-iana` **`7d3c6d1`** · bundle
