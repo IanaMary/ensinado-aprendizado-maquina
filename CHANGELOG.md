@@ -8,6 +8,33 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-29c (aba Provedores, busca de modelo e listagem por fornecedor)
+
+> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-Y4RSIG3U.js`**.
+> Backend: provedores de LLM (ver changelog do backend).
+
+### Adicionado
+- **Aba Provedores** no conf-tutor: um card por provedor (NVIDIA NIM, OpenRouter, "outro provedor")
+  com URL base, porta, chave e botão Ativar. A NVIDIA é somente-leitura — a chave dela vem do
+  `.env`. O campo de chave nasce **vazio**: a tela não conhece o segredo, e pré-preenchê-lo com
+  asteriscos convidaria a gravar lixo por cima.
+- **Seletor de provedor** na aba LLM, com atalho para a aba de configuração.
+- **Busca** por nome de modelo ou fornecedor; grupos com resultado abrem automaticamente.
+- **Listagem colapsável por fornecedor** (o que vem antes da "/"), com contagem, quantos gratuitos
+  e quantos respondem. Fechados por padrão — no OpenRouter são 367 modelos em ~40 fornecedores —,
+  exceto o grupo do modelo em uso.
+- **Selo `free`** por modelo e por grupo; grupos com gratuito vêm primeiro.
+- Botão **testar** por item nos modelos que ficam fora do teste automático (os pagos).
+
+### Corrigido
+- O botão "Re-testar" era `mat-stroked-button`, que nesta versão do Material renderiza o span de
+  foco e destoa dos demais botões da tela; passou a usar `.btn-secundario` (global).
+
+### Verificação
+185/185 (10 novos) + build de produção. Verificado no navegador contra o OpenRouter real.
+
+---
+
 ## 2026-07-29b (o material que o aluno baixa não diz mais "Iana")
 
 > Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-GSFLR7TL.js`**.
