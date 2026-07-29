@@ -8,6 +8,26 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-29b (o material que o aluno baixa não diz mais "Iana")
+
+> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-GSFLR7TL.js`**.
+> Backend: seed do conf-pipeline com guarda + marca (ver changelog do backend).
+
+### Alterado
+- O `.zip` do pipeline levava o nome antigo da plataforma em quatro lugares (título e rodapé do
+  `README.md`, duas docstrings dos `.py` gerados) — agora dizem **H2IA Tutor**.
+- O card da galeria mostrava "Professor Iana" quando o pipeline não tinha professor; virou só
+  "Professor" (o fallback é sobre a pessoa ausente, não sobre a plataforma).
+- H1 deste changelog e de `PRODUCT.md`/`docs/DOCUMENTACAO.md`.
+
+**Preservados:** o nome da autora em `/sobre` e as entradas históricas que narram a própria mudança
+de marca — reescrevê-las contradiria os commits daquela data.
+
+### Verificação
+175/175 + build de produção.
+
+---
+
 ## 2026-07-29 (aba LLM mostra o estado de versão da instrução do tutor)
 
 > Frontend `mestrado-iana` **`fd7e836`** · bundle **`main-CGLQE76V.js`**.
