@@ -8,6 +8,38 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-29 (aba LLM mostra o estado de versão da instrução do tutor)
+
+> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-CGLQE76V.js`**.
+> Backend: a instrução passou a ser persistida e versionada (ver changelog do backend).
+
+### Adicionado
+- Aviso na aba LLM quando **o padrão do sistema mudou depois da edição do admin**, com botão
+  "Usar o novo padrão". A instrução dele continua no ar até decidir.
+- Selo **"não persistido"** quando o backend responde `fonte: 'versionado'` — ou seja, o tutor está
+  usando o texto do código porque o seed não rodou. Em regime normal nunca aparece; é o indicador
+  de que a persistência falhou, em vez de o problema passar batido.
+- `confirm()` antes de "Voltar ao padrão": o botão fica ao lado de "Salvar" e tira do ar a
+  instrução escrita pelo admin. A copy diz que o texto fica registrado no histórico (não se perde).
+- `conf-tutor.component.spec.ts`, que não existia (6 casos).
+
+### Corrigido
+- A aba LLM buscava o prompt com a guarda `!promptTexto`, isto é, pelo **conteúdo**: se o admin
+  limpasse o textarea e trocasse de aba, a volta refazia o GET por cima do que ele estava
+  editando — e o estado de versão só era lido uma vez por carga de página. Agora a guarda é um
+  booleano de "já carregou".
+- O contador de caracteres usava `promptTexto.length` enquanto o servidor valida o texto sem
+  espaço nas pontas: perto do teto, tela e servidor discordavam. Passou a contar o texto trimado,
+  no contador e nas guardas dos botões.
+
+### Verificação
+175/175 (eram 169) + build de produção. Verificado no navegador sobre o build, com o banco no
+estado "admin editou e o padrão mudou": aviso, selos, contador e o histórico com os rótulos novos
+("Padrão do sistema aplicado no deploy"). O `confirm` não foi clicado no navegador de propósito —
+diálogo modal travaria a automação; está coberto no spec.
+
+---
+
 ## 2026-07-28 (a tela do desafio não corrige mais a raia errada)
 
 > **Implantado em 28/07/2026 14h57.** Frontend `mestrado-iana` **`ec3680c`** · bundle
