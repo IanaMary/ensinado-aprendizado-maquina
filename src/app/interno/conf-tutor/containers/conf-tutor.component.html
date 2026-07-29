@@ -19,7 +19,8 @@
           <p class="desc-inicio">
             Este texto aparece no painel do tutor da área de trabalho quando o aluno ainda não
             clicou em nenhum item. Use-o para apresentar a ferramenta e indicar por onde começar.
-            Aceita HTML básico (<code>&lt;h4&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;b&gt;</code>, <code>&lt;ul&gt;&lt;li&gt;</code>).
+            Formate pela barra do editor — título, <b>negrito</b>, <i>itálico</i>, listas e links.
+            Quem preferir escrever HTML pode alternar para <strong>Código HTML</strong>.
           </p>
 
           <div class="carregando-inicio" *ngIf="carregandoInicio">
@@ -28,8 +29,25 @@
           </div>
 
           <form [formGroup]="formConfTutorInicio" *ngIf="!carregandoInicio" class="form-inicio">
-            <label class="label-campo" for="inicio-texto">Texto de boas-vindas</label>
-            <textarea id="inicio-texto" formControlName="texto_pipe" rows="10"
+            <div class="editor-cabecalho">
+              <label class="label-campo" for="inicio-texto">Texto de boas-vindas</label>
+              <button type="button" class="btn-modo" (click)="alternarModoHtml()"
+                [attr.aria-pressed]="editorHtml"
+                [matTooltip]="editorHtml ? 'Voltar ao editor visual' : 'Ver e editar o HTML gerado'">
+                <mat-icon>{{ editorHtml ? 'text_fields' : 'code' }}</mat-icon>
+                {{ editorHtml ? 'Editor visual' : 'Código HTML' }}
+              </button>
+            </div>
+
+            <!-- Editor visual. A barra oferece só o que o painel do aluno renderiza: oferecer
+                 formatação que desaparece na tela dele seria pior que não oferecer. -->
+            <quill-editor *ngIf="!editorHtml" formControlName="texto_pipe" format="html"
+              [modules]="quillModules" theme="snow" class="editor-inicio"
+              placeholder="Escreva as boas-vindas. Use a barra acima para título, negrito e listas."></quill-editor>
+
+            <!-- Modo código: para conferir o que será salvo ou colar um texto exato. -->
+            <textarea *ngIf="editorHtml" id="inicio-texto" formControlName="texto_pipe" rows="14"
+              class="editor-codigo" spellcheck="false"
               placeholder="<h4>Bem-vindo(a)!</h4><p>Aqui você monta um pipeline de Aprendizado de Máquina...</p>"></textarea>
 
             <label class="label-campo" for="inicio-explicacao">Explicação complementar (opcional)</label>
@@ -37,10 +55,16 @@
               placeholder="Texto adicional exibido logo abaixo das boas-vindas."></textarea>
 
             <div class="acoes-inicio">
-              <button mat-flat-button color="primary" type="button"
-                [disabled]="formConfTutorInicio.invalid || salvandoInicio" (click)="salvarInicio()">
+              <button class="btn-primario" type="button"
+                [disabled]="formConfTutorInicio.invalid || salvandoInicio || !inicioMudou"
+                (click)="salvarInicio()">
                 <mat-icon>save</mat-icon> {{ salvandoInicio ? 'Salvando...' : 'Salvar' }}
               </button>
+              <span class="aviso-versionado" *ngIf="inicioMudou">
+                <mat-icon>info</mat-icon>
+                Salvar marca o texto como <strong>seu</strong>: ele deixa de receber as atualizações
+                que vêm nos deploys.
+              </span>
             </div>
 
             <div class="preview-inicio" *ngIf="previewInicio">

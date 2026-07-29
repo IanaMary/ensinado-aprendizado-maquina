@@ -58,6 +58,8 @@ import { TtutorTiposAprendizadoComponent } from './components/tutor-tipos-aprend
     MatProgressBarModule,
     MatSlideToggleModule,
     MatSelectModule,
+    // Nesta branch o Quill já era usado pelos componentes legados por etapa, então o
+    // `forRoot()` (que também exporta os componentes) fica como está.
     QuillModule.forRoot(),
   ],
   providers: []

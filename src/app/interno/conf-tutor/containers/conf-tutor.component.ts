@@ -4,6 +4,7 @@ import { AuthService } from '../../../service/auth/auth.service';
 import { LoginService } from '../../../externo/autenticacao/login/services/login.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService, ModeloLLM, ProvedorLLM } from '../../../dashboard/services/dashboard.service';
+import { htmlParaBoasVindas, mesmoConteudo } from './html-boas-vindas';
 import { NotificacaoService } from '../../../service/notificacao.service';
 
 // Mapeia o indice da aba para o slug "pipe" usado no backend/audit log.
@@ -90,6 +91,23 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
    *  estava editando — e o estado de versão só era lido uma vez por carga de página. */
   promptCarregado = false;
 
+  // Editor visual das boas-vindas (Quill). O admin não precisa saber HTML; quem quiser ver o
+  // código tem o modo "código HTML".
+  editorHtml = false;
+  /** Barra do editor limitada ao que o painel do tutor renderiza: formatar o que não aparece na
+   *  tela do aluno seria pior que não oferecer. */
+  quillModules = {
+    toolbar: [
+      [{ header: [4, false] }],
+      ['bold', 'italic'],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      ['link'],
+      ['clean'],
+    ],
+  };
+  /** Texto como veio do banco: serve para saber se houve edição de verdade. */
+  private inicioCarregado = '';
+
   // Provedores de LLM (aba Provedores)
   provedores: ProvedorLLM[] = [];
   provedorAtivo = '';
@@ -163,10 +181,13 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     this.carregandoInicio = true;
     this.dashboardService.getTutorEditar({ pipe: 'inicio' }).subscribe({
       next: (doc: any) => {
-        this.formConfTutorInicio.patchValue({
-          texto_pipe: doc?.texto_pipe || '',
-          explicacao: doc?.explicacao || null,
-        });
+        const texto = doc?.texto_pipe || '';
+        this.inicioCarregado = texto;
+        this.formConfTutorInicio.patchValue({ texto_pipe: texto, explicacao: doc?.explicacao || null });
+        // `patchValue` não suja o form, e é isso que queremos: abrir a aba não é editar. Sem essa
+        // distinção, o editor normaliza o HTML ao carregar e um Salvar sem intenção marcaria o
+        // texto como "do admin" — que é o que faz ele parar de receber as atualizações do sistema.
+        this.formConfTutorInicio.markAsPristine();
         this.carregandoInicio = false;
       },
       error: () => { this.carregandoInicio = false; }
@@ -174,12 +195,18 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   }
 
   salvarInicio() {
-    if (this.formConfTutorInicio.invalid || this.salvandoInicio) return;
+    if (this.formConfTutorInicio.invalid || this.salvandoInicio || !this.inicioMudou) return;
     this.salvandoInicio = true;
-    const { texto_pipe, explicacao } = this.formConfTutorInicio.value;
+    const { explicacao } = this.formConfTutorInicio.value;
+    // Converte o HTML do editor para o subconjunto que o painel do aluno renderiza — sem isto,
+    // a lista com marcador do Quill 2 (`<ol data-list="bullet">`) apareceria numerada lá.
+    const texto_pipe = htmlParaBoasVindas(this.formConfTutorInicio.value?.texto_pipe || '');
     this.dashboardService.putTutorPipe('inicio', { texto_pipe, explicacao }).subscribe({
       next: () => {
         this.salvandoInicio = false;
+        this.inicioCarregado = texto_pipe;
+        this.formConfTutorInicio.patchValue({ texto_pipe }, { emitEvent: false });
+        this.formConfTutorInicio.markAsPristine();
         this.notificacao.sucesso('Texto de boas-vindas salvo com sucesso.');
         this.carregarHistorico(this.pipeAtual);
       },
@@ -188,6 +215,23 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
         this.notificacao.erro(err.error?.detail || 'Erro ao salvar o texto de boas-vindas.');
       }
     });
+  }
+
+  /** Houve edição de verdade? Compara o conteúdo, não o HTML byte a byte: o editor reserializa o
+   *  texto ao carregar, e sem isso o Salvar viveria habilitado sem nada para salvar. */
+  get inicioMudou(): boolean {
+    const atual = htmlParaBoasVindas(this.formConfTutorInicio.value?.texto_pipe || '');
+    return !mesmoConteudo(atual, this.inicioCarregado);
+  }
+
+  /** Alterna entre o editor visual e o código HTML, normalizando ao sair do visual (assim o que se
+   *  vê no código é exatamente o que será salvo). */
+  alternarModoHtml(): void {
+    if (!this.editorHtml) {
+      const normalizado = htmlParaBoasVindas(this.formConfTutorInicio.value?.texto_pipe || '');
+      this.formConfTutorInicio.patchValue({ texto_pipe: normalizado }, { emitEvent: false });
+    }
+    this.editorHtml = !this.editorHtml;
   }
 
   get previewInicio(): string {
