@@ -3,14 +3,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../service/auth/auth.service';
 import { LoginService } from '../../../externo/autenticacao/login/services/login.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DashboardService } from '../../../dashboard/services/dashboard.service';
+import { DashboardService, ModeloLLM, ProvedorLLM } from '../../../dashboard/services/dashboard.service';
 import { NotificacaoService } from '../../../service/notificacao.service';
 
 // Mapeia o indice da aba para o slug "pipe" usado no backend/audit log.
 // O catálogo (dados/pré-proc/modelos/métricas) é administrado no conf-pipeline.
 const TAB_PIPES = [
   'inicio',   // texto de boas-vindas do tutor (area de trabalho)
-  'llm',      // configuracao do LLM
+  'llm',      // modelo do LLM
+  'llm',      // provedores — mesmo histórico da aba LLM (é a mesma família de configuração)
 ];
 
 const OPERACOES_LABEL: Record<string, string> = {
@@ -22,7 +23,24 @@ const OPERACOES_LABEL: Record<string, string> = {
   restaurou_padrao: 'Instrução do tutor restaurada ao padrão',
   seed_padrao: 'Padrão do sistema aplicado no deploy',
   forcou: 'Padrão do sistema reaplicado à força',
+  definiu_modelo: 'Modelo do tutor trocado',
+  trocou_provedor: 'Provedor de LLM trocado',
+  configurou_provedor: 'Provedor de LLM configurado',
 };
+
+/** Fornecedor do modelo = o que vem antes da "/" no id (nvidia, google, meta, z-ai…). */
+function fornecedorDoModelo(id: string): string {
+  const corte = (id || '').indexOf('/');
+  return corte > 0 ? id.slice(0, corte) : 'outros';
+}
+
+/** Um grupo colapsável da listagem. */
+export interface GrupoModelos {
+  fornecedor: string;
+  modelos: ModeloLLM[];
+  gratuitos: number;
+  respondem: number;
+}
 
 @Component({
   selector: 'app-conf-tutor',
@@ -34,7 +52,10 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
 
   role: string = sessionStorage.getItem('role') || '';
 
-  tabs = [true, false];
+  tabs = [true, false, false];
+  /** Aba visível (ligada ao mat-tab-group): permite navegar por código, ex. do link
+   *  "Configurar provedores" da aba LLM. */
+  abaSelecionada = 0;
 
   formConfTutorInicio: FormGroup;
 
@@ -45,7 +66,7 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   pipeAtual: string = TAB_PIPES[0];
 
   // Configuracao LLM
-  modelosLLM: { id: string; owned_by: string }[] = [];
+  modelosLLM: ModeloLLM[] = [];
   modeloLLMAtual = '';
   carregandoModelos = false;
   salvandoModelo = false;
@@ -68,6 +89,21 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
    *  se o admin limpasse o textarea e trocasse de aba, a volta refazia o GET por cima do que ele
    *  estava editando — e o estado de versão só era lido uma vez por carga de página. */
   promptCarregado = false;
+
+  // Provedores de LLM (aba Provedores)
+  provedores: ProvedorLLM[] = [];
+  provedorAtivo = '';
+  carregandoProvedores = false;
+  salvandoProvedor = '';
+  /** Rascunho por provedor: o que está nos campos da tela antes de salvar. */
+  formProvedor: Record<string, { nome: string; base_url: string; porta: number | null; api_key: string }> = {};
+
+  // Busca e agrupamento da listagem de modelos
+  buscaModelo = '';
+  /** Fornecedores expandidos. Com centenas de modelos, o padrão é tudo fechado — só o grupo do
+   *  modelo em uso abre sozinho, para o admin ver de imediato o que está no ar. */
+  fornecedoresAbertos: Record<string, boolean> = {};
+  testandoModelo = '';
 
   // Health-check dos modelos (testado em segundo plano no backend)
   saudeModelos: Record<string, { responde: boolean; latencia_ms?: number; erro?: string }> = {};
@@ -115,6 +151,9 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     }
     if (this.pipeAtual === 'llm' && !this.modelosLLM.length) {
       this.carregarModelosLLM();
+    }
+    if (idx === 2 && !this.provedores.length) {
+      this.carregarProvedores();
     }
   }
 
@@ -260,6 +299,7 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.modelosLLM = res.modelos || [];
         this.modeloLLMAtual = res.modelo_atual || '';
+        if (res.provedor) { this.provedorAtivo = res.provedor.id; }
         this.carregandoModelos = false;
         this.verificarSaudeModelos();
       },
@@ -317,19 +357,181 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     return total > 0 ? Math.round((concluidos / total) * 100) : 0;
   }
 
-  get modelosAtivos(): { id: string; owned_by: string }[] {
+  get modelosAtivos(): ModeloLLM[] {
     return this.modelosLLM.filter((m) => this.saudeModelos[m.id]?.responde);
   }
 
-  get modelosInativos(): { id: string; owned_by: string }[] {
+  get modelosInativos(): ModeloLLM[] {
     return this.modelosLLM.filter((m) => {
       const s = this.saudeModelos[m.id];
       return s && !s.responde;
     });
   }
 
+  /** Modelos que casam com a busca (por id ou fornecedor). */
+  get modelosFiltrados(): ModeloLLM[] {
+    const termo = this.buscaModelo.trim().toLowerCase();
+    if (!termo) return this.modelosLLM;
+    return this.modelosLLM.filter(
+      (m) => m.id.toLowerCase().includes(termo) || (m.owned_by || '').toLowerCase().includes(termo));
+  }
+
+  /**
+   * Listagem agrupada pelo fornecedor do modelo (o que vem antes da "/").
+   *
+   * Com 367 modelos no OpenRouter, uma lista plana é inutilizável. Grupos com modelo gratuito vêm
+   * primeiro (mesma regra do backend, que já entrega os gratuitos na frente dentro de cada
+   * fornecedor); dentro do grupo, a ordem do backend é preservada.
+   */
+  get gruposModelos(): GrupoModelos[] {
+    const porFornecedor = new Map<string, ModeloLLM[]>();
+    for (const m of this.modelosFiltrados) {
+      const f = fornecedorDoModelo(m.id);
+      (porFornecedor.get(f) || porFornecedor.set(f, []).get(f)!).push(m);
+    }
+    const grupos: GrupoModelos[] = [];
+    porFornecedor.forEach((modelos, fornecedor) => grupos.push({
+      fornecedor,
+      modelos,
+      gratuitos: modelos.filter((m) => m.gratuito === true).length,
+      respondem: modelos.filter((m) => this.saudeModelos[m.id]?.responde).length,
+    }));
+    grupos.sort((a, b) => (Number(b.gratuitos > 0) - Number(a.gratuitos > 0))
+      || a.fornecedor.localeCompare(b.fornecedor));
+    return grupos;
+  }
+
+  /** Aberto quando o admin abriu, quando há busca em curso (para o resultado ficar visível) ou
+   *  quando é o grupo do modelo em uso. */
+  grupoAberto(fornecedor: string): boolean {
+    if (this.buscaModelo.trim()) return true;
+    if (this.fornecedoresAbertos[fornecedor] !== undefined) {
+      return this.fornecedoresAbertos[fornecedor];
+    }
+    return fornecedorDoModelo(this.modeloLLMAtual) === fornecedor;
+  }
+
+  toggleFornecedor(fornecedor: string): void {
+    this.fornecedoresAbertos[fornecedor] = !this.grupoAberto(fornecedor);
+  }
+
+  limparBusca(): void {
+    this.buscaModelo = '';
+  }
+
+  /** Testa um modelo isolado — os pagos ficam fora do teste automático. */
+  testarModelo(id: string, evento?: Event): void {
+    evento?.stopPropagation();
+    if (this.testandoModelo) return;
+    this.testandoModelo = id;
+    this.dashboardService.verificarSaudeModelos(false, id).subscribe({
+      next: (res) => { this.saudeModelos = res.resultados || this.saudeModelos; this.testandoModelo = ''; },
+      error: () => { this.testandoModelo = ''; },
+    });
+  }
+
+  /** `true` quando o modelo nunca foi testado (fica sem selo, em vez de "testando" para sempre). */
+  naoTestado(id: string): boolean {
+    return !this.saudeModelos[id];
+  }
+
   toggleInativos(): void {
     this.inativosAberto = !this.inativosAberto;
+  }
+
+  // === Provedores de LLM ===
+
+  carregarProvedores(): void {
+    this.carregandoProvedores = true;
+    this.dashboardService.getProvedoresLLM().subscribe({
+      next: (res) => { this.aplicarProvedores(res); this.carregandoProvedores = false; },
+      error: (err) => {
+        this.notificacao.erro(err?.error?.detail || 'Erro ao carregar os provedores de LLM.');
+        this.carregandoProvedores = false;
+      },
+    });
+  }
+
+  private aplicarProvedores(res: { ativo: string; provedores: ProvedorLLM[] }): void {
+    this.provedores = res.provedores || [];
+    this.provedorAtivo = res.ativo || '';
+    for (const p of this.provedores) {
+      // O rascunho nasce com o que está gravado, MENOS a chave: a tela não a conhece, e um campo
+      // pré-preenchido com asteriscos convidaria a reenviar lixo por cima do segredo.
+      if (!this.formProvedor[p.id]) {
+        this.formProvedor[p.id] = { nome: p.nome, base_url: p.base_url, porta: null, api_key: '' };
+      }
+    }
+  }
+
+  salvarProvedor(p: ProvedorLLM): void {
+    const form = this.formProvedor[p.id];
+    if (!form || this.salvandoProvedor) return;
+    this.salvandoProvedor = p.id;
+    this.dashboardService.salvarProvedorLLM(p.id, {
+      nome: form.nome || undefined,
+      base_url: form.base_url || undefined,
+      porta: form.porta || undefined,
+      api_key: form.api_key || undefined,     // vazio = manter a chave atual
+    }).subscribe({
+      next: (res) => {
+        this.aplicarProvedores(res);
+        this.formProvedor[p.id].api_key = '';   // não deixa o segredo no DOM depois de salvar
+        this.salvandoProvedor = '';
+        this.notificacao.sucesso(`${p.nome} configurado.`);
+        this.carregarHistorico(this.pipeAtual);
+      },
+      error: (err) => {
+        this.salvandoProvedor = '';
+        this.notificacao.erro(err?.error?.detail || 'Erro ao salvar o provedor.');
+      },
+    });
+  }
+
+  ativarProvedor(p: ProvedorLLM): void {
+    if (this.salvandoProvedor || p.id === this.provedorAtivo) return;
+    this.salvandoProvedor = p.id;
+    this.dashboardService.definirProvedorLLMAtivo(p.id).subscribe({
+      next: (res) => {
+        this.aplicarProvedores(res);
+        this.salvandoProvedor = '';
+        this.notificacao.sucesso(`${p.nome} passou a responder o chat do tutor.`);
+        // Modelos e saúde são POR provedor: a lista de antes não vale mais.
+        this.modelosLLM = [];
+        this.saudeModelos = {};
+        this.saudeProgresso = { concluidos: 0, total: 0 };
+        this.fornecedoresAbertos = {};
+        this.buscaModelo = '';
+        this.carregarModelosLLM();
+        this.carregarHistorico(this.pipeAtual);
+      },
+      error: (err) => {
+        this.salvandoProvedor = '';
+        this.notificacao.erro(err?.error?.detail || 'Não foi possível ativar este provedor.');
+      },
+    });
+  }
+
+  /** Troca pelo seletor da aba LLM (o `select` já mostra o novo valor; o efeito vem do backend). */
+  trocarProvedorPeloSeletor(id: string): void {
+    const p = this.provedores.find((x) => x.id === id);
+    if (!p || p.id === this.provedorAtivo) return;
+    if (!p.configurado) {
+      this.notificacao.erro(`${p.nome} ainda não tem chave de API configurada.`);
+      return;
+    }
+    this.ativarProvedor(p);
+  }
+
+  /** Leva para a aba Provedores (índice 2). */
+  irParaProvedores(): void {
+    this.tabs[2] = true;
+    this.abaSelecionada = 2;
+    this.tabAtual({ index: 2 });
+  }
+
+  get provedorAtivoNome(): string {
+    return this.provedores.find((p) => p.id === this.provedorAtivo)?.nome || '';
   }
 
   ngOnDestroy(): void {

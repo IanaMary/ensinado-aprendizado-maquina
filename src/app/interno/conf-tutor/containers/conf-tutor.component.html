@@ -8,7 +8,8 @@
   </app-topbar>
 
   <div class="conteudo">
-    <mat-tab-group animationDuration="200ms" (selectedTabChange)="tabAtual($event)" class="conf-tutor-tabs">
+    <mat-tab-group animationDuration="200ms" [(selectedIndex)]="abaSelecionada"
+                   (selectedTabChange)="tabAtual($event)" class="conf-tutor-tabs">
       <mat-tab label="Início">
         <div class="box-coluna inicio-config">
           <div class="cabecalho-inicio">
@@ -57,6 +58,21 @@
           </div>
           <p class="desc-llm">Escolha qual modelo de linguagem vai responder as perguntas dos alunos no chat do tutor.</p>
 
+          <!-- Provedor em uso: trocar aqui recarrega a lista, porque os modelos são por provedor -->
+          <div class="provedor-atual" *ngIf="provedores.length">
+            <label class="campo-label" for="sel-provedor">Provedor</label>
+            <div class="provedor-linha">
+              <select id="sel-provedor" class="campo-input" [ngModel]="provedorAtivo"
+                      (ngModelChange)="trocarProvedorPeloSeletor($event)"
+                      [disabled]="!!salvandoProvedor || saudeEmAndamento">
+                <option *ngFor="let p of provedores" [value]="p.id" [disabled]="!p.configurado">
+                  {{ p.nome }}{{ p.configurado ? '' : ' (sem chave)' }}
+                </option>
+              </select>
+              <a class="link-provedores" (click)="irParaProvedores()">Configurar provedores</a>
+            </div>
+          </div>
+
           <div class="carregando-modelos" *ngIf="carregandoModelos">
             <mat-spinner diameter="24"></mat-spinner>
             <span>Carregando modelos disponíveis...</span>
@@ -70,12 +86,21 @@
               <div class="modelo-info">
                 <mat-icon class="modelo-icon">{{ m.id === modeloLLMAtual ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
                 <div class="modelo-detalhes">
-                  <span class="modelo-id">{{ m.id }}</span>
+                  <span class="modelo-id">
+                    {{ m.id }}
+                    <span class="selo-free" *ngIf="m.gratuito === true" title="Sem custo por token">free</span>
+                  </span>
                   <span class="modelo-own" *ngIf="m.owned_by">{{ m.owned_by }}</span>
                 </div>
               </div>
               <div class="modelo-direita">
-                <span class="saude-chip" [ngClass]="statusModelo(m.id)"
+                <!-- Modelo pago fica fora do teste automático: dá para testar um a um -->
+                <button class="btn-testar" type="button" *ngIf="naoTestado(m.id) && !saudeEmAndamento"
+                        (click)="testarModelo(m.id, $event)" [disabled]="!!testandoModelo">
+                  <mat-spinner diameter="12" *ngIf="testandoModelo === m.id"></mat-spinner>
+                  <ng-container *ngIf="testandoModelo !== m.id">testar</ng-container>
+                </button>
+                <span class="saude-chip" *ngIf="!naoTestado(m.id)" [ngClass]="statusModelo(m.id)"
                   [matTooltip]="saudeModelos[m.id]?.erro || (saudeModelos[m.id]?.latencia_ms ? saudeModelos[m.id]?.latencia_ms + ' ms' : '')">
                   <ng-container [ngSwitch]="statusModelo(m.id)">
                     <ng-container *ngSwitchCase="'responde'"><mat-icon>check_circle</mat-icon> responde</ng-container>
@@ -98,44 +123,54 @@
             <p class="verificando-aviso">A seleção fica disponível assim que o teste terminar.</p>
           </div>
 
-          <!-- Teste concluído: Ativos (selecionáveis) + Inativos (recolhidos) -->
+          <!-- Teste concluído: busca + listagem colapsável por fornecedor do modelo -->
           <ng-container *ngIf="!carregandoModelos && modelosLLM.length && verificacaoConcluida">
             <div class="saude-barra">
               <span class="saude-status">
                 <mat-icon>verified</mat-icon>
-                {{ modelosAtivos.length }} ativos · {{ modelosInativos.length }} inativos
+                {{ modelosAtivos.length }} respondem · {{ modelosInativos.length }} sem resposta
+                <ng-container *ngIf="modelosLLM.length as total">· {{ total }} no total</ng-container>
               </span>
-              <button mat-stroked-button class="saude-retestar" (click)="retestarModelos()">
+              <button class="btn-secundario saude-retestar" type="button" (click)="retestarModelos()">
                 <mat-icon>refresh</mat-icon> Re-testar
               </button>
             </div>
 
-            <h4 class="grupo-modelos-titulo ativos">
-              <mat-icon>check_circle</mat-icon> Ativos ({{ modelosAtivos.length }})
-            </h4>
-            <div class="lista-modelos" *ngIf="modelosAtivos.length">
-              <ng-container *ngFor="let m of modelosAtivos">
-                <ng-container *ngTemplateOutlet="modeloItemTpl; context: { $implicit: m }"></ng-container>
-              </ng-container>
+            <div class="busca-modelo">
+              <mat-icon class="busca-icone">search</mat-icon>
+              <input class="campo-input" type="search" [(ngModel)]="buscaModelo"
+                     placeholder="Buscar modelo por nome (ex.: nemotron, llama, :free)"
+                     aria-label="Buscar modelo de linguagem">
+              <button class="btn-limpar" type="button" *ngIf="buscaModelo" (click)="limparBusca()"
+                      aria-label="Limpar busca"><mat-icon>close</mat-icon></button>
             </div>
-            <p class="vazio-grupo" *ngIf="!modelosAtivos.length">Nenhum modelo respondeu ao teste.</p>
 
-            <div class="grupo-inativos" *ngIf="modelosInativos.length">
-              <button type="button" class="grupo-modelos-titulo inativos toggle" (click)="toggleInativos()">
-                <mat-icon class="caret">{{ inativosAberto ? 'expand_less' : 'expand_more' }}</mat-icon>
-                <mat-icon>cancel</mat-icon> Inativos ({{ modelosInativos.length }})
+            <!-- Um grupo por fornecedor (o que vem antes da "/" no id). Fechados por padrão:
+                 no OpenRouter são centenas de modelos. -->
+            <div class="grupo-fornecedor" *ngFor="let g of gruposModelos">
+              <button type="button" class="fornecedor-titulo" (click)="toggleFornecedor(g.fornecedor)"
+                      [attr.aria-expanded]="grupoAberto(g.fornecedor)">
+                <mat-icon class="caret">{{ grupoAberto(g.fornecedor) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                <span class="fornecedor-nome">{{ g.fornecedor }}</span>
+                <span class="fornecedor-contagem">{{ g.modelos.length }}</span>
+                <span class="selo-free" *ngIf="g.gratuitos">{{ g.gratuitos }} free</span>
+                <span class="fornecedor-saude" *ngIf="g.respondem">{{ g.respondem }} respondem</span>
               </button>
-              <div class="lista-modelos" *ngIf="inativosAberto">
-                <ng-container *ngFor="let m of modelosInativos">
+              <div class="lista-modelos" *ngIf="grupoAberto(g.fornecedor)">
+                <ng-container *ngFor="let m of g.modelos">
                   <ng-container *ngTemplateOutlet="modeloItemTpl; context: { $implicit: m }"></ng-container>
                 </ng-container>
               </div>
             </div>
+
+            <p class="vazio-grupo" *ngIf="!gruposModelos.length">
+              Nenhum modelo casa com “{{ buscaModelo }}”.
+            </p>
           </ng-container>
 
           <div class="vazio-modelos" *ngIf="!carregandoModelos && !modelosLLM.length">
             <mat-icon>cloud_off</mat-icon>
-            <p>Nenhum modelo disponível. Verifique a configuração da NVIDIA_API_KEY.</p>
+            <p>Nenhum modelo disponível. Confira a chave do provedor na aba <strong>Provedores</strong>.</p>
           </div>
 
           <div class="modelo-atual-info" *ngIf="modeloLLMAtual && !carregandoModelos">
@@ -186,6 +221,107 @@
               </button>
             </div>
           </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Provedores">
+        <div class="box-coluna provedores-config">
+          <div class="cabecalho-llm">
+            <mat-icon>hub</mat-icon>
+            <h3>Provedores de modelos de linguagem</h3>
+          </div>
+          <p class="desc-llm">
+            Qual serviço responde o chat do tutor. Todos falam o mesmo dialeto (OpenAI-compatible),
+            então trocar de provedor não muda nada no resto da plataforma — só a lista de modelos,
+            que é <strong>de cada provedor</strong>.
+          </p>
+
+          <div class="carregando-modelos" *ngIf="carregandoProvedores">
+            <mat-spinner diameter="24"></mat-spinner>
+            <span>Carregando provedores…</span>
+          </div>
+
+          <div class="provedor-card" *ngFor="let p of provedores" [class.ativo]="p.id === provedorAtivo">
+            <div class="provedor-topo">
+              <mat-icon class="provedor-icone">{{ p.id === provedorAtivo ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+              <div class="provedor-identidade">
+                <span class="provedor-nome">{{ p.nome }}</span>
+                <span class="provedor-url">{{ p.base_url || 'sem URL base' }}</span>
+              </div>
+              <span class="selo-free" *ngIf="p.todos_gratuitos === true">todos free</span>
+              <span class="selo-chave" [ngClass]="p.chave_fonte">
+                <ng-container [ngSwitch]="p.chave_fonte">
+                  <ng-container *ngSwitchCase="'banco'"><mat-icon>key</mat-icon> chave {{ p.chave_mascarada }}</ng-container>
+                  <ng-container *ngSwitchCase="'env'"><mat-icon>lock</mat-icon> chave no .env ({{ p.env_chave }})</ng-container>
+                  <ng-container *ngSwitchDefault><mat-icon>key_off</mat-icon> sem chave</ng-container>
+                </ng-container>
+              </span>
+              <button class="btn-primario" type="button" *ngIf="p.id !== provedorAtivo"
+                      [disabled]="!p.configurado || !!salvandoProvedor" (click)="ativarProvedor(p)">
+                <mat-icon>bolt</mat-icon> Ativar
+              </button>
+              <span class="chip-em-uso" *ngIf="p.id === provedorAtivo">em uso</span>
+            </div>
+
+            <p class="provedor-modelo" *ngIf="p.modelo">
+              Modelo escolhido: <strong>{{ p.modelo }}</strong>
+            </p>
+            <p class="provedor-modelo aviso" *ngIf="!p.modelo && p.configurado">
+              Nenhum modelo escolhido ainda — ative o provedor e escolha na aba LLM.
+            </p>
+
+            <!-- NVIDIA não é editável aqui de propósito: chave e URL vêm do .env do servidor. -->
+            <p class="provedor-somente-leitura" *ngIf="!p.editavel">
+              <mat-icon>info</mat-icon>
+              Configurado pelo <code>.env</code> do servidor ({{ p.env_chave }}) — não é editável pela tela.
+            </p>
+
+            <div class="provedor-form" *ngIf="p.editavel && formProvedor[p.id]">
+              <div class="campo-form" *ngIf="p.id === 'custom'">
+                <label class="campo-label">Nome</label>
+                <input class="campo-input" [(ngModel)]="formProvedor[p.id].nome"
+                       placeholder="Ex.: Ollama na minha máquina" maxlength="80">
+              </div>
+              <div class="provedor-form-linha">
+                <div class="campo-form url">
+                  <label class="campo-label">URL base</label>
+                  <input class="campo-input" [(ngModel)]="formProvedor[p.id].base_url"
+                         placeholder="http://127.0.0.1:11434/v1" spellcheck="false">
+                </div>
+                <div class="campo-form porta">
+                  <label class="campo-label">Porta</label>
+                  <input class="campo-input" type="number" [(ngModel)]="formProvedor[p.id].porta"
+                         placeholder="opcional" min="1" max="65535">
+                </div>
+              </div>
+              <div class="campo-form">
+                <label class="campo-label">Chave de API</label>
+                <input class="campo-input" type="password" [(ngModel)]="formProvedor[p.id].api_key"
+                       autocomplete="new-password" spellcheck="false"
+                       [placeholder]="p.chave_fonte === 'banco' ? 'Guardada — deixe vazio para manter' : 'Cole a chave do provedor'">
+                <small class="campo-dica">
+                  Fica no servidor e nunca volta para a tela: só os últimos 4 caracteres aparecem.
+                  Deixar em branco mantém a chave atual.
+                </small>
+              </div>
+              <div class="provedor-acoes">
+                <a class="link-externo" *ngIf="p.id === 'openrouter'" href="https://openrouter.ai/keys"
+                   target="_blank" rel="noopener">Obter chave no OpenRouter</a>
+                <button class="btn-primario" type="button" (click)="salvarProvedor(p)"
+                        [disabled]="salvandoProvedor === p.id">
+                  <mat-icon>save</mat-icon>
+                  {{ salvandoProvedor === p.id ? 'Salvando…' : 'Salvar' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p class="provedores-nota">
+            <mat-icon>shield</mat-icon>
+            <span>
+              A URL base pode apontar para a rede interna (é o que permite um modelo rodando na
+              própria máquina). Só administradores configuram provedores.
+            </span>
+          </p>
         </div>
       </mat-tab>
     </mat-tab-group>

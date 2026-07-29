@@ -5,6 +5,30 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import itensPipeline from '../../../app/constants/itens-coletas-dados.json'
 
+/** Modelo de linguagem oferecido pelo provedor ativo. */
+export interface ModeloLLM {
+  id: string;
+  owned_by: string;
+  /** `true`/`false` quando se sabe o preço; `null` quando o provedor não informa. */
+  gratuito: boolean | null;
+  contexto?: number;
+}
+
+/** Provedor de LLM como a tela do admin o vê — **sem chave em claro**. */
+export interface ProvedorLLM {
+  id: 'nvidia' | 'openrouter' | 'custom' | string;
+  nome: string;
+  base_url: string;
+  modelo: string;
+  editavel: boolean;
+  todos_gratuitos: boolean | null;
+  /** 'banco' = o admin gravou · 'env' = .env do servidor · 'ausente' = não vai funcionar. */
+  chave_fonte: 'banco' | 'env' | 'ausente';
+  chave_mascarada: string;
+  env_chave: string | null;
+  configurado: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -276,8 +300,14 @@ export class DashboardService {
     );
   }
 
+  /** Modelos do provedor ativo. `gratuito` vem do backend (`null` = sem informação de preço) e a
+   *  lista já chega com os gratuitos primeiro. */
   listarModelosLLM() {
-    return this.http.get<{ modelos: { id: string; owned_by: string }[]; modelo_atual: string }>(
+    return this.http.get<{
+      modelos: ModeloLLM[];
+      modelo_atual: string;
+      provedor?: { id: string; nome: string; todos_gratuitos: boolean | null };
+    }>(
       `${this.url}${this.endpointTutor}/modelos`
     );
   }
@@ -288,15 +318,40 @@ export class DashboardService {
 
   // Health-check dos modelos (testado em segundo plano no backend). `resultados` é
   // um mapa { id_modelo: { responde, latencia_ms?, erro? } }.
-  verificarSaudeModelos(forcar = false) {
+  /** Saúde dos modelos. Com `modelo`, testa só aquele — é o "testar este" dos pagos, que ficam
+   *  fora do teste automático para não gastar chamada (nem crédito) só para montar a tela. */
+  verificarSaudeModelos(forcar = false, modelo?: string) {
+    const params = new URLSearchParams();
+    if (forcar) params.set('forcar', 'true');
+    if (modelo) params.set('modelo', modelo);
+    const qs = params.toString();
     return this.http.get<{
       resultados: Record<string, { responde: boolean; latencia_ms?: number; erro?: string }>;
       atualizado_em: number; em_andamento: boolean; total: number; concluidos: number;
-    }>(`${this.url}${this.endpointTutor}/modelos/saude${forcar ? '?forcar=true' : ''}`);
+    }>(`${this.url}${this.endpointTutor}/modelos/saude${qs ? '?' + qs : ''}`);
   }
 
   definirModeloLLM(modelo: string) {
-    return this.http.put<{ modelo: string }>(`${this.url}${this.endpointTutor}/modelo`, { modelo });
+    return this.http.put<{ modelo: string; provedor?: string }>(
+      `${this.url}${this.endpointTutor}/modelo`, { modelo });
+  }
+
+  // ---- provedores de LLM (aba Provedores do conf-tutor)
+  getProvedoresLLM() {
+    return this.http.get<{ ativo: string; provedores: ProvedorLLM[] }>(
+      `${this.url}${this.endpointTutor}/provedores`);
+  }
+
+  /** Grava URL base, porta, nome e chave. **Chave vazia mantém a atual** — a tela nunca conhece o
+   *  segredo, então não teria como reenviá-lo. */
+  salvarProvedorLLM(id: string, body: { nome?: string; base_url?: string; porta?: number | null; api_key?: string; }) {
+    return this.http.put<{ ativo: string; provedores: ProvedorLLM[] }>(
+      `${this.url}${this.endpointTutor}/provedores/${id}`, body);
+  }
+
+  definirProvedorLLMAtivo(provedor: string) {
+    return this.http.put<{ ativo: string; provedores: ProvedorLLM[] }>(
+      `${this.url}${this.endpointTutor}/provedor-ativo`, { provedor });
   }
 
   putTutorTipoAprendizado(body: any, id: string) {
