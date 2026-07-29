@@ -20,6 +20,8 @@ const OPERACOES_LABEL: Record<string, string> = {
   atualizar_por_pipe: 'Atualização de texto',
   editou: 'Edição da instrução do tutor',
   restaurou_padrao: 'Instrução do tutor restaurada ao padrão',
+  seed_padrao: 'Padrão do sistema aplicado no deploy',
+  forcou: 'Padrão do sistema reaplicado à força',
 };
 
 @Component({
@@ -48,13 +50,24 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   carregandoModelos = false;
   salvandoModelo = false;
 
-  // Instrução de sistema do chat (o banco prevalece; o versionado é o padrão)
+  // Instrução de sistema do chat. O texto é persistido no banco (semeado a partir da fonte
+  // versionada no deploy); o versionado é o padrão de onde ele parte e o fallback de leitura.
   promptTexto = '';
   promptPadrao = '';
   promptPersonalizado = false;
   promptLimite = 6000;
+  /** 'banco' = persistido; 'versionado' = caiu no fallback (o seed não rodou). */
+  promptFonte = '';
+  /** 'versionado' | 'admin' — de quem é o texto que está no ar. */
+  promptOrigem = '';
+  /** O padrão do repo mudou depois que o admin editou o dele. */
+  promptPadraoDesatualizado = false;
   carregandoPrompt = false;
   salvandoPrompt = false;
+  /** Guarda a busca já feita. Antes a condição era `!this.promptTexto`, ou seja, o CONTEÚDO:
+   *  se o admin limpasse o textarea e trocasse de aba, a volta refazia o GET por cima do que ele
+   *  estava editando — e o estado de versão só era lido uma vez por carga de página. */
+  promptCarregado = false;
 
   // Health-check dos modelos (testado em segundo plano no backend)
   saudeModelos: Record<string, { responde: boolean; latencia_ms?: number; erro?: string }> = {};
@@ -97,7 +110,7 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     this.pipeAtual = TAB_PIPES[idx] || TAB_PIPES[0];
     this.carregarHistorico(this.pipeAtual);
 
-    if (this.pipeAtual === 'llm' && !this.promptTexto) {
+    if (this.pipeAtual === 'llm' && !this.promptCarregado) {
       this.carregarPrompt();
     }
     if (this.pipeAtual === 'llm' && !this.modelosLLM.length) {
@@ -170,6 +183,10 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
         this.promptPadrao = res?.padrao || '';
         this.promptPersonalizado = !!res?.personalizado;
         this.promptLimite = res?.limite || this.promptLimite;
+        this.promptFonte = res?.fonte || '';
+        this.promptOrigem = res?.origem || '';
+        this.promptPadraoDesatualizado = !!res?.padrao_desatualizado;
+        this.promptCarregado = true;
         this.carregandoPrompt = false;
       },
       error: (err: any) => {
@@ -177,6 +194,11 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
         this.carregandoPrompt = false;
       },
     });
+  }
+
+  /** Tamanho que o SERVIDOR vai validar (ele grava o texto com strip). */
+  get promptTamanho(): number {
+    return this.promptTexto.trim().length;
   }
 
   salvarPrompt(): void {
@@ -187,6 +209,10 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         this.promptTexto = res?.texto || texto;
         this.promptPersonalizado = !!res?.personalizado;
+        // Acabou de gravar: está no banco, e o texto passou a derivar do padrão de agora.
+        this.promptFonte = 'banco';
+        this.promptOrigem = res?.personalizado ? 'admin' : 'versionado';
+        this.promptPadraoDesatualizado = false;
         this.salvandoPrompt = false;
         this.notificacao.sucesso('Instrução do tutor salva. Vale já na próxima pergunta.');
         this.carregarHistorico(this.pipeAtual);
@@ -198,13 +224,23 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Texto vazio no PUT = sem personalização: o backend volta a usar o versionado. */
+  /** Texto vazio no PUT = o backend GRAVA o padrão versionado (não apaga o documento) e guarda
+   *  o texto anterior no histórico. O `confirm` existe porque o botão fica ao lado de "Salvar":
+   *  um clique sem intenção tira do ar a instrução que o admin escreveu. */
   restaurarPromptPadrao(): void {
+    if (this.promptPersonalizado &&
+        !confirm('Voltar ao padrão do sistema? Sua instrução atual sai do ar e fica registrada ' +
+                 'no histórico desta tela.')) {
+      return;
+    }
     this.salvandoPrompt = true;
     this.dashboardService.putSystemPrompt('').subscribe({
       next: (res: any) => {
         this.promptTexto = res?.texto || this.promptPadrao;
         this.promptPersonalizado = false;
+        this.promptFonte = 'banco';
+        this.promptOrigem = 'versionado';
+        this.promptPadraoDesatualizado = false;
         this.salvandoPrompt = false;
         this.notificacao.sucesso('Instrução do tutor de volta ao padrão do sistema.');
         this.carregarHistorico(this.pipeAtual);

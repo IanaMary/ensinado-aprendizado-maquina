@@ -150,25 +150,38 @@
               <h3>Instrução do tutor (prompt de sistema)</h3>
               <span class="selo-prompt" *ngIf="promptPersonalizado">personalizado</span>
               <span class="selo-prompt padrao" *ngIf="!promptPersonalizado">padrão do sistema</span>
+              <!-- Só aparece se o seed não rodou: o tutor está usando o texto do código, e nada
+                   do que estiver no banco explica o que ele responde. -->
+              <span class="selo-prompt nao-persistido" *ngIf="promptCarregado && promptFonte === 'versionado'"
+                    title="O texto está valendo pelo código, não pelo banco">não persistido</span>
             </div>
             <p class="desc-llm">
               Este texto é enviado ao modelo em <strong>toda</strong> pergunta, antes do contexto do
               pipeline e da base de conhecimento. Define quem é o público, o tom e o que o tutor
               deve recusar.
             </p>
+            <p class="prompt-aviso" *ngIf="promptPadraoDesatualizado" role="status">
+              <mat-icon aria-hidden="true">update</mat-icon>
+              <span>
+                O <strong>padrão do sistema mudou</strong> desde a sua edição. Sua instrução
+                continua no ar; se quiser, adote a nova versão — a atual fica no histórico.
+              </span>
+              <button class="btn-secundario" type="button" (click)="restaurarPromptPadrao()"
+                      [disabled]="salvandoPrompt">Usar o novo padrão</button>
+            </p>
             <textarea class="prompt-editor" rows="12" [(ngModel)]="promptTexto"
                       [disabled]="carregandoPrompt || salvandoPrompt"
                       aria-label="Instrução de sistema do tutor"></textarea>
             <div class="prompt-acoes">
-              <span class="prompt-contador" [class.excedeu]="promptTexto.length > promptLimite">
-                {{ promptTexto.length }} / {{ promptLimite }} caracteres
+              <span class="prompt-contador" [class.excedeu]="promptTamanho > promptLimite">
+                {{ promptTamanho }} / {{ promptLimite }} caracteres
               </span>
               <button class="btn-secundario" type="button" (click)="restaurarPromptPadrao()"
                       [disabled]="salvandoPrompt || (!promptPersonalizado && promptTexto === promptPadrao)">
                 <mat-icon>restart_alt</mat-icon> Voltar ao padrão
               </button>
               <button class="btn-primario" type="button" (click)="salvarPrompt()"
-                      [disabled]="salvandoPrompt || !promptTexto.trim() || promptTexto.length > promptLimite">
+                      [disabled]="salvandoPrompt || !promptTamanho || promptTamanho > promptLimite">
                 <mat-icon>save</mat-icon> Salvar instrução
               </button>
             </div>

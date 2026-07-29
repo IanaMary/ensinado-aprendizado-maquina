@@ -8,6 +8,19 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-29 (aba LLM mostra o estado de versão da instrução) — porte
+
+> Branch `master` (não implantada; produção roda a `mestrado-iana`).
+> Backend `master` `dd55271`: instrução de sistema persistida e versionada.
+
+- Aviso de "o padrão do sistema mudou desde a sua edição" + selo "não persistido" (o seed não
+  rodou) + `confirm()` antes de tirar do ar a instrução do admin.
+- Corrigidos: guarda de lazy-load pelo conteúdo do textarea (refazia o GET por cima da edição em
+  curso) e contador de caracteres sem trim, que discordava do servidor perto do teto.
+- `conf-tutor.component.spec.ts` (novo, 6 casos).
+
+---
+
 ## 2026-07-28 (a tela do desafio não corrige mais a raia errada) — porte
 
 > Branch `master` (não implantada; produção roda a `mestrado-iana`).

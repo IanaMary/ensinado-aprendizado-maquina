@@ -243,16 +243,30 @@ export class DashboardService {
   }
 
   // Configuração do modelo LLM
-  /** Instrução de sistema do chat do tutor: texto vigente, padrão versionado e limite. */
+  /**
+   * Instrução de sistema do chat do tutor: texto vigente, padrão versionado e estado de versão.
+   * Os campos de versão são opcionais de propósito — assim a tela tolera um backend anterior a
+   * eles (devolve `undefined`, e nenhum aviso acende).
+   */
   getSystemPrompt() {
-    return this.http.get<{ texto: string; padrao: string; personalizado: boolean; limite: number }>(
-      `${this.url}${this.endpointTutor}/system-prompt`
-    );
+    return this.http.get<{
+      texto: string; padrao: string; personalizado: boolean; limite: number;
+      /** 'banco' = persistido; 'versionado' = fallback (o seed não rodou). */
+      fonte?: string;
+      /** 'versionado' | 'admin' — de quem é o texto no ar. */
+      origem?: string;
+      padrao_hash?: string;
+      /** Padrão de que a edição do admin derivou (null = desconhecido). */
+      padrao_hash_base?: string | null;
+      padrao_desatualizado?: boolean;
+      versao?: number;
+      atualizado_em?: string;
+    }>(`${this.url}${this.endpointTutor}/system-prompt`);
   }
 
-  /** Grava a instrução (admin). Texto vazio remove a personalização e volta ao versionado. */
+  /** Grava a instrução (admin). Texto vazio grava o padrão versionado de volta (não apaga). */
   putSystemPrompt(texto: string) {
-    return this.http.put<{ texto: string; personalizado: boolean }>(
+    return this.http.put<{ texto: string; personalizado: boolean; versao?: number }>(
       `${this.url}${this.endpointTutor}/system-prompt`, { texto }
     );
   }
