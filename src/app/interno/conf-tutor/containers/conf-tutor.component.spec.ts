@@ -1,6 +1,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { QuillModule } from 'ngx-quill';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { ConfTutorComponent } from './conf-tutor.component';
@@ -68,7 +69,9 @@ describe('ConfTutorComponent (aba LLM)', () => {
 
     TestBed.configureTestingModule({
       schemas: [NO_ERRORS_SCHEMA],
-      imports: [FormsModule, ReactiveFormsModule],
+      // O editor visual é um ControlValueAccessor de verdade: com NO_ERRORS_SCHEMA e sem o
+      // módulo, `formControlName="texto_pipe"` fica sem accessor (NG01203).
+      imports: [FormsModule, ReactiveFormsModule, QuillModule],
       declarations: [ConfTutorComponent],
       providers: [
         { provide: DashboardService, useValue: service },

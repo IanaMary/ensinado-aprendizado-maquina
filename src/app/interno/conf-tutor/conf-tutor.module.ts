@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
+import { QuillModule } from 'ngx-quill';
 
 import { ConfTutorRoutingModule } from './conf-tutor-routing.module';
 import { SharedModule } from '../../shared/shared.module';
@@ -43,6 +44,9 @@ import { ConfTutorComponent } from './containers/conf-tutor.component';
     MatProgressBarModule,
     MatSlideToggleModule,
     MatSelectModule,
+    // Editor visual do texto de boas-vindas. `quill` e `ngx-quill` já eram dependências (e o
+    // `quill.snow.css` já estava no angular.json) — sobraram da versão antiga desta tela.
+    QuillModule,
   ],
   providers: []
 })
