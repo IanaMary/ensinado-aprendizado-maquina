@@ -10,7 +10,7 @@ Alunos do ensino fundamental tardio e médio (12–18 anos) usando a plataforma 
 
 ## Product Purpose
 
-H2IA Tutor (Mestrado Iana) é uma plataforma educacional interativa para ensinar aprendizado de máquina por meio de pipelines visuais: o aluno coleta dados, escolhe pré-processamentos, seleciona modelos, avalia métricas e recebe explicações do tutor em linguagem acessível. Sucesso = aluno completa um pipeline do início ao fim sem abandonar por confusão de interface.
+H2IA Tutor (H2IA Tutor) é uma plataforma educacional interativa para ensinar aprendizado de máquina por meio de pipelines visuais: o aluno coleta dados, escolhe pré-processamentos, seleciona modelos, avalia métricas e recebe explicações do tutor em linguagem acessível. Sucesso = aluno completa um pipeline do início ao fim sem abandonar por confusão de interface.
 
 ## Brand Personality
 

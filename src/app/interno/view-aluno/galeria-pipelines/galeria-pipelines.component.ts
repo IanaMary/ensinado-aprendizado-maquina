@@ -34,7 +34,7 @@ export class GaleriaPipelinesComponent implements OnInit {
           id: p.id,
           nome: p.nome,
           descricao: p.descricao || '',
-          professor: p.professor_id || 'Professor Iana',
+          professor: p.professor_id || 'Professor',
           publico: p.is_public,
           dataCriacao: p.dataCriacao,
           modelo: p.modeloSelecionado?.label || 'Não definido',

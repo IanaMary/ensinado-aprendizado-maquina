@@ -1,4 +1,4 @@
-# Documentação do Projeto Mestrado Iana / H2IA Tutor
+# Documentação do Projeto H2IA Tutor
 
 Plataforma educacional para ensinar **Aprendizado de Máquina** de forma interativa. O público-alvo
 são os estudantes da **ONIA** (Olimpíada Nacional de Inteligência Artificial), que vão do **8º ano do
