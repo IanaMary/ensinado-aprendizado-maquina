@@ -8,6 +8,30 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-30 (provedores de LLM + editor de texto rico no conf-tutor) — porte
+
+> Branch `master` (não implantada). Porte de `7d3c6d1`+`56683bb`+`8bdad04` da `mestrado-iana`
+> (implantados em produção nesta data). Backend `master` `2a6de50`.
+
+### Adicionado
+- **Aba Provedores** no conf-tutor: NVIDIA NIM, OpenRouter e provedor livre (endereço base, porta e
+  chave). A chave vive no banco e a tela só recebe a forma mascarada (`••••1234`).
+- Modelos **gratuitos primeiro**, com etiqueta `free`; todos os da NVIDIA marcados como gratuitos.
+- **Busca por nome** e listagem **colapsável por fornecedor** (o que vem antes da `/`).
+- Seletor de provedor na aba LLM; botão "retestar" no padrão `.btn-secundario`.
+- **Editor visual** (Quill) nas boas-vindas, no lugar do HTML cru, com modo "Código HTML" e
+  `html-boas-vindas.ts` convertendo a saída do editor para o subconjunto que o painel renderiza.
+
+### Nota do porte
+- Nesta branch o `QuillModule.forRoot()` já estava no módulo (os componentes legados por etapa do
+  conf-tutor, que só existem aqui, usam Quill) — mantido como estava, em vez do `QuillModule` que a
+  `mestrado-iana` precisou acrescentar.
+
+### Verificação
+197/197 + build de produção.
+
+---
+
 ## 2026-07-29b (marca H2IA Tutor no material exportado) — porte
 
 > Branch `master` (não implantada). Backend `master` `8abf375`.
