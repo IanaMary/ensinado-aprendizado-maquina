@@ -8,6 +8,29 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-30 (correções da revisão: provedor sem preço, colapso na busca, prévia)
+
+> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-2KWK6MAL.js`**.
+
+### Corrigido
+- **Bloqueador:** com provedor que não informa preço (endpoint customizado) nada entra no teste
+  automático, e a listagem exigia `total > 0` — 300 modelos carregados e tela vazia, sem como
+  escolher o primeiro. A lista aparece assim que não há teste em curso, com "teste sob demanda" e
+  o botão "testar" por item.
+- O **seletor de provedor** da aba LLM não existia na primeira visita (só a aba Provedores carregava
+  a lista); agora as duas carregam.
+- **Recolher grupo** não respondia com busca ativa (a busca forçava aberto).
+- **Ordem dos grupos** empatava em "tem ≥1 gratuito" — um fornecedor com 1 vinha antes de um com 40.
+- **Pré-visualização** das boas-vindas mostrava a saída crua do editor (lista numerada, `&nbsp;`) em
+  vez do HTML convertido que será gravado.
+- Toast duplicado nos handlers de provedor (o `ErrorInterceptor` já mostra o `detail`).
+- `package-lock.json` restaurado (o diff removia entradas sem mudança no `package.json`).
+
+### Verificação
+206/206 (5 novos) + build. Verificado no navegador contra um endpoint OpenAI-compatible local.
+
+---
+
 ## 2026-07-29d (editor de texto rico nas boas-vindas do tutor)
 
 > Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-PJ3RSM34.js`**. Backend inalterado.
