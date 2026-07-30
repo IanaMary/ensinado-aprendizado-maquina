@@ -224,6 +224,87 @@ describe('ConfTutorComponent (aba LLM)', () => {
     });
   });
 
+  /**
+   * Os casos acima afirmam sobre GETTERS. O defeito de 30/07 não estava em getter nenhum: a lista
+   * ficava escondida por um `*ngIf` do template (`verificacaoConcluida` exigia `total > 0`), então
+   * um provedor que não informa preço carregava 300 modelos e a tela ficava vazia — com
+   * `gruposModelos.length` maior que zero o tempo todo. Um teste de getter passa verde nesse cenário;
+   * só olhando o DOM ele acende.
+   */
+  describe('a listagem chega à TELA (DOM)', () => {
+    /** Estados possíveis do teste de saúde, do ponto de vista da tela. */
+    const SAUDE = {
+      nadaTestado:  { resultados: {}, atualizado_em: 1, em_andamento: false, total: 0, concluidos: 0 },
+      emAndamento:  { resultados: {}, atualizado_em: 1, em_andamento: true,  total: 4, concluidos: 1 },
+      parcial:      { resultados: { 'meta/llama-3.3-70b-instruct': { responde: true } },
+                      atualizado_em: 1, em_andamento: false, total: 4, concluidos: 2 },
+      tudoTestado:  { resultados: { 'meta/llama-3.3-70b-instruct': { responde: true },
+                                    'openai/gpt-5-pro': { responde: false } },
+                      atualizado_em: 1, em_andamento: false, total: 4, concluidos: 4 },
+    } as any;
+
+    function naAbaLLMCom(saude: any) {
+      montar();
+      service.verificarSaudeModelos.and.returnValue(of(saude));
+      comp.tabAtual({ index: 1 });
+      fixture.detectChanges();
+    }
+
+    const noDom = (sel: string) => Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll(sel));
+    const textoDaTela = () => (fixture.nativeElement.textContent || '').replace(/\s+/g, ' ');
+
+    it('provedor sem informação de preço: os fornecedores aparecem e dá para escolher um modelo', () => {
+      naAbaLLMCom(SAUDE.nadaTestado);
+
+      // era isto que dava zero: nenhum cabeçalho de fornecedor no DOM
+      const fornecedores = noDom('.grupo-fornecedor .fornecedor-titulo');
+      expect(fornecedores.length).toBe(3);
+      expect(textoDaTela()).toContain('teste sob demanda');
+
+      // e o caminho do admin — abrir um grupo e ver os modelos — funciona
+      const semAberto = noDom('.lista-modelos .modelo-item').length;
+      fornecedores.find((b) => b.textContent!.includes('openai'))!.click();
+      fixture.detectChanges();
+      expect(noDom('.lista-modelos .modelo-item').length).toBeGreaterThan(semAberto);
+    });
+
+    it('em NENHUM estado do teste de saúde a tela fica em branco', () => {
+      // A regra que o defeito violou: o que o admin vê não pode depender do resultado de um teste
+      // que é opcional por natureza. Ou a lista está lá, ou há um progresso explicando a espera.
+      for (const [nome, saude] of Object.entries(SAUDE)) {
+        naAbaLLMCom(saude);
+        const temLista = noDom('.grupo-fornecedor').length > 0;
+        const temProgresso = noDom('.verificando-modelos').length > 0;
+        expect(temLista || temProgresso)
+          .withContext(`estado "${nome}": nem listagem nem progresso na tela`).toBeTrue();
+        fixture.destroy();   // encerra o polling do estado emAndamento
+      }
+    });
+
+    it('enquanto o teste roda, a espera é explicada (e não é uma tela vazia)', () => {
+      naAbaLLMCom(SAUDE.emAndamento);
+      expect(noDom('.verificando-modelos').length).toBe(1);
+      expect(noDom('.grupo-fornecedor').length).toBe(0);
+      expect(textoDaTela()).toContain('Verificando quais modelos estão ativos');
+      fixture.destroy();
+    });
+
+    it('provedor que respondeu o teste mostra o resumo de quantos respondem', () => {
+      naAbaLLMCom(SAUDE.tudoTestado);
+      expect(noDom('.grupo-fornecedor').length).toBe(3);
+      expect(textoDaTela()).toContain('respondem');
+      expect(textoDaTela()).not.toContain('teste sob demanda');
+    });
+
+    it('sem nenhum modelo, a tela diz isso em vez de ficar muda', () => {
+      montar();
+      service.listarModelosLLM.and.returnValue(of({ modelos: [], modelo_atual: '' } as any));
+      comp.tabAtual({ index: 1 });
+      fixture.detectChanges();
+      expect(noDom('.vazio-modelos').length).toBe(1);
+    });
+  });
+
   describe('provedores', () => {
     it('a aba LLM também carrega os provedores (o seletor depende deles)', () => {
       montar();

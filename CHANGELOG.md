@@ -8,6 +8,38 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-30b (testes que pegam os dois defeitos que só apareceram na tela)
+
+> Frontend `mestrado-iana` **`a822272`**. Não requer deploy: só testes, comentários e a
+> extração de uma constante (comportamento idêntico). Produção segue em `main-2KWK6MAL.js`.
+
+### Adicionado
+- **`html-boas-vindas.quill.spec.ts`** — ida e volta pelo **editor Quill de verdade**, pelo mesmo
+  caminho do `ngx-quill` em `format="html"` (`clipboard.convert()` na escrita, `getSemanticHTML()` na
+  leitura), com um trecho fiel do texto de produção. Os casos que já existiam alimentam o conversor
+  com HTML escrito à mão: provam a conversão, mas só cobrem as armadilhas já conhecidas — e foi por
+  isso que o `&nbsp;` passou verde e apareceu na tela. **Verificado que o caso fica vermelho** sem o
+  `normalizarEspacos`.
+- **Testes de DOM na aba LLM** (`conf-tutor.component.spec.ts`): a listagem tem de chegar à *tela*.
+  O defeito do provedor sem preço estava num `*ngIf`, com `gruposModelos.length` maior que zero o
+  tempo todo — teste de getter passa verde nesse cenário. Inclui a regra geral: **em nenhum estado do
+  teste de saúde** (nada testado / em andamento / parcial / completo) a tela fica em branco — ou há
+  listagem, ou há um progresso explicando a espera. **Verificado que 3 casos ficam vermelhos** com o
+  `total > 0` de volta no getter.
+- `QUILL_MODULOS_BOAS_VINDAS` exportado do `html-boas-vindas.ts`: o teste usa a configuração **real**
+  da barra do editor, não uma cópia que poderia divergir dela sem ninguém notar.
+
+### Corrigido (registro, não código)
+- A entrada de 29/07d afirmava que a lista com marcador "apareceria numerada para o aluno". O teste
+  novo mediu: pelo `getSemanticHTML()` o Quill 2.0.3 já devolve `<ul>`. O `data-list` é a forma do
+  `root.innerHTML`, que esta tela não usa — a conversão é guarda, não correção. Corrigido também no
+  `CLAUDE.md`.
+
+### Verificação
+217/217 (11 novos).
+
+---
+
 ## 2026-07-30 (correções da revisão: provedor sem preço, colapso na busca, prévia)
 
 > **Implantado em 30/07/2026 12h10.** Frontend `mestrado-iana` **`8bdad04`** · bundle
@@ -47,9 +79,11 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
   `quill.snow.css` no `angular.json`, sobrando da versão antiga desta tela. Cai no chunk do admin.
 
 ### Corrigido / evitado
-- **Lista com marcador apareceria numerada para o aluno:** o Quill 2 emite
-  `<ol><li data-list="bullet">`, e o `data-list` só desenha marcador com o CSS do Quill, que o
-  painel do aluno não carrega. Convertido para `<ul><li>`.
+- **Lista com marcador convertida para `<ul><li>`:** o `data-list` do Quill só desenha marcador com
+  o CSS dele, que o painel do aluno não carrega. **Corrigido o relato em 30/07:** esta entrada dizia
+  que a lista "apareceria numerada para o aluno"; medindo pelo caminho real do `ngx-quill`
+  (`getSemanticHTML()`), o Quill 2.0.3 já devolve `<ul>` — a conversão é guarda para HTML colado de
+  outra origem e para lista mista, não correção de defeito observado.
 - **`&nbsp;` em todo espaço:** o Quill converte os espaços vizinhos de quebra de linha do HTML de
   origem, e o texto versionado é quebrado em ~95 colunas. Com espaço inquebrável o parágrafo
   deixaria de quebrar linha e transbordaria. **Encontrado na tela, não nos testes.**

@@ -5,15 +5,38 @@
  * descarta `style`, `script` e handlers. Sem esta conversão, o admin formataria no editor e parte do
  * resultado **desapareceria silenciosamente** na tela do aluno.
  *
- * Duas armadilhas concretas do Quill 2 que justificam o arquivo:
+ * O que o arquivo resolve, em ordem de gravidade:
  *
- * 1. **lista com marcador vira `<ol>`**: o Quill 2 emite `<ol><li data-list="bullet">`, e o
- *    `data-list` é o que o CSS dele usa para desenhar o marcador. Jogado no painel do aluno (que
- *    não carrega o CSS do Quill), aquilo aparece numerado. Aqui vira `<ul><li>`.
- * 2. **`<strong>`/`<em>`** em vez de `<b>`/`<i>` — inofensivo no navegador, mas o texto versionado
+ * 1. **`&nbsp;` em quase todo espaço** — real e verificado: o `getSemanticHTML()` do Quill 2 (o
+ *    getter que o `ngx-quill` usa em `format="html"`) troca espaço por espaço inquebrável, e o texto
+ *    versionado é quebrado em ~95 colunas. Sem normalizar, o parágrafo deixa de quebrar linha no
+ *    painel do aluno e transborda. Coberto por `html-boas-vindas.quill.spec.ts`, que passa pelo
+ *    editor de verdade.
+ * 2. **lista com marcador como `<ol><li data-list="bullet">`** — é a forma do `root.innerHTML`, e
+ *    o `data-list` só desenha o marcador com o CSS do Quill, que o painel do aluno não carrega.
+ *    Pelo caminho de hoje (`getSemanticHTML`) **não acontece**: o Quill 2.0.3 já devolve `<ul>`.
+ *    A conversão fica como guarda — vale para HTML colado de outra origem, para lista mista e para
+ *    o dia em que alguém trocar o getter ou a versão. Não é correção de defeito observado.
+ * 3. **`<strong>`/`<em>`** em vez de `<b>`/`<i>` — inofensivo no navegador, mas o texto versionado
  *    do repo usa `<b>`/`<i>`, e a comparação do seed é por hash do texto: normalizar mantém a
  *    edição do admin comparável com o padrão.
  */
+
+/**
+ * Barra do editor, limitada ao que o painel do tutor renderiza: oferecer formatação que desaparece
+ * na tela do aluno é pior que não oferecer. Mora aqui, junto do conversor, porque é o outro lado do
+ * mesmo contrato — e porque o teste de ida-e-volta pelo Quill precisa da configuração REAL da tela,
+ * não de uma cópia que pode divergir dela sem ninguém notar.
+ */
+export const QUILL_MODULOS_BOAS_VINDAS = {
+  toolbar: [
+    [{ header: [4, false] }],
+    ['bold', 'italic'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['link'],
+    ['clean'],
+  ],
+};
 
 /** Tags que o painel do tutor renderiza (o resto é desembrulhado, preservando o conteúdo). */
 const TAGS_PERMITIDAS = new Set(['H4', 'P', 'B', 'I', 'UL', 'OL', 'LI', 'BR', 'A']);
