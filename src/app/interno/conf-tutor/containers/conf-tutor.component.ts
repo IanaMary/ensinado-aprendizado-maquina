@@ -4,7 +4,7 @@ import { AuthService } from '../../../service/auth/auth.service';
 import { LoginService } from '../../../externo/autenticacao/login/services/login.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService, ModeloLLM, ProvedorLLM } from '../../../dashboard/services/dashboard.service';
-import { htmlParaBoasVindas, mesmoConteudo } from './html-boas-vindas';
+import { htmlParaBoasVindas, mesmoConteudo, QUILL_MODULOS_BOAS_VINDAS } from './html-boas-vindas';
 import { NotificacaoService } from '../../../service/notificacao.service';
 
 // Mapeia o indice da aba para o slug "pipe" usado no backend/audit log.
@@ -94,17 +94,7 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   // Editor visual das boas-vindas (Quill). O admin não precisa saber HTML; quem quiser ver o
   // código tem o modo "código HTML".
   editorHtml = false;
-  /** Barra do editor limitada ao que o painel do tutor renderiza: formatar o que não aparece na
-   *  tela do aluno seria pior que não oferecer. */
-  quillModules = {
-    toolbar: [
-      [{ header: [4, false] }],
-      ['bold', 'italic'],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      ['link'],
-      ['clean'],
-    ],
-  };
+  quillModules = QUILL_MODULOS_BOAS_VINDAS;
   /** Texto como veio do banco: serve para saber se houve edição de verdade. */
   private inicioCarregado = '';
 
