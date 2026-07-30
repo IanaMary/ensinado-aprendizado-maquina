@@ -10,7 +10,7 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-07-30b (testes que pegam os dois defeitos que só apareceram na tela)
 
-> Frontend `mestrado-iana` **`a822272`**. Não requer deploy: só testes, comentários e a
+> Frontend `mestrado-iana` **`606c479`**. Não requer deploy: só testes, comentários e a
 > extração de uma constante (comportamento idêntico). Produção segue em `main-2KWK6MAL.js`.
 
 ### Adicionado
