@@ -170,7 +170,10 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     if (this.pipeAtual === 'llm' && !this.modelosLLM.length) {
       this.carregarModelosLLM();
     }
-    if (idx === 2 && !this.provedores.length) {
+    // Abas LLM e Provedores: as duas precisam da lista. Antes só a aba Provedores carregava, então
+    // o seletor de provedor da aba LLM (que é `*ngIf="provedores.length"`) não existia até o admin
+    // visitar a outra aba.
+    if ((idx === 1 || idx === 2) && !this.provedores.length) {
       this.carregarProvedores();
     }
   }
@@ -235,7 +238,10 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   }
 
   get previewInicio(): string {
-    return this.formConfTutorInicio.value?.texto_pipe || '';
+    // Passa pela mesma conversão do salvamento: sem isso o admin via a lista numerada e os
+    // `&nbsp;` que o editor produz e que o `htmlParaBoasVindas` remove — ou seja, uma prévia do
+    // que NÃO seria gravado.
+    return htmlParaBoasVindas(this.formConfTutorInicio.value?.texto_pipe || '');
   }
 
   recarregarHistorico() {
@@ -391,9 +397,20 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     return this.saudeEmAndamento;
   }
 
-  // Teste concluído: já dá para separar ativos/inativos e permitir a seleção.
+  /**
+   * A listagem pode ser mostrada: não há teste em curso.
+   *
+   * NÃO depende de "algum modelo foi testado". Num provedor que não informa preço (endpoint
+   * customizado), nada entra no teste automático — e exigir `total > 0` deixava a tela vazia com
+   * centenas de modelos carregados, sem como escolher o primeiro.
+   */
   get verificacaoConcluida(): boolean {
-    return !this.saudeEmAndamento && this.saudeProgresso.total > 0;
+    return !this.saudeEmAndamento;
+  }
+
+  /** Nenhum modelo foi testado automaticamente (provedor sem informação de preço). */
+  get nenhumTesteAutomatico(): boolean {
+    return this.saudeProgresso.total === 0 && !this.saudeEmAndamento && !!this.modelosLLM.length;
   }
 
   get progressoPct(): number {
@@ -440,18 +457,24 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
       gratuitos: modelos.filter((m) => m.gratuito === true).length,
       respondem: modelos.filter((m) => this.saudeModelos[m.id]?.responde).length,
     }));
-    grupos.sort((a, b) => (Number(b.gratuitos > 0) - Number(a.gratuitos > 0))
+    // Mais gratuitos primeiro (não só "tem ≥1": um fornecedor com 40 gratuitos vinha depois de um
+    // com 1), e alfabético para desempatar — a lista não pode dançar entre recarregamentos.
+    grupos.sort((a, b) => (b.gratuitos - a.gratuitos)
       || a.fornecedor.localeCompare(b.fornecedor));
     return grupos;
   }
 
-  /** Aberto quando o admin abriu, quando há busca em curso (para o resultado ficar visível) ou
-   *  quando é o grupo do modelo em uso. */
+  /**
+   * Aberto quando: o admin abriu explicitamente; há busca em curso (o resultado precisa ficar
+   * visível); ou é o grupo do modelo em uso.
+   *
+   * O estado explícito vence a busca — antes a busca forçava `true` e o botão de recolher parava
+   * de responder enquanto havia filtro.
+   */
   grupoAberto(fornecedor: string): boolean {
+    const explicito = this.fornecedoresAbertos[fornecedor];
+    if (explicito !== undefined) return explicito;
     if (this.buscaModelo.trim()) return true;
-    if (this.fornecedoresAbertos[fornecedor] !== undefined) {
-      return this.fornecedoresAbertos[fornecedor];
-    }
     return fornecedorDoModelo(this.modeloLLMAtual) === fornecedor;
   }
 
@@ -489,10 +512,9 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     this.carregandoProvedores = true;
     this.dashboardService.getProvedoresLLM().subscribe({
       next: (res) => { this.aplicarProvedores(res); this.carregandoProvedores = false; },
-      error: (err) => {
-        this.notificacao.erro(err?.error?.detail || 'Erro ao carregar os provedores de LLM.');
-        this.carregandoProvedores = false;
-      },
+      // O `ErrorInterceptor` já mostra um toast com o `detail` da resposta — repetir aqui daria
+      // dois avisos para o mesmo erro (bug já registrado no CLAUDE.md).
+      error: () => { this.carregandoProvedores = false; },
     });
   }
 
@@ -525,10 +547,7 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
         this.notificacao.sucesso(`${p.nome} configurado.`);
         this.carregarHistorico(this.pipeAtual);
       },
-      error: (err) => {
-        this.salvandoProvedor = '';
-        this.notificacao.erro(err?.error?.detail || 'Erro ao salvar o provedor.');
-      },
+      error: () => { this.salvandoProvedor = ''; },
     });
   }
 
@@ -549,10 +568,7 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
         this.carregarModelosLLM();
         this.carregarHistorico(this.pipeAtual);
       },
-      error: (err) => {
-        this.salvandoProvedor = '';
-        this.notificacao.erro(err?.error?.detail || 'Não foi possível ativar este provedor.');
-      },
+      error: () => { this.salvandoProvedor = ''; },
     });
   }
 
