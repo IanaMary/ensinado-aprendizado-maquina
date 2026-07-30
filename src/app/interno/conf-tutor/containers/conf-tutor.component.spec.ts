@@ -116,6 +116,16 @@ describe('ConfTutorComponent (aba LLM)', () => {
     expect(comp.promptTexto).toBe('');   // não foi sobrescrito
   });
 
+  it('a pré-visualização mostra o HTML já convertido (o que será salvo)', () => {
+    // Antes mostrava a saída crua do editor: lista numerada e `&nbsp;` que o conversor remove.
+    montar();
+    comp.formConfTutorInicio.patchValue({
+      texto_pipe: '<ol><li data-list="bullet">um</li></ol><p>a\u00A0b</p>',
+    });
+    expect(comp.previewInicio).toContain('<ul>');
+    expect(comp.previewInicio).not.toContain('\u00A0');
+  });
+
   it('conta os caracteres como o servidor conta (texto sem espaço nas pontas)', () => {
     montar();
     comp.promptTexto = '  abc  ';
@@ -177,6 +187,35 @@ describe('ConfTutorComponent (aba LLM)', () => {
       expect(comp.grupoAberto('openai')).toBeFalse();
     });
 
+    it('mostra a lista mesmo quando NADA foi testado (provedor sem informação de preço)', () => {
+      // Regressão: `verificacaoConcluida` exigia `total > 0`, então um endpoint customizado (onde
+      // nada entra no teste automático) carregava 300 modelos e não renderizava nenhum — sem como
+      // escolher o primeiro.
+      montar();   // o `montar` define os stubs padrão; o override vem depois dele
+      service.verificarSaudeModelos.and.returnValue(of({
+        resultados: {}, atualizado_em: 1, em_andamento: false, total: 0, concluidos: 0,
+      } as any));
+      comp.tabAtual({ index: 1 });
+      expect(comp.verificacaoConcluida).toBeTrue();
+      expect(comp.nenhumTesteAutomatico).toBeTrue();
+      expect(comp.gruposModelos.length).toBeGreaterThan(0);
+    });
+
+    it('grupos com MAIS gratuitos vêm primeiro', () => {
+      naAbaLLM();
+      const grupos = comp.gruposModelos;
+      // meta tem 2 gratuitos, z-ai tem 1, openai nenhum
+      expect(grupos.map((g) => g.gratuitos)).toEqual([2, 1, 0]);
+    });
+
+    it('recolher um grupo funciona mesmo com busca ativa', () => {
+      naAbaLLM();
+      comp.buscaModelo = 'meta';
+      expect(comp.grupoAberto('meta')).toBeTrue();
+      comp.toggleFornecedor('meta');
+      expect(comp.grupoAberto('meta')).toBeFalse();   // antes a busca forçava `true`
+    });
+
     it('testa um modelo isolado sem disparar o teste de todos', () => {
       naAbaLLM();
       service.verificarSaudeModelos.calls.reset();
@@ -186,6 +225,13 @@ describe('ConfTutorComponent (aba LLM)', () => {
   });
 
   describe('provedores', () => {
+    it('a aba LLM também carrega os provedores (o seletor depende deles)', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      expect(service.getProvedoresLLM).toHaveBeenCalled();
+      expect(comp.provedores.length).toBe(3);
+    });
+
     it('carrega a lista ao abrir a aba', () => {
       montar();
       comp.tabAtual({ index: 2 });

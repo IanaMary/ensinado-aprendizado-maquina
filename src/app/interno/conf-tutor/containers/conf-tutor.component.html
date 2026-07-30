@@ -150,10 +150,16 @@
           <!-- Teste concluído: busca + listagem colapsável por fornecedor do modelo -->
           <ng-container *ngIf="!carregandoModelos && modelosLLM.length && verificacaoConcluida">
             <div class="saude-barra">
-              <span class="saude-status">
+              <span class="saude-status" *ngIf="!nenhumTesteAutomatico">
                 <mat-icon>verified</mat-icon>
                 {{ modelosAtivos.length }} respondem · {{ modelosInativos.length }} sem resposta
                 <ng-container *ngIf="modelosLLM.length as total">· {{ total }} no total</ng-container>
+              </span>
+              <!-- Provedor que não informa preço: nada entra no teste automático (seria uma chamada
+                   paga por modelo). A lista aparece e cada item tem o seu "testar". -->
+              <span class="saude-status" *ngIf="nenhumTesteAutomatico">
+                <mat-icon>info</mat-icon>
+                {{ modelosLLM.length }} modelos · teste sob demanda (este provedor não informa preço)
               </span>
               <button class="btn-secundario saude-retestar" type="button" (click)="retestarModelos()">
                 <mat-icon>refresh</mat-icon> Re-testar
