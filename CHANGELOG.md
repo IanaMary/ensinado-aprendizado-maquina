@@ -8,6 +8,24 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-30b (testes que pegam os defeitos que só apareceram na tela) — porte
+
+> Branch `master` (não implantada). Porte de `606c479` da `mestrado-iana`. Só testes.
+
+- **`html-boas-vindas.quill.spec.ts`**: ida e volta pelo editor Quill de verdade, pelo caminho que o
+  `ngx-quill` usa (`clipboard.convert()` / `getSemanticHTML()`), com trecho fiel do texto de
+  produção. Os casos que já existiam alimentavam o conversor com HTML escrito à mão — foi por isso
+  que o `&nbsp;` passou verde e apareceu na tela.
+- **Testes de DOM na aba LLM**: a listagem tem de chegar à *tela* (o defeito estava num `*ngIf`, com
+  o getter devolvendo valor certo). Inclui a regra geral: em nenhum estado do teste de saúde a tela
+  fica em branco.
+- Os dois verificados **vermelhos** com o defeito reintroduzido.
+
+### Verificação
+208/208 (11 novos).
+
+---
+
 ## 2026-07-30 (provedores de LLM + editor de texto rico no conf-tutor) — porte
 
 > Branch `master` (não implantada). Porte de `7d3c6d1`+`56683bb`+`8bdad04` da `mestrado-iana`
