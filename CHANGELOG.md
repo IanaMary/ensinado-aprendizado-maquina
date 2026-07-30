@@ -10,7 +10,9 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-07-30 (correções da revisão: provedor sem preço, colapso na busca, prévia)
 
-> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-2KWK6MAL.js`**.
+> **Implantado em 30/07/2026 12h10.** Frontend `mestrado-iana` **`8bdad04`** · bundle
+> **`main-2KWK6MAL.js`**. Backup `/home/ubuntu/backups/deploy-20260730-121006`.
+> Portado para a `master` em `6e2d550`.
 
 ### Corrigido
 - **Bloqueador:** com provedor que não informa preço (endpoint customizado) nada entra no teste
@@ -33,7 +35,7 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-07-29d (editor de texto rico nas boas-vindas do tutor)
 
-> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-PJ3RSM34.js`**. Backend inalterado.
+> Frontend `mestrado-iana` **`56683bb`** · bundle **`main-PJ3RSM34.js`**. Backend inalterado.
 
 ### Adicionado
 - **Editor visual** (Quill) no lugar do `<textarea>` de HTML cru da aba Início. Barra limitada ao
@@ -91,7 +93,7 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-07-29b (o material que o aluno baixa não diz mais "Iana")
 
-> Frontend `mestrado-iana` **`<pendente>`** · bundle **`main-GSFLR7TL.js`**.
+> Frontend `mestrado-iana` **`c61acd0`** · bundle **`main-GSFLR7TL.js`**.
 > Backend: seed do conf-pipeline com guarda + marca (ver changelog do backend).
 
 ### Alterado
@@ -191,7 +193,7 @@ diálogo modal travaria a automação; está coberto no spec.
 
 ## 2026-07-27b (manual descreve o Avançado atual)
 
-> Frontend `mestrado-iana` **`<pendente>`** (bundle `main-7ITTBJMV.js`). Backend `master` `ee69abf`.
+> Frontend `mestrado-iana` **`6a7267f`** (bundle `main-7ITTBJMV.js`). Backend `master` `ee69abf`.
 
 - O manual do aluno dizia apenas "Avançado (técnico, com fórmula e hiperparâmetros)". Agora
   descreve os blocos **Fundamentos** e **Na prática** e explica que a escolha do nível fica
@@ -201,7 +203,7 @@ diálogo modal travaria a automação; está coberto no spec.
 
 ## 2026-07-27 (nível do tutor no perfil + blocos Fundamentos / Na prática)
 
-> Frontend `mestrado-iana` **`<pendente>`** / Backend `master` `a9c2eba`.
+> Frontend `mestrado-iana` **`8e4e774`** / Backend `master` `a9c2eba`.
 
 ### Alterado
 - O toggle **Básico/Avançado** deixou de ser estado de tela: `NivelTutorService` guarda a
@@ -221,7 +223,7 @@ diálogo modal travaria a automação; está coberto no spec.
 
 ## 2026-07-26k (editor da instrução do tutor no conf-tutor)
 
-> Frontend `mestrado-iana` **`<pendente>`** (bundle `main-E6W5LFEI.js`) / Backend `master` `7d40bed`.
+> Frontend `mestrado-iana` **`53f1853`** (bundle `main-E6W5LFEI.js`) / Backend `master` `7d40bed`.
 
 ### Adicionado
 - **Editor da instrução de sistema** do chat na aba **LLM** do conf-tutor, abaixo da escolha do
@@ -239,7 +241,7 @@ diálogo modal travaria a automação; está coberto no spec.
 
 ## 2026-07-26j (criar desafio a partir de um dataset de exemplo)
 
-> Frontend `mestrado-iana` **`<pendente>`** (bundle `main-A75CCYTF.js`) / Backend `master` `a1f6f61`.
+> Frontend `mestrado-iana` **`09b419e`** (bundle `main-A75CCYTF.js`) / Backend `master` `a1f6f61`.
 
 ### Adicionado
 - **A criação do desafio começa pela base**: novo campo "Base de dados do desafio" (datasets de
