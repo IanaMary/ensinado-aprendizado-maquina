@@ -8,6 +8,23 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-31 (build e suíte sem avisos) — porte
+
+> Branch `master` (não implantada). Porte de `5dd8d64` da `mestrado-iana`, mais o que só existe
+> nesta branch. Nenhuma mudança de comportamento: CSS emitido byte a byte igual.
+
+- Porte: Sass (`@import` → `@use`, `darken` → `color.adjust`), os 7 avisos NG8107 (corrigindo os
+  **tipos** — trocar `?.` por `.`, como o aviso sugere, criaria crash em acesso indexado) e os 2
+  specs que não afirmavam nada.
+- **Só desta branch:** os 7 componentes legados por etapa do conf-tutor faziam `@import` da folha de
+  outro componente → `@use … as *`; e `long`/`node-fetch`/`seedrandom`/`string_decoder` (arrastados
+  pelo TensorFlow.js da entrada "Léo no Mundo Real") entraram na allowlist de CommonJS.
+
+### Verificação
+Os **62** `.scss` compilados antes e depois: **0 diferenças**. Build com 0 avisos (eram 78). 208/208.
+
+---
+
 ## 2026-07-30b (testes que pegam os defeitos que só apareceram na tela) — porte
 
 > Branch `master` (não implantada). Porte de `606c479` da `mestrado-iana`. Só testes.

@@ -25,10 +25,19 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "allowedCommonJsDependencies": [
-              "seedrandom",
+              "core-js",
+              "dompurify",
+              "file-saver",
+              "html2canvas",
+              "jszip",
+              "long",
               "node-fetch",
-              "string_decoder",
-              "long"
+              "qrcode",
+              "quill-delta",
+              "raf",
+              "rgbcolor",
+              "seedrandom",
+              "string_decoder"
             ],
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -40,18 +49,7 @@
               "src/styles/fontes.scss",
               "node_modules/quill/dist/quill.snow.css"
             ],
-            "scripts": [],
-            "allowedCommonJsDependencies": [
-              "core-js",
-              "dompurify",
-              "file-saver",
-              "html2canvas",
-              "jszip",
-              "qrcode",
-              "quill-delta",
-              "raf",
-              "rgbcolor"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
