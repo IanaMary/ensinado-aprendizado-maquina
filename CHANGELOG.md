@@ -10,7 +10,7 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-07-31 (build e suíte sem avisos: Sass 3, NG8107 e 2 testes que não afirmavam nada)
 
-> Frontend `mestrado-iana` **`<pendente>`**. Nenhuma mudança de comportamento — o CSS emitido é
+> Frontend `mestrado-iana` **`5dd8d64`**. Nenhuma mudança de comportamento — o CSS emitido é
 > byte a byte o mesmo (provado abaixo).
 
 ### Corrigido
