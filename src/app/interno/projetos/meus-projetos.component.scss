@@ -1,4 +1,5 @@
 @use '../../../styles/colores.scss' as *;
+@use 'sass:color';
 
 .meus-projetos-container {
   padding: 24px;
@@ -228,12 +229,12 @@
 
       &.status-em_progresso {
         background: rgba($aviso, 0.1);
-        color: darken($aviso, 10%);
+        color: color.adjust($aviso, $lightness: -10%);
       }
 
       &.status-concluido {
         background: rgba($sucesso, 0.1);
-        color: darken($sucesso, 10%);
+        color: color.adjust($sucesso, $lightness: -10%);
       }
     }
   }

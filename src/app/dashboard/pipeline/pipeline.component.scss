@@ -1,4 +1,9 @@
+// As variáveis vêm do `colores` DIRETO. Antes chegavam de carona pelo `@import` que o
+// dashboard.component fazia: o `@use` não repassa membros de terceiros (é o ponto dele), então
+// a dependência transitiva precisava virar explícita.
+@use '../../../styles/colores.scss' as *;
 @use '../dashboard.component' as *;
+@use 'sass:color';
 
 // Host em bloco (default é inline): evita que o conteúdo (rótulos longos) defina a
 // largura e estoure a barra em navegadores que não sejam o Chrome.
@@ -18,7 +23,7 @@
   transition: all 0.3s ease;
 
   &:hover {
-    background: darken($cinza-claro, 2%);
+    background: color.adjust($cinza-claro, $lightness: -2%);
   }
 
   .section-label {

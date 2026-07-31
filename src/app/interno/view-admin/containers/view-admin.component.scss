@@ -1,4 +1,4 @@
-@import '../../../../styles/colores.scss';
+@use '../../../../styles/colores.scss' as *;
 
 :host {
   display: block;

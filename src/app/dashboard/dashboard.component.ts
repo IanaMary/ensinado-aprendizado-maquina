@@ -11,7 +11,9 @@ import { ExecucoesComponent } from './execucoes/execucoes.component';
 })
 export class DashboardComponent implements OnInit {
 
-  @ViewChild(ExecucoesComponent) execucoesComponent!: ExecucoesComponent;
+  // Só existe depois que a view do filho é criada; `!` afirmaria o contrário e é o que fazia o
+  // `?.` do template parecer redundante (NG8107).
+  @ViewChild(ExecucoesComponent) execucoesComponent?: ExecucoesComponent;
 
   constructor(private dashboardService: DashboardService, private router: Router) { }
 

@@ -114,7 +114,9 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   testandoModelo = '';
 
   // Health-check dos modelos (testado em segundo plano no backend)
-  saudeModelos: Record<string, { responde: boolean; latencia_ms?: number; erro?: string }> = {};
+  // `| undefined`: indexar um Record por chave ausente devolve undefined em runtime, e é o que
+  // justifica o `?.` na listagem (sem isto o compilador o acusava de redundante).
+  saudeModelos: Record<string, { responde: boolean; latencia_ms?: number; erro?: string } | undefined> = {};
   saudeEmAndamento = false;
   saudeProgresso = { concluidos: 0, total: 0 };
   // A lista de inativos fica recolhida por padrão (o foco é escolher um que responde).

@@ -45,11 +45,11 @@
             </span>
           </strong>
           <span *ngIf="a.descricao">{{ a.descricao }}</span>
-          <span class="ativ-historico" *ngIf="a.tipo === 'montagem' && historicoDesafio[a.id]">
-            <ng-container *ngIf="historicoDesafio[a.id].tentativas; else naoTentado">
-              {{ historicoDesafio[a.id].tentativas }}
-              tentativa{{ historicoDesafio[a.id].tentativas > 1 ? 's' : '' }} ·
-              melhor nota {{ historicoDesafio[a.id].melhor_nota }}
+          <span class="ativ-historico" *ngIf="a.tipo === 'montagem' && historicoDesafio[a.id] as h">
+            <ng-container *ngIf="h.tentativas; else naoTentado">
+              {{ h.tentativas }}
+              tentativa{{ h.tentativas > 1 ? 's' : '' }} ·
+              melhor nota {{ h.melhor_nota }}
             </ng-container>
             <ng-template #naoTentado>Você ainda não tentou este desafio.</ng-template>
           </span>

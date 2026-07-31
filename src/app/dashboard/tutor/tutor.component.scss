@@ -1,4 +1,5 @@
 @use '../../../styles/colores.scss' as *;
+@use 'sass:color';
 
 .tutor {
   display: flex;
@@ -260,7 +261,7 @@
 
 // Metric header
 .metric-header {
-  background: linear-gradient(135deg, darken($info, 10%), $info);
+  background: linear-gradient(135deg, color.adjust($info, $lightness: -10%), $info);
   color: $branco;
   border: none;
   padding: 16px;
@@ -362,12 +363,12 @@
     }
 
     &.good {
-      color: darken($sucesso, 10%);
+      color: color.adjust($sucesso, $lightness: -10%);
       mat-icon { color: $sucesso; }
     }
 
     &.bad {
-      color: darken($erro, 10%);
+      color: color.adjust($erro, $lightness: -10%);
       mat-icon { color: $erro; }
     }
   }
@@ -434,12 +435,12 @@
     }
 
     &.good {
-      color: darken($sucesso, 10%);
+      color: color.adjust($sucesso, $lightness: -10%);
       mat-icon { color: $sucesso; }
     }
 
     &.bad {
-      color: darken($erro, 10%);
+      color: color.adjust($erro, $lightness: -10%);
       mat-icon { color: $erro; }
     }
   }
@@ -607,7 +608,7 @@
   .card-label {
     font-size: 10px;
     font-weight: 700;
-    color: darken($sucesso, 10%);
+    color: color.adjust($sucesso, $lightness: -10%);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: block;
@@ -671,7 +672,7 @@
   .card-label {
     font-size: 10px;
     font-weight: 700;
-    color: darken($info, 10%);
+    color: color.adjust($info, $lightness: -10%);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: block;

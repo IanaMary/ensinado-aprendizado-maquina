@@ -1,4 +1,5 @@
 @use '../../../styles/colores.scss' as *;
+@use 'sass:color';
 
 .galeria-container {
   padding: 24px;
@@ -187,17 +188,17 @@
 
       &.dificuldade-iniciante {
         background: rgba($sucesso, 0.1);
-        color: darken($sucesso, 10%);
+        color: color.adjust($sucesso, $lightness: -10%);
       }
 
       &.dificuldade-intermediario {
         background: rgba($aviso, 0.1);
-        color: darken($aviso, 10%);
+        color: color.adjust($aviso, $lightness: -10%);
       }
 
       &.dificuldade-avancado {
         background: rgba($erro, 0.1);
-        color: darken($erro, 10%);
+        color: color.adjust($erro, $lightness: -10%);
       }
     }
 

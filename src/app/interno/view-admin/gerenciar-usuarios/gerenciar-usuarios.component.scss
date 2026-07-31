@@ -1,4 +1,5 @@
 @use '../../../../styles/colores.scss' as *;
+@use 'sass:color';
 
 .gerenciar-usuarios-container {
   padding: 24px;
@@ -443,12 +444,12 @@
 
       &[data-tipo="aluno"] {
         background: rgba($info, 0.1);
-        color: darken($info, 10%);
+        color: color.adjust($info, $lightness: -10%);
       }
 
       &[data-tipo="professor"] {
         background: rgba($sucesso, 0.1);
-        color: darken($sucesso, 10%);
+        color: color.adjust($sucesso, $lightness: -10%);
       }
 
       &[data-tipo="admin"] {
@@ -474,12 +475,12 @@
 
       &[data-status="ativo"] {
         background: rgba($sucesso, 0.1);
-        color: darken($sucesso, 10%);
+        color: color.adjust($sucesso, $lightness: -10%);
       }
 
       &[data-status="pendente"] {
         background: rgba($aviso, 0.1);
-        color: darken($aviso, 10%);
+        color: color.adjust($aviso, $lightness: -10%);
       }
 
       &[data-status="inativo"] {
