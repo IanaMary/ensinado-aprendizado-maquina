@@ -1,4 +1,5 @@
-@import '../../../styles/colores.scss';
+@use '../../../styles/colores.scss' as *;
+@use 'sass:color';
 
 :host { display: block; }
 
@@ -37,7 +38,7 @@
   position: relative;
   overflow: hidden;
   padding: clamp(48px, 9vw, 104px) clamp(20px, 5vw, 40px);
-  background: linear-gradient(135deg, $roxo-escuro 0%, darken($roxo-medio, 4%) 62%, $roxo-medio 100%);
+  background: linear-gradient(135deg, $roxo-escuro 0%, color.adjust($roxo-medio, $lightness: -4%) 62%, $roxo-medio 100%);
   color: $branco;
 }
 

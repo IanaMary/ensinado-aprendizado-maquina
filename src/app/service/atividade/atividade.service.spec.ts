@@ -23,10 +23,21 @@ describe('AtividadeService', () => {
     httpMock.verify();
   });
 
-  it('não registra/envia sem token', () => {
+  // `expectNone` verifica de verdade, mas o Jasmine não a conta como expectativa: a suíte avisava
+  // "has no expectations" nestes dois casos, e um teste que o runner não distingue de um teste vazio
+  // é um teste que pode ser esvaziado sem ninguém notar. Trocado por `match(...).length`, que afirma
+  // o mesmo e é contado — e a oportunidade foi usada para cobrar o resto do contrato.
+  it('sem token não registra nem envia, e nada fica guardado para depois do login', () => {
     service.registrar('ui', 'x');
     service.flush();
-    httpMock.expectNone(loteUrl);
+    expect(httpMock.match(loteUrl).length).toBe(0);
+
+    // O evento é DESCARTADO na hora (a guarda está no `registrar`), não guardado à espera de um
+    // token: quando o login acontece, não há nada de antes para subir. É o que a política de
+    // minimização exige — telemetria só de quem está autenticado.
+    sessionStorage.setItem('token', 'tok');
+    service.flush();
+    expect(httpMock.match(loteUrl).length).toBe(0);
   });
 
   it('registra e faz flush com token', () => {
@@ -75,14 +86,23 @@ describe('AtividadeService', () => {
     req2.flush({});
   });
 
-  it('NÃO re-enfileira em erro 4xx (payload rejeitado)', () => {
+  it('descarta o lote em erro 4xx (payload rejeitado) e continua funcionando', () => {
     sessionStorage.setItem('token', 'tok');
     service.registrar('ui', 'a');
     service.flush();
     httpMock.expectOne(loteUrl).flush('rejeitado', { status: 422, statusText: 'Unprocessable' });
-    // 4xx: descartado — um novo flush não envia nada
+
+    // 4xx não é transitório: reenviar o mesmo payload rejeitado viraria laço.
     service.flush();
-    httpMock.expectNone(loteUrl);
+    expect(httpMock.match(loteUrl).length).toBe(0);
+
+    // E o descarte não pode matar a telemetria: o evento seguinte sobe, sozinho. Sem esta parte,
+    // "flush parou de enviar qualquer coisa" passaria pelo mesmo teste.
+    service.registrar('ui', 'b');
+    service.flush();
+    const req = httpMock.expectOne(loteUrl);
+    expect(req.request.body.eventos.map((e: any) => e.acao)).toEqual(['b']);
+    req.flush({ gravados: 1 });
   });
 
   it('listar() monta a querystring ignorando vazios', () => {

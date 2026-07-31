@@ -34,7 +34,18 @@
               "src/styles/fontes.scss",
               "node_modules/quill/dist/quill.snow.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "core-js",
+              "dompurify",
+              "file-saver",
+              "html2canvas",
+              "jszip",
+              "qrcode",
+              "quill-delta",
+              "raf",
+              "rgbcolor"
+            ]
           },
           "configurations": {
             "production": {

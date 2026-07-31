@@ -8,6 +8,42 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-07-31 (build e suíte sem avisos: Sass 3, NG8107 e 2 testes que não afirmavam nada)
+
+> Frontend `mestrado-iana` **`<pendente>`**. Nenhuma mudança de comportamento — o CSS emitido é
+> byte a byte o mesmo (provado abaixo).
+
+### Corrigido
+- **2 specs "has no expectations"** (`AtividadeService`): usavam só `httpMock.expectNone()`, que
+  verifica de verdade mas o Jasmine não conta — o runner não os distinguia de um teste vazio, e
+  esvaziá-los não acenderia nada. Passaram a afirmar `match(url).length === 0` e ganharam a metade
+  que faltava: o lote rejeitado com 4xx é descartado **e o evento seguinte ainda sobe** (sem isso,
+  "o flush parou de enviar qualquer coisa" passaria pelo mesmo teste).
+- **7 avisos NG8107** (`?.` tido como redundante). **A sugestão do compilador — trocar `?.` por
+  `.` — introduziria crash:** todos os casos eram acesso indexado a `Record` ou `@ViewChild`, que
+  devolvem `undefined` em runtime. Quem estava errado era o tipo: `saudeModelos` e
+  `historicoDesafio` passaram a admitir `| undefined`, o `@ViewChild` trocou `!` por `?`, o
+  histórico do desafio usa `*ngIf … as h`, e só no diálogo de nomear o `?.` era de fato redundante
+  (o único chamador sempre passa `data`).
+- **60 avisos de Sass** (dois grupos, ambos com remoção marcada para o **Dart Sass 3.0**):
+  `@import` → `@use … as *` em 9 arquivos e `darken($c, N%)` → `color.adjust($c, $lightness: -N%)`
+  em 27 chamadas (equivalência exata da definição de `darken`).
+- **Regressão que a migração causou e a verificação pegou:** `pipeline.component.scss` fazia
+  `@use '../dashboard.component' as *` e recebia as variáveis **de carona** pelo `@import` de lá.
+  O `@use` não repassa membros de terceiros — é o ponto dele — então a dependência virou explícita.
+  Sem o passo de comparação isto teria ido para produção como uma tela sem cor.
+- **CommonJS**: `allowedCommonJsDependencies` no `angular.json` para as libs de exportação
+  (jszip/file-saver/qrcode) e as transitivas de jspdf/canvg/quill. O aviso só alerta bailout de
+  otimização; declará-las deixa o log limpo para o que exige ação.
+
+### Verificação
+- **Prova da equivalência do CSS:** os **53** `.scss` do projeto compilados com o dart-sass antes e
+  depois — **0 diferenças** e nenhum que deixe de compilar (foi assim que a regressão do
+  `pipeline.component` apareceu).
+- Build de produção com **0 avisos e 0 erros** (eram 78). 217/217. Backend intacto (623 passed).
+
+---
+
 ## 2026-07-30b (testes que pegam os dois defeitos que só apareceram na tela)
 
 > Frontend `mestrado-iana` **`606c479`**. Não requer deploy: só testes, comentários e a

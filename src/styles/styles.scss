@@ -1,6 +1,6 @@
 @use '@angular/material' as mat;
 @use 'sass:map';
-@import '../styles/colores.scss';
+@use '../styles/colores.scss' as *;
 
 // Tipografia institucional (Maven Pro) e monospace vivem em `styles/fontes.scss`
 // (global-only, via angular.json) — não aqui, senão o @font-face era duplicado em

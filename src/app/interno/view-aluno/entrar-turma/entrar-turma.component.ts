@@ -17,7 +17,8 @@ export class EntrarTurmaComponent implements OnInit {
   turmas: Turma[] = [];
   atividadesPorTurma: Record<string, Atividade[]> = {};
   /** Histórico do aluno por desafio (tentativas e melhor nota), indexado por atividade. */
-  historicoDesafio: Record<string, DesafioDoAluno> = {};
+  // `| undefined`: atividade sem histórico não tem chave no mapa.
+  historicoDesafio: Record<string, DesafioDoAluno | undefined> = {};
   carregando = true;
 
   constructor(
