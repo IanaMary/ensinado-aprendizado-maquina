@@ -8,6 +8,19 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-01 (auditoria de segurança Mantis — frontend)
+
+> Parte da campanha de segurança 2026-08-01 (ver changelog do backend para o conjunto completo).
+> Suíte 217 passed + build de produção ok.
+
+### Corrigido — segurança
+- **Token de convite persistido no log de erros.** O `ErrorInterceptor` enviava a URL crua da
+  requisição ao endpoint `/sistema/erro` (visível no painel do admin). Uma ativação que falhava
+  gravava o token do convite (path `/convite/<token>` ou `?token=`). Agora a URL é **sanitizada**
+  antes do envio: remove a query string e redige o token do path (`error.interceptor.ts`).
+
+---
+
 ## 2026-07-31 (build e suíte sem avisos: Sass 3, NG8107 e 2 testes que não afirmavam nada)
 
 > Frontend `mestrado-iana` **`5dd8d64`**. Nenhuma mudança de comportamento — o CSS emitido é

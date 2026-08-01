@@ -46,16 +46,27 @@ export class ErrorInterceptor implements HttpInterceptor {
           verticalPosition: 'bottom'
         });
 
-        // Envia para o painel de telemetria
+        // Envia para o painel de telemetria — com a URL SANITIZADA. Antes ia a URL
+        // crua: uma requisição de ativação que falhava gravava o token do convite
+        // (path /convite/<token> ou ?token=) no log visível ao admin.
         this.errorLogService.logError({
           message: error.message || errorMessage,
           status: error.status,
-          url: request.url,
+          url: this.rotaSegura(request.url),
           stack: error.error?.stack || null
         });
 
         return throwError(() => error);
       })
     );
+  }
+
+  /** Remove a query string (pode conter ?token=, ?codigo=, ?q=) e redige o token
+   * do convite no path, evitando persistir credenciais no log de erros. */
+  private rotaSegura(url: string): string {
+    let rota = (url || '').split('?')[0];
+    rota = rota.replace(/\/convite\/[^/]+/, '/convite/<redacted>');
+    rota = rota.replace(/\/ativar-conta\/[^/]+/, '/ativar-conta/<redacted>');
+    return rota;
   }
 }
