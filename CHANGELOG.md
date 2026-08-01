@@ -8,6 +8,19 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-01b (auditoria Mantis — 2ª passada: telas internas/dashboard)
+
+> Varredura das telas que a 1ª passada não cobriu (`src/app/interno/**`, `src/app/dashboard/**`).
+> Resultado: quase tudo limpo (o pipe de markdown escapa antes de renderizar; a tela de desafio não
+> recebe gabarito/lane/papel; editores do admin tratam a chave de API com segurança). Um achado real.
+> Suíte 217 passed + build ok.
+
+### Corrigido — segurança
+- **CSV/formula injection na exportação de telemetria** (`view-admin/atividades`): `montarCsv` só
+  tratava `" , \n`, não os gatilhos de fórmula (`= + - @`). O aluno controla o próprio nome/e-mail;
+  ao exportar e abrir no Excel/Sheets, uma fórmula/DDE do aluno executaria (exfiltração). Agora
+  células que começam com gatilho recebem prefixo `'` (continuam visíveis, não executam).
+
 ## 2026-08-01 (auditoria de segurança Mantis — frontend)
 
 > Parte da campanha de segurança 2026-08-01 (ver changelog do backend para o conjunto completo).
