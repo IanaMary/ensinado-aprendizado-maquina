@@ -211,7 +211,13 @@ export class AtividadesComponent implements OnInit, OnDestroy {
   private montarCsv(linhas: any[]): string {
     const cols = ['timestamp', 'usuario_nome', 'usuario_email', 'usuario_role', 'tipo', 'acao', 'status', 'duracao_ms', 'pipeline_id', 'erro'];
     const esc = (v: any) => {
-      const s = v === null || v === undefined ? '' : String(v);
+      let s = v === null || v === undefined ? '' : String(v);
+      // Anti CSV/formula injection: nome/e-mail são preenchidos pelo aluno; sem isto
+      // um valor como `=HYPERLINK(...)`/`=cmd|...` executaria no Excel/Sheets quando o
+      // professor abrisse a exportação. Prefixa `'` quando começa com gatilho de fórmula.
+      if (/^[=+\-@\t\r]/.test(s)) {
+        s = "'" + s;
+      }
       return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
     };
     const head = cols.join(',');
