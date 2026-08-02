@@ -85,14 +85,10 @@
           [disabled]="!!teste.nomeArquivo">
           Embaralhar dados antes da divisão
         </mat-checkbox>
-        <mat-checkbox
-          [(ngModel)]="resultColetaDadoL.estratificarDados"
-          [disabled]="true">
-          Separar treino/teste com estratificação
-        </mat-checkbox>
-        <mat-hint class="divisao-hint" *ngIf="!teste.nomeArquivo">
-          A estratificação será habilitada após escolher uma coluna alvo de classificação.
-        </mat-hint>
+        <!-- A estratificação NÃO aparece aqui: antes de carregar o arquivo não há tarefa nem
+             coluna alvo, então a caixa nunca poderia ser marcada. Mostrá-la cinza sugeria uma
+             funcionalidade bloqueada sem motivo (revisão da banca, Imagem 4). Ela nasce no bloco
+             de configuração, e só em classificação. -->
         <mat-hint class="divisao-hint" *ngIf="teste.nomeArquivo">
           A divisão automática fica desativada quando uma planilha de teste é enviada.
         </mat-hint>
@@ -245,13 +241,21 @@
               (change)="onDivisaoDadosChange()">
               Embaralhar dados antes da divisão
             </mat-checkbox>
-            <mat-checkbox
+            <!-- Só existe em classificação: estratificar é manter a proporção das CATEGORIAS.
+                 Em regressão/exploratório a caixa não aparece, em vez de aparecer cinza. -->
+            <mat-checkbox *ngIf="tipoPredicao === 'classificacao'"
               [(ngModel)]="resultColetaDadoL.estratificarDados"
               [disabled]="!!teste.nomeArquivo || !resultColetaDadoL.embaralharDados || !resultColetaDadoL.preverCategoria || !resultColetaDadoL.target"
               (change)="onDivisaoDadosChange()">
               Separar treino/teste com estratificação
             </mat-checkbox>
-            <mat-hint *ngIf="!teste.nomeArquivo && resultColetaDadoL.preverCategoria" class="divisao-hint">
+            <!-- Quando ela se aplica mas está bloqueada, dizer O QUE destrava. -->
+            <mat-hint *ngIf="tipoPredicao === 'classificacao' && motivoEstratificacaoIndisponivel"
+              class="divisao-hint">
+              {{ motivoEstratificacaoIndisponivel }}
+            </mat-hint>
+            <mat-hint *ngIf="!teste.nomeArquivo && resultColetaDadoL.preverCategoria && !motivoEstratificacaoIndisponivel"
+              class="divisao-hint">
               Em classificação já vem ligada: treino e teste ficam com a mesma proporção de
               categorias, senão uma categoria pouco frequente pode não aparecer no teste.
             </mat-hint>

@@ -8,6 +8,30 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-02d (estratificação: some onde não se aplica, explica onde se aplica)
+
+> Apontado na revisão da banca (Imagem 4): a caixa "Separar treino/teste com estratificação"
+> aparecia desabilitada em situações em que não se aplica, sugerindo funcionalidade bloqueada sem
+> dizer o porquê. Suíte 222 passed (217 + 5 novos) + build.
+
+### Alterado — `coleta-dado`
+- **A caixa some em Regressão e Exploratório** (`*ngIf="tipoPredicao === 'classificacao'"`).
+  Estratificar é manter a proporção das **categorias** — fora de classificação o conceito não
+  existe, e uma caixa cinza sugeria o contrário.
+- **Some também no bloco de upload, antes de carregar o arquivo**, onde era `[disabled]="true"`
+  fixo: sem tarefa e sem coluna alvo ela nunca poderia ser marcada.
+- **Quando se aplica mas está bloqueada, agora diz o que destrava** — novo getter
+  `motivoEstratificacaoIndisponivel`, no mesmo padrão do `getMotivoDesabilitado` que já servia o
+  tooltip da coluna alvo: sem alvo → "Escolha a coluna alvo para poder estratificar."; sem
+  embaralhar → "A estratificação depende do embaralhamento…". Com planilha de teste ele cala de
+  propósito, porque ali já existe uma hint sobre a divisão inteira.
+
+### Sem mudança de comportamento
+Nada no estado nem no servidor: `onTipoPredicaoChange` já zerava `estratificarDados` fora de
+classificação (esconder a caixa não deixa flag ligada por baixo) e `dividir_dataframe` segue sendo
+o único divisor. O `*ngIf` **não** é coberto por teste unitário — o TestBed sobrescreve o template
+com string vazia —, então a regra de visibilidade foi conferida na tela.
+
 ## 2026-08-02c (bloco de código do tutor: um `}` que faltava desde 09/07)
 
 > Apontado na revisão da banca (Imagem 2): o "EXEMPLO DE CÓDIGO" vazava para fora do card e da
