@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: AuthService;
+  let recarregar: jasmine.Spy;
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
@@ -15,6 +16,10 @@ describe('AuthService', () => {
       ],
     });
     service = TestBed.inject(AuthService);
+    // Sair recarrega a aplicação de verdade — o que, dentro do Karma, reinicia o próprio runner
+    // ("Some of your tests did a full page reload!"). Neutralizado aqui porque VÁRIOS caminhos
+    // chamam logout(), inclusive o isAuthenticated() com token vencido.
+    recarregar = spyOn<any>(service, 'recarregarNoLogin');
     sessionStorage.clear();
   });
 
@@ -95,11 +100,19 @@ describe('AuthService', () => {
   });
 
   describe('logout', () => {
-    it('should clear sessionStorage and navigate to login', () => {
+    // Sair RECARREGA a aplicação, em vez de navegar por rota. Numa SPA o navigate não reinicia
+    // nada: os BehaviorSubject do DashboardService ficavam com o pipeline da sessão anterior e o
+    // login seguinte reabria a Área de Trabalho montada, mas sem os IDs de coleta/configuração
+    // (que moram no sessionStorage) — daí "IDs ausentes" ao treinar. Ver Imagens 9, 10 e 11.
+    it('limpa o sessionStorage e recarrega no login', () => {
       sessionStorage.setItem('token', 'test');
+
       service.logout();
+
       expect(sessionStorage.getItem('token')).toBeNull();
-      expect(router.navigate).toHaveBeenCalledWith(['/autenticacao/login'], { queryParams: { expirado: 1 } });
+      expect(recarregar).toHaveBeenCalled();
+      // Navegar por rota manteria o estado em memória — é justamente o que não pode acontecer.
+      expect(router.navigate).not.toHaveBeenCalled();
     });
   });
 });

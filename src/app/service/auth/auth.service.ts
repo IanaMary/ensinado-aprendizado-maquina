@@ -74,8 +74,26 @@ export class AuthService {
     }
   }
 
+  /** Encerra a sessão e RECARREGA a aplicação.
+   *
+   *  Antes era `router.navigate`, que numa SPA não reinicia nada: os `BehaviorSubject` do
+   *  `DashboardService` continuavam com os itens do pipeline, e modais e drawers seguiam abertos.
+   *  No login seguinte a Área de Trabalho reaparecia montada, mas `idColeta`/`configuracaoTreinamento`
+   *  tinham ido embora com o `sessionStorage` — daí "IDs ausentes" ao treinar (apontado pela banca,
+   *  Imagens 9, 10 e 11).
+   *
+   *  Um reload zera tudo de uma vez. A alternativa — cada serviço registrar a própria limpeza —
+   *  depende de ninguém esquecer um serviço, e é justamente esse esquecimento que produz o
+   *  defeito de novo, em outra forma. */
   logout(): void {
     sessionStorage.clear();
-    this.router.navigate(['/autenticacao/login'], { queryParams: { expirado: 1 } });
+    this.recarregarNoLogin();
+  }
+
+  /** Ponto único de saída, isolado para o teste poder substituí-lo: chamar `location.assign` de
+   *  verdade recarregaria o próprio runner. */
+  protected recarregarNoLogin(): void {
+    const base = document.querySelector('base')?.getAttribute('href') || '/';
+    window.location.assign(`${base.replace(/\/$/, '')}/autenticacao/login?expirado=1`);
   }
 }

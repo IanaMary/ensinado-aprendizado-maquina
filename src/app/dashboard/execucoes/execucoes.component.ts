@@ -5,7 +5,7 @@ import { ItemPipeline, MediaMetrica, ResultadoColetaDado } from '../../models/it
 import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.component';
 import { TutorContexto } from '../tutor/tutor.component';
 import { conteudoParaItemInfo } from '../tutor/conteudo-to-item-info';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, take, takeUntil } from 'rxjs';
 import tutor from '../../constants/tutor.json';
 import { ScriptGeneratorService } from '../../service/script-generator.service';
 import { PipelineService, PipelineState } from '../../service/pipeline.service';
@@ -184,15 +184,37 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     this.getTutor('inicio');
   }
 
-  /** Um desafio pendente abre direto; vários, a lista de turmas (o aluno escolhe). */
+  /** Uma atividade pendente abre direto; várias, a lista de turmas (o aluno escolhe).
+   *
+   *  O destino depende do tipo — montagem é quebra-cabeça em tela própria, pipeline é o dashboard
+   *  vinculado à atividade. Mesma navegação do `entrar-turma`, para os dois caminhos não divergirem. */
   abrirDesafios(): void {
-    const unico = this.desafiosPendentes.length === 1 ? this.desafiosPendentes[0] : null;
-    if (unico) {
-      this.router.navigate(['/desafio'],
-        { queryParams: { atividade: unico.atividade_id, turma: unico.turma_id } });
+    const unica = this.desafiosPendentes.length === 1 ? this.desafiosPendentes[0] : null;
+    if (!unica) {
+      this.router.navigate(['/view-aluno/entrar']);
       return;
     }
-    this.router.navigate(['/view-aluno/entrar']);
+    if ((unica.tipo || 'montagem') === 'montagem') {
+      this.router.navigate(['/desafio'],
+        { queryParams: { atividade: unica.atividade_id, turma: unica.turma_id } });
+      return;
+    }
+    this.router.navigate(['/view-aluno'], {
+      queryParams: {
+        atividade: unica.atividade_id,
+        turma: unica.turma_id,
+        dataset: unica.dataset || undefined,
+      },
+    });
+  }
+
+  /** Só de montagem, só de pipeline, ou os dois? Governa o texto do aviso. */
+  get pendentesSaoTodasDeMontagem(): boolean {
+    return this.desafiosPendentes.every(d => (d.tipo || 'montagem') === 'montagem');
+  }
+
+  get pendentesSaoTodasDePipeline(): boolean {
+    return this.desafiosPendentes.every(d => d.tipo === 'pipeline');
   }
 
   getTituloColeta(item: ItemPipeline): string {
@@ -263,8 +285,25 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   /** Atalho do banner de atividade: abre direto a etapa de Coleta para o aluno
    *  carregar o dataset sugerido (o card de coleta já existe na lane). */
   abrirColetaAtividade(): void {
-    const coleta = this.colunaColeta[0];
-    if (coleta) this.abrirModalExecucao(coleta);
+    const jaNaRaia = this.colunaColeta[0];
+    if (jaNaRaia) {
+      this.abrirModalExecucao(jaNaRaia);
+      return;
+    }
+
+    // Área de Trabalho vazia é o caso NORMAL de quem acabou de abrir a atividade da turma — e era
+    // aqui que o botão não fazia nada, porque o código assumia um card já na raia (apontado pela
+    // banca, Imagem 14). Põe o item de Coleta na raia pelo mesmo caminho do arrastar e segue.
+    this.dashboardService.getItensColetasDados().pipe(take(1)).subscribe(itens => {
+      const item = (itens || [])[0];
+      if (!item) {
+        this.notificacao.aviso('Não consegui abrir a Coleta agora. Recarregue a página e tente de novo.');
+        return;
+      }
+      const naRaia = { ...item, movido: true };
+      this.dashboardService.movendoItemExecucao(naRaia);
+      this.abrirModalExecucao(naRaia);
+    });
   }
 
   abrirModalExecucao(item: ItemPipeline): void {

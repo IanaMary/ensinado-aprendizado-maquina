@@ -8,6 +8,45 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-02g (sair reinicia a aplicação, sessão se renova e botões que não respondiam)
+
+> 2ª leva da revisão da banca (Imagens 9-botão, 10, 11, 12, 14). Suíte **234** passed (6 novos) +
+> build. **As capturas da banca são de 01/08 15:45**, anteriores aos deploys de hoje — a parte da
+> Imagem 9 sobre "KNN/árvore/PCA/K-Means falham" já havia sido corrigida em 02b/02e.
+
+### Corrigido — sair não reiniciava nada (Imagens 9-botão, 10 e 11)
+`logout()` limpava só o `sessionStorage` e navegava por rota. Numa SPA isso **não reinicia nada**:
+os `BehaviorSubject` do `DashboardService` seguiam com o pipeline montado, e modais e drawers
+continuavam abertos. No login seguinte a Área de Trabalho reaparecia completa, mas
+`idColeta`/`configuracaoTreinamento` tinham ido embora com o `sessionStorage` — daí **"IDs
+ausentes: faça upload de dados e selecione o modelo"** ao tentar treinar, que a banca leu como
+"o botão não responde".
+
+Agora o logout **recarrega a aplicação**. Um reload zera tudo de uma vez; a alternativa (cada
+serviço registrar a própria limpeza) depende de ninguém esquecer um serviço — e é esse
+esquecimento que traz o defeito de volta em outra forma.
+
+### Adicionado — a sessão se renova enquanto o aluno usa (Imagem 10)
+`SessaoRenovacaoService` + gancho no `AuthInterceptor`: toda resposta bem-sucedida verifica quanto
+falta no `exp` e, abaixo de 15 min, renova em segundo plano (`POST /login/renovar`). **Sem timer**
+de fundo, de propósito: um timer manteria viva a aba esquecida aberta, que é justamente o que a
+expiração deve encerrar. Falha na renovação não desloga — o token atual ainda vale e a próxima
+requisição tenta de novo.
+
+### Corrigido — dois botões que engoliam o clique
+- **"Gerar avaliações"** (Imagem 12) era `(click)="metricaAvaliacao?.postAvaliacao()"`: com o
+  ViewChild ainda nulo, o `?.` fazia o clique **não produzir nada**. Agora um handler explícito
+  avalia ou **diz** que a etapa está carregando.
+- **"Carregar dados"** do aviso de atividade (Imagem 14) fazia
+  `const coleta = this.colunaColeta[0]; if (coleta) …` — e Área de Trabalho vazia é o caso **normal**
+  de quem acabou de abrir a atividade. Agora põe o item de Coleta na raia pelo mesmo caminho do
+  arrastar (`movendoItemExecucao`) e abre o modal.
+
+### Alterado — o pipeline do professor aparece no aviso (Imagem 14)
+O aviso do topo cobria só desafios de montagem; a atividade de pipeline só era encontrada pelo
+avatar → Turmas. Agora cobre os dois, com texto, ícone e destino por tipo (montagem → `/desafio`;
+pipeline → dashboard vinculado, com o dataset sugerido), reusando a navegação do `entrar-turma`.
+
 ## 2026-08-02f (painel do tutor: uma fonte de conteúdo, identidade explícita e zoom no pairplot)
 
 > Terceira leva da revisão da banca: Imagens 5, 6, 7 e 8. Suíte **228** passed (6 casos novos) +

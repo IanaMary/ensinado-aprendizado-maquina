@@ -86,8 +86,13 @@ export interface TabuleiroDesafio {
 /** Desafio de montagem visto pelo aluno, de qualquer turma dele, com o histórico dele. */
 export interface DesafioDoAluno {
   atividade_id: string;
+  /** 'montagem' (quebra-cabeça, tela própria) ou 'pipeline' (dashboard). Ausente = montagem,
+   *  para não quebrar se o servidor for mais antigo que o front. */
+  tipo?: 'montagem' | 'pipeline';
   titulo: string;
   descricao?: string;
+  /** Dataset sugerido pelo professor, só em atividades de pipeline. */
+  dataset?: string | null;
   turma_id: string;
   turma_nome?: string;
   tentativas: number;
