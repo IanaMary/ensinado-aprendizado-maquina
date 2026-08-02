@@ -8,6 +8,18 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-02e (pré-processamento não aponta mais para o alvo)
+
+> Parte da correção da Imagem 9 (ver changelog do backend, entrada 2026-08-02b, para o conjunto
+> completo — os três defeitos de treinamento eram de servidor). Suíte 222 passed + build.
+
+### Corrigido
+- **`pre-processamento-config`: o alvo deixou de ser ofertado como coluna.** Ele não entra em X no
+  treino, então configurar um pré-processador sobre ele gerava um `ColumnTransformer` apontando
+  para coluna inexistente — e o sklearn quebrava dentro do sandbox (500, visto em produção com
+  KNN e Árvore de Decisão). `carregarColunas` filtrava o alvo em **um** dos dois ramos; pelo ramo
+  de `colunasDetalhes` ele continuava na lista. Agora os dois filtram.
+
 ## 2026-08-02d (estratificação: some onde não se aplica, explica onde se aplica)
 
 > Apontado na revisão da banca (Imagem 4): a caixa "Separar treino/teste com estratificação"
