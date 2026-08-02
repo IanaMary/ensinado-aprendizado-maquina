@@ -8,6 +8,23 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-02 (acentuação dos rótulos do painel do tutor)
+
+> Apontado na revisão da banca (Imagem 1): os cards do tutor exibiam **"INTUICAO"** e
+> **"EXEMPLO PRATICO"**. A causa era o texto-fonte: os rótulos estão hardcoded sem acento no
+> template; o `text-transform: uppercase` do SCSS só põe em caixa alta (ele preservaria o acento
+> se existisse). Suíte 217 passed + build de produção ok.
+
+### Corrigido
+- **5 rótulos sem acentuação** em `dashboard/tutor/tutor.component.html` (11 ocorrências):
+  `Intuicao` → **Intuição** (3×), `Exemplo pratico` → **Exemplo prático** (2×), `Formula` →
+  **Fórmula** (2×, alinhando com o bloco *Fundamentos*, que já usava a forma correta),
+  `Hiperparametros` → **Hiperparâmetros** (2×) e `Padrao:` → **Padrão:** (2×). Como
+  `<app-tutor>` é reusado em três lugares (área de trabalho, modal do wizard e modal de avaliação
+  de métrica), a correção vale para os três.
+- **Não** foram tocadas as chaves de dado `intuicao` (JSONs de `app/conteudo/`, `schema.py`,
+  interfaces TS): são identificadores do contrato backend↔frontend, não texto de UI.
+
 ## 2026-08-01b (auditoria Mantis — 2ª passada: telas internas/dashboard)
 
 > Varredura das telas que a 1ª passada não cobriu (`src/app/interno/**`, `src/app/dashboard/**`).
