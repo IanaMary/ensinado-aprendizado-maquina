@@ -8,6 +8,31 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-02c (bloco de código do tutor: um `}` que faltava desde 09/07)
+
+> Apontado na revisão da banca (Imagem 2): o "EXEMPLO DE CÓDIGO" vazava para fora do card e da
+> margem do painel, sem quebra nem rolagem. Suíte 217 passed + build.
+
+### Corrigido
+- **`tutor.component.scss`: `.conceito-item` não fechava.** O bloco aberto na linha 807 engolia
+  tudo o que vinha depois de `.conceito-desc` — `.codigo-section`, `.codigo-bloco` (com as 22
+  regras de cor do highlight.js) e `.doc-yellowbrick-link`. Compilado, virava
+  `.conceito-item .codigo-bloco`: seletor que **nunca casa**. O `<pre>` ficava sem estilo nenhum, e
+  `<pre>` sem estilo é `white-space: pre` sem rolagem — daí o transbordo. Fechado o bloco e
+  desaninhadas as regras; **nenhuma regra foi alterada**.
+- **A correção anunciada em 2026-07-09c nunca valeu.** O commit `7184e90`, que dizia entregar
+  "código do tutor com scroll e cores", é o mesmo que introduziu o aninhamento errado: as regras
+  nasceram inertes. Por isso o código aparecia preto no branco em vez do bloco escuro colorido —
+  o tema estava morto junto com o `overflow-x`.
+- Efeito visível: o bloco volta ao desenho previsto (fundo `#1e1e2e`, sintaxe colorida, rolagem
+  horizontal própria), igual ao que o chat do tutor já mostrava. Vale nos três lugares que reusam
+  `<app-tutor>`: painel da Área de Trabalho, drawer do `modal-execucao` e modal `metrica-avaliacao`.
+
+### Como foi provado (repetível)
+`npx sass --load-path=node_modules --no-source-map src/app/dashboard/tutor/tutor.component.scss`
+antes e depois: 22 regras saíam prefixadas por `.conceito-item`, agora 0 — e o diff do CSS emitido,
+removido o prefixo, é **idêntico**, o que garante que só o escopo mudou.
+
 ## 2026-08-02b (acentuação — varredura no app inteiro)
 
 > Segunda passada, depois que o Painel de Administração apareceu com o mesmo defeito durante a
