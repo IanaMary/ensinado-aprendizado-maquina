@@ -10,9 +10,9 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ## 2026-08-02 (correções da revisão da banca) — porte
 
-> Branch `master` (não implantada). Porte dos quatro commits da `mestrado-iana` que responderam à
-> revisão da banca em 02/08. Suíte 208 (e 213 depois do último, que traz specs novos).
-> Detalhe de cada correção nas entradas 2026-08-02 a 2026-08-02d do CHANGELOG da `mestrado-iana`.
+> Branch `master` (não implantada). Porte dos commits da `mestrado-iana` que responderam à
+> revisão da banca em 02/08. Suíte 208 → 213 (o de estratificação traz specs novos).
+> Detalhe de cada correção nas entradas 2026-08-02 a 2026-08-02e do CHANGELOG da `mestrado-iana`.
 
 | Aqui | Origem | O quê |
 |---|---|---|
@@ -20,6 +20,7 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 | `ed81132` | `0438177` | Acentuação no resto do app (Painel de Administração + textos de fallback do tutor) |
 | `819edda` | `59612fd` | `.conceito-item` sem `}` matava o estilo do bloco de código, que transbordava o card |
 | `f32c617` | `07e599f` | Estratificação some fora de classificação e explica o bloqueio quando se aplica |
+| `cf67519` | `35672f1` | Alvo deixa de ser ofertado como coluna de pré-processamento (o 500 do KNN/Árvore da Imagem 9) |
 
 > Nota: os três primeiros portes foram commitados só com `src/`; esta entrada cobre os quatro de
 > uma vez e recoloca a `master` em dia com a própria convenção de registrar portes.
