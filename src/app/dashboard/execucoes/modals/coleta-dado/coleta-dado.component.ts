@@ -567,6 +567,24 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     this.putConfiguracaoTreino();
   }
 
+  /** Por que a caixa de estratificação está cinza, em uma frase — vazio quando ela está usável.
+   *
+   *  Só faz sentido em classificação (fora dela a caixa nem é renderizada). Aqui tratamos o caso
+   *  em que ela SE APLICA mas algo falta: mostrar cinza sem dizer o quê foi o apontamento da
+   *  banca. A planilha de teste devolve '' de propósito — esse caso já tem uma hint própria,
+   *  que fala da divisão inteira, não só da estratificação. */
+  get motivoEstratificacaoIndisponivel(): string {
+    if (this.tipoPredicao !== 'classificacao') return '';
+    if (this.teste.nomeArquivo) return '';
+    if (!this.resultColetaDadoL.embaralharDados) {
+      return 'A estratificação depende do embaralhamento: ligue "Embaralhar dados antes da divisão".';
+    }
+    if (!this.resultColetaDadoL.target) {
+      return 'Escolha a coluna alvo para poder estratificar.';
+    }
+    return '';
+  }
+
   isColunaHabilitada(item: any): boolean {
     if (this.tipoPredicao === 'exploratorio') return false;
     if (!this.resultColetaDadoL.dadosRotulados) return false;

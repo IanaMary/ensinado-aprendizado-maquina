@@ -169,6 +169,45 @@ describe('ColetaDadoComponent', () => {
       expect(component.resultColetaDadoL.estratificarDados).toBeFalse();
     });
 
+    // A caixa cinza sem explicação foi o apontamento da banca (Imagem 4). Fora de
+    // classificação ela nem é renderizada (`*ngIf` no template, não coberto aqui porque o
+    // TestBed sobrescreve o template); dentro dela, o motivo tem de estar dito.
+    describe('motivo de indisponibilidade', () => {
+      it('não opina fora de classificação (lá a caixa nem aparece)', () => {
+        component.onTipoPredicaoChange('regressao');
+        expect(component.motivoEstratificacaoIndisponivel).toBe('');
+
+        component.onTipoPredicaoChange('exploratorio');
+        expect(component.motivoEstratificacaoIndisponivel).toBe('');
+      });
+
+      it('pede a coluna alvo quando ela falta', () => {
+        component.onTipoPredicaoChange('classificacao');
+        component.resultColetaDadoL.target = '';
+        expect(component.motivoEstratificacaoIndisponivel).toContain('coluna alvo');
+      });
+
+      it('aponta o embaralhamento antes do alvo, por ser o bloqueio de fora', () => {
+        component.onTipoPredicaoChange('classificacao');
+        component.resultColetaDadoL.target = 'classe';
+        component.resultColetaDadoL.embaralharDados = false;
+        expect(component.motivoEstratificacaoIndisponivel).toContain('embaralhamento');
+      });
+
+      it('cala quando a caixa está utilizável', () => {
+        component.onTipoPredicaoChange('classificacao');
+        component.resultColetaDadoL.target = 'classe';
+        component.resultColetaDadoL.embaralharDados = true;
+        expect(component.motivoEstratificacaoIndisponivel).toBe('');
+      });
+
+      it('cala com planilha de teste enviada: ali a hint é sobre a divisão inteira', () => {
+        component.onTipoPredicaoChange('classificacao');
+        component.teste.nomeArquivo = 'teste.csv';
+        expect(component.motivoEstratificacaoIndisponivel).toBe('');
+      });
+    });
+
     it('envia o pedido de estratificação na redivisão', fakeAsync(() => {
       component.onTipoPredicaoChange('classificacao');
       component.resultColetaDadoL.target = 'classe';
