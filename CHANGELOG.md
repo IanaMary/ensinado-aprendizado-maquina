@@ -8,6 +8,22 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-02 (correções da revisão da banca) — porte
+
+> Branch `master` (não implantada). Porte dos quatro commits da `mestrado-iana` que responderam à
+> revisão da banca em 02/08. Suíte 208 (e 213 depois do último, que traz specs novos).
+> Detalhe de cada correção nas entradas 2026-08-02 a 2026-08-02d do CHANGELOG da `mestrado-iana`.
+
+| Aqui | Origem | O quê |
+|---|---|---|
+| `f8a1b61` | `96a4c89` | Acentuação dos rótulos do painel do tutor (Intuição, Exemplo prático, Fórmula, Hiperparâmetros, Padrão:) |
+| `ed81132` | `0438177` | Acentuação no resto do app (Painel de Administração + textos de fallback do tutor) |
+| `819edda` | `59612fd` | `.conceito-item` sem `}` matava o estilo do bloco de código, que transbordava o card |
+| `f32c617` | `07e599f` | Estratificação some fora de classificação e explica o bloqueio quando se aplica |
+
+> Nota: os três primeiros portes foram commitados só com `src/`; esta entrada cobre os quatro de
+> uma vez e recoloca a `master` em dia com a própria convenção de registrar portes.
+
 ## 2026-07-31 (build e suíte sem avisos) — porte
 
 > Branch `master` (não implantada). Porte de `5dd8d64` da `mestrado-iana`, mais o que só existe
