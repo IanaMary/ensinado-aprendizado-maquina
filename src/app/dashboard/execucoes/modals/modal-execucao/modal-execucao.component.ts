@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ScriptGeneratorService } from '../../../../service/script-generator.service';
 import { NivelTutorService } from '../../../../service/nivel-tutor.service';
+import { NotificacaoService } from '../../../../service/notificacao.service';
 import { MetricaAvaliacaoComponent } from '../metrica-avaliacao/metrica-avaliacao.component';
 import { ClasificadorComponent } from '../classificador/classificador.component';
 import { TutorContexto } from '../../../tutor/tutor.component';
@@ -104,10 +105,22 @@ export class ModalExecucaoComponent implements OnInit {
     private scriptGenerator: ScriptGeneratorService,
     private nivelTutor: NivelTutorService,
     private cdr: ChangeDetectorRef,
+    private notificacao: NotificacaoService,
     public dialogRef: MatDialogRef<ModalExecucaoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.atualizarVariaveis(data);
+  }
+
+  /** Dispara a avaliação. O botão chamava `metricaAvaliacao?.postAvaliacao()` direto, e o `?.`
+   *  fazia o clique não produzir NADA quando o ViewChild ainda não estava pronto — o usuário
+   *  clicava e a tela não reagia (banca, Imagem 12). Agora, ou avalia, ou diz o que houve. */
+  gerarAvaliacoes(): void {
+    if (!this.metricaAvaliacao) {
+      this.notificacao.aviso('A etapa de avaliação ainda está carregando. Tente de novo em instantes.');
+      return;
+    }
+    this.metricaAvaliacao.postAvaliacao();
   }
 
   ngOnInit(): void {

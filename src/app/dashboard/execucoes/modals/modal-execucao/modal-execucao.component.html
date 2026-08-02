@@ -107,7 +107,9 @@
             [disabled]="!metricaAvaliacao?.metricsAvaliadas?.length">
             Baixar relatório (PDF)
           </button>
-          <button mat-raised-button color="primary" (click)="metricaAvaliacao?.postAvaliacao()">
+          <!-- Handler explícito: com `metricaAvaliacao?.postAvaliacao()` o `?.` engolia o clique
+               em silêncio quando o ViewChild ainda não estava pronto (banca, Imagem 12). -->
+          <button mat-raised-button color="primary" (click)="gerarAvaliacoes()">
             Gerar avaliações
           </button>
         </ng-container>

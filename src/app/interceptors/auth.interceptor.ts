@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { AuthService } from '../service/auth/auth.service';
+import { SessaoRenovacaoService } from '../service/auth/sessao-renovacao.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService,
+    private renovacao: SessaoRenovacaoService,
+  ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.getToken();
@@ -20,7 +24,15 @@ export class AuthInterceptor implements HttpInterceptor {
       });
     }
 
+    // A própria atividade do usuário mantém a sessão viva: se o token está perto de expirar,
+    // renova em segundo plano. Não entra em /login/renovar (evita laço) nem na telemetria
+    // (/atividades sobe em background e não representa interação).
+    const contaComoUso = token
+      && !req.url.includes('/login')
+      && !req.url.includes('/atividades');
+
     return next.handle(req).pipe(
+      tap(() => { if (contaComoUso) this.renovacao.aoUsar(); }),
       catchError(err => {
         // Não redirecionar para login em endpoints públicos. /atividades é
         // telemetria fire-and-forget (flush em background): um 401 nela não deve

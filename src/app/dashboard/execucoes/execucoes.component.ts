@@ -173,12 +173,14 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     this.getTutor('inicio');
   }
 
-  /** Um desafio pendente abre direto; vários, a lista de turmas (o aluno escolhe). */
+  /** Uma atividade pendente abre direto; várias, a lista de turmas (o aluno escolhe).
+   *
+   *  O destino depende do tipo — montagem é quebra-cabeça em tela própria, pipeline é o dashboard
+   *  vinculado à atividade. Mesma navegação do `entrar-turma`, para os dois caminhos não divergirem. */
   abrirDesafios(): void {
-    const unico = this.desafiosPendentes.length === 1 ? this.desafiosPendentes[0] : null;
-    if (unico) {
-      this.router.navigate(['/desafio'],
-        { queryParams: { atividade: unico.atividade_id, turma: unico.turma_id } });
+    const unica = this.desafiosPendentes.length === 1 ? this.desafiosPendentes[0] : null;
+    if (!unica) {
+      this.router.navigate(['/view-aluno/entrar']);
       return;
     }
     this.router.navigate(['/entrar']);

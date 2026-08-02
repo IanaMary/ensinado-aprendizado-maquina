@@ -14,17 +14,30 @@
   <div class="atividade-banner" *ngIf="desafiosPendentes.length">
     <mat-icon>extension</mat-icon>
     <span *ngIf="desafiosPendentes.length === 1">
-      Você tem um <strong>desafio de montagem</strong> para fazer:
-      <strong>{{ desafiosPendentes[0].titulo }}</strong>
-      <ng-container *ngIf="desafiosPendentes[0].turma_nome"> ({{ desafiosPendentes[0].turma_nome }})</ng-container>.
-      Nele você monta o pipeline como um quebra-cabeça e recebe uma nota com o retorno de cada ponto.
+      <ng-container *ngIf="desafiosPendentes[0].tipo === 'pipeline'; else umaMontagem">
+        Seu professor propôs uma <strong>atividade de pipeline</strong>:
+        <strong>{{ desafiosPendentes[0].titulo }}</strong>
+        <ng-container *ngIf="desafiosPendentes[0].turma_nome"> ({{ desafiosPendentes[0].turma_nome }})</ng-container><ng-container
+          *ngIf="desafiosPendentes[0].dataset"> — dataset sugerido: <strong>{{ desafiosPendentes[0].dataset }}</strong></ng-container>.
+        Monte o pipeline na Área de Trabalho e <strong>salve</strong> para enviar sua submissão.
+      </ng-container>
+      <ng-template #umaMontagem>
+        Você tem um <strong>desafio de montagem</strong> para fazer:
+        <strong>{{ desafiosPendentes[0].titulo }}</strong>
+        <ng-container *ngIf="desafiosPendentes[0].turma_nome"> ({{ desafiosPendentes[0].turma_nome }})</ng-container>.
+        Nele você monta o pipeline como um quebra-cabeça e recebe uma nota com o retorno de cada ponto.
+      </ng-template>
     </span>
     <span *ngIf="desafiosPendentes.length > 1">
-      Você tem <strong>{{ desafiosPendentes.length }} desafios de montagem</strong> para fazer
-      nas suas turmas — monte o pipeline como um quebra-cabeça e receba a nota com o retorno.
+      Você tem <strong>{{ desafiosPendentes.length }}
+      {{ pendentesSaoTodasDeMontagem ? 'desafios de montagem' : (pendentesSaoTodasDePipeline ? 'atividades de pipeline' : 'atividades') }}</strong>
+      para fazer nas suas turmas.
     </span>
     <button class="banner-acao" (click)="abrirDesafios()">
-      <mat-icon>extension</mat-icon> {{ desafiosPendentes.length === 1 ? 'Fazer o desafio' : 'Ver desafios' }}
+      <mat-icon>{{ pendentesSaoTodasDePipeline ? 'assignment' : 'extension' }}</mat-icon>
+      {{ desafiosPendentes.length === 1
+          ? (desafiosPendentes[0].tipo === 'pipeline' ? 'Fazer a atividade' : 'Fazer o desafio')
+          : 'Ver atividades' }}
     </button>
   </div>
 
