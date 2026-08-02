@@ -8,6 +8,32 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-02b (acentuação — varredura no app inteiro)
+
+> Segunda passada, depois que o Painel de Administração apareceu com o mesmo defeito durante a
+> verificação visual do deploy anterior. A varredura foi feita sobre o **texto visível** dos
+> templates (nós de texto + `placeholder`/`matTooltip`/`aria-label`/`title`/`alt`), ignorando
+> bindings, nomes de classe e interpolações, mais uma checagem cruzada que marca palavra sem acento
+> quando a mesma palavra aparece acentuada em outro ponto do app. Suíte 217 passed + build.
+
+### Corrigido
+- **Painel de Administração** (`interno/view-admin/containers/view-admin.component.html`):
+  "Painel de Administracao" → **Administração**; "as configuracoes do tutor" → **configurações**;
+  "etapas disponiveis" → **disponíveis**; "mensagens e descricoes contextuais" → **descrições**.
+- **Textos de fallback do tutor** (`dashboard/execucoes/execucoes.component.ts`): "Metrica de
+  avaliacao do modelo." → **Métrica de avaliação**; "Selecione as metricas…" → **métricas**;
+  "…configure os hiperparametros" → **hiperparâmetros**. Aparecem quando o item do catálogo não
+  tem `conteudo` no banco.
+
+### Verificado e deliberadamente não alterado
+- **Nomes de variável no código Python gerado** (`script-generator.service.ts`: `previsao`,
+  `precisao`, `metrica`) — são identificadores do script que o aluno exporta e executa.
+- **`placeholder="min"` / `"max"`** no editor de hiperparâmetros: abreviações técnicas que
+  espelham os campos `h.min`/`h.max`, não português abreviado.
+- **`console.error('Erro ao gerar metricas…')`** (`modal-execucao.component.ts`): log, não interface.
+- Demonstrativos corretos que a checagem cruzada marcou como suspeitos ("**esta** avaliação",
+  "se **esta** é a sua conta", "já **vem** ligada") e o e-mail de exemplo `joao@email.com`.
+
 ## 2026-08-02 (acentuação dos rótulos do painel do tutor)
 
 > Apontado na revisão da banca (Imagem 1): os cards do tutor exibiam **"INTUICAO"** e
