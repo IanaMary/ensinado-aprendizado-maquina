@@ -11,7 +11,7 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 ## 2026-08-02 (correções da revisão da banca) — porte
 
 > Branch `master` (não implantada). Porte dos commits da `mestrado-iana` que responderam à
-> revisão da banca em 02/08. Suíte 208 → 213 (o de estratificação traz specs novos).
+> revisão da banca em 02/08. Suíte 208 → 219 (estratificação e painel do tutor trazem specs novos).
 > Detalhe de cada correção nas entradas 2026-08-02 a 2026-08-02e do CHANGELOG da `mestrado-iana`.
 
 | Aqui | Origem | O quê |
@@ -21,7 +21,12 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 | `819edda` | `59612fd` | `.conceito-item` sem `}` matava o estilo do bloco de código, que transbordava o card |
 | `f32c617` | `07e599f` | Estratificação some fora de classificação e explica o bloqueio quando se aplica |
 | `cf67519` | `35672f1` | Alvo deixa de ser ofertado como coluna de pré-processamento (o 500 do KNN/Árvore da Imagem 9) |
+| `9050b7c` | `8d2a2de` | Painel do tutor com fonte única (Imagens 7/8), faixa Tutor × Informativo (Imagem 6) e zoom no pairplot (Imagem 5) |
 
+> Conflitos do último porte resolvidos a favor desta branch: ela não tem o link do Yellowbrick
+> nem o realce de sintaxe no `exemplo_codigo` (ambos só-`mestrado-iana`) — só a fonte do dado
+> mudou para `infoExibida`.
+>
 > Nota: os três primeiros portes foram commitados só com `src/`; esta entrada cobre os quatro de
 > uma vez e recoloca a `master` em dia com a própria convenção de registrar portes.
 
