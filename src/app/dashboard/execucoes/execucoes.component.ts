@@ -178,11 +178,15 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
    *  O destino depende do tipo — montagem é quebra-cabeça em tela própria, pipeline é o dashboard
    *  vinculado à atividade. Mesma navegação do `entrar-turma`, para os dois caminhos não divergirem. */
   abrirDesafios(): void {
-    const unica = this.desafiosPendentes.length === 1 ? this.desafiosPendentes[0] : null;
-    if (!unica) {
-      this.router.navigate(['/view-aluno/entrar']);
+    const unico = this.desafiosPendentes.length === 1 ? this.desafiosPendentes[0] : null;
+    if (unico) {
+      this.router.navigate(['/desafio'],
+        { queryParams: { atividade: unico.atividade_id, turma: unico.turma_id } });
       return;
     }
+    // Nesta branch a lista de turmas é `/entrar` (na `mestrado-iana` é `/view-aluno/entrar`).
+    // O roteamento por TIPO de atividade não foi portado: aqui não existe o dashboard vinculado
+    // à atividade de turma, então não haveria para onde levar um pipeline sugerido.
     this.router.navigate(['/entrar']);
   }
 

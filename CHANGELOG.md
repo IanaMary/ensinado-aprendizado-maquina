@@ -11,7 +11,8 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 ## 2026-08-02 (correções da revisão da banca) — porte
 
 > Branch `master` (não implantada). Porte dos commits da `mestrado-iana` que responderam à
-> revisão da banca em 02/08. Suíte 208 → 219 (estratificação e painel do tutor trazem specs novos).
+> revisão da banca em 02/08. Suíte 208 → 225 (estratificação, painel do tutor e renovação de sessão
+> trazem specs novos).
 > Detalhe de cada correção nas entradas 2026-08-02 a 2026-08-02e do CHANGELOG da `mestrado-iana`.
 
 | Aqui | Origem | O quê |
@@ -22,10 +23,14 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 | `f32c617` | `07e599f` | Estratificação some fora de classificação e explica o bloqueio quando se aplica |
 | `cf67519` | `35672f1` | Alvo deixa de ser ofertado como coluna de pré-processamento (o 500 do KNN/Árvore da Imagem 9) |
 | `9050b7c` | `8d2a2de` | Painel do tutor com fonte única (Imagens 7/8), faixa Tutor × Informativo (Imagem 6) e zoom no pairplot (Imagem 5) |
+| (este) | `79c1d32` | Logout recarrega o app, renovação de sessão e "Gerar avaliações" sem clique morto |
 
-> Conflitos do último porte resolvidos a favor desta branch: ela não tem o link do Yellowbrick
-> nem o realce de sintaxe no `exemplo_codigo` (ambos só-`mestrado-iana`) — só a fonte do dado
-> mudou para `infoExibida`.
+> Conflitos resolvidos a favor desta branch quando a feature não existe aqui: ela não tem o link
+> do Yellowbrick nem o realce de sintaxe no `exemplo_codigo`, e **não tem atividade de turma no
+> dashboard** (`atividadeId`). Por isso o porte de `79c1d32` trouxe **logout com reload**,
+> **renovação de sessão** e o **botão "Gerar avaliações"**, mas NÃO o banner de pipeline nem o
+> `abrirColetaAtividade` — sem o dashboard vinculado à atividade, não haveria para onde levar o
+> aluno. `abrirDesafios` continua indo a `/entrar` (aqui) em vez de `/view-aluno/entrar`.
 >
 > Nota: os três primeiros portes foram commitados só com `src/`; esta entrada cobre os quatro de
 > uma vez e recoloca a `master` em dia com a própria convenção de registrar portes.
