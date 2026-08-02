@@ -46,12 +46,17 @@ export class PreProcessamentoConfigComponent implements OnInit {
   }
 
   carregarColunas() {
+    // O alvo NÃO entra em X no treino, então oferecê-lo aqui produzia um
+    // pré-processador apontando para coluna inexistente — e o sklearn quebrava
+    // dentro do sandbox. Vale para os dois ramos abaixo: antes só o primeiro
+    // filtrava, e pelo ramo de `colunasDetalhes` o alvo continuava na lista.
+    const alvo = this.resultadoColetaDado?.target;
+    const semAlvo = (nomes: string[]) => nomes.filter(c => c !== alvo);
+
     if (this.resultadoColetaDado?.colunas) {
-      this.colunas = this.resultadoColetaDado.colunas.filter(
-        c => c !== this.resultadoColetaDado?.target
-      );
+      this.colunas = semAlvo(this.resultadoColetaDado.colunas);
     }
-    
+
     // Separar colunas por tipo (canonical: 'Número' / 'Texto' / 'Booleano')
     const isNumero = (t: string) => t === 'número' || t === 'numero';
     const isCategorica = (t: string) => t === 'texto' || t === 'booleano';
@@ -61,12 +66,12 @@ export class PreProcessamentoConfigComponent implements OnInit {
       this.colunasNumericas = this.colunas.filter(c => isNumero((this.tiposColunas[c] || '').toLowerCase()));
       this.colunasCategoricas = this.colunas.filter(c => isCategorica((this.tiposColunas[c] || '').toLowerCase()));
     } else if (this.resultadoColetaDado?.colunasDetalhes?.length) {
-      this.colunasNumericas = this.resultadoColetaDado.colunasDetalhes
+      this.colunasNumericas = semAlvo(this.resultadoColetaDado.colunasDetalhes
         .filter((d: any) => isNumero((d.tipo_coluna || '').toLowerCase()))
-        .map((d: any) => d.nome_coluna);
-      this.colunasCategoricas = this.resultadoColetaDado.colunasDetalhes
+        .map((d: any) => d.nome_coluna));
+      this.colunasCategoricas = semAlvo(this.resultadoColetaDado.colunasDetalhes
         .filter((d: any) => isCategorica((d.tipo_coluna || '').toLowerCase()))
-        .map((d: any) => d.nome_coluna);
+        .map((d: any) => d.nome_coluna));
     } else {
       // Se não tiver informação de tipo, assume todas como numéricas
       this.colunasNumericas = [...this.colunas];
