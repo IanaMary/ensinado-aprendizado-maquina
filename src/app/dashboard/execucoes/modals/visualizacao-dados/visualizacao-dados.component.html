@@ -49,8 +49,12 @@
 
   <!-- Resultado -->
   <div class="resultado" *ngIf="imagemBase64 && !carregando">
-    <div class="imagem-container">
+    <div class="imagem-container" (click)="abrirZoom()" title="Clique para ampliar">
       <img [src]="'data:image/png;base64,' + imagemBase64" alt="Pairplot" />
+      <button type="button" class="btn-ampliar" (click)="$event.stopPropagation(); abrirZoom()"
+        aria-label="Ampliar o pairplot">
+        <mat-icon>zoom_in</mat-icon>
+      </button>
     </div>
     <div class="info">
       <span>Colunas: {{ colunasVisualizadas.join(', ') }}</span>
@@ -63,5 +67,29 @@
   <div class="erro" *ngIf="erro">
     <mat-icon>error</mat-icon>
     <span>{{ erro }}</span>
+  </div>
+
+  <!-- Zoom: abre em tamanho real com rolagem, para os eixos ficarem legíveis com muitas colunas.
+       Mesmo padrão do zoom das visualizações Yellowbrick (metrica-avaliacao). -->
+  <div class="pairplot-zoom-backdrop" *ngIf="ampliada" (click)="fecharZoom()">
+    <div class="pairplot-zoom-dialog" (click)="$event.stopPropagation()">
+      <div class="pairplot-zoom-header">
+        <div class="titulo">
+          <strong>Pairplot — Matriz de dispersão</strong>
+          <span>{{ colunasVisualizadas.length }} colunas · {{ totalAmostras }} amostras</span>
+        </div>
+        <div class="acoes">
+          <button type="button" class="btn-secundario" (click)="alternarTamanho()">
+            {{ tamanhoReal ? 'Ajustar à tela' : 'Tamanho real' }}
+          </button>
+          <button mat-icon-button aria-label="Fechar zoom" (click)="fecharZoom()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+      <div class="pairplot-zoom-corpo" [class.ajustar]="!tamanhoReal">
+        <img [src]="'data:image/png;base64,' + imagemBase64" alt="Pairplot ampliado" />
+      </div>
+    </div>
   </div>
 </div>

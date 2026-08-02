@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import tutor from '../../constants/tutor.json';
 import { NivelTutor, NivelTutorService } from '../../service/nivel-tutor.service';
+import { conteudoParaItemInfo } from './conteudo-to-item-info';
 
 export interface TutorContexto {
   titulo: string;
@@ -91,8 +91,27 @@ export class TutorComponent implements OnChanges {
   /** O pai limpa o que é dele (item/pipeline) e recarrega o texto de boas-vindas. */
   @Output() voltarInicio = new EventEmitter<void>();
 
-  tutor = tutor;
   objectKeys = Object.keys;
+
+  /** Info derivada do item selecionado (modelo/métrica) quando o pai não passa `tutorItemInfo`.
+   *
+   *  Fonte: o `conteudo` do catálogo, no banco — a MESMA que alimenta o card de item. Antes o
+   *  painel montava um `contexto` paralelo a partir de `constants/tutor.json`, e as duas fontes
+   *  diziam a mesma coisa com outras palavras: "Como pensar nesse modelo" repetia a Intuição, e
+   *  "Como funciona" repetia o "Passo a passo" (apontado pela banca, Imagens 7 e 8). Com uma
+   *  fonte só a repetição deixa de ser possível. */
+  infoDerivada: TutorItemInfo | null = null;
+
+  /** O que o bloco de item renderiza: o que o pai passou ou, na falta, o derivado do catálogo. */
+  get infoExibida(): TutorItemInfo | null {
+    return this.tutorItemInfo ?? this.infoDerivada;
+  }
+
+  /** True quando o painel mostra a ficha de UM item (o "informativo"); false quando mostra o
+   *  texto do tutor (boas-vindas ou a explicação da etapa). Governa a faixa de identificação. */
+  get ehInformativo(): boolean {
+    return !!this.infoExibida;
+  }
 
   constructor(private nivelTutor: NivelTutorService) { }
 
@@ -122,11 +141,10 @@ export class TutorComponent implements OnChanges {
     return this.modoTutor === 'avancado';
   }
 
+  /** Texto do bloco "Em palavras simples", que só aparece quando NÃO há ficha de item.
+   *  Não cai mais na `intuicao` do item: era ela que reaparecia logo abaixo, no card Intuição. */
   getExplicacaoBasica(): string {
-    const texto = this.tutorItemInfo?.descricao
-      || this.contexto?.modelo?.intuicao
-      || this.contexto?.metrica?.intuicao
-      || this.contexto?.descricao
+    const texto = this.contexto?.descricao
       || this.tutorPipelineInfo?.descricao
       || '';
 
@@ -134,8 +152,6 @@ export class TutorComponent implements OnChanges {
   }
 
   getTituloBasico(): string {
-    if (this.contexto?.modelo) return 'Como pensar nesse modelo';
-    if (this.contexto?.metrica) return 'Como ler essa métrica';
     return 'Em palavras simples';
   }
 
@@ -157,43 +173,28 @@ export class TutorComponent implements OnChanges {
    *  é do pai (que também recarrega as boas-vindas). */
   irParaInicio(): void {
     this.contexto = null;
+    // Sem isto o painel não volta: a ficha derivada do item continuaria na tela, porque ela só é
+    // recalculada quando `modeloSelecionado` muda — e o pipeline do aluno segue com o modelo lá.
+    this.infoDerivada = null;
     this.voltarInicio.emit();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['modeloSelecionado'] && this.modeloSelecionado && !this.tutorItemInfo) {
-      this.buildModeloContexto();
+    // O modelo tem precedência sobre a métrica, como antes: quem acabou de ser escolhido na raia
+    // de treino é o que o aluno está olhando.
+    if (changes['modeloSelecionado'] && this.modeloSelecionado) {
+      this.infoDerivada = this.derivarInfo(this.modeloSelecionado);
     }
-    if (changes['metricaSelecionada'] && this.metricaSelecionada && !this.tutorItemInfo && !this.contexto?.modelo) {
-      this.buildMetricaContexto();
+    if (changes['metricaSelecionada'] && this.metricaSelecionada && !this.modeloSelecionado) {
+      this.infoDerivada = this.derivarInfo(this.metricaSelecionada);
     }
   }
 
-  private buildModeloContexto(): void {
-    const modeloKey = this.modeloSelecionado?.valor;
-    const modelos = this.tutor.modelos as any;
-    const modeloInfo = modelos?.[modeloKey];
-    if (!modeloInfo) return;
-
-    this.contexto = {
-      titulo: modeloInfo.nome,
-      descricao: modeloInfo.descricao,
-      itens: modeloInfo.comoFunciona,
-      modelo: modeloInfo
-    };
-  }
-
-  private buildMetricaContexto(): void {
-    const metricaKey = this.metricaSelecionada?.valor;
-    const metricas = this.tutor.metricas as any;
-    const metricaInfo = metricas?.[metricaKey];
-    if (!metricaInfo) return;
-
-    this.contexto = {
-      titulo: metricaInfo.nome,
-      descricao: metricaInfo.descricao,
-      itens: metricaInfo.quandoUsar || metricaInfo.comoLer,
-      metrica: metricaInfo
-    };
+  /** Item do catálogo → ficha do tutor. Sem `conteudo` não há o que mostrar (nenhum stub: o
+   *  catálogo em produção tem `conteudo` nos 24 modelos e nas 12 métricas). */
+  private derivarInfo(item: any): TutorItemInfo | null {
+    const conteudo = item?.conteudo;
+    if (!conteudo) return null;
+    return conteudoParaItemInfo(conteudo, item?.label || item?.valor || '');
   }
 }

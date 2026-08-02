@@ -25,6 +25,27 @@ export class VisualizacaoDadosComponent implements OnInit {
   carregando = false;
   erro = '';
 
+  /** Zoom da figura. Com muitas colunas o pairplot fica ilegível encaixotado na largura do modal
+   *  (apontado pela banca, Imagem 5) — e só ampliar "até caber na tela" não resolve, porque a
+   *  matriz cresce ao quadrado do número de colunas. Por isso o zoom abre em TAMANHO REAL, com
+   *  rolagem, e o botão alterna para "ajustar à tela" quando o aluno quer a visão geral. */
+  ampliada = false;
+  tamanhoReal = true;
+
+  abrirZoom(): void {
+    if (!this.imagemBase64) return;
+    this.ampliada = true;
+    this.tamanhoReal = true;
+  }
+
+  fecharZoom(): void {
+    this.ampliada = false;
+  }
+
+  alternarTamanho(): void {
+    this.tamanhoReal = !this.tamanhoReal;
+  }
+
   constructor(
     private dashboardService: DashboardService,
     private sessionService: SessionService,

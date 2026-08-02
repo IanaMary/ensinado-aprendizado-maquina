@@ -27,6 +27,55 @@
   }
 }
 
+// Faixa que identifica o conteúdo aberto: Tutor (roxo, a cor do assistente) x Informativo
+// (verde, a mesma família dos cards de conteúdo). Cor + ícone + nome do item, porque só a cor
+// não serve a quem não a distingue.
+.painel-identidade {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba($roxo-claro, 0.7);
+  background: $roxo-fundo;
+  color: $roxo-escuro;
+  min-width: 0;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .painel-tipo {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex: 0 0 auto;
+  }
+
+  // Nome do item: pode ser longo, então corta com elipse em vez de esticar a faixa.
+  .painel-alvo {
+    font-size: 11px;
+    color: $cinza-escuro;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+
+    &::before {
+      content: '· ';
+    }
+  }
+
+  &.e-informativo {
+    border-color: rgba(#2e7d32, 0.45);
+    background: rgba(#2e7d32, 0.08);
+    color: #2e7d32;
+  }
+}
+
 .tutor-mode {
   display: grid;
   grid-template-columns: 1fr 1fr;
