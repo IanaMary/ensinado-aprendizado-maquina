@@ -791,7 +791,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
       return {
         titulo: item.label,
         descricao: item.resumo || 'Modelo de aprendizado de máquina para treinamento.',
-        dicas: ['Selecione o modelo e configure os hiperparametros', 'Clique em Treinar para iniciar o processo']
+        dicas: ['Selecione o modelo e configure os hiperparâmetros', 'Clique em Treinar para iniciar o processo']
       };
     }
 
@@ -799,8 +799,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     if (tipo === 'metrica') {
       return {
         titulo: item.label,
-        descricao: item.resumo || 'Metrica de avaliacao do modelo.',
-        dicas: ['Selecione as metricas para avaliar o modelo']
+        descricao: item.resumo || 'Métrica de avaliação do modelo.',
+        dicas: ['Selecione as métricas para avaliar o modelo']
       };
     }
 
