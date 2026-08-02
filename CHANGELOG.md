@@ -8,6 +8,44 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-02f (painel do tutor: uma fonte de conteúdo, identidade explícita e zoom no pairplot)
+
+> Terceira leva da revisão da banca: Imagens 5, 6, 7 e 8. Suíte **228** passed (6 casos novos) +
+> build. Só frontend.
+
+### Corrigido — repetição de conteúdo (Imagens 7 e 8)
+- **O painel lia o modelo de DUAS fontes**: o `conteudo` do catálogo (banco) e o
+  `src/app/constants/tutor.json`. As duas diziam a mesma coisa com outras palavras — "Como pensar
+  nesse modelo" repetia a **Intuição**, e "Como funciona" repetia o "Passo a passo".
+- Agora existe **uma fonte só**: `TutorComponent.infoExibida` é o que o pai passou **ou** o
+  derivado do `conteudo` do item selecionado (`derivarInfo` → `conteudoParaItemInfo`, o mesmo
+  mapeamento que o card de item já usava). Os blocos "CONTEXTO DO MODELO" e "CONTEXTO DA MÉTRICA"
+  (169 linhas de template) saíram — com uma fonte só, a repetição deixou de ser possível.
+- **A numeração dupla "1. 1." foi embora com eles**: os textos de `passoAPasso` no JSON já vinham
+  numerados ("1. Treina um classificador fraco") e o `<ol>` numerava de novo.
+- `getExplicacaoBasica()` não cai mais na `intuicao` do item — era ela que reaparecia no card
+  Intuição logo abaixo. E `getTituloBasico()` deixou de ter os títulos por tipo, que só existiam
+  para rotular a repetição.
+- **O `tutor.json` NÃO foi aposentado**: ele segue alimentando os hiperparâmetros do
+  `tipos-classificadores` e textos de etapa no `execucoes`/`coleta-dado`. O que mudou é que o
+  painel do tutor não o lê mais para modelo/métrica.
+
+### Adicionado — o painel diz o que está aberto (Imagem 6)
+Faixa de identificação no topo: **Tutor** (roxo, ícone do assistente) × **Informativo** (verde,
+ícone de livro) — mais o **nome do item** ao lado, cortado com elipse. Os dois conteúdos ocupam a
+mesma região, e abrir o informativo escondia o tutor sem aviso. Cor **e** ícone **e** texto, porque
+só a cor não serve a quem não a distingue.
+
+### Adicionado — zoom no pairplot (Imagem 5)
+Botão de lupa sobre a figura (e clique na própria imagem) abre a matriz em **tamanho real com
+rolagem**, com alternância para "Ajustar à tela". Tamanho real é o padrão de propósito: a matriz
+cresce ao quadrado do número de colunas, então "caber na tela" é justamente o que deixa os eixos
+ilegíveis. Mesmo padrão visual do zoom das visualizações Yellowbrick.
+
+### Verificado e não alterado
+A **diagonal do pairplot está correta** — é a densidade (KDE) de cada variável, não "massa ×
+massa". O relato inicial da Imagem 5 era de interpretação; o pedido real era o zoom.
+
 ## 2026-08-02e (pré-processamento não aponta mais para o alvo)
 
 > Parte da correção da Imagem 9 (ver changelog do backend, entrada 2026-08-02b, para o conjunto

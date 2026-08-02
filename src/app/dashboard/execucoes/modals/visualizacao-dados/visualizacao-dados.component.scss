@@ -74,16 +74,114 @@
 }
 
 .imagem-container {
+  position: relative;
   border: 1px solid $roxo-claro;
   border-radius: 8px;
   background: $branco;
   overflow: hidden;
+  cursor: zoom-in;
 
   img {
     display: block;
     width: 100%;
     max-height: 560px;
     object-fit: contain;
+  }
+
+  .btn-ampliar {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid $roxo-claro;
+    border-radius: 6px;
+    background: rgba($branco, 0.92);
+    color: $roxo-escuro;
+    cursor: zoom-in;
+
+    &:hover {
+      background: $roxo-fundo;
+    }
+  }
+}
+
+.pairplot-zoom-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(#000, 0.72);
+  cursor: zoom-out;
+}
+
+.pairplot-zoom-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(1400px, 96vw);
+  max-height: 94vh;
+  border-radius: 8px;
+  background: $branco;
+  box-shadow: 0 18px 60px rgba(#000, 0.35);
+  cursor: default;
+  overflow: hidden;
+}
+
+.pairplot-zoom-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid $roxo-claro;
+  background: $roxo-fundo;
+  color: $roxo-escuro;
+
+  .titulo {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    span {
+      font-size: 11px;
+      color: $cinza-escuro;
+    }
+  }
+
+  .acoes {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+}
+
+// Tamanho real + rolagem é o padrão: é o que torna os eixos legíveis quando a matriz tem muitas
+// colunas. `.ajustar` volta à visão geral (a figura inteira caber na área).
+.pairplot-zoom-corpo {
+  overflow: auto;
+  background: $branco;
+
+  img {
+    display: block;
+    max-width: none;
+  }
+
+  &.ajustar {
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      max-height: calc(94vh - 64px);
+      object-fit: contain;
+    }
   }
 }
 
