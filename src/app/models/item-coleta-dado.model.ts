@@ -103,6 +103,9 @@ export interface ResultadoColetaDado {
   fonteDados?: 'arquivo' | 'dataset';
   nomeDataset?: string;
   datasetId?: string;
+  /** Semente que o servidor usou para GERAR o dataset sintético (blobs, moons, sorvete…).
+   *  É o que permite ao script exportado reproduzir exatamente os mesmos dados. */
+  datasetSeed?: number | null;
 }
 
 export interface InformacoesDados {

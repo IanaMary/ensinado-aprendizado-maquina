@@ -231,15 +231,25 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
   processarResultadoDataset(resultado: any) {
     // Configurar dados de treino
     this.treino.dados = resultado.dados;
-    this.treino.totalDados = resultado.total_dados;
+    // `total_dados` é o dataset INTEIRO; o treino é só a parte que ficou com o servidor.
+    // Usar o total aqui fazia a hint anunciar "Treino: 442 (70%) | Teste: 0 (30%)" — três
+    // números errados de uma vez, para uma divisão que na verdade foi 331/111.
+    this.treino.totalDados = resultado.num_linhas_treino ?? resultado.total_dados;
     this.treino.nomeArquivo = resultado.nome_dataset;
-    this.resultColetaDadoL.porcentagemTreino = 70;
+    // Quem divide o dataset de exemplo é o servidor; a tela só reflete o que ele fez
+    // (`test_size` na resposta). Fixar 70 aqui fazia a tela dizer 70/30, o treino rodar
+    // 75/25 e o script exportado reproduzir uma acurácia diferente da exibida.
+    this.resultColetaDadoL.porcentagemTreino = resultado.test_size
+      ? Math.round((1 - resultado.test_size) * 100)
+      : 70;
     this.resultColetaDadoL.embaralharDados = true;
     this.resultColetaDadoL.estratificarDados = false;
 
-    // Limpar dados de teste (toy datasets não têm arquivo de teste separado)
+    // Toy datasets não têm ARQUIVO de teste separado (por isso `nomeArquivo` vazio: é ele que
+    // sinaliza "o usuário trouxe uma planilha de teste"), mas têm um conjunto de teste, que o
+    // servidor separou — daí o total vir dele.
     this.teste.dados = [];
-    this.teste.totalDados = 0;
+    this.teste.totalDados = resultado.num_linhas_teste ?? 0;
     this.teste.nomeArquivo = '';
     this.teste.erro = '';
 
@@ -259,6 +269,7 @@ export class ColetaDadoComponent implements OnChanges, OnInit, OnDestroy {
     this.resultColetaDadoL.fonteDados = 'dataset';
     this.resultColetaDadoL.nomeDataset = resultado.nome_dataset;
     this.resultColetaDadoL.datasetId = resultado.id;
+    this.resultColetaDadoL.datasetSeed = resultado.seed ?? null;
 
     // Configurar target
     this.resultColetaDadoL.target = resultado.target;

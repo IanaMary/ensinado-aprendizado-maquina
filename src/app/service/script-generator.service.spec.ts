@@ -117,4 +117,90 @@ describe('ScriptGeneratorService', () => {
     expect(script).toContain('if __name__ == "__main__":');
     expect(script).toContain('modelo = ...  # Defina o modelo aqui');
   });
+
+  // A partir daqui: o script exportado tem de RODAR. Os testes acima checam substrings e por isso
+  // conviveram com quatro erros que impediam a execução (medidos rodando o zip baixado).
+
+  const datasetSklearn: ResultadoColetaDado = {
+    ...resultadoArquivo,
+    fonteDados: 'dataset',
+    nomeDataset: 'wine',
+    datasetId: 'wine',
+    porcentagemTreino: 75,
+  };
+
+  /** Nome em camelCase dentro de chaves = interpolação do TypeScript que vazou para a f-string
+   *  do Python. Foi assim que `{splitPct}` chegou ao aluno como NameError. */
+  const INTERPOLACAO_VAZADA = /\{[a-z]+[A-Z]\w*\}/;
+
+  it('não deixa interpolação do TypeScript vazar para dentro da f-string', () => {
+    const script = service.generatePythonScript(datasetSklearn, modeloKnn, metricas, {});
+
+    expect(script).not.toMatch(INTERPOLACAO_VAZADA);
+    expect(script).toContain('amostras (75%)');
+  });
+
+  it('indexa colunas do DataFrame com colchete duplo no pré-processamento', () => {
+    const preProc = { itens: [{ valor: 'standard_scaler', colunas: ['mass', 'width'] }] };
+
+    const script = service.generatePythonScript(datasetSklearn, modeloKnn, metricas, {}, preProc);
+
+    // `X_train["mass", "width"]` é uma chave de tupla para o pandas: KeyError.
+    expect(script).toContain('X_train[["mass", "width"]] = scaler.fit_transform(X_train[["mass", "width"]])');
+    expect(script).toContain('X_test[["mass", "width"]] = scaler.transform(X_test[["mass", "width"]])');
+  });
+
+  it('calcula as métricas de regressão, não só as importa', () => {
+    const metricasRegressao: ItemPipeline[] = [
+      { label: 'R²', valor: 'r2_score' } as ItemPipeline,
+      { label: 'MAE', valor: 'mean_absolute_error' } as ItemPipeline,
+      { label: 'MSE', valor: 'mean_squared_error' } as ItemPipeline,
+      { label: 'RMSE', valor: 'root_mean_squared_error' } as ItemPipeline,
+    ];
+    const modeloLinear = { ...modeloKnn, label: 'Regressão Linear', valor: 'regressao_linear' } as ItemPipeline;
+
+    const script = service.generatePythonScript(datasetSklearn, modeloLinear, metricasRegressao, {});
+
+    expect(script).toContain('r2 = r2_score(y_test, y_pred)');
+    expect(script).toContain('mae = mean_absolute_error(y_test, y_pred)');
+    expect(script).toContain('mse = mean_squared_error(y_test, y_pred)');
+    // RMSE pela raiz com numpy: `root_mean_squared_error` só existe no sklearn 1.4+.
+    expect(script).toContain('rmse = float(np.sqrt(');
+    expect(script).not.toContain('from sklearn.metrics import (r2_score, mean_absolute_error, mean_squared_error, root_mean_squared_error)');
+  });
+
+  it('gera selecionar_features sem y quando o modelo é de agrupamento', () => {
+    const modeloKmeans = {
+      ...modeloKnn, label: 'K-means', valor: 'k_means', dadosRotulados: false,
+    } as ItemPipeline;
+    const metricasAgrup: ItemPipeline[] = [
+      { label: 'Silhouette', valor: 'silhouette_score' } as ItemPipeline,
+    ];
+
+    const script = service.generatePythonScript(datasetSklearn, modeloKmeans, metricasAgrup, {});
+
+    // A execução principal chama com um argumento só; a definição tem de casar.
+    expect(script).toContain('def selecionar_features(X):');
+    expect(script).toContain('X_train, X_test = selecionar_features(X)');
+    expect(script).not.toContain('def selecionar_features(X, y):');
+  });
+
+  it('reproduz dataset sintético no próprio script, sem depender de CSV', () => {
+    const blobs: ResultadoColetaDado = {
+      ...resultadoArquivo,
+      fonteDados: 'dataset',
+      nomeDataset: 'Agrupamentos (blobs) gerados',
+      datasetId: 'gen_blobs',
+      datasetSeed: 42,
+    };
+    const modeloKmeans = {
+      ...modeloKnn, valor: 'k_means', dadosRotulados: false,
+    } as ItemPipeline;
+
+    const script = service.generatePythonScript(blobs, modeloKmeans, [], {});
+
+    expect(script).toContain('make_blobs(n_samples=300, n_features=2, centers=3, random_state=42)');
+    // Ler CSV aqui era FileNotFoundError: o zip não anexa CSV para dataset de exemplo.
+    expect(script).not.toContain('pd.read_csv("data/treino.csv")');
+  });
 });
