@@ -222,6 +222,72 @@ describe('ScriptGeneratorService', () => {
     expect(script).not.toContain('"ash"');
   });
 
+  // Divergências backend↔script achadas cruzando os 24 routers de `app/routers/` com os mapas
+  // do gerador: o script instanciava outra classe (ou outra configuração) da que treinou.
+
+  it('svm_linear é SVC com kernel linear, como o servidor treina', () => {
+    const modelo = { ...modeloKnn, label: 'SVM Linear', valor: 'svm_linear' } as ItemPipeline;
+
+    const script = service.generatePythonScript(datasetSklearn, modelo, metricas, {});
+
+    // `app/routers/svm_linear.py` passa SVC + kernel="linear". LinearSVC é outra formulação e
+    // dá outro resultado (medido no Wine: 0.9556 contra 0.9778).
+    expect(script).toContain('from sklearn.svm import SVC');
+    expect(script).toContain('modelo = SVC(kernel="linear")');
+    expect(script).not.toContain('LinearSVC');
+  });
+
+  it('reproduz os ajustes que o servidor fixa (max_iter do MLP e da regressão logística)', () => {
+    const mlp = { ...modeloKnn, valor: 'mlp' } as ItemPipeline;
+    const logistica = { ...modeloKnn, valor: 'regressao_logistica' } as ItemPipeline;
+
+    expect(service.generatePythonScript(datasetSklearn, mlp, metricas, {}))
+      .toContain('modelo = MLPClassifier(max_iter=500)');
+    expect(service.generatePythonScript(datasetSklearn, logistica, metricas, {}))
+      .toContain('modelo = LogisticRegression(max_iter=1000)');
+  });
+
+  it('o valor escolhido pelo aluno tem precedência sobre o que o servidor fixa', () => {
+    const mlp = { ...modeloKnn, valor: 'mlp' } as ItemPipeline;
+
+    const script = service.generatePythonScript(datasetSklearn, mlp, metricas, { max_iter: 50 });
+
+    expect(script).toContain('modelo = MLPClassifier(max_iter=50)');
+    expect(script).not.toContain('max_iter=500');
+  });
+
+  it('tira os hiperparâmetros do treino, ficando só nos que o catálogo expõe', () => {
+    // A resposta do treino traz o `get_params()` inteiro; o script deve mostrar o que o aluno vê.
+    const resultado = {
+      nome_modelo: 'k-NN', modelo: 'knn',
+      hiperparametros: { n_neighbors: 11, weights: 'distance', leaf_size: 30, algorithm: 'auto' },
+      hiperparametros_padrao: { n_neighbors: 5, weights: 'uniform' },
+    };
+
+    const hiper = (service as any).hiperparametrosDoTreino(resultado);
+
+    expect(hiper).toEqual({ n_neighbors: 11, weights: 'distance' });
+    expect((service as any).hiperparametrosDoTreino(undefined)).toEqual({});
+  });
+
+  it('cada ramo do multi-modelo sai com os seus próprios ajustes', () => {
+    const treinados = [
+      { nome_modelo: 'k-NN', modelo: 'knn',
+        hiperparametros: { n_neighbors: 11, leaf_size: 30 },
+        hiperparametros_padrao: { n_neighbors: 5 } },
+      { nome_modelo: 'Árvore', modelo: 'arvore_decisao',
+        hiperparametros: { max_depth: 4, splitter: 'best' },
+        hiperparametros_padrao: { max_depth: null } },
+    ];
+
+    const script = (service as any).generateMultiModelScript(datasetSklearn, treinados, metricas, undefined);
+
+    // Instanciar tudo no default apagava justamente a diferença que se quer comparar.
+    expect(script).toContain('"k-NN": KNeighborsClassifier(n_neighbors=11)');
+    expect(script).toContain('"Árvore": DecisionTreeClassifier(max_depth=4)');
+    expect(script).not.toContain('leaf_size');
+  });
+
   it('gera o import de pré-processamento com parênteses no script multi-modelo', () => {
     const treinados = [
       { nome_modelo: 'k-NN', modelo: 'knn' },
@@ -238,6 +304,82 @@ describe('ScriptGeneratorService', () => {
     // chegava a rodar.
     expect(script).toContain('from sklearn.preprocessing import (');
     expect(script).not.toMatch(/import StandardScaler[^\n]*,\n/);
+  });
+
+  it('serializa booleano como True/False, não como true/false', () => {
+    const script = service.generatePythonScript(datasetSklearn, modeloKnn, metricas, {
+      shrinking: true, warm_start: false, n_neighbors: 3, weights: 'distance',
+    });
+
+    // `String(true)` é `"true"`, que em Python é NameError. Atingia todo modelo com booleano.
+    expect(script).toContain('shrinking=True, warm_start=False, n_neighbors=3, weights="distance"');
+    expect(script).not.toMatch(/=(true|false)[,)]/);
+  });
+
+  it('dataset do UCI: carrega `data.original` e usa o alvo escolhido na tela', () => {
+    const uci: ResultadoColetaDado = {
+      ...datasetSklearn, nomeDataset: 'heart_failure', datasetId: 'heart_failure',
+      target: 'death_event',
+      colunas: ['age', 'serum_sodium', 'death_event'],
+      atributos: { age: true, serum_sodium: true, death_event: false },
+    };
+
+    const script = service.generatePythonScript(uci, modeloKnn, metricas, {});
+
+    // `data.features` deixa de fora a coluna que o UCI declara como alvo — e a tela, que lista as
+    // colunas de `original`, permite marcá-la. Daí `KeyError: "['death_event'] not in index"`.
+    expect(script).toContain('df = dados.data.original');
+    expect(script).toContain('y = df["death_event"]');
+    expect(script).toContain('X = df.drop(columns=["death_event"])');
+    expect(script).not.toContain('dados.data.features');
+  });
+
+  it('alvo dos datasets de classificação do sklearn vem pelo nome da classe', () => {
+    const script = service.generatePythonScript(datasetSklearn, modeloKnn, metricas, {});
+
+    // A plataforma troca o inteiro pelo rótulo; sem isso a matriz de confusão do script sai com
+    // outros rótulos — e no breast_cancer em outra ordem, ficando transposta.
+    expect(script).toContain('y = dados.target.map(dict(enumerate(dados.target_names)))');
+  });
+
+  it('regressão não mapeia o alvo para nome de classe', () => {
+    const diabetes: ResultadoColetaDado = {
+      ...datasetSklearn, nomeDataset: 'diabetes', datasetId: 'diabetes', preverCategoria: false,
+    };
+
+    const script = service.generatePythonScript(diabetes, modeloKnn, metricas, {});
+
+    expect(script).toContain('y = dados.target');
+    expect(script).not.toContain('target_names');
+  });
+
+  it('PCA é avaliado por variância explicada, não por métrica de agrupamento', () => {
+    const pca = { ...modeloKnn, label: 'PCA', valor: 'pca', dadosRotulados: false } as ItemPipeline;
+
+    // O catálogo do PCA tem `metricas: []` — é o caso nominal, e era onde o script quebrava.
+    const script = service.generatePythonScript(datasetSklearn, pca, [], {});
+
+    expect(script).toContain('def avaliar_modelo(modelo, X_test):');
+    expect(script).toContain('X_reduzido = modelo.transform(X_test)');
+    expect(script).toContain('explained_variance_ratio_');
+    // PCA não tem `predict`: era `AttributeError`.
+    expect(script).not.toContain('modelo.predict(X_test)');
+  });
+
+  it('comparação não mistura tarefas: leva os modelos da coleta e diz quais ficaram fora', () => {
+    const treinados = [
+      { nome_modelo: 'k-NN', modelo: 'knn' },
+      { nome_modelo: 'K-means', modelo: 'k_means' },
+    ];
+
+    // Coleta COM alvo: a comparação é supervisionada.
+    const script = (service as any).generateMultiModelScript(datasetSklearn, treinados, metricas, undefined);
+
+    expect(script).toContain('"k-NN": KNeighborsClassifier');
+    expect(script).not.toContain('"K-means": KMeans');
+    expect(script).toContain('Fora desta comparação');
+    // O laço aplicava `fit(X_train)` a todos: `fit() missing 1 required argument: 'y'`.
+    expect(script).toContain('modelo.fit(X_train, y_train)');
   });
 
   it('sem semente do servidor, fixa uma e diz que os números não serão idênticos', () => {

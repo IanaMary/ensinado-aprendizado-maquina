@@ -244,9 +244,17 @@ export class MetricaAvaliacaoComponent implements OnChanges, OnInit {
     return typeof value === 'number';
   }
 
+  /** A métrica é do tipo "quanto MENOR, melhor"?
+   *
+   *  Decide pelo rótulo, que é a chave sob a qual os resultados chegam. `davies`/`bouldin` estão
+   *  na lista porque o Índice de Davies-Bouldin é o único do catálogo em que menor é melhor sem
+   *  ter "erro" no nome — sem ele, a estrela de melhor valor e o "Melhor modelo" do relatório
+   *  apontavam o PIOR agrupamento. Silhueta e Calinski-Harabasz são maior-é-melhor e ficam fora
+   *  de propósito. */
   isMetricaMenorMelhor(metrica: string): boolean {
     const chave = metrica.toLowerCase();
-    return ['mse', 'mae', 'rmse', 'erro', 'error', 'loss', 'perda', 'mean_squared', 'mean_absolute'].some(k => chave.includes(k));
+    return ['mse', 'mae', 'rmse', 'erro', 'error', 'loss', 'perda', 'mean_squared', 'mean_absolute',
+            'davies', 'bouldin'].some(k => chave.includes(k));
   }
 
   // Link para a pagina do Yellowbrick/sklearn de cada tipo de grafico.
