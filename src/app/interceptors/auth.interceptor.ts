@@ -32,7 +32,13 @@ export class AuthInterceptor implements HttpInterceptor {
       && !req.url.includes('/atividades');
 
     return next.handle(req).pipe(
-      tap(() => { if (contaComoUso) this.renovacao.aoUsar(); }),
+      // try/catch obrigatório: isto roda no caminho de TODAS as respostas. Uma exceção aqui
+      // viraria erro da requisição original — o app inteiro quebraria por causa da renovação,
+      // que é acessória. Renovar é "melhor esforço": se falhar, o token atual ainda vale.
+      tap(() => {
+        if (!contaComoUso) return;
+        try { this.renovacao.aoUsar(); } catch { /* nunca contamina a resposta */ }
+      }),
       catchError(err => {
         // Não redirecionar para login em endpoints públicos. /atividades é
         // telemetria fire-and-forget (flush em background): um 401 nela não deve
