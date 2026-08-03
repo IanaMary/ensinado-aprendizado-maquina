@@ -131,6 +131,19 @@ O aluno segue essas instruções à risca, e elas estavam erradas em quatro pont
 A linha de origem passou a sair do mesmo despacho que decide o carregamento (`descreverOrigem`),
 para não haver duas versões da verdade.
 
+### Corrigido — o relatório PDF perdia os marcadores de lista e pesava 12 MB
+
+Medido no PDF **baixado de produção**, com dois modelos:
+
+- **`•` e `—` saíam como espaço.** A fonte padrão do jsPDF (helvetica, codificação padrão) não tem
+  esses glifos: o aluno lia `" k-NN"` e `" O modelo acertou bem todas as classes…"` — listas **sem
+  marcador**, só um espaço solto — e `"Matriz de confusão  k-NN"`, com dois espaços onde havia o
+  travessão. Não era problema de acentuação (`ã`, `ç`, `ê` sobrevivem). Trocados por `-`.
+- **12,2 MB num relatório de dois modelos.** Os PNGs do Yellowbrick entram por `addImage` sem
+  recompressão e o documento era criado sem `compress`. Um boletim de 12 MB é hostil para anexar
+  por e-mail ou baixar em internet ruim. Agora `compress: true` nos dois PDFs (o relatório e o
+  promocional do Hub).
+
 ### Corrigido — a tabela do relatório PDF cortava texto sem avisar
 
 `splitTextToSize(...)[0]` ficava com a primeira linha e **descartava o resto em silêncio**: "MSE
