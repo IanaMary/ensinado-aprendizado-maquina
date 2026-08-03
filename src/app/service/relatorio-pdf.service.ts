@@ -71,6 +71,12 @@ export class RelatorioPdfService {
     const { jsPDF } = await this.load();
     // `compress: true`: os PNGs do Yellowbrick entram sem recompressão e um relatório de dois
     // modelos chegava a 11,7 MB — inviável de anexar por e-mail ou baixar em internet ruim.
+    //
+    // Sobre `•` e `—` no texto deste relatório: eles RENDERIZAM. O jsPDF declara as fontes core
+    // com `/Encoding /WinAnsiEncoding`, onde `•` é 0x95 e `—` é 0x97 — verificado nos bytes do
+    // PDF gerado. Houve um relato de que saíam como espaço; era erro da instrumentação que o
+    // mediu (`String.fromCharCode(0x95)` dá um caractere de controle invisível). Não troque por
+    // ASCII sem antes conferir o `/Encoding` do PDF de verdade.
     const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
     const M = 15;
     const W = doc.internal.pageSize.getWidth();
@@ -117,7 +123,7 @@ export class RelatorioPdfService {
     doc.text('Relatório do experimento', M, 14);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
-    doc.textWithLink(`${HUB_NOME} - ia.ufpel.edu.br`, M, 21, { url: HUB_URL });
+    doc.textWithLink(`${HUB_NOME} — ia.ufpel.edu.br`, M, 21, { url: HUB_URL });
     y = 34;
 
     if (input.nomeExperimento) texto(`Experimento: ${input.nomeExperimento}`, { size: 13, style: 'bold', color: ROXO });
@@ -127,7 +133,7 @@ export class RelatorioPdfService {
       texto(input.pergunta, { gap: 2 });
     }
     texto('Modelos avaliados', { size: 12, style: 'bold', color: ROXO });
-    texto(input.modelos.map(m => `- ${m}`).join('\n'));
+    texto(input.modelos.map(m => `• ${m}`).join('\n'));
     if (input.melhorModelo) texto(`Melhor modelo (mais métricas ganhas): ${input.melhorModelo}`, { style: 'bold', gap: 2 });
 
     // Tabela de métricas (desenhada à mão — sem depender de jspdf-autotable, cujo
@@ -170,7 +176,7 @@ export class RelatorioPdfService {
     if (input.observacoes.length) {
       garantir(12);
       texto('O que observar', { size: 12, style: 'bold', color: ROXO });
-      texto(input.observacoes.map(o => `- ${o}`).join('\n'), { gap: 2 });
+      texto(input.observacoes.map(o => `• ${o}`).join('\n'), { gap: 2 });
     }
 
     // Gráficos: imagem + discussão + dicas.
@@ -179,7 +185,7 @@ export class RelatorioPdfService {
       texto('Visualizações', { size: 13, style: 'bold', color: ROXO, gap: 1 });
       for (const g of input.graficos) {
         garantir(12);
-        texto(`${g.titulo} - ${g.modelo}`, { size: 11, style: 'bold', color: ROXO });
+        texto(`${g.titulo} — ${g.modelo}`, { size: 11, style: 'bold', color: ROXO });
         try {
           const props = doc.getImageProperties(g.dataUrl);
           const ratio = props.height / props.width;
@@ -193,7 +199,7 @@ export class RelatorioPdfService {
         if (g.discussao) texto(g.discussao, { size: 10 });
         if (g.dicas?.length) {
           texto('Dicas', { size: 10, style: 'bold', color: ROXO });
-          texto(g.dicas.map(d => `- ${d}`).join('\n'), { size: 10 });
+          texto(g.dicas.map(d => `• ${d}`).join('\n'), { size: 10 });
         }
         y += 4;
       }
@@ -244,7 +250,7 @@ export class RelatorioPdfService {
     doc.setFontSize(11);
     const descricao =
       'O H2IA reúne pesquisa, ensino e extensão em Inteligência Artificial na UFPel. ' +
-      'O H2IA Tutor, a plataforma que gerou este pipeline, nasceu aqui para ensinar ' +
+      'O H2IA Tutor — a plataforma que gerou este pipeline — nasceu aqui, para ensinar ' +
       'aprendizado de máquina na prática, da coleta de dados à avaliação de modelos.';
     for (const ln of doc.splitTextToSize(descricao, W - 60)) {
       doc.text(ln, W / 2, y, { align: 'center' });

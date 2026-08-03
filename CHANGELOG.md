@@ -131,18 +131,21 @@ O aluno segue essas instruções à risca, e elas estavam erradas em quatro pont
 A linha de origem passou a sair do mesmo despacho que decide o carregamento (`descreverOrigem`),
 para não haver duas versões da verdade.
 
-### Corrigido — o relatório PDF perdia os marcadores de lista e pesava 12 MB
+### Corrigido — o relatório PDF de dois modelos pesava 12 MB
 
-Medido no PDF **baixado de produção**, com dois modelos:
+Medido no arquivo **baixado de produção**: `12.218.927` bytes. Os PNGs do Yellowbrick entram por
+`addImage` sem recompressão e o documento era criado sem `compress`. Um boletim de 12 MB é hostil
+para anexar por e-mail ou baixar em internet ruim. Agora `compress: true` nos dois PDFs (o
+relatório e o promocional do Hub).
 
-- **`•` e `—` saíam como espaço.** A fonte padrão do jsPDF (helvetica, codificação padrão) não tem
-  esses glifos: o aluno lia `" k-NN"` e `" O modelo acertou bem todas as classes…"` — listas **sem
-  marcador**, só um espaço solto — e `"Matriz de confusão  k-NN"`, com dois espaços onde havia o
-  travessão. Não era problema de acentuação (`ã`, `ç`, `ê` sobrevivem). Trocados por `-`.
-- **12,2 MB num relatório de dois modelos.** Os PNGs do Yellowbrick entram por `addImage` sem
-  recompressão e o documento era criado sem `compress`. Um boletim de 12 MB é hostil para anexar
-  por e-mail ou baixar em internet ruim. Agora `compress: true` nos dois PDFs (o relatório e o
-  promocional do Hub).
+### Correção de registro — os marcadores de lista do PDF nunca estiveram quebrados
+
+Uma verificação anterior relatou que `•` e `—` saíam como espaço no PDF, e a troca por `-` chegou a
+ser publicada. **Era erro da instrumentação que mediu**, não do produto: o jsPDF declara as fontes
+core com `/Encoding /WinAnsiEncoding`, onde `•` é `0x95` e `—` é `0x97` — e os bytes estão no PDF.
+Quem mediu usou `String.fromCharCode(0x95)`, que produz um caractere de controle **invisível**, e
+procurou a forma escapada (`\225`) quando o byte estava cru. Os glifos foram restaurados e o
+motivo ficou registrado no código, para ninguém "corrigir" isso de novo sem olhar o `/Encoding`.
 
 ### Corrigido — a tabela do relatório PDF cortava texto sem avisar
 
