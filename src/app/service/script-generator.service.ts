@@ -1024,11 +1024,11 @@ export class ScriptGeneratorService {
       'digits': { importLine: 'load_digits(as_frame=True)', rotulosDeClasse: true },
       'diabetes': { importLine: 'load_diabetes(as_frame=True)' },
       'california_housing': { importLine: 'fetch_california_housing(as_frame=True)' },
+      // Sem `colunas`: o Titanic entrega as 13 do OpenML, como a plataforma (`OPENML_SPECS` com
+      // `colunas: None`) — inclusive `boat`/`body`, que são vazamento e estão expostas de
+      // propósito, para ensinar. Quem recorta é a seleção de atributos do aluno.
       // O alvo já vem como rótulo ('0'/'1'), então NÃO passa pelo mapa de `target_names`.
-      'titanic': {
-        importLine: 'fetch_openml("titanic", version=1, as_frame=True)',
-        colunas: ['pclass', 'sex', 'age', 'sibsp', 'parch', 'fare', 'embarked'],
-      },
+      'titanic': { importLine: 'fetch_openml("titanic", version=1, as_frame=True)' },
     };
     return map[nome] ?? null;
   }
