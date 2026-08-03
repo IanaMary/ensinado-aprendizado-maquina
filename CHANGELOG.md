@@ -12,15 +12,20 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 > Correções encontradas **na própria verificação** do deploy 02g. Suíte **242** passed + build.
 
-### Corrigido — o atalho "Carregar dados" só funcionava no segundo clique
+### Endurecido — o atalho "Carregar dados" não depende mais do instante do clique
 O fix de 02g lia o catálogo de Coleta com `take(1)`. Como `getItensColetasDados()` é um
-`BehaviorSubject` que **começa vazio**, um clique logo depois de a tela abrir pegava `[]` e o botão
-não fazia nada — exatamente o defeito que ele deveria consertar, só mais raro. **Medido em
-produção:** 1º clique sem efeito, 2º abrindo o modal.
+`BehaviorSubject` que **começa vazio**, ler o valor atual é frágil por construção. Agora ele
+**espera** o primeiro valor não-vazio (`filter` + `take(1)`), com `timeout(5000)` para o clique
+nunca morrer em silêncio. Spec novo reproduz a corrida com um `BehaviorSubject` que emite `[]` e
+depois a lista.
 
-Agora ele **espera** o primeiro valor não-vazio (`filter` + `take(1)`), com `timeout(5000)` para o
-clique nunca morrer em silêncio: se o catálogo não chegar, o aluno recebe um aviso. O spec novo
-reproduz a corrida com um `BehaviorSubject` que emite `[]` e depois a lista.
+**Correção de registro:** eu havia atribuído a essa corrida um sintoma observado em produção
+("1º clique sem efeito, 2º funcionando"). **Provavelmente não era isso.** `carregarDados()` roda no
+`ngOnInit` do `dashboard.component`, então a lista chega em centenas de ms e um clique humano sempre
+a encontra pronta; e o mesmo bundle abriu de primeira quando o clique foi disparado via
+`element.click()` em vez das coordenadas da automação. A proteção acima continua correta — ler o
+estado inicial de um BehaviorSubject é defeito latente —, mas o sintoma que me levou a ela era
+quase certamente **artefato do clique automatizado**, não do produto.
 
 ### Blindado — a renovação de sessão não pode contaminar a resposta
 O gancho no `AuthInterceptor` roda no caminho de **todas** as respostas. Envolvido em `try/catch`:
