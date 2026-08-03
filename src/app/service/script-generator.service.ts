@@ -389,26 +389,59 @@ export class ScriptGeneratorService {
     return [headers.join(','), ...rows].join('\n');
   }
 
+  /** De onde o SCRIPT tira os dados, em uma frase. Espelha o despacho de
+   *  `generateDataLoadingFunction` — as quatro saídas possíveis, na mesma ordem. */
+  private descreverOrigem(resultado: ResultadoColetaDado | undefined): string {
+    if (resultado?.fonteDados !== 'dataset' || !resultado.nomeDataset) {
+      const nome = resultado?.treino?.nomeArquivo;
+      return nome ? `Arquivo enviado por você (\`${nome}\`), incluído em \`data/\``
+                  : 'Arquivos CSV incluídos em `data/`';
+    }
+    const chave = resultado.datasetId ?? resultado.nomeDataset;
+    if (this.getToyDatasetLoader(chave)) {
+      return `Dataset de exemplo '${resultado.nomeDataset}' do scikit-learn (carregado via \`as_frame=True\`)`;
+    }
+    const uciId = this.getUciDatasetId(chave);
+    if (uciId !== null) {
+      return `Dataset '${resultado.nomeDataset}' do UCI Machine Learning Repository (baixado com \`fetch_ucirepo(id=${uciId})\`)`;
+    }
+    if (this.getGeradorSintetico(chave, resultado.datasetSeed)) {
+      return `Dataset sintético '${resultado.nomeDataset}', GERADO pelo próprio script (mesma semente da plataforma)`;
+    }
+    return `Dataset de exemplo '${resultado.nomeDataset}', com os dados incluídos em \`data/\``;
+  }
+
   private generateReadme(modelo: ItemPipeline | undefined, resultado: ResultadoColetaDado | undefined, modelosTreinados?: any[], temModelo = false): string {
     const lines: string[] = [];
+    // No modo comparação o zip põe cada modelo em `modelos/<slug>/` (ver `anexarModeloTreinado`),
+    // então a árvore e os comandos precisam desse prefixo. Sem isto o README mandava rodar
+    // `python usar_modelo_joblib.py` num arquivo que não existe na raiz.
+    const isMulti = !!modelosTreinados && modelosTreinados.length > 1;
+    const prefixoModelo = isMulti ? 'modelos/<nome-do-modelo>/' : '';
+
     lines.push('# Pipeline de Aprendizado de Máquina - H2IA Tutor');
     lines.push('');
     lines.push('## Estrutura do Projeto');
     lines.push('');
     lines.push('```');
     lines.push('pipeline_iana/');
-    if (resultado?.fonteDados === 'dataset') {
-      lines.push('├── pipeline.py          # Script principal do pipeline');
-    } else {
-      lines.push('├── pipeline.py          # Script principal do pipeline');
+    lines.push('├── pipeline.py          # Script principal do pipeline');
+    // Os CSVs entram no zip quando o SCRIPT vai lê-los, não quando a fonte é upload — a árvore
+    // segue a mesma regra do anexo (`scriptLeCsv`), senão anuncia arquivos que não existem
+    // (ou omite os que existem, no caso de um dataset de exemplo sem loader conhecido).
+    if (this.scriptLeCsv(resultado)) {
       lines.push('├── data/');
-      lines.push('│   ├── treino.csv       # Dados de treino');
-      lines.push('│   └── teste.csv        # Dados de teste');
+      if (resultado?.treino?.dados?.length) {
+        lines.push('│   ├── treino.csv       # Dados de treino');
+      }
+      if (resultado?.teste?.dados?.length) {
+        lines.push('│   └── teste.csv        # Dados de teste');
+      }
     }
     if (temModelo) {
-      lines.push('├── modelo/              # Modelo JÁ treinado (formato MLflow)');
-      lines.push('├── usar_modelo_mlflow.py # Carrega o modelo via MLflow e faz uma previsão');
-      lines.push('├── usar_modelo_joblib.py # Carrega o modelo via joblib (sem MLflow) e faz uma previsão');
+      lines.push(`├── ${prefixoModelo}modelo/              # Modelo JÁ treinado (formato MLflow)`);
+      lines.push(`├── ${prefixoModelo}usar_modelo_mlflow.py # Carrega o modelo via MLflow e faz uma previsão`);
+      lines.push(`├── ${prefixoModelo}usar_modelo_joblib.py # Carrega o modelo via joblib (sem MLflow) e faz uma previsão`);
     }
     lines.push('├── hub-ia.pdf           # Conheça o Hub de Inovação em IA (ia.ufpel.edu.br)');
     lines.push('└── README.md            # Este arquivo');
@@ -419,7 +452,11 @@ export class ScriptGeneratorService {
     lines.push('1. Certifique-se de ter Python 3.7+ instalado');
     lines.push('2. Instale as dependências:');
     lines.push('   ```bash');
-    lines.push('   pip install pandas numpy scikit-learn');
+    // `ucimlrepo` é obrigatório quando o script baixa do UCI — sem ela o aluno segue o README à
+    // risca e recebe `ModuleNotFoundError: No module named 'ucimlrepo'`.
+    const precisaUci = resultado?.fonteDados === 'dataset'
+      && this.getUciDatasetId(resultado.datasetId ?? resultado.nomeDataset ?? '') !== null;
+    lines.push(`   pip install pandas numpy scikit-learn${precisaUci ? ' ucimlrepo' : ''}`);
     lines.push('   ```');
     lines.push('3. Execute o pipeline:');
     lines.push('   ```bash');
@@ -433,6 +470,11 @@ export class ScriptGeneratorService {
       lines.push('`model.pkl` e `requirements.txt`). Há DUAS formas de usá-lo:');
       lines.push('');
       lines.push('```bash');
+      if (isMulti) {
+        lines.push('# Cada modelo comparado tem a sua pasta; entre na do modelo que quer usar:');
+        lines.push('cd modelos/<nome-do-modelo>');
+        lines.push('');
+      }
       lines.push('pip install -r modelo/requirements.txt   # mesmas versões do treino');
       lines.push('');
       lines.push('# Opção 1 — via joblib (mais simples, sem dependência extra):');
@@ -444,7 +486,9 @@ export class ScriptGeneratorService {
       lines.push('```');
       lines.push('');
       lines.push('> Edite os valores de exemplo nos `usar_modelo_*.py` para os seus dados.');
-      lines.push('> No modo comparação, cada modelo fica em `modelos/<nome>/` com seus `usar_modelo_*.py`.');
+      if (isMulti) {
+        lines.push('> Os caminhos acima são relativos à pasta do modelo — rode de dentro dela.');
+      }
       lines.push('');
     }
 
@@ -465,10 +509,14 @@ export class ScriptGeneratorService {
     if (resultado) {
       lines.push('## Dados');
       lines.push('');
-      if (resultado.fonteDados === 'dataset') {
-        lines.push(`- **Origem:** Toy dataset '${resultado.nomeDataset}' do scikit-learn (carregado via as_frame=True)`);
+      // A origem vem do MESMO despacho de `generateDataLoadingFunction`, senão o README afirma
+      // "toy dataset do scikit-learn" para um dataset do UCI (que o script baixa com
+      // `fetch_ucirepo`) ou para um sintético (que o script GERA).
+      lines.push(`- **Origem:** ${this.descreverOrigem(resultado)}`);
+      // Em agrupamento não há alvo: a linha saía como "- **Target:** " sem valor nenhum.
+      if (resultado.target) {
+        lines.push(`- **Target:** ${resultado.target}`);
       }
-      lines.push(`- **Target:** ${resultado.target}`);
       lines.push(`- **Atributos:** ${Object.keys(resultado.atributos || {}).filter(k => resultado.atributos?.[k]).join(', ')}`);
       lines.push(`- **Divisão Treino/Teste:** ${resultado.porcentagemTreino || 70}/${100 - (resultado.porcentagemTreino || 70)}`);
       lines.push(`- **Embaralhar dados:** ${resultado.embaralharDados === false ? 'Não' : 'Sim'}`);

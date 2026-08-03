@@ -115,6 +115,28 @@ Também: **o zip do aluno não leva mais metadados do servidor** — `environmen
 lista `NVIDIA_API_KEY`, só o nome) sai do pacote e o `MLmodel` é saneado no backend, preservando o
 que o `load_model` precisa (verificado: o modelo saneado carrega e prevê o mesmo valor).
 
+### Corrigido — README do bundle mandava o aluno rodar o que não existe
+
+O aluno segue essas instruções à risca, e elas estavam erradas em quatro pontos:
+
+- **multi-modelo:** o README citava `modelo/` e `usar_modelo_*.py` na raiz, mas o zip põe cada
+  modelo em `modelos/<slug>/`. Agora a árvore e os comandos trazem o prefixo, com um `cd` antes.
+- **datasets do UCI:** dizia "Toy dataset do scikit-learn" (o script usa `fetch_ucirepo`) e o
+  `pip install` não incluía `ucimlrepo` — quem seguia o README recebia `ModuleNotFoundError`.
+- **datasets sintéticos:** mesma origem errada, quando o script GERA os dados.
+- **agrupamento:** saía a linha `- **Target:** ` sem valor, e `data/` era anunciado por um critério
+  diferente do que decide o anexo (agora os dois usam `scriptLeCsv`, e o CSV de teste só aparece
+  quando existe).
+
+A linha de origem passou a sair do mesmo despacho que decide o carregamento (`descreverOrigem`),
+para não haver duas versões da verdade.
+
+### Corrigido — a tabela do relatório PDF cortava texto sem avisar
+
+`splitTextToSize(...)[0]` ficava com a primeira linha e **descartava o resto em silêncio**: "MSE
+(Erro Quadrático Médio)" virava "MSE (Erro". Agora sai com "…" quando há mais texto — com 4+
+modelos a coluna aperta e isso vale para quase todo rótulo.
+
 ### Corrigido — "Melhor modelo" premiava o pior agrupamento
 
 `isMetricaMenorMelhor` decidia por substring do rótulo, e **Davies-Bouldin** é o único índice do
