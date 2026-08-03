@@ -5,7 +5,7 @@ import { ItemPipeline, MediaMetrica, ResultadoColetaDado } from '../../models/it
 import { ModalExecucaoComponent } from './modals/modal-execucao/modal-execucao.component';
 import { TutorContexto } from '../tutor/tutor.component';
 import { conteudoParaItemInfo } from '../tutor/conteudo-to-item-info';
-import { Subject, take, takeUntil } from 'rxjs';
+import { Subject, filter, take, takeUntil, timeout } from 'rxjs';
 import tutor from '../../constants/tutor.json';
 import { ScriptGeneratorService } from '../../service/script-generator.service';
 import { PipelineService, PipelineState } from '../../service/pipeline.service';
@@ -294,15 +294,22 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     // Área de Trabalho vazia é o caso NORMAL de quem acabou de abrir a atividade da turma — e era
     // aqui que o botão não fazia nada, porque o código assumia um card já na raia (apontado pela
     // banca, Imagem 14). Põe o item de Coleta na raia pelo mesmo caminho do arrastar e segue.
-    this.dashboardService.getItensColetasDados().pipe(take(1)).subscribe(itens => {
-      const item = (itens || [])[0];
-      if (!item) {
-        this.notificacao.aviso('Não consegui abrir a Coleta agora. Recarregue a página e tente de novo.');
-        return;
-      }
-      const naRaia = { ...item, movido: true };
-      this.dashboardService.movendoItemExecucao(naRaia);
-      this.abrirModalExecucao(naRaia);
+    // ESPERA o catálogo, não lê o valor atual: `getItensColetasDados()` é um BehaviorSubject que
+    // começa vazio, então um `take(1)` cru pega `[]` quando o clique vem logo depois de a tela
+    // abrir — e o botão não fazia nada no PRIMEIRO clique, só no segundo (medido em produção).
+    // O teto de tempo existe para o clique nunca morrer em silêncio, que era o defeito original.
+    this.dashboardService.getItensColetasDados().pipe(
+      filter(itens => !!itens?.length),
+      take(1),
+      timeout(5000),
+    ).subscribe({
+      next: itens => {
+        const naRaia = { ...itens[0], movido: true };
+        this.dashboardService.movendoItemExecucao(naRaia);
+        this.abrirModalExecucao(naRaia);
+      },
+      error: () => this.notificacao.aviso(
+        'Não consegui abrir a Coleta agora. Recarregue a página e tente de novo.'),
     });
   }
 

@@ -8,6 +8,25 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-02h (corrida no atalho de Coleta + blindagem da renovação)
+
+> Correções encontradas **na própria verificação** do deploy 02g. Suíte **242** passed + build.
+
+### Corrigido — o atalho "Carregar dados" só funcionava no segundo clique
+O fix de 02g lia o catálogo de Coleta com `take(1)`. Como `getItensColetasDados()` é um
+`BehaviorSubject` que **começa vazio**, um clique logo depois de a tela abrir pegava `[]` e o botão
+não fazia nada — exatamente o defeito que ele deveria consertar, só mais raro. **Medido em
+produção:** 1º clique sem efeito, 2º abrindo o modal.
+
+Agora ele **espera** o primeiro valor não-vazio (`filter` + `take(1)`), com `timeout(5000)` para o
+clique nunca morrer em silêncio: se o catálogo não chegar, o aluno recebe um aviso. O spec novo
+reproduz a corrida com um `BehaviorSubject` que emite `[]` e depois a lista.
+
+### Blindado — a renovação de sessão não pode contaminar a resposta
+O gancho no `AuthInterceptor` roda no caminho de **todas** as respostas. Envolvido em `try/catch`:
+uma exceção na renovação (acessória) transformaria qualquer requisição em erro. Quatro specs novos,
+inclusive um em que `aoUsar()` lança e a resposta **continua chegando**.
+
 ## 2026-08-02g (sair reinicia a aplicação, sessão se renova e botões que não respondiam)
 
 > 2ª leva da revisão da banca (Imagens 9-botão, 10, 11, 12, 14). Suíte **234** passed (6 novos) +
