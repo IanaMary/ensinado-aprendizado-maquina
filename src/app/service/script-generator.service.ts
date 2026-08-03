@@ -146,7 +146,11 @@ export class ScriptGeneratorService {
 
     folder.file('pipeline.py', script);
 
-    if (resultadoColetaDado?.fonteDados !== 'dataset') {
+    // Quem decide não é a fonte, é o SCRIPT: ele lê `data/*.csv` sempre que não souber
+    // reproduzir os dados sozinho (sem loader do sklearn, sem id do UCI, sem gerador
+    // sintético). Condicionar ao `fonteDados !== 'dataset'` deixava o zip de um dataset de
+    // exemplo não-sklearn sem CSV nenhum, com o script morrendo em FileNotFoundError.
+    if (this.scriptLeCsv(resultadoColetaDado)) {
       if (resultadoColetaDado?.treino?.dados && resultadoColetaDado.treino.dados.length > 0) {
         folder.file('data/treino.csv', this.convertToCsv(resultadoColetaDado.treino.dados));
       }
@@ -233,10 +237,17 @@ export class ScriptGeneratorService {
     }
     lines.push('');
 
+    // Precisa vir ANTES da geração das funções: a de seleção de features muda de assinatura
+    // em agrupamento (sem y), e é ela que a execução principal chama.
+    const isClustering = modelosTreinados.some(m => {
+      const cls = m.modelo ?? '';
+      return ['k_means', 'dbscan', 'agglomerative'].includes(cls);
+    });
+
     // Data loading
     lines.push(this.generateDataLoadingFunction(resultadoColetaDado));
     lines.push('');
-    lines.push(this.generateFeatureSelectionFunction(resultadoColetaDado));
+    lines.push(this.generateFeatureSelectionFunction(resultadoColetaDado, isClustering));
     lines.push('');
     lines.push(this.generatePreprocessingFunction(resultadoColetaDado, preProcessamentoConfig));
     lines.push('');
@@ -254,12 +265,6 @@ export class ScriptGeneratorService {
     }
     lines.push('}');
     lines.push('');
-
-    // Main
-    const isClustering = modelosTreinados.some(m => {
-      const cls = m.modelo ?? '';
-      return ['k_means', 'dbscan', 'agglomerative'].includes(cls);
-    });
 
     lines.push('# ============================================');
     lines.push('# Execução Principal');
@@ -450,10 +455,14 @@ export class ScriptGeneratorService {
     lines.push(imports.join('\n'));
     lines.push('');
 
+    // Declarado aqui (e não junto da execução principal) porque a seleção de features muda de
+    // assinatura em agrupamento — sem y — e é ela que a execução principal chama.
+    const isClustering = modeloSelecionado?.dadosRotulados === false;
+
     // Functions for each pipeline stage
     lines.push(this.generateDataLoadingFunction(resultadoColetaDado));
     lines.push('');
-    lines.push(this.generateFeatureSelectionFunction(resultadoColetaDado));
+    lines.push(this.generateFeatureSelectionFunction(resultadoColetaDado, isClustering));
     lines.push('');
     lines.push(this.generatePreprocessingFunction(resultadoColetaDado, preProcessamentoConfig));
     lines.push('');
@@ -468,7 +477,6 @@ export class ScriptGeneratorService {
     lines.push('# ============================================');
     lines.push('');
     lines.push('if __name__ == "__main__":');
-    const isClustering = modeloSelecionado?.dadosRotulados === false;
     if (resultadoColetaDado?.fonteDados === 'dataset' && resultadoColetaDado.nomeDataset) {
       const splitPct = resultadoColetaDado.porcentagemTreino || 70;
       const testPct = 100 - splitPct;
@@ -613,6 +621,11 @@ export class ScriptGeneratorService {
           case 'mean_absolute_error':
             if (!metricImports.includes('mean_absolute_error')) metricImports.push('mean_absolute_error');
             break;
+          // RMSE não entra na lista de imports de propósito: o cálculo sai da raiz do erro
+          // quadrático com numpy (ver generateEvaluationFunction), o que dispensa a função
+          // `root_mean_squared_error` — que só existe no sklearn 1.4+.
+          case 'root_mean_squared_error':
+            break;
         }
       }
     }
@@ -663,6 +676,19 @@ export class ScriptGeneratorService {
     return imports[modeloValor] || '';
   }
 
+  /** O script exportado vai ler `data/treino.csv`/`data/teste.csv`?
+   *
+   *  Espelha a decisão de `generateDataLoadingFunction`: com dataset de exemplo, o script só lê
+   *  CSV quando não há loader do sklearn, nem id do UCI, nem gerador sintético para ele. É essa
+   *  a condição que manda anexar os CSVs ao zip — e não a fonte dos dados. */
+  private scriptLeCsv(resultado?: ResultadoColetaDado): boolean {
+    if (resultado?.fonteDados !== 'dataset' || !resultado.nomeDataset) return true;
+    const chave = resultado.datasetId ?? resultado.nomeDataset;
+    return !this.getToyDatasetLoader(chave)
+      && this.getUciDatasetId(chave) === null
+      && !this.getGeradorSintetico(chave, resultado.datasetSeed);
+  }
+
   private generateDataLoadingFunction(resultado?: ResultadoColetaDado): string {
     if (resultado?.fonteDados === 'dataset' && resultado.nomeDataset) {
       const datasetKey = resultado.datasetId ?? resultado.nomeDataset;
@@ -682,6 +708,24 @@ export class ScriptGeneratorService {
           '    print(X.head())',
           '    print(f"Shape de X: {X.shape}")',
           '    print(f"Shape de y: {y.shape}")',
+          '    ',
+          '    return X, y'
+        ].join('\n');
+      }
+
+      const gerado = this.getGeradorSintetico(datasetKey, resultado.datasetSeed);
+      if (gerado) {
+        return [
+          '# ============================================',
+          '# Função: Carregamento dos Dados',
+          '# ============================================',
+          'def carregar_dados():',
+          `    """Gera o dataset sintético '${resultado.nomeDataset}' com a MESMA semente da plataforma."""`,
+          ...gerado,
+          '    ',
+          '    print("Primeiras amostras (X):")',
+          '    print(X.head())',
+          '    print(f"Shape de X: {X.shape}")',
           '    ',
           '    return X, y'
         ].join('\n');
@@ -731,6 +775,91 @@ export class ScriptGeneratorService {
     ].join('\n');
   }
 
+  /** Código que reproduz um dataset SINTÉTICO (os `gen_*` do catálogo).
+   *
+   *  Sem isto o gerador caía no ramo "ler data/treino.csv" — e o bundle não anexa CSV quando a
+   *  fonte é um dataset de exemplo, então o script exportado morria em FileNotFoundError na
+   *  primeira linha. Aqui o próprio script gera os dados, com a semente que o servidor usou
+   *  (`seed` na resposta do endpoint), espelhando `carregar_gerador` do backend
+   *  (`app/models/dataset_loaders.py`) — inclusive os nomes das colunas, de que o
+   *  pré-processamento depende para achar as colunas certas.
+   *
+   *  `null` quando o id não é de um gerador conhecido. Divergir do backend aqui produz um
+   *  script que roda mas com outros dados; ao mexer num gerador de lá, ajuste os dois. */
+  private getGeradorSintetico(id: string, seed?: number | null): string[] | null {
+    const rs = seed ?? null;
+    const rsArg = rs === null ? 'None' : String(rs);
+    const colunas = (n: number) => `[f"atributo_{i + 1}" for i in range(${n})]`;
+
+    switch (id) {
+      case 'gen_classification':
+        return [
+          '    from sklearn.datasets import make_classification',
+          `    dados, alvo = make_classification(`,
+          `        n_samples=300, n_features=4, n_informative=2, n_redundant=0,`,
+          `        n_classes=2, n_clusters_per_class=1, random_state=${rsArg},`,
+          '    )',
+          `    X = pd.DataFrame(dados, columns=${colunas(4)})`,
+          '    y = pd.Series(alvo, name="target")',
+        ];
+      case 'gen_blobs':
+        return [
+          '    from sklearn.datasets import make_blobs',
+          `    dados, alvo = make_blobs(n_samples=300, n_features=2, centers=3, random_state=${rsArg})`,
+          `    X = pd.DataFrame(dados, columns=${colunas(2)})`,
+          // Agrupamento não expõe target (o backend não põe a coluna no dataframe).
+          '    y = None',
+        ];
+      case 'gen_moons':
+        return [
+          '    from sklearn.datasets import make_moons',
+          `    dados, alvo = make_moons(n_samples=300, noise=0.1, random_state=${rsArg})`,
+          '    X = pd.DataFrame(dados, columns=["atributo_1", "atributo_2"])',
+          '    y = pd.Series(alvo, name="target")',
+        ];
+      case 'gen_circles':
+        return [
+          '    from sklearn.datasets import make_circles',
+          `    dados, alvo = make_circles(n_samples=300, noise=0.05, factor=0.5, random_state=${rsArg})`,
+          '    X = pd.DataFrame(dados, columns=["atributo_1", "atributo_2"])',
+          '    y = pd.Series(alvo, name="target")',
+        ];
+      case 'gen_regression':
+        return [
+          '    from sklearn.datasets import make_regression',
+          `    dados, alvo = make_regression(n_samples=300, n_features=3, noise=10.0, random_state=${rsArg})`,
+          `    X = pd.DataFrame(dados, columns=${colunas(3)})`,
+          '    y = pd.Series(alvo, name="target")',
+        ];
+      case 'gen_sorvete':
+        return [
+          `    rng = np.random.RandomState(${rsArg})`,
+          '    temperatura = rng.uniform(15, 40, 300)',
+          '    pessoas = rng.uniform(0, 500, 300)',
+          '    alvo = np.clip(3.0 * (temperatura - 15) + 0.2 * pessoas + rng.normal(0, 12, 300), 0, None).round()',
+          '    X = pd.DataFrame({"temperatura": temperatura.round(1), "pessoas_na_praia": pessoas.round()})',
+          '    y = pd.Series(alvo, name="target")',
+        ];
+      case 'gen_cardume':
+        return [
+          '    from sklearn.datasets import make_blobs',
+          `    dados, alvo = make_blobs(n_samples=300, n_features=2, centers=3, random_state=${rsArg})`,
+          '    X = pd.DataFrame(dados, columns=["velocidade", "direcao"])',
+          '    y = None',
+        ];
+      case 'gen_cachorro':
+        return [
+          `    rng = np.random.RandomState(${rsArg})`,
+          '    altura = rng.uniform(20, 70, 200)',
+          '    alvo = np.clip(0.6 * (altura - 15) + rng.normal(0, 3, 200), 1, None).round(1)',
+          '    X = pd.DataFrame({"altura_cm": altura.round(1)})',
+          '    y = pd.Series(alvo, name="target")',
+        ];
+      default:
+        return null;
+    }
+  }
+
   private getToyDatasetLoader(nome: string): { importLine: string } | null {
     const map: Record<string, { importLine: string }> = {
       'iris': { importLine: 'load_iris(as_frame=True)' },
@@ -762,12 +891,36 @@ export class ScriptGeneratorService {
     return map[nome] ?? null;
   }
 
-  private generateFeatureSelectionFunction(resultado: ResultadoColetaDado | undefined): string {
+  private generateFeatureSelectionFunction(
+    resultado: ResultadoColetaDado | undefined,
+    ehAgrupamento = false,
+  ): string {
     if (resultado?.fonteDados === 'dataset' && resultado.nomeDataset) {
       const splitPct = resultado.porcentagemTreino || 70;
       const testPct = 100 - splitPct;
       const shuffle = resultado.embaralharDados === false ? 'False' : 'True';
       const stratify = resultado.estratificarDados && resultado.embaralharDados !== false ? 'y' : 'None';
+      // Agrupamento não tem y — e a execução principal chama `selecionar_features(X)` com um
+      // argumento só. Gerar aqui a versão de dois parâmetros deixava o script com um
+      // TypeError garantido (faltando 'y') em todo pipeline exploratório sobre dataset.
+      if (ehAgrupamento) {
+        return [
+          '# ============================================',
+          '# Função: Seleção de Features',
+          '# ============================================',
+          'def selecionar_features(X):',
+          '    """Divide o dataset em treino e teste (agrupamento não usa target)."""',
+          '    X_train, X_test = train_test_split(',
+          `        X, test_size=${(testPct / 100).toFixed(2)}, random_state=42, shuffle=${shuffle}`,
+          '    )',
+          '    ',
+          '    print("\\nDivisão treino/teste:")',
+          `    print(f"Treino: {X_train.shape[0]} amostras (${splitPct}%)")`,
+          `    print(f"Teste:  {X_test.shape[0]} amostras (${testPct}%)")`,
+          '    ',
+          '    return X_train, X_test'
+        ].join('\n');
+      }
       return [
         '# ============================================',
         '# Função: Seleção de Features e Target',
@@ -780,7 +933,10 @@ export class ScriptGeneratorService {
         '    )',
         '    ',
         '    print("\\nDivisão treino/teste:")',
-        `    print(f"Treino: {X_train.shape[0]} amostras ({splitPct}%)")`,
+        // O `${splitPct}` é interpolado aqui, no TypeScript; `{X_train.shape[0]}` fica literal
+        // para a f-string do Python. Faltar o `$` gera um campo que o Python não conhece
+        // (NameError: splitPct) e o script exportado nem chega a treinar.
+        `    print(f"Treino: {X_train.shape[0]} amostras (${splitPct}%)")`,
         `    print(f"Teste:  {X_test.shape[0]} amostras (${testPct}%)")`,
         '    ',
         '    return X_train, X_test, y_train, y_test'
@@ -870,9 +1026,15 @@ export class ScriptGeneratorService {
 
     for (const item of preProcessamentoConfig.itens) {
       const colunas = item.colunas || [];
+      // Dois formatos, porque o pandas cobra colchetes diferentes em cada posição:
+      // `colsArray` é a LISTA (`["a","b"]`), para `drop(columns=...)` e
+      // `get_feature_names_out(...)`; `colsIdx` é o INDEXADOR (`[["a","b"]]`), para
+      // `X_train[[...]]`. Usar a lista como indexador vira `X_train["a","b"]`, que o pandas
+      // lê como uma única chave de tupla e estoura KeyError no primeiro pré-processador.
       const colsArray = colunas.length > 0
         ? `[${colunas.map((c: string) => `"${c}"`).join(', ')}]`
         : null;
+      const colsIdx = colsArray ? `[${colsArray}]` : null;
 
       lines.push('    ');
 
@@ -881,8 +1043,8 @@ export class ScriptGeneratorService {
           lines.push(`    # ${item.label}: Remove média e escala para variância unitária`);
           lines.push(`    scaler = StandardScaler(${this.preprocArgs(item, '')})`);
           if (colsArray) {
-            lines.push(`    X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
-            lines.push(`    X_test${colsArray} = scaler.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsIdx} = scaler.fit_transform(X_train${colsIdx})`);
+            lines.push(`    X_test${colsIdx} = scaler.transform(X_test${colsIdx})`);
           } else {
             lines.push('    X_train = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
             lines.push('    X_test = pd.DataFrame(scaler.transform(X_test), columns=X_test.columns, index=X_test.index)');
@@ -893,8 +1055,8 @@ export class ScriptGeneratorService {
           lines.push(`    # ${item.label}: Escala dados para intervalo [0, 1]`);
           lines.push(`    scaler = MinMaxScaler(${this.preprocArgs(item, '')})`);
           if (colsArray) {
-            lines.push(`    X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
-            lines.push(`    X_test${colsArray} = scaler.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsIdx} = scaler.fit_transform(X_train${colsIdx})`);
+            lines.push(`    X_test${colsIdx} = scaler.transform(X_test${colsIdx})`);
           } else {
             lines.push('    X_train = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
             lines.push('    X_test = pd.DataFrame(scaler.transform(X_test), columns=X_test.columns, index=X_test.index)');
@@ -905,8 +1067,8 @@ export class ScriptGeneratorService {
           lines.push(`    # ${item.label}: Escala usando estatísticas robustas a outliers`);
           lines.push(`    scaler = RobustScaler(${this.preprocArgs(item, '')})`);
           if (colsArray) {
-            lines.push(`    X_train${colsArray} = scaler.fit_transform(X_train${colsArray})`);
-            lines.push(`    X_test${colsArray} = scaler.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsIdx} = scaler.fit_transform(X_train${colsIdx})`);
+            lines.push(`    X_test${colsIdx} = scaler.transform(X_test${colsIdx})`);
           } else {
             lines.push('    X_train = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
             lines.push('    X_test = pd.DataFrame(scaler.transform(X_test), columns=X_test.columns, index=X_test.index)');
@@ -917,8 +1079,8 @@ export class ScriptGeneratorService {
           lines.push(`    # ${item.label}: Normaliza amostras para norma unitária`);
           lines.push(`    normalizer = Normalizer(${this.preprocArgs(item, 'norm="l2"')})`);
           if (colsArray) {
-            lines.push(`    X_train${colsArray} = normalizer.fit_transform(X_train${colsArray})`);
-            lines.push(`    X_test${colsArray} = normalizer.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsIdx} = normalizer.fit_transform(X_train${colsIdx})`);
+            lines.push(`    X_test${colsIdx} = normalizer.transform(X_test${colsIdx})`);
           } else {
             lines.push('    X_train = pd.DataFrame(normalizer.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
             lines.push('    X_test = pd.DataFrame(normalizer.transform(X_test), columns=X_test.columns, index=X_test.index)');
@@ -939,8 +1101,8 @@ export class ScriptGeneratorService {
           lines.push(`    # ${item.label}: Codifica features categóricas como inteiros ordinais`);
           lines.push(`    encoder = OrdinalEncoder(${this.preprocArgs(item, 'handle_unknown="use_encoded_value", unknown_value=-1')})`);
           if (colsArray) {
-            lines.push(`    X_train${colsArray} = encoder.fit_transform(X_train${colsArray})`);
-            lines.push(`    X_test${colsArray} = encoder.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsIdx} = encoder.fit_transform(X_train${colsIdx})`);
+            lines.push(`    X_test${colsIdx} = encoder.transform(X_test${colsIdx})`);
           }
           break;
 
@@ -965,8 +1127,8 @@ export class ScriptGeneratorService {
           lines.push(`    # ${item.label}: Preenche valores ausentes`);
           lines.push(`    imputer = SimpleImputer(${this.preprocArgs(item, "strategy='mean'")})`);
           if (colsArray) {
-            lines.push(`    X_train${colsArray} = imputer.fit_transform(X_train${colsArray})`);
-            lines.push(`    X_test${colsArray} = imputer.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsIdx} = imputer.fit_transform(X_train${colsIdx})`);
+            lines.push(`    X_test${colsIdx} = imputer.transform(X_test${colsIdx})`);
           } else {
             lines.push('    X_train = pd.DataFrame(imputer.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
             lines.push('    X_test = pd.DataFrame(imputer.transform(X_test), columns=X_test.columns, index=X_test.index)');
@@ -977,8 +1139,8 @@ export class ScriptGeneratorService {
           lines.push(`    # ${item.label}: Gera features polinomiais`);
           lines.push(`    poly = PolynomialFeatures(${this.preprocArgs(item, 'degree=2, include_bias=False')})`);
           if (colsArray) {
-            lines.push(`    X_train_poly = poly.fit_transform(X_train${colsArray})`);
-            lines.push(`    X_test_poly = poly.transform(X_test${colsArray})`);
+            lines.push(`    X_train_poly = poly.fit_transform(X_train${colsIdx})`);
+            lines.push(`    X_test_poly = poly.transform(X_test${colsIdx})`);
             lines.push(`    poly_cols = poly.get_feature_names_out(${colsArray})`);
             lines.push('    X_train_poly = pd.DataFrame(X_train_poly, columns=poly_cols, index=X_train.index)');
             lines.push('    X_test_poly = pd.DataFrame(X_test_poly, columns=poly_cols, index=X_test.index)');
@@ -991,8 +1153,8 @@ export class ScriptGeneratorService {
           lines.push(`    # ${item.label}: Transformação para dados mais Gaussianos`);
           lines.push(`    pt = PowerTransformer(${this.preprocArgs(item, 'method="yeo-johnson"')})`);
           if (colsArray) {
-            lines.push(`    X_train${colsArray} = pt.fit_transform(X_train${colsArray})`);
-            lines.push(`    X_test${colsArray} = pt.transform(X_test${colsArray})`);
+            lines.push(`    X_train${colsIdx} = pt.fit_transform(X_train${colsIdx})`);
+            lines.push(`    X_test${colsIdx} = pt.transform(X_test${colsIdx})`);
           } else {
             lines.push('    X_train = pd.DataFrame(pt.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
             lines.push('    X_test = pd.DataFrame(pt.transform(X_test), columns=X_test.columns, index=X_test.index)');
@@ -1007,8 +1169,8 @@ export class ScriptGeneratorService {
             lines.push(`    # ${item.label}: ${item.resumo || cls}`);
             lines.push(`    transformer = ${cls}(${kwargs})`);
             if (colsArray) {
-              lines.push(`    X_train${colsArray} = transformer.fit_transform(X_train${colsArray})`);
-              lines.push(`    X_test${colsArray} = transformer.transform(X_test${colsArray})`);
+              lines.push(`    X_train${colsIdx} = transformer.fit_transform(X_train${colsIdx})`);
+              lines.push(`    X_test${colsIdx} = transformer.transform(X_test${colsIdx})`);
             } else {
               lines.push('    X_train = pd.DataFrame(transformer.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
               lines.push('    X_test = pd.DataFrame(transformer.transform(X_test), columns=X_test.columns, index=X_test.index)');
@@ -1211,6 +1373,40 @@ export class ScriptGeneratorService {
             lines.push(`    recall = recall_score(y_test, y_pred, average="${average}", zero_division=0)`);
             lines.push('    resultados["recall"] = recall');
             lines.push('    print(f"Recall: {recall:.4f}")');
+            break;
+          // As quatro de regressão. Sem elas, um pipeline de regressão exportava um
+          // `avaliar_modelo` que importava as funções, imprimia o cabeçalho "MÉTRICAS DE
+          // AVALIAÇÃO" e devolvia dicionário vazio — o aluno rodava e não via número nenhum.
+          case 'r2_score':
+            lines.push('    ');
+            lines.push('    # R² (Coeficiente de Determinação)');
+            lines.push('    r2 = r2_score(y_test, y_pred)');
+            lines.push('    resultados["r2"] = r2');
+            lines.push('    print(f"R²: {r2:.4f}")');
+            break;
+          case 'mean_absolute_error':
+            lines.push('    ');
+            lines.push('    # MAE (Erro Absoluto Médio)');
+            lines.push('    mae = mean_absolute_error(y_test, y_pred)');
+            lines.push('    resultados["mae"] = mae');
+            lines.push('    print(f"MAE (Erro Absoluto Médio): {mae:.4f}")');
+            break;
+          case 'mean_squared_error':
+            lines.push('    ');
+            lines.push('    # MSE (Erro Quadrático Médio)');
+            lines.push('    mse = mean_squared_error(y_test, y_pred)');
+            lines.push('    resultados["mse"] = mse');
+            lines.push('    print(f"MSE (Erro Quadrático Médio): {mse:.4f}")');
+            break;
+          case 'root_mean_squared_error':
+            lines.push('    ');
+            lines.push('    # RMSE (Raiz do Erro Quadrático Médio)');
+            // Pela raiz do MSE calculado com numpy, não por `root_mean_squared_error`: a função
+            // só existe no sklearn a partir da 1.4, e `np` está sempre importado — assim a linha
+            // não depende de qual import o script trouxe (o caminho multi-modelo importa outro).
+            lines.push('    rmse = float(np.sqrt(np.mean((np.asarray(y_test) - np.asarray(y_pred)) ** 2)))');
+            lines.push('    resultados["rmse"] = rmse');
+            lines.push('    print(f"RMSE (Raiz do Erro Quadrático Médio): {rmse:.4f}")');
             break;
         }
       }

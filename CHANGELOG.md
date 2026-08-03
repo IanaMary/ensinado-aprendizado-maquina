@@ -8,6 +8,55 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-03 (o código exportado volta a rodar: 6 defeitos no gerador de script)
+
+> Achados montando **três pipelines completos em produção** (classificação, regressão e
+> exploratório), baixando o zip de cada um, desempacotando e **executando o `pipeline.py`**.
+> Nenhum dos três rodava até o fim. Suíte **250** passed (front) / **638** (back) + build.
+
+### Corrigido — `pipeline.py` morria antes de treinar
+
+- **`NameError: splitPct`**: o gerador escrevia `{splitPct}` (sem o `$`) dentro de uma f-string do
+  Python, então a interpolação do TypeScript nunca acontecia e o Python tratava o nome como campo
+  a resolver. O script parava na divisão treino/teste — **em todo pipeline sobre dataset de
+  exemplo**.
+- **`KeyError` no primeiro pré-processador**: as colunas saíam como `X_train["a", "b"]`, que o
+  pandas lê como uma única chave de tupla. Faltava o par externo de colchetes
+  (`X_train[["a", "b"]]`). Agora há duas formas explícitas no gerador — `colsArray` (lista, para
+  `drop(columns=…)` e `get_feature_names_out(…)`) e `colsIdx` (indexador).
+- **`TypeError` em agrupamento**: a execução principal chamava `selecionar_features(X)` com um
+  argumento, e a única definição gerada era `(X, y)`. Agora o gerador emite a variante sem target
+  quando o modelo é não supervisionado.
+- **`FileNotFoundError` em dataset gerado**: o script caía no ramo "ler `data/treino.csv`" para
+  datasets sintéticos (blobs, sorvete, cardume…), mas o zip não anexa CSV quando a fonte é dataset
+  de exemplo — o pipeline exploratório era **100% inexecutável**. Agora o script **gera os dados
+  ele mesmo**, com a semente que o servidor usou (`seed` na resposta), espelhando
+  `carregar_gerador` do backend; e o anexo de CSV passou a ser decidido por "o script vai ler
+  CSV?", não pela fonte dos dados.
+
+### Corrigido — o script não media o que a tela mediu
+
+- **Métricas de regressão não eram calculadas**: `avaliar_modelo` importava
+  `mean_absolute_error`/`r2_score`, imprimia o cabeçalho "MÉTRICAS DE AVALIAÇÃO" e devolvia
+  dicionário vazio — o `switch` só cobria classificação e agrupamento. Entraram as quatro (R², MAE,
+  MSE, RMSE). O RMSE sai da raiz com `numpy`, não de `root_mean_squared_error`, que só existe no
+  sklearn 1.4+.
+- **A divisão exportada não era a que treinou o modelo**: dataset de exemplo é dividido pelo
+  servidor em **75/25** fixo, mas isso não ia na resposta — a tela presumia 70/30, exibia
+  "Total disponível: 442 | Treino: 442 (70%) | Teste: 0 (30%)" (três números errados, para uma
+  divisão que foi 331/111) e o script reproduzia 70/30. O endpoint passou a devolver `test_size`,
+  `num_linhas_treino` e `num_linhas_teste`, e a tela reflete o que o servidor fez.
+  **Verificado**: com o fix, o script exportado do pipeline de regressão imprime **R² 0.4849 / MAE
+  41.5485** — os mesmos valores da tela, na quarta casa.
+
+### Por que os testes não pegavam
+
+As asserções do gerador eram todas de `toContain` em trechos isolados; nunca se executou o script
+resultante. Os novos testes cobrem cada defeito e há uma guarda genérica contra interpolação do
+TypeScript vazada (`/\{[a-z]+[A-Z]\w*\}/`), que é a classe do `{splitPct}`.
+
+---
+
 ## 2026-08-02 (correções da revisão da banca) — porte
 
 > Branch `master` (não implantada). Porte dos commits da `mestrado-iana` que responderam à

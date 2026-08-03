@@ -277,4 +277,41 @@ describe('ColetaDadoComponent', () => {
       expect(notificacao.aviso).toHaveBeenCalledWith('Não foi possível estratificar.');
     });
   });
+
+  describe('divisão de um dataset de exemplo', () => {
+    const resposta = (extra: any = {}) => ({
+      dados: [], total_dados: 178, nome_dataset: 'Wine', id: 'wine',
+      colunas: ['alcohol', 'target'],
+      colunas_detalhes: [{ nome_coluna: 'alcohol', tipo_coluna: 'Número' },
+                         { nome_coluna: 'target', tipo_coluna: 'Texto' }],
+      target: 'target', prever_categoria: true, dados_rotulados: true, tipo_target: 'Texto',
+      stratify: true, test_size: 0.25, num_linhas_treino: 133, num_linhas_teste: 45,
+      seed: 42, ...extra,
+    });
+
+    it('reflete a divisão que o SERVIDOR fez, não um 70/30 presumido', () => {
+      component.processarResultadoDataset(resposta());
+
+      // Antes: 70% fixo com "Treino: 178 | Teste: 0" — e o script exportado saía com 70/30,
+      // reproduzindo uma acurácia diferente da que o aluno viu na tela.
+      expect(component.resultColetaDadoL.porcentagemTreino).toBe(75);
+      expect(component.treino.totalDados).toBe(133);
+      expect(component.teste.totalDados).toBe(45);
+      // Sem ARQUIVO de teste: é isso que distingue "o usuário trouxe uma planilha".
+      expect(component.teste.nomeArquivo).toBe('');
+    });
+
+    it('guarda a semente do dataset gerado, que o script usa para reproduzir os dados', () => {
+      component.processarResultadoDataset(resposta({ id: 'gen_blobs', seed: 7 }));
+
+      expect(component.resultColetaDadoL.datasetSeed).toBe(7);
+    });
+
+    it('cai em 70/30 quando a resposta é antiga e não traz test_size', () => {
+      component.processarResultadoDataset(resposta({ test_size: undefined, num_linhas_treino: undefined }));
+
+      expect(component.resultColetaDadoL.porcentagemTreino).toBe(70);
+      expect(component.treino.totalDados).toBe(178);
+    });
+  });
 });
