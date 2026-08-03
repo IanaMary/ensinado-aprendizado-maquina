@@ -16,6 +16,14 @@ const PRE_PROC_BUILTINS = new Set<string>([
   'polynomial_features', 'power_transformer',
 ]);
 
+/** Modelos não supervisionados que TRANSFORMAM em vez de agrupar: expõem `transform`, não
+ *  `predict`, e não têm rótulo de grupo para medir. Espelha os `dados_rotulados: false` do
+ *  catálogo que não são clusterers (`app/conteudo/modelos.json`). */
+const MODELOS_DE_TRANSFORMACAO = new Set<string>(['pca']);
+
+/** Todos os `dados_rotulados: false` do catálogo — treinam com `fit(X)`, sem alvo. */
+const MODELOS_NAO_SUPERVISIONADOS = new Set<string>(['k_means', ...MODELOS_DE_TRANSFORMACAO]);
+
 @Injectable({
   providedIn: 'root'
 })
@@ -40,6 +48,10 @@ export class ScriptGeneratorService {
       for (const nome of Object.keys(zipModelo.files)) {
         const f = zipModelo.files[nome];
         if (f.dir) continue;
+        // `environment_variables.txt` do MLflow lista as variáveis de ambiente do SERVIDOR de
+        // treino (inclusive `NVIDIA_API_KEY`). Só o nome, nunca o valor — mas isso vai num zip
+        // que o aluno baixa e repassa, e nenhum dos `usar_modelo_*.py` usa variável de ambiente.
+        if (nome.split('/').pop() === 'environment_variables.txt') continue;
         modeloDir.file(nome, await f.async('uint8array'));
       }
       dest.file('usar_modelo_mlflow.py', this.gerarUsarModeloMlflow(entry, coleta));
@@ -140,9 +152,16 @@ export class ScriptGeneratorService {
     const modelosTreinados = resultadosTreinamento ? Object.values(resultadosTreinamento) : [];
     const isMultiModelo = modelosTreinados.length > 1;
 
+    // Os ajustes do aluno vêm do PRÓPRIO TREINO quando o chamador não os passa — e nenhum
+    // chamador passa (a Área de Trabalho manda `{}`). Sem isto, ajustar `n_neighbors` na tela,
+    // treinar e exportar dava um script com a classe no default: outro modelo, outra métrica.
+    const hiperEfetivos = Object.keys(hiperparametros || {}).length
+      ? hiperparametros
+      : this.hiperparametrosDoTreino(modelosTreinados[0]);
+
     const script = isMultiModelo
       ? this.generateMultiModelScript(resultadoColetaDado, modelosTreinados, metricasSelecionadas, preProcessamentoConfig)
-      : this.generatePythonScript(resultadoColetaDado, modeloSelecionado, metricasSelecionadas, hiperparametros, preProcessamentoConfig);
+      : this.generatePythonScript(resultadoColetaDado, modeloSelecionado, metricasSelecionadas, hiperEfetivos, preProcessamentoConfig);
 
     folder.file('pipeline.py', script);
 
@@ -247,10 +266,23 @@ export class ScriptGeneratorService {
 
     // Precisa vir ANTES da geração das funções: a de seleção de features muda de assinatura
     // em agrupamento (sem y), e é ela que a execução principal chama.
-    const isClustering = modelosTreinados.some(m => {
-      const cls = m.modelo ?? '';
-      return ['k_means', 'dbscan', 'agglomerative'].includes(cls);
-    });
+    // Espelha o catálogo (`dados_rotulados: false`), não uma lista solta: a antiga citava
+    // `dbscan` e `agglomerative`, que não existem no catálogo, e deixava o `pca` de fora — daí o
+    // script de comparação chamar `predict` num PCA.
+    const ehNaoSupervisionado = (m: any) => MODELOS_NAO_SUPERVISIONADOS.has(m?.modelo ?? '');
+
+    // Uma comparação mistura os dois tipos quando o aluno treina, na MESMA coleta, um modelo
+    // supervisionado e um k-Means (o acumulado de `resultadoTreinamento` guarda os dois). O laço
+    // aplicava o mesmo `fit` a todos e estourava `fit() missing 1 required argument: 'y'`. E não
+    // haveria o que comparar: acurácia e silhueta medem coisas diferentes. Então o script leva os
+    // modelos da tarefa da COLETA e diz, em comentário, quais ficaram de fora.
+    const semAlvo = !resultadoColetaDado?.target || resultadoColetaDado?.dadosRotulados === false;
+    const compativeis = modelosTreinados.filter(m => ehNaoSupervisionado(m) === semAlvo);
+    const usados = compativeis.length ? compativeis : modelosTreinados;
+    const deixadosDeFora = modelosTreinados.filter(m => !usados.includes(m));
+    modelosTreinados = usados;
+
+    const isClustering = modelosTreinados.some(ehNaoSupervisionado);
 
     // Data loading
     lines.push(this.generateDataLoadingFunction(resultadoColetaDado));
@@ -259,17 +291,27 @@ export class ScriptGeneratorService {
     lines.push('');
     lines.push(this.generatePreprocessingFunction(resultadoColetaDado, preProcessamentoConfig));
     lines.push('');
-    lines.push(this.generateEvaluationFunction(metricasSelecionadas));
+    lines.push(this.generateEvaluationFunction(metricasSelecionadas, isClustering));
     lines.push('');
 
     // Dict with all models
     lines.push('# ============================================');
     lines.push('# Dicionário com todos os modelos a comparar');
     lines.push('# ============================================');
+    if (deixadosDeFora.length) {
+      lines.push('# Fora desta comparação, por serem de outro tipo de tarefa (não há como comparar');
+      lines.push('# acurácia com silhueta): ' + deixadosDeFora.map(m => m.nome_modelo).join(', '));
+      lines.push('# Exporte-os a partir de um pipeline do tipo correspondente.');
+    }
     lines.push('MODELOS = {');
     for (const m of modelosTreinados) {
       const cls = this.getModelClass(m.modelo ?? '', m.execucao);
-      lines.push(`    "${m.nome_modelo}": ${cls}(),`);
+      // Cada ramo da comparação tem os SEUS ajustes (é o ponto de comparar dois modelos com
+      // configurações diferentes). Instanciar tudo no default apagava justamente a diferença.
+      const doAluno = this.hiperparametrosDoTreino(m);
+      const fixos = this.hiperparametrosFixosDoServidor(m.modelo ?? '', doAluno);
+      const params = [fixos, this.formatHyperparameters(doAluno)].filter(p => p).join(', ');
+      lines.push(`    "${m.nome_modelo}": ${cls}(${params}),`);
     }
     lines.push('}');
     lines.push('');
@@ -476,7 +518,7 @@ export class ScriptGeneratorService {
     lines.push('');
     lines.push(this.generateModelTrainingFunction(modeloSelecionado, hiperparametros));
     lines.push('');
-    lines.push(this.generateEvaluationFunction(metricasSelecionadas));
+    lines.push(this.generateEvaluationFunction(metricasSelecionadas, isClustering, modeloSelecionado?.valor));
     lines.push('');
 
     // Main execution
@@ -573,8 +615,13 @@ export class ScriptGeneratorService {
         imports.push(')');
         imports.push('from sklearn.impute import SimpleImputer');
       }
+      // O PCA não vive em `sklearn.preprocessing` (é `decomposition`), então tem import próprio.
+      if (itens.some(i => i.valor === 'pca')) {
+        imports.push('from sklearn.decomposition import PCA');
+      }
       for (const item of itens) {
-        if (!PRE_PROC_BUILTINS.has(item.valor) && item.execucao?.modulo && item.execucao?.classe) {
+        if (!PRE_PROC_BUILTINS.has(item.valor) && item.valor !== 'pca'
+            && item.execucao?.modulo && item.execucao?.classe) {
           const line = `from ${item.execucao.modulo} import ${item.execucao.classe}`;
           if (!imports.includes(line)) imports.push(line);
         }
@@ -655,7 +702,10 @@ export class ScriptGeneratorService {
       'knn': 'from sklearn.neighbors import KNeighborsClassifier',
       'arvore_decisao': 'from sklearn.tree import DecisionTreeClassifier',
       'svm': 'from sklearn.svm import SVC',
-      'svm_linear': 'from sklearn.svm import LinearSVC',
+      // `SVC`, não `LinearSVC`: o servidor treina `SVC(kernel="linear")`
+      // (`app/routers/svm_linear.py`). São formulações diferentes e dão resultados diferentes —
+      // medido no Wine: 0.9556 com SVC(kernel=linear) contra 0.9778 com LinearSVC.
+      'svm_linear': 'from sklearn.svm import SVC',
       'regressao_logistica': 'from sklearn.linear_model import LogisticRegression',
       'regressao_linear': 'from sklearn.linear_model import LinearRegression',
       'random_forest': 'from sklearn.ensemble import RandomForestClassifier',
@@ -710,7 +760,11 @@ export class ScriptGeneratorService {
           `    """Carrega o dataset '${resultado.nomeDataset}' do scikit-learn."""`,
           `    dados = ${ds.importLine}`,
           '    X = dados.data',
-          '    y = dados.target',
+          ...(ds.rotulosDeClasse
+            ? ['    # O alvo pelo NOME da classe, como a plataforma mostra — assim a matriz de',
+               '    # confusão sai com os mesmos rótulos, e na mesma ordem, da que você viu na tela.',
+               '    y = dados.target.map(dict(enumerate(dados.target_names)))']
+            : ['    y = dados.target']),
           '    ',
           '    print("Primeiras amostras (X):")',
           '    print(X.head())',
@@ -750,13 +804,22 @@ export class ScriptGeneratorService {
           '    from ucimlrepo import fetch_ucirepo',
           '    ',
           `    dados = fetch_ucirepo(id=${uciId})`,
-          '    X = dados.data.features',
-          '    y = dados.data.targets.squeeze()',
+          // `data.original`, e não `data.features`/`data.targets`: é a MESMA fonte que o servidor
+          // usa (`app/models/dataset_loaders.py:172`). Com `features`, a coluna que o UCI declara
+          // como alvo fica de fora do dataframe — e a tela, que lista as colunas de `original`,
+          // deixa o aluno marcá-la como atributo. O script então cobrava uma coluna que não
+          // existia: `KeyError: "['color'] not in index"` em 5 datasets. E o alvo saía do que o
+          // UCI declara, ignorando o que o aluno escolheu na tela.
+          '    df = dados.data.original',
+          ...(resultado.target
+            ? [`    y = df["${resultado.target}"]`,
+               `    X = df.drop(columns=["${resultado.target}"])`]
+            : ['    y = None',
+               '    X = df']),
           '    ',
           '    print("Primeiras amostras (X):")',
           '    print(X.head())',
           '    print(f"Shape de X: {X.shape}")',
-          '    print(f"Shape de y: {y.shape}")',
           '    ',
           '    return X, y'
         ].join('\n');
@@ -886,12 +949,17 @@ export class ScriptGeneratorService {
     }
   }
 
-  private getToyDatasetLoader(nome: string): { importLine: string } | null {
-    const map: Record<string, { importLine: string }> = {
-      'iris': { importLine: 'load_iris(as_frame=True)' },
-      'wine': { importLine: 'load_wine(as_frame=True)' },
-      'breast_cancer': { importLine: 'load_breast_cancer(as_frame=True)' },
-      'digits': { importLine: 'load_digits(as_frame=True)' },
+  /** `rotulosDeClasse`: o servidor troca o alvo numérico pelo NOME da classe nesses datasets
+   *  (`app/routers/toy_datasets.py`), então o script faz o mesmo — senão a matriz de confusão do
+   *  aluno sai com `0/1/2` onde a tela mostra `setosa/versicolor/virginica`, e no breast_cancer
+   *  a ordem chega a inverter (o sklearn usa `0=malignant`, a tela ordena alfabeticamente), o que
+   *  dá uma matriz transposta em relação à da plataforma. */
+  private getToyDatasetLoader(nome: string): { importLine: string; rotulosDeClasse?: boolean } | null {
+    const map: Record<string, { importLine: string; rotulosDeClasse?: boolean }> = {
+      'iris': { importLine: 'load_iris(as_frame=True)', rotulosDeClasse: true },
+      'wine': { importLine: 'load_wine(as_frame=True)', rotulosDeClasse: true },
+      'breast_cancer': { importLine: 'load_breast_cancer(as_frame=True)', rotulosDeClasse: true },
+      'digits': { importLine: 'load_digits(as_frame=True)', rotulosDeClasse: true },
       'diabetes': { importLine: 'load_diabetes(as_frame=True)' },
       'california_housing': { importLine: 'fetch_california_housing(as_frame=True)' },
     };
@@ -1203,6 +1271,16 @@ export class ScriptGeneratorService {
           }
           break;
 
+        case 'pca':
+          // PCA REDUZ o número de colunas, então não dá para atribuir o resultado de volta às
+          // colunas de origem. Sem este `case` o item caía no `default` sem `execucao` e o script
+          // saía com um comentário "não implementada" — rodava, mas treinando sobre as features
+          // cruas enquanto o servidor aplicou PCA (divergência silenciosa, pior que um erro).
+          lines.push(`    # ${item.label}: Redução de dimensionalidade`);
+          lines.push(`    pca = PCA(${this.preprocArgs(item, 'n_components=2')})`);
+          lines.push(...this.linhasTransformadorLarguraVariavel('pca', colsArray));
+          break;
+
         default:
           // Pré-processador registrado pelo admin: gera código a partir do execucao.
           if (item.execucao?.classe) {
@@ -1210,13 +1288,13 @@ export class ScriptGeneratorService {
             const kwargs = this.execKwargs(item.execucao.hiperparametros);
             lines.push(`    # ${item.label}: ${item.resumo || cls}`);
             lines.push(`    transformer = ${cls}(${kwargs})`);
-            if (colsArray) {
-              lines.push(`    X_train${colsIdx} = transformer.fit_transform(X_train${colsIdx})`);
-              lines.push(`    X_test${colsIdx} = transformer.transform(X_test${colsIdx})`);
-            } else {
-              lines.push('    X_train = pd.DataFrame(transformer.fit_transform(X_train), columns=X_train.columns, index=X_train.index)');
-              lines.push('    X_test = pd.DataFrame(transformer.transform(X_test), columns=X_test.columns, index=X_test.index)');
-            }
+            // Não presumir que a largura de X continua a mesma: o admin pode cadastrar um
+            // PCA, um SelectKBest, um TruncatedSVD. Reconstruir o DataFrame com
+            // `columns=X_train.columns` estourava `Shape of passed values`, e atribuir de volta
+            // ao indexador estourava `Columns must be same length as key` — com o agravante de
+            // que o servidor treina sem problema (monta um `sklearn.Pipeline` de verdade), então
+            // era a plataforma dando o número e o script exportado morrendo.
+            lines.push(...this.linhasTransformadorLarguraVariavel('transformer', colsArray));
           } else {
             lines.push(`    # ${item.label}: Transformação não implementada automaticamente`);
           }
@@ -1227,6 +1305,45 @@ export class ScriptGeneratorService {
     lines.push('    return X_train, X_test');
 
     return lines.join('\n');
+  }
+
+  /** Linhas que aplicam um transformador que PODE mudar o número de colunas (PCA, SelectKBest,
+   *  TruncatedSVD…), sem presumir a largura de X.
+   *
+   *  Os nomes das colunas novas saem de `get_feature_names_out()` quando o transformador o
+   *  oferece — o que preserva os nomes originais nos que são 1-para-1 e dá nomes próprios
+   *  (`pca0`, `pca1`…) nos que reduzem. O `try/except` existe porque transformadores antigos ou
+   *  de terceiros podem não ter o método.
+   *
+   *  @param nomeVar nome da variável Python que guarda o transformador já instanciado
+   *  @param colsArray lista de colunas em que aplicar (`["a", "b"]`), ou `null` para X inteiro */
+  private linhasTransformadorLarguraVariavel(nomeVar: string, colsArray: string | null): string[] {
+    const nomesGerados = (fonte: string) => [
+      `    try:`,
+      `        _cols = list(${nomeVar}.get_feature_names_out(${fonte}))`,
+      `    except Exception:`,
+      `        _cols = [f"${nomeVar}_{i}" for i in range(_arr.shape[1])]`,
+    ];
+
+    if (!colsArray) {
+      return [
+        `    _arr = ${nomeVar}.fit_transform(X_train)`,
+        ...nomesGerados(''),
+        `    X_train = pd.DataFrame(_arr, columns=_cols, index=X_train.index)`,
+        `    _arr = ${nomeVar}.transform(X_test)`,
+        `    X_test = pd.DataFrame(_arr, columns=_cols, index=X_test.index)`,
+      ];
+    }
+    // Mesmo padrão do `polynomial_features`: descarta as colunas de origem e concatena as novas.
+    return [
+      `    _arr = ${nomeVar}.fit_transform(X_train[${colsArray}])`,
+      ...nomesGerados(colsArray),
+      `    X_train = pd.concat([X_train.drop(columns=${colsArray}),`,
+      `                         pd.DataFrame(_arr, columns=_cols, index=X_train.index)], axis=1)`,
+      `    _arr = ${nomeVar}.transform(X_test[${colsArray}])`,
+      `    X_test = pd.concat([X_test.drop(columns=${colsArray}),`,
+      `                        pd.DataFrame(_arr, columns=_cols, index=X_test.index)], axis=1)`,
+    ];
   }
 
   /** Args de instanciação de um pré-processador built-in: usa execucao.hiperparametros
@@ -1302,7 +1419,10 @@ export class ScriptGeneratorService {
       lines.push(`    )`);
     } else {
       const modelClass = this.getModelClass(modelo.valor, modelo.execucao);
-      lines.push(`    modelo = ${modelClass}(${params})`);
+      // Os ajustes que o SERVIDOR fixa entram aqui, senão o script treina outra configuração.
+      const fixos = this.hiperparametrosFixosDoServidor(modelo.valor, hiperparametros);
+      const todos = [fixos, params].filter(p => p).join(', ');
+      lines.push(`    modelo = ${modelClass}(${todos})`);
     }
     lines.push('    ');
     lines.push('    # Treinamento');
@@ -1318,8 +1438,58 @@ export class ScriptGeneratorService {
     return lines.join('\n');
   }
 
-  private generateEvaluationFunction(metricas: ItemPipeline[]): string {
-    const isClustering = metricas.some(m =>
+  /** Os hiperparâmetros COM QUE O MODELO FOI TREINADO, na forma que o script deve reproduzir.
+   *
+   *  A resposta do treino traz dois dicionários: `hiperparametros` (o `get_params()` do estimador
+   *  final, com dezenas de chaves) e `hiperparametros_padrao` (só as que o catálogo expõe, que são
+   *  as que o aluno vê e ajusta). Emitir o primeiro inteiro encheria o script de ruído
+   *  (`algorithm='auto'`, `leaf_size=30`…), então cruzamos os dois: as CHAVES do catálogo com os
+   *  VALORES efetivos do treino. Assim o script mostra o que o aluno mexeu, e só isso. */
+  private hiperparametrosDoTreino(resultado: any): any {
+    const efetivos = resultado?.hiperparametros;
+    const expostos = resultado?.hiperparametros_padrao;
+    if (!efetivos || !expostos) return {};
+    const saida: Record<string, any> = {};
+    for (const chave of Object.keys(expostos)) {
+      if (efetivos[chave] !== undefined) saida[chave] = efetivos[chave];
+    }
+    return saida;
+  }
+
+  /** Ajustes que o ROUTER do backend passa fixos ao treinar, e que o aluno não vê na tela.
+   *
+   *  Espelha os `kwargs` literais de `app/routers/<modelo>.py` (o 4º argumento de
+   *  `treinar_modelo_generico`). Sem isto o script exportado instanciava a classe no default e
+   *  treinava outra configuração: o `svm_linear` é `SVC(kernel="linear")` no servidor, e o MLP
+   *  batia no teto de 200 iterações onde o servidor usa 500 (medido: converge em 267).
+   *  Um valor escolhido pelo aluno para o mesmo parâmetro tem precedência — por isso a
+   *  chave já presente em `hiperparametros` é omitida aqui.
+   *
+   *  **Ao mudar um `kwargs` fixo num router do backend, ajuste este mapa.** */
+  private hiperparametrosFixosDoServidor(valor: string, hiperparametros: any): string {
+    const fixos: Record<string, Record<string, string | number>> = {
+      'svm_linear': { kernel: '"linear"' },
+      'mlp': { max_iter: 500 },
+      'regressao_logistica': { max_iter: 1000 },
+    };
+    const doModelo = fixos[valor];
+    if (!doModelo) return '';
+    const escolhidos = hiperparametros || {};
+    return Object.entries(doModelo)
+      .filter(([chave]) => escolhidos[chave] === undefined || escolhidos[chave] === null)
+      .map(([chave, v]) => `${chave}=${v}`)
+      .join(', ');
+  }
+
+  /** @param ehAgrupamento decidido pelo MODELO (fonte única). Quando não informado, cai na
+   *  inferência pelas métricas — que era a fonte antiga e discordava do resto do script: o corpo
+   *  chamava `avaliar_modelo(modelo, X_test)` e a definição saía `(modelo, X_test, y_test)`,
+   *  `TypeError` na cara do aluno. Acontecia com agrupamento sem métrica de agrupamento
+   *  selecionada — o caso NOMINAL do PCA, cujo `metricas` é `[]` no catálogo. */
+  private generateEvaluationFunction(
+    metricas: ItemPipeline[], ehAgrupamento?: boolean, valorModelo?: string,
+  ): string {
+    const isClustering = ehAgrupamento ?? metricas.some(m =>
       ['silhouette_score', 'calinski_harabasz_score', 'davies_bouldin_score'].includes(m.valor)
     );
 
@@ -1327,6 +1497,31 @@ export class ScriptGeneratorService {
     lines.push('# ============================================');
     lines.push('# Função: Avaliação do Modelo');
     lines.push('# ============================================');
+
+    // O PCA é não supervisionado mas NÃO é agrupamento: ele tem `transform`, não `predict`, e
+    // `modelo.predict(X_test)` estourava `AttributeError`. Aqui a avaliação que faz sentido é a
+    // variância explicada — que é também o que a plataforma mostra, porque o servidor recusa
+    // métrica de agrupamento para o PCA (guarda em `app/metricas/metricas.py`).
+    if (isClustering && MODELOS_DE_TRANSFORMACAO.has(valorModelo ?? '')) {
+      lines.push('def avaliar_modelo(modelo, X_test):');
+      lines.push('    """O PCA transforma os dados: avaliamos quanta informação as componentes guardam."""');
+      lines.push('    ');
+      lines.push('    X_reduzido = modelo.transform(X_test)');
+      lines.push('    ');
+      lines.push('    print("\\n" + "=" * 50)');
+      lines.push('    print("RESULTADO DA REDUÇÃO DE DIMENSIONALIDADE")');
+      lines.push('    print("=" * 50)');
+      lines.push('    print(f"Colunas antes: {X_test.shape[1]} | depois: {X_reduzido.shape[1]}")');
+      lines.push('    ');
+      lines.push('    razoes = modelo.explained_variance_ratio_');
+      lines.push('    for i, r in enumerate(razoes, start=1):');
+      lines.push('        print(f"Componente {i}: explica {r:.2%} da variação dos dados")');
+      lines.push('    total = float(razoes.sum())');
+      lines.push('    print(f"As componentes juntas guardam {total:.2%} da informação original")');
+      lines.push('    ');
+      lines.push('    return {"variancia_explicada_total": total}');
+      return lines.join('\n');
+    }
 
     if (isClustering) {
       lines.push('def avaliar_modelo(modelo, X_test):');
@@ -1468,7 +1663,8 @@ export class ScriptGeneratorService {
       'knn': 'KNeighborsClassifier',
       'arvore_decisao': 'DecisionTreeClassifier',
       'svm': 'SVC',
-      'svm_linear': 'LinearSVC',
+      // SVC com kernel linear (ver o import acima e `hiperparametrosFixosDoServidor`).
+      'svm_linear': 'SVC',
       'regressao_logistica': 'LogisticRegression',
       'regressao_linear': 'LinearRegression',
       'random_forest': 'RandomForestClassifier',
@@ -1501,12 +1697,13 @@ export class ScriptGeneratorService {
 
     const params: string[] = [];
     for (const [key, value] of Object.entries(hiperparametros)) {
+      // `null` é pulado (e não emitido como `None`) para o default da classe valer.
       if (value === null || value === undefined) continue;
-      if (typeof value === 'string') {
-        params.push(`${key}="${value}"`);
-      } else {
-        params.push(`${key}=${value}`);
-      }
+      // `pyLiteral` e não interpolação direta: `String(true)` é `"true"`, que em Python é um
+      // nome inexistente (`NameError: name 'true' is not defined`). Qualquer modelo com
+      // hiperparâmetro booleano — `shrinking`, `fit_intercept`, `early_stopping`, `warm_start`,
+      // `copy_X`, `positive`, `whiten` — gerava um script que nem chegava a treinar.
+      params.push(`${key}=${this.pyLiteral(value)}`);
     }
 
     return params.join(', ');

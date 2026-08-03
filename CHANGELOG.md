@@ -76,6 +76,51 @@ SimpleImputer + OneHotEncoder; PolynomialFeatures; RobustScaler + PowerTransform
 datasets gerados de regressão (sorvete) e classificação (moons); regressão polinomial; e MLP sem
 pré-processamento.
 
+### Corrigido — 3ª rodada: varredura por agentes nos ramos que faltavam
+
+Quatro agentes varreram, em paralelo, os 24 modelos, as 12 métricas, os 10 pré-processadores, os 25
+datasets do catálogo, os casos de borda e as demais saídas do zip — gerando e **executando** cada
+combinação. Sete defeitos novos:
+
+- **Booleano vazava como `true`/`false` para o Python** (`NameError: name 'true' is not defined`):
+  `formatHyperparameters` só tratava string, e `String(true)` é `"true"`. Atingia **13 dos 24
+  modelos** — todos os que têm hiperparâmetro booleano (`shrinking`, `fit_intercept`,
+  `early_stopping`, `warm_start`, `copy_X`, `positive`, `whiten`). O arquivo já tinha o
+  serializador certo (`pyLiteral`), usado só no pré-processamento. **Este era latente até esta
+  mesma versão**: enquanto os hiperparâmetros não chegavam ao script, nenhum booleano era emitido.
+- **`avaliar_modelo` com aridade decidida pelas métricas** e a chamada decidida pelo modelo:
+  `TypeError` quando um modelo de agrupamento é exportado sem métrica de agrupamento — o caso
+  **nominal do PCA**, cujo `metricas` é `[]` no catálogo. Agora a decisão é uma só, a do modelo.
+- **PCA tratado como agrupamento**: o script chamava `modelo.predict(X_test)`, e PCA é um
+  transformador (`AttributeError`). Passa a ser avaliado pela **variância explicada**, que é o que
+  faz sentido — e o que a plataforma mostra, já que o servidor recusa métrica de cluster para ele.
+- **Comparação misturando tarefas**: com um supervisionado e um k-Means na mesma coleta, o laço
+  aplicava `fit(X_train)` a todos (`fit() missing 1 required argument: 'y'`). O script passa a
+  levar os modelos da tarefa da coleta e a dizer, em comentário, quais ficaram de fora — não se
+  compara acurácia com silhueta.
+- **Datasets do UCI liam `data.features`**, enquanto o servidor lê `data.original`
+  (`dataset_loaders.py:172`). A coluna que o UCI declara como alvo ficava fora do dataframe, mas a
+  tela a oferece como atributo: `KeyError: "['color'] not in index"` em **5 datasets**
+  (wine_quality, wholesale_customers, obesity_levels, online_shoppers, heart_failure). E o alvo
+  saía do que o UCI declara, ignorando o que o aluno escolheu.
+- **Alvo dos datasets de classificação do sklearn**: a plataforma mostra o nome da classe
+  (`setosa`), o script usava o inteiro. Mesma acurácia, mas a matriz de confusão saía com outros
+  rótulos — e no breast_cancer em outra ordem, **transposta** em relação à da tela.
+- **Transformador que muda a largura de X** (PCA, SelectKBest… via `execucao` do admin): o
+  caminho genérico reconstruía o DataFrame com as colunas antigas (`Shape of passed values`) ou
+  atribuía de volta ao indexador (`Columns must be same length as key`) — com o servidor treinando
+  sem problema. Agora os nomes saem de `get_feature_names_out()`.
+
+Também: **o zip do aluno não leva mais metadados do servidor** — `environment_variables.txt` (que
+lista `NVIDIA_API_KEY`, só o nome) sai do pacote e o `MLmodel` é saneado no backend, preservando o
+que o `load_model` precisa (verificado: o modelo saneado carrega e prevê o mesmo valor).
+
+### Corrigido — "Melhor modelo" premiava o pior agrupamento
+
+`isMetricaMenorMelhor` decidia por substring do rótulo, e **Davies-Bouldin** é o único índice do
+catálogo em que menor é melhor sem ter "erro" no nome. A estrela de melhor valor e o "Melhor
+modelo" do relatório PDF apontavam o **pior** agrupamento.
+
 ### Por que os testes não pegavam
 
 As asserções do gerador eram todas de `toContain` em trechos isolados; nunca se executou o script
