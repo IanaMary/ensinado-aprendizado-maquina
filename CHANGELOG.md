@@ -49,6 +49,14 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
   **Verificado**: com o fix, o script exportado do pipeline de regressão imprime **R² 0.4849 / MAE
   41.5485** — os mesmos valores da tela, na quarta casa.
 
+### Endurecido — dataset gerado sem semente virava sorteio a cada execução
+
+Verificando o zip publicado: a plataforma normalmente **não fixa semente** (`seed` vem nulo), e o
+script saía com `random_state=None` — o aluno rodaria duas vezes e veria duas silhuetas
+(medido: **0.3374** no script contra **0.2545** na tela). Agora o script fixa `42` e **diz no
+próprio código** que a plataforma não usou semente, então os números saem parecidos e não
+idênticos. Determinismo para quem executa; honestidade sobre o que não é reproduzível.
+
 ### Por que os testes não pegavam
 
 As asserções do gerador eram todas de `toContain` em trechos isolados; nunca se executou o script

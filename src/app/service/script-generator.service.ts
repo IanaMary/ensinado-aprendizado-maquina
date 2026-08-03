@@ -787,13 +787,24 @@ export class ScriptGeneratorService {
    *  `null` quando o id não é de um gerador conhecido. Divergir do backend aqui produz um
    *  script que roda mas com outros dados; ao mexer num gerador de lá, ajuste os dois. */
   private getGeradorSintetico(id: string, seed?: number | null): string[] | null {
-    const rs = seed ?? null;
-    const rsArg = rs === null ? 'None' : String(rs);
+    // Quando a plataforma não fixou semente (o caso comum: `seed` vem nulo), os dados que
+    // treinaram o modelo são irrecuperáveis. Emitir `random_state=None` deixaria o script
+    // sorteando um dataset novo a cada execução — o aluno rodaria duas vezes e veria duas
+    // métricas. Fixamos 42 e avisamos no próprio script que os números serão parecidos, não
+    // idênticos aos da tela.
+    const semSemente = seed === null || seed === undefined;
+    const rsArg = semSemente ? '42' : String(seed);
     const colunas = (n: number) => `[f"atributo_{i + 1}" for i in range(${n})]`;
+    const nota = semSemente
+      ? ['    # A plataforma gerou estes dados SEM semente fixa, então os valores aqui saem',
+         '    # parecidos com os da tela, não idênticos. A semente 42 abaixo é para que ESTE',
+         '    # script dê sempre o mesmo resultado quando você rodar de novo.']
+      : [];
 
     switch (id) {
       case 'gen_classification':
         return [
+          ...nota,
           '    from sklearn.datasets import make_classification',
           `    dados, alvo = make_classification(`,
           `        n_samples=300, n_features=4, n_informative=2, n_redundant=0,`,
@@ -804,6 +815,7 @@ export class ScriptGeneratorService {
         ];
       case 'gen_blobs':
         return [
+          ...nota,
           '    from sklearn.datasets import make_blobs',
           `    dados, alvo = make_blobs(n_samples=300, n_features=2, centers=3, random_state=${rsArg})`,
           `    X = pd.DataFrame(dados, columns=${colunas(2)})`,
@@ -812,6 +824,7 @@ export class ScriptGeneratorService {
         ];
       case 'gen_moons':
         return [
+          ...nota,
           '    from sklearn.datasets import make_moons',
           `    dados, alvo = make_moons(n_samples=300, noise=0.1, random_state=${rsArg})`,
           '    X = pd.DataFrame(dados, columns=["atributo_1", "atributo_2"])',
@@ -819,6 +832,7 @@ export class ScriptGeneratorService {
         ];
       case 'gen_circles':
         return [
+          ...nota,
           '    from sklearn.datasets import make_circles',
           `    dados, alvo = make_circles(n_samples=300, noise=0.05, factor=0.5, random_state=${rsArg})`,
           '    X = pd.DataFrame(dados, columns=["atributo_1", "atributo_2"])',
@@ -826,6 +840,7 @@ export class ScriptGeneratorService {
         ];
       case 'gen_regression':
         return [
+          ...nota,
           '    from sklearn.datasets import make_regression',
           `    dados, alvo = make_regression(n_samples=300, n_features=3, noise=10.0, random_state=${rsArg})`,
           `    X = pd.DataFrame(dados, columns=${colunas(3)})`,
@@ -833,6 +848,7 @@ export class ScriptGeneratorService {
         ];
       case 'gen_sorvete':
         return [
+          ...nota,
           `    rng = np.random.RandomState(${rsArg})`,
           '    temperatura = rng.uniform(15, 40, 300)',
           '    pessoas = rng.uniform(0, 500, 300)',
@@ -842,6 +858,7 @@ export class ScriptGeneratorService {
         ];
       case 'gen_cardume':
         return [
+          ...nota,
           '    from sklearn.datasets import make_blobs',
           `    dados, alvo = make_blobs(n_samples=300, n_features=2, centers=3, random_state=${rsArg})`,
           '    X = pd.DataFrame(dados, columns=["velocidade", "direcao"])',
@@ -849,6 +866,7 @@ export class ScriptGeneratorService {
         ];
       case 'gen_cachorro':
         return [
+          ...nota,
           `    rng = np.random.RandomState(${rsArg})`,
           '    altura = rng.uniform(20, 70, 200)',
           '    alvo = np.clip(0.6 * (altura - 15) + rng.normal(0, 3, 200), 1, None).round(1)',
