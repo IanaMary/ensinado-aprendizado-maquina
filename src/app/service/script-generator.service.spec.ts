@@ -204,6 +204,42 @@ describe('ScriptGeneratorService', () => {
     expect(script).not.toContain('pd.read_csv("data/treino.csv")');
   });
 
+  it('respeita a seleção de atributos também no caminho de dataset', () => {
+    const wine: ResultadoColetaDado = {
+      ...datasetSklearn,
+      colunas: ['alcohol', 'malic_acid', 'ash', 'target'],
+      // o aluno desmarcou `ash`
+      atributos: { alcohol: true, malic_acid: true, ash: false, target: false },
+      target: 'target',
+    };
+
+    const script = service.generatePythonScript(wine, modeloKnn, metricas, {});
+
+    // O backend treina com `df[atributos]`; o script usava o dataset inteiro (`X = dados.data`)
+    // e por isso media outra coisa. O caminho de upload já filtrava.
+    expect(script).toContain('atributos = ["alcohol", "malic_acid"]');
+    expect(script).toContain('X = X[atributos]');
+    expect(script).not.toContain('"ash"');
+  });
+
+  it('gera o import de pré-processamento com parênteses no script multi-modelo', () => {
+    const treinados = [
+      { nome_modelo: 'k-NN', modelo: 'knn' },
+      { nome_modelo: 'Árvore', modelo: 'arvore_decisao' },
+    ];
+
+    const script = (service as any).generateMultiModelScript(
+      datasetSklearn, treinados, metricas,
+      { itens: [{ valor: 'standard_scaler', colunas: ['mass'] }] },
+    );
+
+    // Sem os parênteses a lista quebrada em duas linhas termina em vírgula solta e o Python
+    // recusa o arquivo inteiro: nenhum script de comparação de modelos com pré-processamento
+    // chegava a rodar.
+    expect(script).toContain('from sklearn.preprocessing import (');
+    expect(script).not.toMatch(/import StandardScaler[^\n]*,\n/);
+  });
+
   it('sem semente do servidor, fixa uma e diz que os números não serão idênticos', () => {
     const blobs: ResultadoColetaDado = {
       ...resultadoArquivo,
