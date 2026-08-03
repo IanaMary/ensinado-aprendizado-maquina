@@ -351,13 +351,12 @@ describe('ScriptGeneratorService', () => {
 
     expect(script).toContain('from sklearn.datasets import fetch_openml');
     expect(script).toContain('dados = fetch_openml("titanic", version=1, as_frame=True)');
-    // O recorte que a plataforma oferece — `boat`/`body` entregam a resposta e ficam fora.
-    // A checagem é na LINHA do recorte: o script também *menciona* as duas num comentário,
-    // explicando por que ficaram de fora, e um `not.toContain` cru bateria nesse comentário.
-    const linhaRecorte = script.split('\n').find(l => l.includes('X = X[['))!;
-    expect(linhaRecorte).toContain('"pclass", "sex", "age", "sibsp", "parch", "fare", "embarked"');
-    expect(linhaRecorte).not.toContain('boat');
-    expect(linhaRecorte).not.toContain('body');
+    // O Titanic entrega as 13 colunas do OpenML (decisão do usuário: `boat`/`body` são vazamento
+    // e ficam expostas para ENSINAR). Então o carregador NÃO recorta — quem recorta é a seleção
+    // de atributos do aluno, logo abaixo, e é isso que mantém o script fiel à tela.
+    expect(script).not.toContain('X = X[[');
+    expect(script).toContain('atributos = ["pclass", "age", "fare"]');
+    expect(script).toContain('X = X[atributos]');
     // O alvo já vem como rótulo ('0'/'1'): não passa pelo mapa de `target_names`.
     expect(script).toContain('y = dados.target');
     expect(script).not.toContain('dados.target_names');

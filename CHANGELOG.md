@@ -8,6 +8,24 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-03g (Titanic com as 13 colunas: o gerador não recorta mais)
+
+> Espelho da decisão do usuário no backend. Suíte **269** + build.
+
+### Mudado
+- `getToyDatasetLoader('titanic')` perdeu o campo `colunas`: o dataset entrega as **13** do OpenML,
+  como a plataforma (`OPENML_SPECS` com `colunas: None`) — inclusive `boat`/`body`, que são
+  vazamento e estão expostas de propósito, para ensinar. **Quem recorta é a seleção de atributos do
+  aluno** (`atributos = [...]; X = X[atributos]`), e é isso que mantém o script fiel à tela.
+- **Tinha de subir junto com o backend:** servidor oferecendo 13 e script recortando 7 daria
+  `KeyError` no código exportado para quem marcasse `boat`.
+
+### Notas
+- Verificado executando o script com `boat` marcado: `Shape de X: (1309, 13)` e **0.9238** de
+  acurácia — contra 0.6585 sem o vazamento. O código exportado reproduz a armadilha, como deve.
+
+---
+
 ## 2026-08-03 (exportação da Trilha: notebook inválido e zip sem os dados) — não implantada
 
 > A Trilha (`/trilha`) só existe nesta branch e **não está em produção** — medido no bundle
