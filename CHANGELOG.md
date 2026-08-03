@@ -8,6 +8,30 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-03f (Titanic vem do OpenML, e o script exportado usa o mesmo recorte)
+
+> Espelho da correção do backend (o `Titanic` apontava para o UCI `id=597`, que é produtividade de
+> fábrica têxtil). Suíte **269** + build.
+
+### Corrigido
+- `getUciDatasetId` perdeu o `titanic: 597` e `getToyDatasetLoader` ganhou
+  **`fetch_openml("titanic", version=1, as_frame=True)`**, espelhando `OPENML_SPECS` do backend.
+- O loader passou a aceitar **`colunas`**: quando o backend recorta as colunas oferecidas, o script
+  aplica o **mesmo** recorte (`X = X[["pclass", "sex", …]]`). Sem isso o script treinaria com as 13
+  colunas do OpenML — inclusive `boat` e `body`, que **entregam a resposta** (bote salva-vidas /
+  corpo recuperado) — e devolveria um acerto quase perfeito, nada a ver com o da tela.
+- O Titanic **não** usa o mapa de `target_names`: o alvo do OpenML já vem como rótulo (`'0'`/`'1'`).
+
+### Notas
+- Verificado executando o script gerado: **exit 0**, `Shape de X: (1309, 7)`, divisão
+  `981/328 (75/25)` — os mesmos números da plataforma. E o `X` do script é **idêntico**
+  (`DataFrame.equals`) ao dataframe que o backend serve.
+- **Armadilha do próprio teste, registrada:** o script *menciona* `boat`/`body` num comentário que
+  explica por que ficaram de fora, então um `expect(script).not.toContain('boat')` falha por causa
+  do comentário. A checagem correta é na **linha do recorte**, não no arquivo inteiro.
+
+---
+
 ## 2026-08-03 (o código exportado volta a rodar: 6 defeitos no gerador de script)
 
 > Achados montando **três pipelines completos em produção** (classificação, regressão e
