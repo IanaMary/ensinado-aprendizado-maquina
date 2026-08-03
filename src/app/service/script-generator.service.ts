@@ -213,8 +213,16 @@ export class ScriptGeneratorService {
     }
 
     if (preProcessamentoConfig?.itens?.length > 0) {
-      lines.push('from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, Normalizer,');
-      lines.push('    LabelEncoder, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, PowerTransformer');
+      // Os PARÊNTESES são obrigatórios: a lista ocupa duas linhas, e sem eles o Python vê uma
+      // vírgula solta no fim da primeira e recusa o arquivo inteiro
+      // (`SyntaxError: trailing comma not allowed without surrounding parentheses`).
+      // Era isso que tornava TODO script de comparação de modelos com pré-processamento
+      // inválido — nem chegava a importar pandas.
+      lines.push('from sklearn.preprocessing import (');
+      lines.push('    StandardScaler, MinMaxScaler, RobustScaler, Normalizer,');
+      lines.push('    LabelEncoder, OneHotEncoder, OrdinalEncoder,');
+      lines.push('    PolynomialFeatures, PowerTransformer');
+      lines.push(')');
       lines.push('from sklearn.impute import SimpleImputer');
     }
 
@@ -921,6 +929,20 @@ export class ScriptGeneratorService {
       // Agrupamento não tem y — e a execução principal chama `selecionar_features(X)` com um
       // argumento só. Gerar aqui a versão de dois parâmetros deixava o script com um
       // TypeError garantido (faltando 'y') em todo pipeline exploratório sobre dataset.
+      // As colunas que o aluno DEIXOU MARCADAS na coleta. Sem isto o script usava o dataset
+      // inteiro (`X = dados.data`), ignorando a seleção de features — o backend treinava com as
+      // colunas escolhidas e o script exportado com todas, dando outra métrica. O caminho de
+      // upload já fazia esse filtro (`atributos = [...]`); só o de dataset não.
+      const marcadas = Object.entries(resultado.atributos || {})
+        .filter(([col, ligada]) => ligada && col !== resultado.target)
+        .map(([col]) => col);
+      const filtroFeatures = marcadas.length > 0
+        ? ['    # Só as colunas marcadas como atributo na tela',
+           `    atributos = [${marcadas.map(c => `"${c}"`).join(', ')}]`,
+           '    X = X[atributos]',
+           '    ']
+        : [];
+
       if (ehAgrupamento) {
         return [
           '# ============================================',
@@ -928,6 +950,7 @@ export class ScriptGeneratorService {
           '# ============================================',
           'def selecionar_features(X):',
           '    """Divide o dataset em treino e teste (agrupamento não usa target)."""',
+          ...filtroFeatures,
           '    X_train, X_test = train_test_split(',
           `        X, test_size=${(testPct / 100).toFixed(2)}, random_state=42, shuffle=${shuffle}`,
           '    )',
@@ -945,6 +968,7 @@ export class ScriptGeneratorService {
         '# ============================================',
         'def selecionar_features(X, y):',
         '    """Divide o dataset em treino e teste, mantendo a coluna target separada."""',
+        ...filtroFeatures,
         `    X_train, X_test, y_train, y_test = train_test_split(`,
         `        X, y, test_size=${(testPct / 100).toFixed(2)}, random_state=42,`,
         `        shuffle=${shuffle}, stratify=${stratify}`,

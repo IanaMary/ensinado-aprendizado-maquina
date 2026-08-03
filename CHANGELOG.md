@@ -57,6 +57,25 @@ script saía com `random_state=None` — o aluno rodaria duas vezes e veria duas
 próprio código** que a plataforma não usou semente, então os números saem parecidos e não
 idênticos. Determinismo para quem executa; honestidade sobre o que não é reproduzível.
 
+### Corrigido — mais dois, achados varrendo 11 combinações e executando cada uma
+
+- **O script de comparação de modelos nem compilava**: o import de `sklearn.preprocessing` era
+  quebrado em duas linhas **sem parênteses**, e o Python recusa o arquivo inteiro
+  (`SyntaxError: trailing comma not allowed without surrounding parentheses`). Valia para
+  **todo** pipeline multi-modelo com pré-processamento — o caminho de modelo único já usava
+  parênteses.
+- **A seleção de atributos era ignorada no caminho de dataset**: o script usava o dataset inteiro
+  (`X = dados.data`) enquanto o backend treina com `df[atributos]`. Desmarcar uma coluna na tela
+  dava um script que media outra coisa (medido no Wine com 3 das 13 colunas: acurácia do k-NN
+  0.8667 no script filtrado contra 0.7778 sem filtro). O caminho de upload já filtrava — só o de
+  dataset não.
+
+Cobertura desta varredura, todas **executadas** (exit 0 e saída conferida): multi-modelo de
+classificação, regressão e agrupamento; upload com alvo texto + LabelEncoder; upload com
+SimpleImputer + OneHotEncoder; PolynomialFeatures; RobustScaler + PowerTransformer + Normalizer;
+datasets gerados de regressão (sorvete) e classificação (moons); regressão polinomial; e MLP sem
+pré-processamento.
+
 ### Por que os testes não pegavam
 
 As asserções do gerador eram todas de `toContain` em trechos isolados; nunca se executou o script
