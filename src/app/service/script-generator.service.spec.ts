@@ -203,4 +203,19 @@ describe('ScriptGeneratorService', () => {
     // Ler CSV aqui era FileNotFoundError: o zip não anexa CSV para dataset de exemplo.
     expect(script).not.toContain('pd.read_csv("data/treino.csv")');
   });
+
+  it('sem semente do servidor, fixa uma e diz que os números não serão idênticos', () => {
+    const blobs: ResultadoColetaDado = {
+      ...resultadoArquivo,
+      fonteDados: 'dataset', nomeDataset: 'blobs', datasetId: 'gen_blobs', datasetSeed: null,
+    };
+    const modeloKmeans = { ...modeloKnn, valor: 'k_means', dadosRotulados: false } as ItemPipeline;
+
+    const script = service.generatePythonScript(blobs, modeloKmeans, [], {});
+
+    // `random_state=None` faria o script sortear dados novos a cada execução.
+    expect(script).not.toContain('random_state=None');
+    expect(script).toContain('random_state=42');
+    expect(script).toContain('SEM semente fixa');
+  });
 });
