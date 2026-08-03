@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
+import JSZip from 'jszip';
+
 import { ScriptGeneratorService } from './script-generator.service';
 import { ItemPipeline, ResultadoColetaDado } from '../models/item-coleta-dado.model';
 
@@ -447,5 +449,45 @@ describe('ScriptGeneratorService', () => {
     expect(script).not.toContain('random_state=None');
     expect(script).toContain('random_state=42');
     expect(script).toContain('SEM semente fixa');
+  });
+
+  // `anexarDadosCsv` existe porque há DOIS montadores de zip (o bundle clássico e o `exportar()`
+  // da Trilha) e a Trilha não anexava CSV nenhum — o script dela morria em FileNotFoundError.
+  it('anexarDadosCsv: com dados do aluno, grava treino e teste na pasta recebida', async () => {
+    const upload: ResultadoColetaDado = {
+      ...resultadoArquivo,
+      treino: { dados: [{ a: 1, b: 2 }], totalDados: 1, nomeArquivo: 'f.csv' },
+      teste: { dados: [{ a: 3, b: 4 }], totalDados: 1, nomeArquivo: '' },
+    };
+    const zip = new JSZip();
+    const pasta = zip.folder('knn')!;
+
+    service.anexarDadosCsv(pasta, upload);
+
+    expect(zip.file('knn/data/treino.csv')).toBeTruthy();
+    expect(zip.file('knn/data/teste.csv')).toBeTruthy();
+    expect(await zip.file('knn/data/treino.csv')!.async('string')).toBe('a,b\n1,2');
+  });
+
+  it('anexarDadosCsv: não grava nada quando o script reproduz os dados sozinho', () => {
+    const zip = new JSZip();
+
+    service.anexarDadosCsv(zip, datasetSklearn);
+
+    expect(Object.keys(zip.files).length).toBe(0);
+  });
+
+  it('anexarDadosCsv: omite o CSV vazio em vez de gravar arquivo sem linhas', () => {
+    const semTeste: ResultadoColetaDado = {
+      ...resultadoArquivo,
+      treino: { dados: [{ a: 1 }], totalDados: 1, nomeArquivo: 'f.csv' },
+      teste: { dados: [], totalDados: 0, nomeArquivo: '' },
+    };
+    const zip = new JSZip();
+
+    service.anexarDadosCsv(zip, semTeste);
+
+    expect(zip.file('data/treino.csv')).toBeTruthy();
+    expect(zip.file('data/teste.csv')).toBeNull();
   });
 });

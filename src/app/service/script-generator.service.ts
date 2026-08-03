@@ -31,6 +31,27 @@ export class ScriptGeneratorService {
 
   constructor(private http: HttpClient, private relatorioPdf: RelatorioPdfService) { }
 
+  /** Anexa `data/treino.csv` / `data/teste.csv` a `folder` QUANDO o script gerado vai lê-los.
+   *
+   *  Quem decide não é a fonte, é o SCRIPT: ele lê `data/*.csv` sempre que não souber reproduzir
+   *  os dados sozinho (sem loader do sklearn, sem id do UCI, sem gerador sintético). Condicionar
+   *  ao `fonteDados !== 'dataset'` deixava o zip de um dataset de exemplo não-sklearn sem CSV
+   *  nenhum, com o script morrendo em FileNotFoundError.
+   *
+   *  Público porque há DOIS montadores de zip: o `generatePipelineBundle` daqui e o `exportar()`
+   *  da Trilha. A Trilha não anexava CSV nenhum, então todo pipeline dela sobre dados do aluno
+   *  (upload de planilha ou ingestão por URL) exportava um script que morria na primeira linha
+   *  em `FileNotFoundError: data/treino.csv`. */
+  anexarDadosCsv(folder: JSZip, coleta: ResultadoColetaDado | undefined): void {
+    if (!this.scriptLeCsv(coleta)) return;
+    if (coleta?.treino?.dados?.length) {
+      folder.file('data/treino.csv', this.convertToCsv(coleta.treino.dados));
+    }
+    if (coleta?.teste?.dados?.length) {
+      folder.file('data/teste.csv', this.convertToCsv(coleta.teste.dados));
+    }
+  }
+
   /** Baixa o modelo treinado (id) e o mescla no bundle sob `<subpasta>/modelo/`,
    *  escrevendo também os exemplos `usar_modelo_mlflow.py` e `usar_modelo_joblib.py`.
    *  Best-effort: se o download falhar (modelo indisponível), o bundle segue sem o modelo. */
@@ -165,18 +186,7 @@ export class ScriptGeneratorService {
 
     folder.file('pipeline.py', script);
 
-    // Quem decide não é a fonte, é o SCRIPT: ele lê `data/*.csv` sempre que não souber
-    // reproduzir os dados sozinho (sem loader do sklearn, sem id do UCI, sem gerador
-    // sintético). Condicionar ao `fonteDados !== 'dataset'` deixava o zip de um dataset de
-    // exemplo não-sklearn sem CSV nenhum, com o script morrendo em FileNotFoundError.
-    if (this.scriptLeCsv(resultadoColetaDado)) {
-      if (resultadoColetaDado?.treino?.dados && resultadoColetaDado.treino.dados.length > 0) {
-        folder.file('data/treino.csv', this.convertToCsv(resultadoColetaDado.treino.dados));
-      }
-      if (resultadoColetaDado?.teste?.dados && resultadoColetaDado.teste.dados.length > 0) {
-        folder.file('data/teste.csv', this.convertToCsv(resultadoColetaDado.teste.dados));
-      }
-    }
+    this.anexarDadosCsv(folder, resultadoColetaDado);
 
     folder.file('README.md', this.generateReadme(modeloSelecionado, resultadoColetaDado, isMultiModelo ? modelosTreinados : undefined, modelosTreinados.length > 0));
 

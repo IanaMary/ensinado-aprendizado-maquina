@@ -8,6 +8,39 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-03 (exportação da Trilha: notebook inválido e zip sem os dados) — não implantada
+
+> A Trilha (`/trilha`) só existe nesta branch e **não está em produção** — medido no bundle
+> publicado: zero ocorrências de `nbformat`, `ipynb`, `cell_type`, `kernelspec` e `'trilha'` nos
+> 54 chunks servidos. Os dois defeitos abaixo, portanto, nunca atingiram aluno; foram achados
+> varrendo as saídas de exportação além do `pipeline.py`. Suíte **262** passed + build.
+
+### Corrigido
+- **O zip da Trilha não anexava `data/*.csv`, e o script morria na primeira linha.** `exportar()`
+  gravava só `pipeline.{py,ipynb}`, o modelo e o `comparacao.csv` — nunca os dados. Com dados do
+  aluno (upload de planilha ou ingestão por URL) o script gerado abre `data/treino.csv`, então
+  **todo** pipeline da Trilha sobre dados próprios exportava algo que terminava em
+  `FileNotFoundError: [Errno 2] No such file or directory: 'data/treino.csv'` — reproduzido antes
+  da correção, e agora o notebook roda até o fim (`Acurácia: 1.0000`, exit 0).
+  A decisão "o script vai ler CSV?" já existia no `ScriptGeneratorService` (`scriptLeCsv`), mas
+  privada e usada só pelo bundle clássico; virou o método público **`anexarDadosCsv(folder, coleta)`**,
+  agora a única fonte da verdade para os DOIS montadores de zip (`generatePipelineBundle` e o
+  `exportar()` da Trilha). Ele também omite o CSV vazio em vez de gravar arquivo sem linhas.
+- **O `.ipynb` violava o schema do nbformat.** `toNotebook` declarava `nbformat_minor: 5` e não
+  emitia `id` em célula nenhuma — o `nbformat.validate` acusava `'id' is a required property` nas
+  duas células (medido: 2 erros no JSON cru → 0 depois). Hoje o Jupyter conserta na leitura e só
+  avisa (`MissingIDFieldWarning`), mas o próprio aviso diz que vai virar erro, e aí o notebook do
+  aluno deixaria de abrir.
+
+### Notas
+- O conteúdo da célula de código é **byte-idêntico** ao `pipeline.py` equivalente (verificado com
+  `diff`), e executa com `python3` sem erro — o `.ipynb` não tem gerador próprio de código.
+- **Gotcha do build nesta branch:** o `node_modules` compartilhado com a `mestrado-iana` poda as
+  deps do TF.js, e aí `leo-visao.service.ts` quebra o build com `TS18046: 'a' is of type 'unknown'`
+  — parece regressão e não é. Requer `npm install` na própria branch.
+
+---
+
 ## 2026-08-03 (o código exportado volta a rodar: 6 defeitos no gerador de script)
 
 > Achados montando **três pipelines completos em produção** (classificação, regressão e

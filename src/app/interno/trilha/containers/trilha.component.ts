@@ -664,6 +664,9 @@ export class TrilhaComponent implements OnInit, OnDestroy {
       const conteudo = this.exportFormato === 'ipynb' ? this.toNotebook(c.label, script) : script;
       const pasta = zip.folder(c.valor)!;
       pasta.file(`pipeline.${ext}`, conteudo);
+      // Os CSVs, quando o script for lê-los: com dados do aluno (planilha ou URL) o script abre
+      // `data/treino.csv`, e sem isto o zip saía sem a pasta — FileNotFoundError na 1ª linha.
+      this.scriptGen.anexarDadosCsv(pasta, this.resultadoColetaDado);
       // Modelo JÁ treinado do ramo + usar_modelo.py (best-effort).
       await this.scriptGen.anexarModeloTreinado(pasta, c.resultado, this.resultadoColetaDado);
     }
@@ -721,12 +724,18 @@ export class TrilhaComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Empacota o script num `.ipynb`.
+   *
+   *  O `id` por célula é OBRIGATÓRIO a partir do nbformat 4.5, que é o que declaramos em
+   *  `nbformat_minor`. Sem ele o `nbformat.validate` acusa "'id' is a required property" nas duas
+   *  células; hoje o Jupyter conserta na leitura e só avisa (`MissingIDFieldWarning`), mas o
+   *  próprio aviso diz que vai virar erro — e aí o notebook do aluno deixaria de abrir. */
   private toNotebook(titulo: string, script: string): string {
     const linhas = script.split('\n');
     return JSON.stringify({
       cells: [
-        { cell_type: 'markdown', metadata: {}, source: [`# ${titulo}\n`, 'Pipeline gerado pela Trilha de ML (H2IA Tutor).'] },
-        { cell_type: 'code', execution_count: null, metadata: {}, outputs: [], source: linhas.map((l, i) => i < linhas.length - 1 ? l + '\n' : l) },
+        { cell_type: 'markdown', id: 'titulo', metadata: {}, source: [`# ${titulo}\n`, 'Pipeline gerado pela Trilha de ML (H2IA Tutor).'] },
+        { cell_type: 'code', id: 'pipeline', execution_count: null, metadata: {}, outputs: [], source: linhas.map((l, i) => i < linhas.length - 1 ? l + '\n' : l) },
       ],
       metadata: { kernelspec: { name: 'python3', display_name: 'Python 3' }, language_info: { name: 'python' } },
       nbformat: 4, nbformat_minor: 5,
