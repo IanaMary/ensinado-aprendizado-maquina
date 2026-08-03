@@ -142,7 +142,16 @@ export class RelatorioPdfService {
         doc.setFontSize(9);
         doc.setTextColor(...(bold ? [255, 255, 255] : [30, 30, 30]));
         cells.forEach((c, i) => {
-          const txt = doc.splitTextToSize(String(c ?? ''), colW - 3)[0] || '';
+          // Uma linha por célula (a altura da linha é fixa), mas com "…" quando sobrou texto:
+          // antes o resto era descartado em silêncio e "MSE (Erro Quadrático Médio)" virava
+          // "MSE (Erro" sem qualquer sinal de que havia mais. Com 4+ modelos a coluna aperta e
+          // isso passa a valer para quase todo rótulo.
+          const partes = doc.splitTextToSize(String(c ?? ''), colW - 3);
+          let txt = partes[0] || '';
+          if (partes.length > 1) {
+            txt = doc.splitTextToSize(txt + '…', colW - 3)[0] || txt;
+            if (!txt.endsWith('…')) txt = txt.slice(0, -1) + '…';
+          }
           doc.text(txt, M + i * colW + 1.5, y + 4.8);
         });
         y += rowH;

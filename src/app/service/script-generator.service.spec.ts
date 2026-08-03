@@ -382,6 +382,58 @@ describe('ScriptGeneratorService', () => {
     expect(script).toContain('modelo.fit(X_train, y_train)');
   });
 
+  // README do bundle: o aluno segue estas instruções à risca.
+
+  it('README: origem sai da mesma decisão do carregamento, não "toy dataset" para tudo', () => {
+    const uci: ResultadoColetaDado = {
+      ...datasetSklearn, nomeDataset: 'heart_failure', datasetId: 'heart_failure',
+      target: 'death_event',
+    };
+
+    const readme = (service as any).generateReadme(modeloKnn, uci, undefined, true);
+
+    expect(readme).toContain('UCI Machine Learning Repository');
+    expect(readme).not.toContain("do scikit-learn");
+    // sem `ucimlrepo` o script quebra em ModuleNotFoundError seguindo o próprio README
+    expect(readme).toContain('pip install pandas numpy scikit-learn ucimlrepo');
+  });
+
+  it('README: dataset sintético diz que os dados são gerados, e agrupamento não imprime Target', () => {
+    const blobs: ResultadoColetaDado = {
+      ...datasetSklearn, nomeDataset: 'blobs', datasetId: 'gen_blobs', datasetSeed: 42, target: '',
+    };
+
+    const readme = (service as any).generateReadme(modeloKnn, blobs, undefined, false);
+
+    expect(readme).toContain('GERADO pelo próprio script');
+    expect(readme).not.toContain('**Target:**');
+  });
+
+  it('README: no multi-modelo os caminhos apontam para modelos/<nome>/', () => {
+    const treinados = [{ nome_modelo: 'k-NN' }, { nome_modelo: 'Árvore de Decisão' }];
+
+    const readme = (service as any).generateReadme(undefined, datasetSklearn, treinados, true);
+
+    // O zip põe cada modelo em `modelos/<slug>/`; o README mandava rodar na raiz.
+    expect(readme).toContain('cd modelos/<nome-do-modelo>');
+    expect(readme).toContain('modelos/<nome-do-modelo>/usar_modelo_joblib.py');
+  });
+
+  it('README: só anuncia data/ quando o script realmente lê CSV', () => {
+    const semCsv = (service as any).generateReadme(modeloKnn, datasetSklearn, undefined, false);
+    expect(semCsv).not.toContain('data/');
+
+    const upload: ResultadoColetaDado = {
+      ...resultadoArquivo,
+      treino: { dados: [{ a: 1 }], totalDados: 1, nomeArquivo: 'f.csv' },
+      teste: { dados: [], totalDados: 0, nomeArquivo: '' },
+    };
+    const comCsv = (service as any).generateReadme(modeloKnn, upload, undefined, false);
+    expect(comCsv).toContain('treino.csv');
+    // o teste vazio não é anexado ao zip, então não deve ser anunciado
+    expect(comCsv).not.toContain('teste.csv');
+  });
+
   it('sem semente do servidor, fixa uma e diz que os números não serão idênticos', () => {
     const blobs: ResultadoColetaDado = {
       ...resultadoArquivo,
