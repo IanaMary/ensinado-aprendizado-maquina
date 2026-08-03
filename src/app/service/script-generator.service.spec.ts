@@ -336,6 +336,36 @@ describe('ScriptGeneratorService', () => {
     expect(script).not.toContain('dados.data.features');
   });
 
+  // O Titanic saiu do UCI: o id 597 que ele usava NÃO é o Titanic, é "Productivity Prediction of
+  // Garment Employees" — quem escolhesse "Titanic" recebia dados de fábrica têxtil e um alvo
+  // inexistente. Agora vem do OpenML pelo `fetch_openml`, espelhando `OPENML_SPECS` do backend.
+  it('Titanic vem do OpenML, com o mesmo recorte de colunas do backend', () => {
+    const titanic: ResultadoColetaDado = {
+      ...datasetSklearn, nomeDataset: 'Titanic', datasetId: 'titanic',
+      target: 'survived',
+      colunas: ['pclass', 'sex', 'age', 'fare', 'survived'],
+      atributos: { pclass: true, age: true, fare: true, survived: false },
+    };
+
+    const script = service.generatePythonScript(titanic, modeloKnn, metricas, {});
+
+    expect(script).toContain('from sklearn.datasets import fetch_openml');
+    expect(script).toContain('dados = fetch_openml("titanic", version=1, as_frame=True)');
+    // O recorte que a plataforma oferece — `boat`/`body` entregam a resposta e ficam fora.
+    // A checagem é na LINHA do recorte: o script também *menciona* as duas num comentário,
+    // explicando por que ficaram de fora, e um `not.toContain` cru bateria nesse comentário.
+    const linhaRecorte = script.split('\n').find(l => l.includes('X = X[['))!;
+    expect(linhaRecorte).toContain('"pclass", "sex", "age", "sibsp", "parch", "fare", "embarked"');
+    expect(linhaRecorte).not.toContain('boat');
+    expect(linhaRecorte).not.toContain('body');
+    // O alvo já vem como rótulo ('0'/'1'): não passa pelo mapa de `target_names`.
+    expect(script).toContain('y = dados.target');
+    expect(script).not.toContain('dados.target_names');
+    // E não é mais tratado como dataset do UCI.
+    expect(script).not.toContain('ucimlrepo');
+    expect(script).not.toContain('fetch_ucirepo');
+  });
+
   it('alvo dos datasets de classificação do sklearn vem pelo nome da classe', () => {
     const script = service.generatePythonScript(datasetSklearn, modeloKnn, metricas, {});
 

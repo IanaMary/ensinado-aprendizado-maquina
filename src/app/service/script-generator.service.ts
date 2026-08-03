@@ -818,6 +818,12 @@ export class ScriptGeneratorService {
           `    """Carrega o dataset '${resultado.nomeDataset}' do scikit-learn."""`,
           `    dados = ${ds.importLine}`,
           '    X = dados.data',
+          ...(ds.colunas
+            ? ['    # O MESMO recorte que a plataforma oferece. As colunas de fora não são',
+               '    # "a menos": `boat` e `body` (bote salva-vidas / corpo recuperado) revelam a',
+               '    # resposta, e treinar com elas daria um acerto quase perfeito e enganoso.',
+               `    X = X[[${ds.colunas.map(c => `"${c}"`).join(', ')}]]`]
+            : []),
           ...(ds.rotulosDeClasse
             ? ['    # O alvo pelo NOME da classe, como a plataforma mostra — assim a matriz de',
                '    # confusão sai com os mesmos rótulos, e na mesma ordem, da que você viu na tela.',
@@ -1012,25 +1018,37 @@ export class ScriptGeneratorService {
    *  aluno sai com `0/1/2` onde a tela mostra `setosa/versicolor/virginica`, e no breast_cancer
    *  a ordem chega a inverter (o sklearn usa `0=malignant`, a tela ordena alfabeticamente), o que
    *  dá uma matriz transposta em relação à da plataforma. */
-  private getToyDatasetLoader(nome: string): { importLine: string; rotulosDeClasse?: boolean } | null {
-    const map: Record<string, { importLine: string; rotulosDeClasse?: boolean }> = {
+  /** Espelha `carregar_sklearn` e `OPENML_SPECS` do backend (`app/models/dataset_loaders.py`).
+   *
+   *  `colunas` é o recorte que a plataforma oferece: quando existe, o script tem de aplicar o
+   *  MESMO recorte, senão treina com colunas que a tela nunca mostrou. No Titanic isso é
+   *  crítico — `boat` e `body` são vazamento (bote salva-vidas / corpo recuperado) e levariam o
+   *  script a ~100% de acerto contra os ~80% da tela. */
+  private getToyDatasetLoader(
+    nome: string,
+  ): { importLine: string; rotulosDeClasse?: boolean; colunas?: string[] } | null {
+    const map: Record<string, { importLine: string; rotulosDeClasse?: boolean; colunas?: string[] }> = {
       'iris': { importLine: 'load_iris(as_frame=True)', rotulosDeClasse: true },
       'wine': { importLine: 'load_wine(as_frame=True)', rotulosDeClasse: true },
       'breast_cancer': { importLine: 'load_breast_cancer(as_frame=True)', rotulosDeClasse: true },
       'digits': { importLine: 'load_digits(as_frame=True)', rotulosDeClasse: true },
       'diabetes': { importLine: 'load_diabetes(as_frame=True)' },
       'california_housing': { importLine: 'fetch_california_housing(as_frame=True)' },
+      // O alvo já vem como rótulo ('0'/'1'), então NÃO passa pelo mapa de `target_names`.
+      'titanic': {
+        importLine: 'fetch_openml("titanic", version=1, as_frame=True)',
+        colunas: ['pclass', 'sex', 'age', 'sibsp', 'parch', 'fare', 'embarked'],
+      },
     };
     return map[nome] ?? null;
   }
 
-  // Espelha o mapa uci_ids do backend (app/routers/toy_datasets.py::_carregar_uci).
+  // Espelha o mapa UCI_IDS do backend (app/models/dataset_loaders.py).
   private getUciDatasetId(nome: string): number | null {
     const map: Record<string, number> = {
       'adult': 2,
       'wine_quality': 186,
       'heart_disease': 45,
-      'titanic': 597,
       'abalone': 1,
       'housing': 601,
       'car_evaluation': 19,
