@@ -9,6 +9,41 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-04b (fecha o resíduo do arrasto, mata o handler morto, mostra o motivo)
+
+Bundle publicado: `main-AAXFAZ3W.js`. Verificado **na tela**, em produção.
+
+### Corrigido
+- **Resíduo do arrasto, fechado.** A primeira versão da guarda só olhava
+  `isPointerOverContainer`, então cancelava quando o aluno soltava de volta sobre a paleta — mas
+  soltar sobre uma **terceira** área (painel do tutor, cabeçalho, aviso de atividades) ainda
+  adicionava o item. A decisão passa a usar também `dropPoint` contra a área das raias: só entra o
+  que cai numa raia. Continua falhando para o lado seguro (sem `dropPoint` ou sem raia medível,
+  adiciona como antes). Verificado na tela: soltar sobre o aviso de atividades não adiciona; soltar
+  na raia adiciona.
+- **O anexo do modelo treinado deixa de falhar em silêncio.** O `catch {}` mudo escondia por que a
+  pasta `modelo/` não vinha no zip. Agora o motivo vai ao console e um `MODELO-AUSENTE.txt` entra no
+  próprio pacote, explicando que o `pipeline.py` não depende dela.
+
+### Removido
+- `onItemDropped` da paleta de **pré-processamento**: código morto. Aquele template não liga
+  `(cdkDropListDropped)` e é o único que declara `cdkDropListConnectedTo`, então o `dropped` sai na
+  raia, que não tem handler — o caminho real dali é o clique.
+
+### Investigado (o zip de agrupamento sem `modelo/`)
+Três registros de histórico traziam isso como "observação não investigada". **Não é o backend:**
+medi em produção que `download_artifacts(run_id, "model")` funciona para `k_means`, `arvore_decisao`
+e `pca`, e que 52 modelos estão logados no store. Duas hipóteses minhas caíram no caminho — que o
+`log_sklearn_model` estivesse falhando (não está: zero exceções no log) e que o leitor procurasse no
+lugar errado (o MLflow 3 resolve `run_id` + `artifact_path` de forma transparente, mesmo com
+`list_artifacts` vazio, porque o modelo virou entidade própria). Por isso a correção foi tornar a
+falha **visível** em vez de adivinhar a causa.
+
+### Paridade
+Portado para a `master` (`fecfe7e`). Copiar o `script-generator.service.ts` inteiro **apagaria** o
+`anexarDadosCsv` público de lá — que existe porque a Trilha tem o segundo montador de zip. O `git
+diff` mostrou 26 remoções, o arquivo foi revertido e só a troca do `catch` foi aplicada.
+
 ## 2026-08-04 (dá para desistir de um arrasto; a galeria não inventa dados)
 
 Bundle publicado: `main-MBE3HF7F.js`. Verificado **na tela**, em produção, com o aluno logado.
