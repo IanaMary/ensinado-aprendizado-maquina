@@ -11,7 +11,16 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ## 2026-08-04 (dá para desistir de um arrasto; a galeria não inventa dados)
 
+Bundle publicado: `main-MBE3HF7F.js`. Verificado **na tela**, em produção, com o aluno logado.
+
 ### Corrigido
+- **Soltar uma métrica apagava o card "Dados".** Achado testando no navegador.
+  `movendoItemExecucao` é chamado pelas QUATRO paletas e desabilitava a paleta de coleta **sem olhar
+  o tipo do item** — a intenção era "dados se carregam uma vez por pipeline". Com a área de trabalho
+  vazia, soltar uma métrica (ou um modelo, ou um pré-processador) deixava o card em
+  `item-desabilitado cdk-drag-disabled`, e o aluno perdia a única forma de carregar dados; só voltava
+  limpando o pipeline inteiro. Quem começasse a montar pela avaliação travava sem entender por quê.
+  Reproduzido em produção do zero e reconferido depois da correção.
 - **Arrastar e desistir adicionava o item.** As paletas do pipeline não declaram
   `cdkDropListConnectedTo`, então para o CDK o item nunca sai da paleta: o `dropped` é sempre emitido
   por ela mesma, e o handler tratava isso como "soltou em algum lugar, adiciona". Pegar um item,
