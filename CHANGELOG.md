@@ -50,6 +50,32 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 
 ---
 
+## 2026-08-03e (o arrastar-e-soltar ganha teste — cobertura era zero)
+
+> Levantamento de cobertura por agente: **38 de 77 arquivos sem spec**, **17 de 40 specs apagam o
+> template** (`{ set: { template: '' } }`, então o dashboard roda sem DOM) e o **drag-and-drop tinha
+> cobertura ZERO**. Suíte **273** (era 269).
+
+### Coberto — `onItemDropped`, que é como o aluno monta o pipeline
+
+Os quatro componentes de paleta (`dashboard/pipeline/*`) têm o mesmo `onItemDropped` e todos tinham
+um único `it('should create')`. O de coleta passou a ter 5 casos.
+
+**O mecanismo não é óbvio, e ficou documentado no próprio teste:** a paleta **não** declara
+`cdkDropListConnectedTo`, então soltar o item sobre uma raia **não é um drop válido** para o CDK — o
+evento `dropped` volta a ser emitido pela própria paleta, e é dele que o handler se serve para
+empurrar o item à raia pelo serviço. Funciona por efeito colateral de um drop inválido.
+
+Consequência fixada em teste: o handler **não olha** `isPointerOverContainer` nem o container de
+destino, então **começar a arrastar e desistir no meio do caminho adiciona o item** — não há como
+cancelar um arrasto. Não é regressão nem crash; é comportamento que ninguém tinha escrito. Se algum
+dia passar a depender de onde o ponteiro terminou, o teste falha e a mudança fica explícita.
+
+Também explica por que a automação de browser não conseguia montar pipeline arrastando: sem
+`connectedTo`, o drop precisa de eventos de ponteiro reais na paleta, não de um alvo de soltar.
+
+---
+
 ## 2026-08-03 (o código exportado volta a rodar: 6 defeitos no gerador de script)
 
 > Achados montando **três pipelines completos em produção** (classificação, regressão e
