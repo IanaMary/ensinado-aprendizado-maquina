@@ -66,6 +66,7 @@ export interface PipelineProfessor {
   descricao: string;
   professor: string;
   disciplina?: string;
+  /** Nome da turma — o servidor só o envia quando sou membro dela. */
   turma?: string;
   publico: boolean;
   dataCriacao: string;
@@ -75,6 +76,8 @@ export interface PipelineProfessor {
   tags: string[];
   // `totalCopias` e `avaliacao` saíram: nunca vieram do servidor. A galeria os preenchia com 0 e
   // 5.0 fixos e os exibia como se fossem medição. Voltam quando houver contagem e nota de verdade.
+  /** O servidor decide: pertence a uma turma da qual eu sou aluno ou professor. */
+  daMinhaTurma: boolean;
   estado?: PipelineState;
 }
 

@@ -23,9 +23,21 @@
     </div>
     
     <div class="filtros-grupo">
-      <!-- O grupo Públicos/Minha Turma/Todos saiu: a galeria já é, por definição, a lista dos
-           pipelines públicos. "Públicos" e "Todos" mostravam a mesma coisa e "Minha Turma" filtrava
-           os não-públicos dentro de uma lista só de públicos — resultado sempre vazio. -->
+      <!-- Dois botões, não três: "Públicos" e "Todos" mostravam a mesma lista, e o "Minha Turma"
+           antigo filtrava os não-públicos dentro de uma lista só de públicos — sempre vazio. E o
+           grupo só aparece quando há item de turma para filtrar: filtro que não pode dar resultado é
+           o defeito que esta tela tinha. -->
+      <div class="filtro-tipo" *ngIf="temItensDaMinhaTurma">
+        <button [class.active]="filtroTurma === 'todos'" (click)="filtroTurma = 'todos'">
+          <mat-icon>apps</mat-icon>
+          Todos
+        </button>
+        <button [class.active]="filtroTurma === 'minha'" (click)="filtroTurma = 'minha'">
+          <mat-icon>group</mat-icon>
+          Minha turma
+        </button>
+      </div>
+
       <div class="filtro-dificuldade">
         <button *ngFor="let dificuldade of ['todos', 'iniciante', 'intermediario', 'avancado']"
                 [class.active]="filtroDificuldade === dificuldade"
@@ -51,9 +63,14 @@
         <div class="card-badge" [ngClass]="getDificuldadeClass(pipeline.dificuldade)">
           {{ getDificuldadeLabel(pipeline.dificuldade) }}
         </div>
-        <!-- Não há selo de turma: o endpoint da galeria não devolve o vínculo, e `pipeline.turma`
-             nunca era preenchido — o selo saía vazio (e era inalcançável, já que todo item da
-             galeria é público). -->
+        <!-- Selo de turma: o nome só chega do servidor quando sou membro dela, então este bloco
+             nunca renderiza vazio (era o defeito do selo de cadeado anterior, que lia um
+             `pipeline.turma` nunca preenchido). O ícone muda quando o material não é público: é
+             material da turma, não da galeria aberta. -->
+        <div class="card-tipo" *ngIf="pipeline.turma">
+          <mat-icon>{{ pipeline.publico ? 'group' : 'lock' }}</mat-icon>
+          <span>{{ pipeline.turma }}</span>
+        </div>
 
       </div>
       
@@ -101,6 +118,7 @@
     <mat-icon>explore</mat-icon>
     <h3>Nenhum pipeline encontrado</h3>
     <p *ngIf="termoBusca">Tente buscar com outros termos</p>
-    <p *ngIf="!termoBusca">Não há pipelines disponíveis com os filtros selecionados</p>
+    <p *ngIf="!termoBusca && filtroTurma === 'minha'">Nenhum material da sua turma com esses filtros</p>
+    <p *ngIf="!termoBusca && filtroTurma !== 'minha'">Não há pipelines disponíveis com os filtros selecionados</p>
   </div>
 </div>
