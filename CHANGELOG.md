@@ -1,12 +1,43 @@
 # Changelog — H2IA Tutor
 
-Histórico de deploys em produção (`https://absapt.tk/h2ia/`). Formato inspirado em
+Histórico de deploys em produção (`https://absapt.tk/h2ia/tutor/`). Formato inspirado em
 [Keep a Changelog](https://keepachangelog.com); datas em AAAA-MM-DD. Cada entrada cita os
-commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Historical Production Reference_.
+commits (frontend/backend) e o bundle publicado. O histórico narrativo completo (incidentes,
+diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 > Frontend: `IanaMary/ensinado-aprendizado-maquina` · Backend: `IanaMary/ensinado-aprendizado-maquina-back`.
 
 ---
+
+## 2026-08-04 (dá para desistir de um arrasto; a galeria não inventa dados)
+
+### Corrigido
+- **Arrastar e desistir adicionava o item.** As paletas do pipeline não declaram
+  `cdkDropListConnectedTo`, então para o CDK o item nunca sai da paleta: o `dropped` é sempre emitido
+  por ela mesma, e o handler tratava isso como "soltou em algum lugar, adiciona". Pegar um item,
+  pensar melhor e largar punha a peça na raia — sem como cancelar, no gesto que é justamente como o
+  aluno monta o pipeline. `desistiuDoArrasto` (`dashboard/pipeline/arrasto-cancelado.ts`) usa
+  `isPointerOverContainer`, que no CDK (`drag-drop.mjs:1169`) compara o ponto de soltura com o rect do
+  container que recebeu o drop — a própria paleta.
+  **Deliberadamente não se decide pela geometria das raias:** a paleta de pré-processamento também
+  roda dentro do `modal-execucao`, onde raia não existe, e medir `.column-content` global cancelaria o
+  arrasto legítimo lá. Falha para o lado seguro: sem o campo, volta a adicionar — o inaceitável seria
+  parar de adicionar.
+- **A galeria do aluno mostrava um filtro impossível.** `GET /pipelines/galeria` devolve só
+  `is_public: true`, e o botão "Minha Turma" filtrava `!publico` sobre essa lista: resultado
+  **sempre vazio**, a galeria sumia ao clicar. "Públicos" e "Todos" eram a mesma lista. O grupo saiu
+  inteiro; filtrar por turma de verdade exige o endpoint devolver o vínculo, o que é feature, não
+  conserto.
+- **E números inventados na tela do aluno.** Cada cartão exibia "0 cópias" e uma nota de **5
+  estrelas**: `totalCopias: 0` e `avaliacao: 5.0` cravados no cliente, não medição do servidor. No
+  lugar deles vão dataset e modelo, que vêm do servidor. Os dois campos saíram da interface
+  `PipelineProfessor`. Também saiu o selo de turma, que lia `pipeline.turma` — campo nunca preenchido,
+  em ramo inalcançável.
+
+### Documentação
+- `docs/DOCUMENTACAO.md` era **cópia byte a byte** da do backend (559 linhas). Virou ponteiro: duas
+  cópias do mesmo texto em repositórios diferentes divergem, e o conteúdo (coleções, endpoints, envs,
+  allowlist do sandbox) é do backend.
 
 ## 2026-08-03g (Titanic com as 13 colunas: o gerador não recorta mais)
 
