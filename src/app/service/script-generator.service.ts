@@ -77,8 +77,27 @@ export class ScriptGeneratorService {
       }
       dest.file('usar_modelo_mlflow.py', this.gerarUsarModeloMlflow(entry, coleta));
       dest.file('usar_modelo_joblib.py', this.gerarUsarModeloJoblib(entry, coleta));
-    } catch {
-      /* modelo indisponível: segue sem ele */
+    } catch (erro: any) {
+      // Best-effort de propósito (o `pipeline.py` treina do zero e não depende da pasta), mas o
+      // `catch {}` mudo de antes escondia POR QUE a pasta não veio: a ausência do `modelo/` no zip
+      // de agrupamento ficou três registros de histórico como "observação não investigada", sem
+      // ninguém conseguir dizer se era 404 de dono, MLflow desligado ou rede. Agora o motivo sai no
+      // console e uma nota vai dentro do próprio zip, onde quem baixou consegue ler.
+      const motivo = erro?.status ? `HTTP ${erro.status}` : (erro?.message || 'motivo desconhecido');
+      console.warn(`[H2IA] modelo treinado não foi anexado ao zip (${motivo}).`, erro);
+      try {
+        const dest = subpasta ? folder.folder(subpasta)! : folder;
+        dest.file('MODELO-AUSENTE.txt', [
+          'O modelo já treinado não pôde ser anexado a este pacote.',
+          `Motivo: ${motivo}.`,
+          '',
+          'Isso NÃO afeta o `pipeline.py`: ele treina o modelo do zero a partir dos dados.',
+          'Falta apenas o atalho de reusar o modelo já treinado (`usar_modelo_*.py`).',
+          '',
+          'Causas comuns: o modelo foi treinado por outra conta (o download é escopado ao dono),',
+          'o registro foi apagado do servidor, ou houve falha de rede durante a exportação.',
+        ].join('\n'));
+      } catch { /* nem a nota deu: o zip segue sem ela */ }
     }
   }
 

@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../../services/dashboard.service';
 import { ItemPipeline } from '../../../models/item-coleta-dado.model';
 import { PreProcessamentoDialogComponent } from './pre-processamento-dialog/pre-processamento-dialog.component';
-import { desistiuDoArrasto } from '../arrasto-cancelado';
 
 @Component({
   selector: 'app-pre-processamento',
@@ -68,14 +67,11 @@ export class PreProcessamentoComponent implements OnInit {
     return !!this.gruposColapsados[nome];
   }
 
-  onItemDropped(event: any) {
-    // Soltar de volta sobre a paleta é desistir do arrasto, não adicionar o item.
-    if (desistiuDoArrasto(event)) { return; }
-
-    const item = event.item.data;
-    event.item.data.movido = true;
-    this.dashboardService.movendoItemExecucao(item);
-  }
+  // NÃO existe `onItemDropped` aqui de propósito. Esta paleta é a única que declara
+  // `cdkDropListConnectedTo` e a única cujo template NÃO liga `(cdkDropListDropped)`: o `dropped`
+  // sai na raia, que não tem handler. O método existia e nunca era chamado — código morto que
+  // custou um ciclo de teste a quem foi verificar a guarda do arrasto por aqui. O caminho real
+  // desta paleta é o clique (`onItemClicked`), que abre o diálogo de configuração.
 
   onItemClicked(item: ItemPipeline, event: Event) {
     event.stopPropagation();
