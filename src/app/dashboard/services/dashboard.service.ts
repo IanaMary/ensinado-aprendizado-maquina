@@ -709,11 +709,19 @@ export class DashboardService {
       item
     ]);
 
-    const itensAtualizados = this.itensColetasDados.value.map(i => ({
-      ...i,
-      habilitado: false
-    }));
-    this.itensColetasDados.next(itensAtualizados);
+    // Só a entrada de DADOS desabilita a paleta de coleta — os dados se carregam uma vez por
+    // pipeline. Antes isto rodava para QUALQUER item, e como este método é chamado pelas quatro
+    // paletas, soltar uma métrica (ou um modelo, ou um pré-processador) acinzentava o card "Dados":
+    // o aluno perdia a única forma de carregar dados e só recuperava limpando o pipeline inteiro.
+    // Medido em produção antes da correção: com a área de trabalho vazia, soltar "Acurácia" na raia
+    // de métricas deixava o card em `item-desabilitado cdk-drag-disabled`.
+    if (item.tipoItem === 'coleta-dado') {
+      const itensAtualizados = this.itensColetasDados.value.map(i => ({
+        ...i,
+        habilitado: false
+      }));
+      this.itensColetasDados.next(itensAtualizados);
+    }
 
     // Preditores: habilita só os da mesma categoria do que entrou na lane.
     this.atualizarPreditoresHabilitados();

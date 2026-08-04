@@ -93,6 +93,48 @@ describe('DashboardService', () => {
     });
   });
 
+  describe('movendoItemExecucao', () => {
+    /** Este método é chamado pelas QUATRO paletas. Ele desabilita a paleta de coleta porque os dados
+     *  se carregam uma vez por pipeline — mas fazia isso para qualquer item, então soltar uma métrica
+     *  acinzentava o card "Dados" e o aluno perdia a única forma de carregar dados sem limpar tudo.
+     *  Reproduzido em produção antes da correção. */
+    const carregarPaletaDeColeta = () => {
+      service.carregarItensColetasDados();
+      httpMock.expectOne(`${environment.apiUrl}conf_pipeline/coleta_dados/todos`)
+        .flush([{ label: 'Dados', valor: 'dados', tipoItem: 'coleta-dado', habilitado: true, movido: false }]);
+    };
+    const coletaHabilitada = () => {
+      let hab: boolean | undefined;
+      service.getItensColetasDados().subscribe(itens => { hab = itens[0]?.habilitado; }).unsubscribe();
+      return hab;
+    };
+
+    it('soltar uma MÉTRICA não desabilita a paleta de coleta', () => {
+      carregarPaletaDeColeta();
+      expect(coletaHabilitada()).withContext('antes do arrasto').toBeTrue();
+
+      service.movendoItemExecucao({ label: 'Acurácia', valor: 'acuracia', tipoItem: 'metrica' } as any);
+
+      expect(coletaHabilitada()).withContext('depois de soltar uma métrica').toBeTrue();
+    });
+
+    it('soltar um MODELO não desabilita a paleta de coleta', () => {
+      carregarPaletaDeColeta();
+
+      service.movendoItemExecucao({ label: 'k-NN', valor: 'knn', tipoItem: 'treino-validacao-teste' } as any);
+
+      expect(coletaHabilitada()).toBeTrue();
+    });
+
+    it('soltar DADOS desabilita a paleta de coleta, que é o comportamento desejado', () => {
+      carregarPaletaDeColeta();
+
+      service.movendoItemExecucao({ label: 'Dados', valor: 'dados', tipoItem: 'coleta-dado' } as any);
+
+      expect(coletaHabilitada()).toBeFalse();
+    });
+  });
+
   describe('emitirProximaEtapaPipe', () => {
     it('should emit event', (done) => {
       service.proximaEtapaPipe$.subscribe(data => {
