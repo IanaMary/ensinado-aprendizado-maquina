@@ -13,7 +13,11 @@ import { ItemPipeline } from '../../../models/item-coleta-dado.model';
  *  sobre uma raia não é um drop válido para o CDK — o `dropped` volta a ser emitido pela PRÓPRIA
  *  paleta, e é esse evento que o handler usa para empurrar o item à raia pelo serviço. Funciona,
  *  mas por efeito colateral de um drop inválido. Estes testes fixam o comportamento observável
- *  para que uma futura refatoração do drag-and-drop não o quebre em silêncio. */
+ *  para que uma futura refatoração do drag-and-drop não o quebre em silêncio.
+ *
+ *  É desse mecanismo que vinha o defeito corrigido em `arrasto-cancelado.ts`: como TODO drop é um
+ *  drop na própria paleta, o handler adicionava o item independentemente de onde o ponteiro
+ *  terminasse — desistir de um arrasto era impossível. */
 describe('ColetaDeDadosComponent', () => {
   let component: ColetaDeDadosComponent;
   let fixture: ComponentFixture<ColetaDeDadosComponent>;
@@ -70,14 +74,21 @@ describe('ColetaDeDadosComponent', () => {
     expect(dashboardService.movendoItemExecucao).toHaveBeenCalledWith(arrastado);
   });
 
-  it('adiciona o item mesmo quando o drop NÃO termina sobre a raia', () => {
-    // Comportamento atual, fixado de propósito: o handler não olha `isPointerOverContainer` nem o
-    // container de destino. Consequência para o aluno: começar a arrastar e desistir no meio do
-    // caminho ADICIONA o item — não há como cancelar um arrasto. Se algum dia isso passar a
-    // depender de onde o ponteiro terminou, este teste falha e o comportamento novo fica explícito.
+  it('soltar fora da paleta (na raia) adiciona o item', () => {
     component.onItemDropped(eventoDrop(item(), false));
 
     expect(dashboardService.movendoItemExecucao).toHaveBeenCalledTimes(1);
+  });
+
+  it('soltar de volta SOBRE a paleta cancela o arrasto', () => {
+    // O aluno pega um item, pensa melhor e larga onde pegou. Antes isso adicionava o item de todo
+    // jeito, porque o handler ignorava onde o ponteiro terminou — não havia como desistir.
+    const arrastado = item();
+
+    component.onItemDropped(eventoDrop(arrastado, true));
+
+    expect(dashboardService.movendoItemExecucao).not.toHaveBeenCalled();
+    expect(arrastado.movido).toBeFalse();
   });
 
   it('o ⓘ pede a ficha do item ao tutor sem disparar o clique do card', () => {
