@@ -13,6 +13,7 @@ export class GaleriaPipelinesComponent implements OnInit {
   pipelines: PipelineProfessor[] = [];
   carregando = true;
   filtroDificuldade = 'todos';
+  filtroTurma: 'todos' | 'minha' = 'todos';
   termoBusca = '';
 
   constructor(
@@ -40,6 +41,10 @@ export class GaleriaPipelinesComponent implements OnInit {
           dataset: p.resultadoColetaDado?.dataset_nome || 'Não definido',
           dificuldade: p.dificuldade || 'iniciante',
           tags: p.tags || [],
+          // Quem decide o pertencimento é o SERVIDOR (`da_minha_turma`), e o nome da turma só vem
+          // quando sou membro dela — a galeria também lista público de turmas alheias.
+          daMinhaTurma: !!p.da_minha_turma,
+          turma: p.turma_nome ?? undefined,
         }));
         this.carregando = false;
       },
@@ -53,11 +58,13 @@ export class GaleriaPipelinesComponent implements OnInit {
   get pipelinesFiltrados(): PipelineProfessor[] {
     let filtrados = this.pipelines;
     
-    // Não há filtro por visibilidade aqui: `GET /pipelines/galeria` já devolve SÓ `is_public: true`
-    // (`app/routers/pipelines.py:listar_galeria`). O filtro "Minha Turma" que existia filtrava
-    // `!publico` sobre essa lista, então devolvia SEMPRE lista vazia — o aluno clicava e a galeria
-    // sumia. Filtrar por turma de verdade exige o endpoint devolver o vínculo, que é feature, não
-    // conserto; até então a tela não promete o que não faz.
+    // Filtro por turma, agora de verdade: quem decide é o servidor, no campo `da_minha_turma`. O
+    // botão "Minha Turma" antigo filtrava `!publico` numa lista só de públicos e devolvia SEMPRE
+    // vazio — por isso o `temItensDaMinhaTurma` abaixo esconde o botão quando não há o que filtrar.
+    if (this.filtroTurma === 'minha') {
+      filtrados = filtrados.filter(p => p.daMinhaTurma);
+    }
+
 
 
     // Filtrar por dificuldade
@@ -77,6 +84,12 @@ export class GaleriaPipelinesComponent implements OnInit {
     }
     
     return filtrados;
+  }
+
+  /** Só oferece o filtro quando ele pode produzir resultado. Um filtro que só devolve lista vazia é
+   *  exatamente o defeito que esta tela tinha. */
+  get temItensDaMinhaTurma(): boolean {
+    return this.pipelines.some(p => p.daMinhaTurma);
   }
 
   abrirPipeline(pipeline: PipelineProfessor): void {
