@@ -5,8 +5,9 @@ import { AuthService } from './auth.service';
 
 /** Mantém viva a sessão de quem está usando o sistema.
  *
- *  O token dura 60 min e não era renovado: o aluno era deslogado no meio de uma atividade, sem
- *  aviso (apontado pela banca, Imagem 10). Aqui a renovação é disparada pela PRÓPRIA atividade —
+ *  O token não era renovado: o aluno era deslogado no meio de uma atividade, sem aviso (apontado
+ *  pela banca, Imagem 10). A duração é do servidor (`TOKEN_EXPIRE_MINUTES`, 240 min desde 04/08) e
+ *  este serviço não a conhece — só lê o `exp` do próprio token. Aqui a renovação é disparada pela PRÓPRIA atividade —
  *  toda requisição bem-sucedida passa por `aoUsar()` —, então a sessão só cai depois de
  *  inatividade de verdade. Sem timer de fundo: um timer renovaria a sessão de uma aba esquecida
  *  aberta, que é exatamente o que a expiração deve encerrar.
