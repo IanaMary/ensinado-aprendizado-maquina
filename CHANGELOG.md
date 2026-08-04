@@ -11,7 +11,14 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ## 2026-08-04c (o filtro "Minha turma" da galeria volta, funcionando)
 
-Bundle publicado: `main-2CE77UUY.js` · backend `353dc86`.
+Bundle publicado: `main-LROU77IM.js` · backend `d3a5fb9`.
+
+**Verificado na tela, em produção.** Caso negativo: o aluno está na "Turma 1" e o botão **não**
+aparece, porque aquela turma não tem material do professor sem atividade — é o comportamento certo.
+Caso positivo: exercitado no bundle publicado interceptando só a resposta HTTP da galeria (nada foi
+escrito em produção) — o grupo aparece, o selo mostra "🔒 Turma 1", e o filtro deixa 1 de 2 cartões.
+Ali a captura revelou um defeito de rótulo que nenhum teste pegaria: **"Todos" (turma) encostado em
+"Todas" (dificuldade)**. Virou "Toda a galeria".
 
 ### Adicionado
 - **Filtro por turma na galeria, de verdade.** Quem decide o pertencimento é o servidor, no campo
