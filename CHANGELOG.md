@@ -9,6 +9,31 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-04c (o filtro "Minha turma" da galeria volta, funcionando)
+
+Bundle publicado: `main-2CE77UUY.js` · backend `353dc86`.
+
+### Adicionado
+- **Filtro por turma na galeria, de verdade.** Quem decide o pertencimento é o servidor, no campo
+  `da_minha_turma` de `GET /pipelines/galeria`; o nome da turma só chega para quem é membro dela,
+  porque a galeria também lista público de turmas alheias. A galeria passou a mostrar **também o
+  material que o professor deixou nas turmas do aluno sem ter publicado** — com dois recortes de
+  privacidade descritos no CHANGELOG do backend.
+- **Primeiro spec desta tela** (não tinha nenhum): 11 casos.
+
+### Decisões de tela, todas vindas do defeito anterior
+- **Dois botões, não três** — "Públicos" e "Todos" mostravam a mesma lista.
+- **O grupo só aparece quando há item de turma para filtrar** (`temItensDaMinhaTurma`): filtro que só
+  pode devolver lista vazia é exatamente o que esta tela tinha.
+- **O selo do cartão volta com o nome da turma** e nunca renderiza vazio — o selo de cadeado anterior
+  lia um `pipeline.turma` que nunca era preenchido. O ícone distingue material da turma de público.
+- Nenhum CSS novo: `.filtro-tipo` continuava no `.scss`; só o HTML havia saído.
+
+### Paridade
+Portado para a `master` (`9a5c17c`), onde a galeria vive em `src/app/interno/galeria/` com um nível
+menos no import do serviço. Porte por **edição cirúrgica**, não cópia: o `pipeline.service.ts` das
+duas branches já divergia em comentários.
+
 ## 2026-08-04b (fecha o resíduo do arrasto, mata o handler morto, mostra o motivo)
 
 Bundle publicado: `main-AAXFAZ3W.js`. Verificado **na tela**, em produção.
