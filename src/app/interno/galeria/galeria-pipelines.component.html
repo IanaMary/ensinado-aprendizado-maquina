@@ -23,21 +23,9 @@
     </div>
     
     <div class="filtros-grupo">
-      <div class="filtro-tipo">
-        <button [class.active]="filtroTipo === 'publicos'" (click)="filtroTipo = 'publicos'">
-          <mat-icon>public</mat-icon>
-          Públicos
-        </button>
-        <button [class.active]="filtroTipo === 'turma'" (click)="filtroTipo = 'turma'">
-          <mat-icon>group</mat-icon>
-          Minha Turma
-        </button>
-        <button [class.active]="filtroTipo === 'todos'" (click)="filtroTipo = 'todos'">
-          <mat-icon>apps</mat-icon>
-          Todos
-        </button>
-      </div>
-      
+      <!-- O grupo Públicos/Minha Turma/Todos saiu: a galeria já é, por definição, a lista dos
+           pipelines públicos. "Públicos" e "Todos" mostravam a mesma coisa e "Minha Turma" filtrava
+           os não-públicos dentro de uma lista só de públicos — resultado sempre vazio. -->
       <div class="filtro-dificuldade">
         <button *ngFor="let dificuldade of ['todos', 'iniciante', 'intermediario', 'avancado']"
                 [class.active]="filtroDificuldade === dificuldade"
@@ -63,10 +51,9 @@
         <div class="card-badge" [ngClass]="getDificuldadeClass(pipeline.dificuldade)">
           {{ getDificuldadeLabel(pipeline.dificuldade) }}
         </div>
-        <div class="card-tipo" *ngIf="!pipeline.publico">
-          <mat-icon>lock</mat-icon>
-          <span>{{ pipeline.turma }}</span>
-        </div>
+        <!-- Não há selo de turma: o endpoint da galeria não devolve o vínculo, e `pipeline.turma`
+             nunca era preenchido — o selo saía vazio (e era inalcançável, já que todo item da
+             galeria é público). -->
       </div>
       
       <div class="card-content">
@@ -85,14 +72,18 @@
       </div>
       
       <div class="card-footer">
+        <!-- "N cópias" e a nota em estrelas saíram: os dois eram constantes cravadas no cliente
+             (`totalCopias: 0`, `avaliacao: 5.0`), não dados do servidor. Todo pipeline da galeria
+             aparecia com 0 cópias e 5 estrelas que ninguém deu. Número inventado numa tela de aluno
+             ensina a confiar no que a plataforma mostra sem que ela tenha medido nada. -->
         <div class="card-stats">
-          <span class="stat">
-            <mat-icon>content_copy</mat-icon>
-            {{ pipeline.totalCopias }} cópias
+          <span class="stat" *ngIf="pipeline.dataset && pipeline.dataset !== 'Não definido'">
+            <mat-icon>table_chart</mat-icon>
+            {{ pipeline.dataset }}
           </span>
-          <span class="stat">
-            <mat-icon>star</mat-icon>
-            {{ pipeline.avaliacao }}
+          <span class="stat" *ngIf="pipeline.modelo && pipeline.modelo !== 'Não definido'">
+            <mat-icon>model_training</mat-icon>
+            {{ pipeline.modelo }}
           </span>
         </div>
         

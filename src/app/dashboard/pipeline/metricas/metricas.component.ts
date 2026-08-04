@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { ItemPipeline } from '../../../models/item-coleta-dado.model';
+import { desistiuDoArrasto } from '../arrasto-cancelado';
 
 interface GrupoMetricas {
   nome: string;
@@ -60,6 +61,9 @@ export class MetricasComponent implements OnInit {
   }
 
   onItemDropped(event: any) {
+    // Soltar de volta sobre a paleta é desistir do arrasto, não adicionar o item.
+    if (desistiuDoArrasto(event)) { return; }
+
     const item = event.item.data;
     event.item.data.movido = true;
     this.dashboardService.movendoItemExecucao(item);

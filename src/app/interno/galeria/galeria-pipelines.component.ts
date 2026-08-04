@@ -13,7 +13,6 @@ export class GaleriaPipelinesComponent implements OnInit {
   pipelines: PipelineProfessor[] = [];
   carregando = true;
   filtroDificuldade = 'todos';
-  filtroTipo = 'publicos';
   termoBusca = '';
 
   constructor(
@@ -41,8 +40,6 @@ export class GaleriaPipelinesComponent implements OnInit {
           dataset: p.resultadoColetaDado?.dataset_nome || 'Não definido',
           dificuldade: p.dificuldade || 'iniciante',
           tags: p.tags || [],
-          totalCopias: 0, // Placeholder
-          avaliacao: 5.0, // Placeholder
         }));
         this.carregando = false;
       },
@@ -56,15 +53,13 @@ export class GaleriaPipelinesComponent implements OnInit {
   get pipelinesFiltrados(): PipelineProfessor[] {
     let filtrados = this.pipelines;
     
-    // Filtrar por tipo (públicos/privados)
-    if (this.filtroTipo === 'publicos') {
-      filtrados = filtrados.filter(p => p.publico);
-    } else if (this.filtroTipo === 'turma') {
-      // Por enquanto, filtros de turma são baseados em is_public=false se houver contexto de turma
-      // Como não temos turmas implementadas no backend ainda, mantemos simples
-      filtrados = filtrados.filter(p => !p.publico);
-    }
-    
+    // Não há filtro por visibilidade aqui: `GET /pipelines/galeria` já devolve SÓ `is_public: true`
+    // (`app/routers/pipelines.py:listar_galeria`). O filtro "Minha Turma" que existia filtrava
+    // `!publico` sobre essa lista, então devolvia SEMPRE lista vazia — o aluno clicava e a galeria
+    // sumia. Filtrar por turma de verdade exige o endpoint devolver o vínculo, que é feature, não
+    // conserto; até então a tela não promete o que não faz.
+
+
     // Filtrar por dificuldade
     if (this.filtroDificuldade !== 'todos') {
       filtrados = filtrados.filter(p => p.dificuldade === this.filtroDificuldade);
@@ -130,9 +125,6 @@ export class GaleriaPipelinesComponent implements OnInit {
     });
   }
 
-  getEstrelas(avaliacao: number): number[] {
-    return Array(5).fill(0).map((_, i) => i < Math.floor(avaliacao) ? 1 : 0);
-  }
 
   voltar(): void {
     this.router.navigate(['/inicio']);

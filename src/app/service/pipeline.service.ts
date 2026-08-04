@@ -73,8 +73,8 @@ export interface PipelineProfessor {
   dataset: string;
   dificuldade: 'iniciante' | 'intermediario' | 'avancado';
   tags: string[];
-  totalCopias: number;
-  avaliacao: number;
+  // `totalCopias` e `avaliacao` saíram: nunca vieram do servidor. A galeria os preenchia com 0 e
+  // 5.0 fixos e os exibia como se fossem medição. Voltam quando houver contagem e nota de verdade.
   estado?: PipelineState;
 }
 

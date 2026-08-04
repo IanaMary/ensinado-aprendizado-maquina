@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DashboardService } from '../../services/dashboard.service';
 import { ItemPipeline } from '../../../models/item-coleta-dado.model';
 import { PreProcessamentoDialogComponent } from './pre-processamento-dialog/pre-processamento-dialog.component';
+import { desistiuDoArrasto } from '../arrasto-cancelado';
 
 @Component({
   selector: 'app-pre-processamento',
@@ -68,6 +69,9 @@ export class PreProcessamentoComponent implements OnInit {
   }
 
   onItemDropped(event: any) {
+    // Soltar de volta sobre a paleta é desistir do arrasto, não adicionar o item.
+    if (desistiuDoArrasto(event)) { return; }
+
     const item = event.item.data;
     event.item.data.movido = true;
     this.dashboardService.movendoItemExecucao(item);
