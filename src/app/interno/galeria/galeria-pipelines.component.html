@@ -27,10 +27,13 @@
            antigo filtrava os não-públicos dentro de uma lista só de públicos — sempre vazio. E o
            grupo só aparece quando há item de turma para filtrar: filtro que não pode dar resultado é
            o defeito que esta tela tinha. -->
+      <!-- "Toda a galeria", não "Todos": na tela este grupo fica lado a lado com o de dificuldade,
+           cujo primeiro botão é "Todas" — dois rótulos quase idênticos e adjacentes, visto na
+           captura da verificação. -->
       <div class="filtro-tipo" *ngIf="temItensDaMinhaTurma">
         <button [class.active]="filtroTurma === 'todos'" (click)="filtroTurma = 'todos'">
           <mat-icon>apps</mat-icon>
-          Todos
+          Toda a galeria
         </button>
         <button [class.active]="filtroTurma === 'minha'" (click)="filtroTurma = 'minha'">
           <mat-icon>group</mat-icon>
