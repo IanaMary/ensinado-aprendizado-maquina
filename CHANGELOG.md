@@ -13,6 +13,11 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 Bundle publicado: `main-MBE3HF7F.js`. Verificado **na tela**, em produção, com o aluno logado.
 
+Os três consertos foram **portados para a `master`** (`a2964b4`), onde os três defeitos também
+existiam — a galeria lá vive em `src/app/interno/galeria/`, caminho diferente e mesmo defeito.
+Junto foi o `coleta-de-dados.component.spec.ts` completo, porte que estava pendente. Suíte na
+`master`: 275, com `npm install` feito nela; build de produção OK. Aquela branch não é implantada.
+
 ### Corrigido
 - **Soltar uma métrica apagava o card "Dados".** Achado testando no navegador.
   `movendoItemExecucao` é chamado pelas QUATRO paletas e desabilitava a paleta de coleta **sem olhar
