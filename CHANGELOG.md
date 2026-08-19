@@ -9,6 +9,41 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-19 (a lista de reserva de modelos, editável na aba LLM)
+
+Bundle publicado: `main-E3VX56JA.js` · backend `1a015ef`.
+
+**Verificado em produção depois do deploy**, exercitando o caminho real do chat no servidor
+(mesmo provedor, mesma cadeia, mesmo gerador SSE): com uma lista gravada no banco pondo um modelo
+MORTO na frente (`deepseek-v4-flash`, `410 Gone`) e um vivo atrás, a cadeia passou a ser
+`[kimi-k2.6, deepseek-v4-flash, llama-3.1-8b]` — a do banco, não a do código — e o stream respondeu
+sem evento de erro pelo terceiro. O estado anterior foi restaurado ao fim do teste.
+
+### Adicionado
+- **Cartão "Se o modelo escolhido falhar, tentar nesta ordem"** na aba LLM do conf-tutor, com a
+  ordem visível e numerada, remover, reordenar e o selo *padrão do sistema* / *definida por você*.
+  Fica **antes** da listagem de modelos de propósito: depois de centenas de linhas, ninguém o veria.
+- **Acrescentar é um `+` dentro do item de modelo que já existe** (`#modeloItemTpl`), então o admin
+  escolhe a reserva com a mesma busca, o mesmo agrupamento e o mesmo chip de saúde com que escolhe o
+  modelo ativo — sem uma segunda listagem na tela.
+- **O que faz a lista valer alguma coisa: o chip de saúde por reserva.** É ele que mostra o
+  `410 Gone` no item, que é como o admin descobre um modelo morto antes do aluno. Mais o aviso
+  "fora do catálogo" (id colado de outro provedor) e o aviso quando **nenhuma** reserva responde.
+
+### Decisões
+- **Reordenar por ↑/↓, não arrasto.** No máximo 5 itens (o ganho do CDK cresce com o tamanho); o
+  `DragDropModule` obrigaria a mexer no `conf-tutor.module.ts`, o único arquivo desta tela que
+  diverge entre `mestrado-iana` e `master`; e arrasto é o único padrão do repo que ninguém cobriu
+  com teste.
+- **"Voltar ao padrão do sistema" usa o `DELETE`**, não um salvar com lista vazia: "voltar ao
+  padrão" e "não quero reserva nenhuma" são escolhas diferentes, e a segunda é uma configuração
+  legítima. Salvar só habilita quando a ordem muda de verdade.
+
+### Testes
+13 casos novos, entre eles a ordem exata enviada ao servidor, os extremos das setas, o teto, e dois
+de DOM — incluindo **o cartão aparecer mesmo com o catálogo de modelos vazio**, que é justamente
+quando o provedor caiu e o admin precisa mexer nas reservas. Suíte **302 → 315**.
+
 ## 2026-08-18 (chat do tutor: a pergunta que falha não fica, e o contexto deixa de ser um retrato velho)
 
 Bundle publicado: `main-B54MSO3I.js` · backend `7e07bc4`.
