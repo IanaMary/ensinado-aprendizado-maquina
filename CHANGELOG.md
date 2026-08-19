@@ -9,6 +9,40 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-19b (a listagem de modelos: alvos de clique e ordem)
+
+Bundle publicado: `main-BY27KC2K.js` · backend `6a18e56`.
+
+**Um clique acidental nesta tela trocou o modelo do tutor em produção por um classificador de
+segurança**, que responde 200 a tudo com `{"User Safety": "safe"}` — e como é 200, a cadeia de
+reserva não protege. O relato chegou como "o botão de + não está funcionando".
+
+### Corrigido
+- **A linha inteira selecionava o modelo**, e o `+` de "acrescentar à reserva" ficava na ponta
+  direita, colado no selo de saúde: errar o alvo por poucos pixels trocava o modelo. Agora **só a
+  área do nome** troca (virou `<button>`, com acesso por teclado) e o `+` mora num slot fixo à
+  esquerda, onde ficava o radio.
+- **O radio virou o estado da linha**: pílula **em uso**, **reserva** ou o `+` — um por linha,
+  sempre na mesma posição, nomes alinhados.
+- **O `+` não dava retorno visível**: o cartão da reserva fica acima da listagem, então quem rolou
+  até os modelos não via nada acontecer. Agora avisa na tela, dizendo também que ainda é rascunho
+  até "Salvar ordem".
+- **O cartão da reserva nascia recolhido** e o `+` da listagem era o único jeito de adicionar — que
+  some enquanto o teste de saúde roda e some de vez se o catálogo do provedor falhar. Nasce aberto
+  e tem campo próprio para adicionar, aceitando id colado à mão.
+
+### Alterado
+- **Ordem da listagem** (a pedido): fornecedores com mais modelos que **respondem** primeiro,
+  depois mais gratuitos, depois alfabético; dentro do fornecedor, quem responde na frente, o não
+  testado no meio e quem falhou no fim. Antes, um fornecedor com 45 gratuitos e nenhum vivo abria
+  a lista.
+- CSS morto removido (`.box-formulario`, `.grupo-modelos-titulo`, `.texto-label`,
+  `.grupo-inativos`): o componente voltou a caber no orçamento de 20 kB sem afrouxar o limite.
+
+### Testes
+3 casos de DOM travam os alvos de clique — o principal falha se a linha voltar a ser clicável
+inteira (verificado) —, mais 5 da nova ordem e 3 da descoberta do cartão. Suíte **315 → 327**.
+
 ## 2026-08-19 (a lista de reserva de modelos, editável na aba LLM)
 
 Bundle publicado: `main-E3VX56JA.js` · backend `1a015ef`.
