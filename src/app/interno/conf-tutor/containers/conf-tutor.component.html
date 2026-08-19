@@ -97,6 +97,86 @@
             </div>
           </div>
 
+          <!-- Lista de reserva: a ordem de tentativa quando o modelo escolhido não atende.
+               Fica ANTES da listagem de propósito — depois de centenas de modelos, ninguém a vê. -->
+          <div class="reservas-card" *ngIf="provedores.length">
+            <button type="button" class="reservas-titulo" (click)="toggleReservas()"
+                    [attr.aria-expanded]="reservasAberto">
+              <mat-icon class="caret">{{ reservasAberto ? 'expand_less' : 'expand_more' }}</mat-icon>
+              <span class="reservas-nome">Se o modelo escolhido falhar, tentar nesta ordem</span>
+              <span class="reservas-contagem">{{ reservas.length }}</span>
+              <span class="selo-prompt padrao" *ngIf="reservasOrigem === 'catalogo'">padrão do sistema</span>
+              <span class="selo-prompt" *ngIf="reservasOrigem === 'admin'">definida por você</span>
+              <span class="saude-chip sem-resposta" *ngIf="reservasSemResposta">{{ reservasSemResposta }} sem resposta</span>
+            </button>
+
+            <div class="reservas-corpo" *ngIf="reservasAberto">
+              <p class="desc-llm">
+                O tutor tenta o modelo ativo primeiro. Se ele não existir, tiver sido
+                <strong>aposentado</strong> pelo provedor ou estiver fora do ar, o servidor passa
+                para o próximo desta lista — sem o aluno perceber. Use o
+                <mat-icon class="icone-inline">add</mat-icon> na listagem abaixo para acrescentar.
+              </p>
+
+              <p class="reservas-vazio" *ngIf="!reservas.length">
+                Sem reserva: se o modelo ativo falhar, o chat do tutor falha junto.
+              </p>
+
+              <div class="reserva-item" *ngFor="let m of reservas; let i = index">
+                <span class="ordem">{{ i + 1 }}</span>
+                <span class="reserva-id">
+                  {{ m }}
+                  <span class="reserva-aviso" *ngIf="m === modeloLLMAtual"
+                        title="Já é o modelo ativo — a cadeia não o tenta duas vezes">já é o ativo</span>
+                  <span class="reserva-aviso alerta" *ngIf="reservaForaDoCatalogo(m)"
+                        title="Este id não aparece no catálogo deste provedor">fora do catálogo</span>
+                </span>
+                <button class="btn-testar" type="button" *ngIf="naoTestado(m) && !saudeEmAndamento"
+                        (click)="testarModelo(m, $event)" [disabled]="!!testandoModelo">
+                  <mat-spinner diameter="12" *ngIf="testandoModelo === m"></mat-spinner>
+                  <ng-container *ngIf="testandoModelo !== m">testar</ng-container>
+                </button>
+                <span class="saude-chip" *ngIf="!naoTestado(m)" [ngClass]="statusModelo(m)"
+                  [matTooltip]="saudeModelos[m]?.erro || (saudeModelos[m]?.latencia_ms ? saudeModelos[m]?.latencia_ms + ' ms' : '')">
+                  <ng-container [ngSwitch]="statusModelo(m)">
+                    <ng-container *ngSwitchCase="'responde'"><mat-icon>check_circle</mat-icon> responde</ng-container>
+                    <ng-container *ngSwitchCase="'sem-resposta'"><mat-icon>cancel</mat-icon> sem resposta</ng-container>
+                    <ng-container *ngSwitchDefault><mat-icon>hourglass_empty</mat-icon> testando</ng-container>
+                  </ng-container>
+                </span>
+                <button class="btn-mover" type="button" (click)="moverReserva(i, -1)"
+                        [disabled]="i === 0" aria-label="Tentar mais cedo">
+                  <mat-icon>arrow_upward</mat-icon>
+                </button>
+                <button class="btn-mover" type="button" (click)="moverReserva(i, 1)"
+                        [disabled]="i === reservas.length - 1" aria-label="Tentar mais tarde">
+                  <mat-icon>arrow_downward</mat-icon>
+                </button>
+                <button class="btn-remover-reserva" type="button" (click)="removerReserva(i)"
+                        [attr.aria-label]="'Remover ' + m">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+
+              <p class="reservas-alerta-linha" *ngIf="nenhumaReservaResponde" role="status">
+                <mat-icon aria-hidden="true">warning</mat-icon>
+                Nenhuma reserva responde — se o modelo ativo cair, a cadeia cai junto.
+              </p>
+
+              <div class="reservas-acoes">
+                <button class="btn-primario" type="button" (click)="salvarReservas()"
+                        [disabled]="!reservasMudaram || salvandoReservas">
+                  <mat-spinner diameter="16" *ngIf="salvandoReservas"></mat-spinner>
+                  Salvar ordem
+                </button>
+                <button class="btn-secundario" type="button" (click)="restaurarReservasPadrao()"
+                        *ngIf="reservasOrigem === 'admin'" [disabled]="salvandoReservas">
+                  Voltar ao padrão do sistema
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="carregando-modelos" *ngIf="carregandoModelos">
             <mat-spinner diameter="24"></mat-spinner>
             <span>Carregando modelos disponíveis...</span>
@@ -118,6 +198,15 @@
                 </div>
               </div>
               <div class="modelo-direita">
+                <!-- Acrescenta à lista de reserva. `stopPropagation` no método: sem isso o
+                     clique também trocaria o modelo ATIVO. -->
+                <button class="btn-reserva" type="button" (click)="adicionarReserva(m.id, $event)"
+                        *ngIf="m.id !== modeloLLMAtual && !ehReserva(m.id)"
+                        [attr.aria-label]="'Usar ' + m.id + ' como reserva'"
+                        matTooltip="Usar como reserva">
+                  <mat-icon>add</mat-icon>
+                </button>
+                <span class="selo-reserva" *ngIf="ehReserva(m.id)" title="Já está na lista de reserva">reserva</span>
                 <!-- Modelo pago fica fora do teste automático: dá para testar um a um -->
                 <button class="btn-testar" type="button" *ngIf="naoTestado(m.id) && !saudeEmAndamento"
                         (click)="testarModelo(m.id, $event)" [disabled]="!!testandoModelo">

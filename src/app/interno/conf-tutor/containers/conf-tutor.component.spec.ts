@@ -27,7 +27,8 @@ const MODELOS = [
 const PROVEDORES = [
   { id: 'nvidia', nome: 'NVIDIA NIM', base_url: 'https://integrate.api.nvidia.com/v1',
     modelo: 'meta/llama-3.3-70b-instruct', editavel: false, todos_gratuitos: true,
-    chave_fonte: 'env', chave_mascarada: '••••abcd', env_chave: 'NVIDIA_API_KEY', configurado: true },
+    chave_fonte: 'env', chave_mascarada: '••••abcd', env_chave: 'NVIDIA_API_KEY', configurado: true,
+    fallbacks: ['meta/llama-3.1-8b-instruct'], fallbacks_origem: 'catalogo' },
   { id: 'openrouter', nome: 'OpenRouter', base_url: 'https://openrouter.ai/api/v1', modelo: '',
     editavel: true, todos_gratuitos: false, chave_fonte: 'ausente', chave_mascarada: '',
     env_chave: 'OPENROUTER_API_KEY', configurado: false },
@@ -52,6 +53,7 @@ describe('ConfTutorComponent (aba LLM)', () => {
       'getTutorEditar', 'putTutorPipe', 'getTutorAudit', 'getSystemPrompt', 'putSystemPrompt',
       'listarModelosLLM', 'verificarSaudeModelos', 'definirModeloLLM',
       'getProvedoresLLM', 'salvarProvedorLLM', 'definirProvedorLLMAtivo',
+      'salvarFallbacksLLM', 'restaurarFallbacksLLM',
     ]);
     service.getTutorEditar.and.returnValue(of({ texto_pipe: 'oi' } as any));
     service.getTutorAudit.and.returnValue(of([] as any));
@@ -66,6 +68,8 @@ describe('ConfTutorComponent (aba LLM)', () => {
     service.getProvedoresLLM.and.returnValue(of({ ativo: 'nvidia', provedores: PROVEDORES } as any));
     service.salvarProvedorLLM.and.returnValue(of({ ativo: 'nvidia', provedores: PROVEDORES } as any));
     service.definirProvedorLLMAtivo.and.returnValue(of({ ativo: 'openrouter', provedores: PROVEDORES } as any));
+    service.salvarFallbacksLLM.and.returnValue(of({ ativo: 'nvidia', provedores: PROVEDORES } as any));
+    service.restaurarFallbacksLLM.and.returnValue(of({ ativo: 'nvidia', provedores: PROVEDORES } as any));
 
     TestBed.configureTestingModule({
       schemas: [NO_ERRORS_SCHEMA],
@@ -356,6 +360,144 @@ describe('ConfTutorComponent (aba LLM)', () => {
       // modelos e saúde são por provedor: a lista de antes não vale mais
       expect(service.listarModelosLLM).toHaveBeenCalled();
       expect(comp.buscaModelo).toBe('');
+    });
+  });
+
+  // A lista de reserva é a ordem de tentativa quando o modelo ativo não atende. Até 19/08 ela
+  // era fixa no código do servidor — quando um reserva atingiu fim de vida, só um deploy podia
+  // consertá-la, e o tutor passou 11 dias devolvendo erro.
+  describe('lista de reserva', () => {
+    it('carrega a lista do provedor ativo e de quem a definiu', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      expect(comp.reservas).toEqual(['meta/llama-3.1-8b-instruct']);
+      expect(comp.reservasOrigem).toBe('catalogo');
+    });
+
+    it('o + acrescenta no fim, não duplica e respeita o teto', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.reservas = [];
+      comp.adicionarReserva('a');
+      comp.adicionarReserva('b');
+      comp.adicionarReserva('a');                    // repetido não entra
+      expect(comp.reservas).toEqual(['a', 'b']);     // ordem de chegada
+
+      comp.reservas = ['1', '2', '3', '4', '5'];     // teto
+      comp.adicionarReserva('6');
+      expect(comp.reservas.length).toBe(5);
+    });
+
+    it('o clique no + não troca o modelo ativo junto', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      const evento = jasmine.createSpyObj('Event', ['stopPropagation']);
+      comp.adicionarReserva('z-ai/glm-4.5-air:free', evento);
+      expect(evento.stopPropagation).toHaveBeenCalled();
+    });
+
+    it('as setas movem e param nos extremos', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.reservas = ['a', 'b', 'c'];
+      comp.moverReserva(2, -1);
+      expect(comp.reservas).toEqual(['a', 'c', 'b']);
+      comp.moverReserva(0, -1);                      // já é o primeiro
+      expect(comp.reservas).toEqual(['a', 'c', 'b']);
+      comp.moverReserva(2, 1);                       // já é o último
+      expect(comp.reservas).toEqual(['a', 'c', 'b']);
+    });
+
+    it('salvar envia a ordem exata que está na tela', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.reservas = ['segundo', 'primeiro'];
+      comp.moverReserva(1, -1);
+      comp.salvarReservas();
+      expect(service.salvarFallbacksLLM)
+        .toHaveBeenCalledWith('nvidia', ['primeiro', 'segundo']);
+    });
+
+    it('Salvar só habilita quando a ordem muda de verdade', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      expect(comp.reservasMudaram).toBeFalse();
+      comp.moverReserva(0, 1);                        // lista de 1 item: não move nada
+      expect(comp.reservasMudaram).toBeFalse();
+      comp.adicionarReserva('outro');
+      expect(comp.reservasMudaram).toBeTrue();
+    });
+
+    it('lista vazia é uma escolha, e vai ao servidor como tal', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.removerReserva(0);
+      comp.salvarReservas();
+      expect(service.salvarFallbacksLLM).toHaveBeenCalledWith('nvidia', []);
+    });
+
+    it('voltar ao padrão usa o DELETE, não um salvar com lista vazia', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.restaurarReservasPadrao();
+      expect(service.restaurarFallbacksLLM).toHaveBeenCalledWith('nvidia');
+      expect(service.salvarFallbacksLLM).not.toHaveBeenCalled();
+    });
+
+    it('denuncia reserva fora do catálogo do provedor e a que não responde', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.reservas = ['meta/llama-3.1-8b-instruct', 'colado/de-outro-provedor'];
+      expect(comp.reservaForaDoCatalogo('colado/de-outro-provedor')).toBeTrue();
+      expect(comp.reservaForaDoCatalogo('meta/llama-3.1-8b-instruct')).toBeFalse();
+
+      comp.saudeModelos = {
+        'meta/llama-3.1-8b-instruct': { responde: false, erro: 'HTTP 410' },
+        'colado/de-outro-provedor': { responde: false, erro: 'HTTP 404' },
+      };
+      expect(comp.reservasSemResposta).toBe(2);
+      expect(comp.nenhumaReservaResponde).toBeTrue();   // a cadeia cai junto com o ativo
+    });
+
+    it('trocar de provedor descarta as reservas do anterior', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      expect(comp.reservas.length).toBe(1);
+      const openrouter = { ...PROVEDORES[1], configurado: true, fallbacks: [],
+                           fallbacks_origem: 'admin' } as any;
+      comp.provedores = [PROVEDORES[0] as any, openrouter];
+      service.definirProvedorLLMAtivo.and.returnValue(
+        of({ ativo: 'openrouter', provedores: [PROVEDORES[0], openrouter] } as any));
+      comp.ativarProvedor(openrouter);
+      expect(comp.reservas).toEqual([]);               // a lista é POR provedor
+    });
+
+    it('o cartão aparece mesmo sem catálogo de modelos (é quando mais importa)', () => {
+      montar();
+      service.listarModelosLLM.and.returnValue(of({ modelos: [], modelo_atual: '' } as any));
+      comp.tabAtual({ index: 1 });
+      comp.reservasAberto = true;
+      fixture.detectChanges();
+      const cartao = fixture.nativeElement.querySelector('.reservas-card');
+      expect(cartao).withContext('o provedor caiu: é aí que o admin precisa mexer').toBeTruthy();
+    });
+
+    it('a lista chega ao DOM numerada e com o botão de remover', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.reservas = ['um', 'dois'];
+      comp.reservasAberto = true;
+      fixture.detectChanges();
+      const itens = fixture.nativeElement.querySelectorAll('.reserva-item');
+      expect(itens.length).toBe(2);
+      expect(itens[0].querySelector('.ordem').textContent.trim()).toBe('1');
+      expect(itens[1].querySelector('.btn-remover-reserva')).toBeTruthy();
+    });
+
+    it('o histórico mostra rótulo legível para as operações novas', () => {
+      montar();
+      expect(comp.formatarOperacao('definiu_fallbacks')).not.toBe('definiu_fallbacks');
+      expect(comp.formatarOperacao('restaurou_fallbacks')).not.toBe('restaurou_fallbacks');
     });
   });
 

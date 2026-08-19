@@ -24,6 +24,10 @@ export interface ProvedorLLM {
   todos_gratuitos: boolean | null;
   /** 'banco' = o admin gravou · 'env' = .env do servidor · 'ausente' = não vai funcionar. */
   chave_fonte: 'banco' | 'env' | 'ausente';
+  /** Ordem de tentativa quando o modelo escolhido não atende (a "lista de reserva"). */
+  fallbacks: string[];
+  /** 'admin' = configurada na tela; 'catalogo' = o padrão que vem no código do servidor. */
+  fallbacks_origem: 'admin' | 'catalogo';
   chave_mascarada: string;
   env_chave: string | null;
   configurado: boolean;
@@ -347,6 +351,19 @@ export class DashboardService {
   definirProvedorLLMAtivo(provedor: string) {
     return this.http.put<{ ativo: string; provedores: ProvedorLLM[] }>(
       `${this.url}${this.endpointTutor}/provedor-ativo`, { provedor });
+  }
+
+  /** Ordem de tentativa quando o modelo escolhido não atende. Lista vazia = sem reserva. */
+  salvarFallbacksLLM(provedor: string, modelos: string[]) {
+    return this.http.put<{ ativo: string; provedores: ProvedorLLM[] }>(
+      `${this.url}${this.endpointTutor}/provedores/${provedor}/fallbacks`, { modelos });
+  }
+
+  /** Descarta a lista do admin e volta ao padrão do servidor. É DELETE de propósito: "voltar ao
+   *  padrão" e "não quero reserva nenhuma" (que é `salvarFallbacksLLM(id, [])`) são diferentes. */
+  restaurarFallbacksLLM(provedor: string) {
+    return this.http.delete<{ ativo: string; provedores: ProvedorLLM[] }>(
+      `${this.url}${this.endpointTutor}/provedores/${provedor}/fallbacks`);
   }
 
   putTutorTipoAprendizado(body: any, id: string) {
