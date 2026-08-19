@@ -114,10 +114,11 @@
 
             <div class="reservas-corpo" *ngIf="reservasAberto">
               <p class="desc-llm">
-                O tutor tenta o modelo ativo primeiro. Se ele não existir, tiver sido
-                <strong>aposentado</strong> pelo provedor ou estiver fora do ar, o servidor passa
-                para o próximo desta lista — sem o aluno perceber. Use o
-                <mat-icon class="icone-inline">add</mat-icon> na listagem abaixo para acrescentar.
+                Esta é a <strong>ordem de tentativa</strong>. A posição 1 é o
+                <strong>modelo ativo</strong> — é ele que responde no chat. As posições seguintes
+                só entram se a anterior falhar: modelo que não existe, foi
+                <strong>aposentado</strong> pelo provedor ou está fora do ar. Para o tutor passar
+                a usar outro, clique em <strong>usar</strong> na linha dele.
               </p>
 
               <!-- Reusa o visual da busca de modelos. O `+` da listagem continua existindo, mas
@@ -142,38 +143,52 @@
                 Sem reserva: se o modelo ativo falhar, o chat do tutor falha junto.
               </p>
 
-              <div class="reserva-item" *ngFor="let m of reservas; let i = index">
+              <!-- A cadeia inteira, com o MODELO ATIVO na posição 1 (era o que faltava: a lista
+                   numerava as reservas a partir de 1 e o ativo, que responde de fato, nem
+                   aparecia aqui). `linha.indice` é a posição na lista gravada. -->
+              <div class="reserva-item" *ngFor="let linha of cadeiaVisivel; let i = index"
+                   [class.ativo]="linha.ativo">
                 <span class="ordem">{{ i + 1 }}</span>
                 <span class="reserva-id">
-                  {{ m }}
-                  <span class="reserva-aviso" *ngIf="m === modeloLLMAtual"
-                        title="Já é o modelo ativo — a cadeia não o tenta duas vezes">já é o ativo</span>
-                  <span class="reserva-aviso alerta" *ngIf="reservaForaDoCatalogo(m)"
+                  {{ linha.id }}
+                  <span class="selo-uso" *ngIf="linha.ativo"
+                        title="É este que responde o chat">em uso</span>
+                  <span class="reserva-aviso alerta" *ngIf="reservaForaDoCatalogo(linha.id)"
                         title="Este id não aparece no catálogo deste provedor">fora do catálogo</span>
                 </span>
-                <button class="btn-testar" type="button" *ngIf="naoTestado(m) && !saudeEmAndamento"
-                        (click)="testarModelo(m, $event)" [disabled]="!!testandoModelo">
-                  <mat-spinner diameter="12" *ngIf="testandoModelo === m"></mat-spinner>
-                  <ng-container *ngIf="testandoModelo !== m">testar</ng-container>
+                <button class="btn-testar" type="button"
+                        *ngIf="naoTestado(linha.id) && !saudeEmAndamento"
+                        (click)="testarModelo(linha.id, $event)" [disabled]="!!testandoModelo">
+                  <mat-spinner diameter="12" *ngIf="testandoModelo === linha.id"></mat-spinner>
+                  <ng-container *ngIf="testandoModelo !== linha.id">testar</ng-container>
                 </button>
-                <span class="saude-chip" *ngIf="!naoTestado(m)" [ngClass]="statusModelo(m)"
-                  [matTooltip]="saudeModelos[m]?.erro || (saudeModelos[m]?.latencia_ms ? saudeModelos[m]?.latencia_ms + ' ms' : '')">
-                  <ng-container [ngSwitch]="statusModelo(m)">
+                <span class="saude-chip" *ngIf="!naoTestado(linha.id)" [ngClass]="statusModelo(linha.id)"
+                  [matTooltip]="saudeModelos[linha.id]?.erro || (saudeModelos[linha.id]?.latencia_ms ? saudeModelos[linha.id]?.latencia_ms + ' ms' : '')">
+                  <ng-container [ngSwitch]="statusModelo(linha.id)">
                     <ng-container *ngSwitchCase="'responde'"><mat-icon>check_circle</mat-icon> responde</ng-container>
                     <ng-container *ngSwitchCase="'sem-resposta'"><mat-icon>cancel</mat-icon> sem resposta</ng-container>
                     <ng-container *ngSwitchDefault><mat-icon>hourglass_empty</mat-icon> testando</ng-container>
                   </ng-container>
                 </span>
-                <button class="btn-mover" type="button" (click)="moverReserva(i, -1)"
-                        [disabled]="i === 0" aria-label="Tentar mais cedo">
+                <!-- "quero que o tutor use ESTE": promove a modelo ativo, que é a posição 1. -->
+                <button class="btn-usar" type="button" *ngIf="!linha.ativo"
+                        (click)="usarComoAtivo(linha.id, linha.indice)"
+                        [disabled]="salvandoModelo || saudeEmAndamento"
+                        [attr.aria-label]="'Usar ' + linha.id + ' como modelo do tutor'"
+                        matTooltip="Passar a responder o chat com este modelo">usar</button>
+                <button class="btn-mover" type="button" *ngIf="!linha.ativo"
+                        (click)="moverReserva(linha.indice, -1)"
+                        [disabled]="linha.indice === 0" aria-label="Tentar mais cedo">
                   <mat-icon>arrow_upward</mat-icon>
                 </button>
-                <button class="btn-mover" type="button" (click)="moverReserva(i, 1)"
-                        [disabled]="i === reservas.length - 1" aria-label="Tentar mais tarde">
+                <button class="btn-mover" type="button" *ngIf="!linha.ativo"
+                        (click)="moverReserva(linha.indice, 1)"
+                        [disabled]="linha.indice === reservas.length - 1" aria-label="Tentar mais tarde">
                   <mat-icon>arrow_downward</mat-icon>
                 </button>
-                <button class="btn-remover-reserva" type="button" (click)="removerReserva(i)"
-                        [attr.aria-label]="'Remover ' + m">
+                <button class="btn-remover-reserva" type="button" *ngIf="!linha.ativo"
+                        (click)="removerReserva(linha.indice)"
+                        [attr.aria-label]="'Remover ' + linha.id">
                   <mat-icon>delete_outline</mat-icon>
                 </button>
               </div>
