@@ -363,6 +363,56 @@ describe('ConfTutorComponent (aba LLM)', () => {
     });
   });
 
+  // Em 19/08 um clique que errou o `+` por poucos pixels trocou o modelo do tutor EM PRODUÇÃO
+  // por um classificador de segurança, que responde 200 a tudo com {"User Safety": "safe"} — a
+  // cadeia de reserva não protege disso, porque ela só reage a ERRO. A causa era a linha inteira
+  // ser clicável, com o `+` colado no selo de saúde.
+  describe('alvos de clique da linha do modelo', () => {
+    function linhas() {
+      return fixture.nativeElement.querySelectorAll('.modelo-item');
+    }
+
+    /** Linha de um modelo que não é o ativo nem já é reserva — é onde o `+` aparece. */
+    function linhaLivre(): HTMLElement {
+      return [...linhas()].find(
+        (l: any) => !l.classList.contains('ativo') && l.querySelector('.btn-reserva')) as HTMLElement;
+    }
+
+    beforeEach(() => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.saudeEmAndamento = false;
+      // Os grupos nascem fechados (menos o do modelo em uso); aqui queremos ver as linhas.
+      comp.fornecedoresAbertos = { meta: true, openai: true, 'z-ai': true };
+      fixture.detectChanges();
+    });
+
+    it('só a área do nome troca o modelo do tutor', () => {
+      const linha = linhaLivre();
+      linha.click();                                  // clique na linha, fora dos controles
+      expect(service.definirModeloLLM).not.toHaveBeenCalled();
+
+      linha.querySelector<HTMLElement>('.modelo-detalhes')!.click();
+      expect(service.definirModeloLLM).toHaveBeenCalled();
+    });
+
+    it('o + fica no slot da esquerda e não seleciona o modelo', () => {
+      const linha = linhaLivre();
+      expect(linha.querySelector('.modelo-acao .btn-reserva'))
+        .withContext('o + tem de estar no slot da esquerda, longe do selo de saúde').toBeTruthy();
+
+      linha.querySelector<HTMLElement>('.btn-reserva')!.click();
+      expect(service.definirModeloLLM).not.toHaveBeenCalled();
+      expect(comp.reservas.length).toBeGreaterThan(0);
+    });
+
+    it('o modelo em uso mostra "em uso" no lugar do +', () => {
+      const ativa = [...linhas()].find((l: any) => l.classList.contains('ativo')) as HTMLElement;
+      expect(ativa.querySelector('.selo-uso')).toBeTruthy();
+      expect(ativa.querySelector('.btn-reserva')).toBeNull();
+    });
+  });
+
   // A tela responde a uma pergunta só: *qual modelo eu posso escolher agora?* Quem responde vem
   // primeiro; quem já falhou no teste de saúde desce.
   describe('ordem por saúde', () => {
