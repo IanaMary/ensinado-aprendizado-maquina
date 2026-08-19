@@ -730,6 +730,79 @@
   &:disabled { opacity: 0.5; cursor: default; }
 }
 
+// -------------------------------------------------- lista de reserva (aba LLM)
+.btn-reserva {
+  @extend .btn-testar;
+  width: 22px; padding: 0; justify-content: center;
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+}
+
+.selo-reserva {
+  @extend .selo-free;
+  background: rgba($roxo-medio, 0.12); color: $roxo-escuro;
+}
+
+.reservas-card {
+  border: 1px solid rgba($roxo-claro, 0.7); border-radius: 12px;
+  margin: 4px 0 14px; overflow: hidden;
+}
+
+.reservas-titulo {
+  width: 100%; display: flex; align-items: center; gap: 8px; text-align: left;
+  padding: 10px 14px; background: rgba($roxo-claro, 0.18); border: none; cursor: pointer;
+  &:hover { background: rgba($roxo-claro, 0.3); }
+
+  .caret { color: $roxo-medio; }
+  .reservas-nome { font-size: 13px; font-weight: 700; color: $roxo-escuro; flex: 1; }
+  .reservas-contagem {
+    font-size: 11px; font-weight: 700; color: $cinza-escuro;
+    background: $branco; border-radius: 999px; padding: 1px 8px;
+  }
+}
+
+.reservas-corpo {
+  padding: 12px 14px;
+  .desc-llm { margin-bottom: 10px; }
+  .icone-inline { font-size: 14px; width: 14px; height: 14px; vertical-align: -2px; }
+}
+
+.reservas-vazio, .reservas-alerta-linha {
+  margin: 0 0 10px; font-size: 12px; color: $vermelho-escuro;
+  display: flex; align-items: center; gap: 6px;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.reserva-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 0;
+  border-bottom: 1px solid rgba($roxo-claro, 0.5);
+  &:last-of-type { border-bottom: none; }
+
+  .ordem {
+    flex: none; width: 20px; height: 20px; border-radius: 50%;
+    background: $roxo-medio; color: $branco; font-size: 11px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .reserva-id {
+    flex: 1; min-width: 0; font-size: 12px; font-family: monospace; color: $preto;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .reserva-aviso {
+    font-family: inherit; font-size: 10px; font-weight: 700; padding: 1px 6px;
+    border-radius: 999px; background: rgba($roxo-claro, 0.4); color: $roxo-escuro;
+    &.alerta { background: rgba($aviso, 0.14); color: $aviso; }
+  }
+}
+
+.btn-mover, .btn-remover-reserva {
+  border: none; background: transparent; cursor: pointer; color: $cinza-escuro;
+  padding: 2px; display: inline-flex; align-items: center;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  &:hover:not(:disabled) { color: $roxo-medio; }
+  &:disabled { opacity: 0.3; cursor: default; }
+}
+
+.reservas-acoes { display: flex; gap: 10px; margin-top: 12px; }
+
 // -------------------------------------------------- seletor de provedor (aba LLM)
 .provedor-atual {
   margin: 4px 0 12px;

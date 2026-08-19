@@ -27,6 +27,8 @@ const OPERACOES_LABEL: Record<string, string> = {
   definiu_modelo: 'Modelo do tutor trocado',
   trocou_provedor: 'Provedor de LLM trocado',
   configurou_provedor: 'Provedor de LLM configurado',
+  definiu_fallbacks: 'Lista de reserva do tutor alterada',
+  restaurou_fallbacks: 'Lista de reserva voltou ao padrão do sistema',
 };
 
 /** Fornecedor do modelo = o que vem antes da "/" no id (nvidia, google, meta, z-ai…). */
@@ -105,6 +107,16 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   salvandoProvedor = '';
   /** Rascunho por provedor: o que está nos campos da tela antes de salvar. */
   formProvedor: Record<string, { nome: string; base_url: string; porta: number | null; api_key: string }> = {};
+
+  // Lista de reserva (fallbacks) do provedor ativo: a ordem de tentativa quando o modelo
+  // escolhido não atende. Rascunho local — só vira configuração ao salvar.
+  reservas: string[] = [];
+  reservasOrigem: 'admin' | 'catalogo' = 'catalogo';
+  reservasAberto = false;
+  salvandoReservas = false;
+  /** Cópia do que está gravado, para o botão Salvar só habilitar quando a ordem mudou. */
+  private reservasGravadas: string[] = [];
+  readonly maxReservas = 5;
 
   // Busca e agrupamento da listagem de modelos
   buscaModelo = '';
@@ -513,6 +525,7 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   private aplicarProvedores(res: { ativo: string; provedores: ProvedorLLM[] }): void {
     this.provedores = res.provedores || [];
     this.provedorAtivo = res.ativo || '';
+    this.hidratarReservas();
     for (const p of this.provedores) {
       // O rascunho nasce com o que está gravado, MENOS a chave: a tela não a conhece, e um campo
       // pré-preenchido com asteriscos convidaria a reenviar lixo por cima do segredo.
@@ -551,7 +564,9 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
         this.aplicarProvedores(res);
         this.salvandoProvedor = '';
         this.notificacao.sucesso(`${p.nome} passou a responder o chat do tutor.`);
-        // Modelos e saúde são POR provedor: a lista de antes não vale mais.
+        // Modelos, saúde e reservas são POR provedor: o que estava na tela não vale mais.
+        // (as reservas já foram re-hidratadas por `aplicarProvedores`, com o provedor novo)
+        this.reservasAberto = false;
         this.modelosLLM = [];
         this.saudeModelos = {};
         this.saudeProgresso = { concluidos: 0, total: 0 };
@@ -573,6 +588,99 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
       return;
     }
     this.ativarProvedor(p);
+  }
+
+  // === Lista de reserva (fallbacks) ===
+  // A cadeia é [modelo ativo, ...reservas]: se o escolhido não atende — 404 (não liberado),
+  // 410 (fim de vida), 402 (sem crédito) ou 5xx — o servidor tenta o próximo. Até 19/08 essa
+  // lista era fixa no código, e quando um reserva morreu só um deploy pôde consertá-la.
+
+  private hidratarReservas(): void {
+    const p = this.provedores.find((x) => x.id === this.provedorAtivo);
+    this.reservas = [...(p?.fallbacks || [])];
+    this.reservasGravadas = [...this.reservas];
+    this.reservasOrigem = p?.fallbacks_origem || 'catalogo';
+  }
+
+  toggleReservas(): void {
+    this.reservasAberto = !this.reservasAberto;
+  }
+
+  /** O `+` da listagem de modelos: entra no fim da fila, que é onde uma reserva nova pertence. */
+  adicionarReserva(modeloId: string, evento?: Event): void {
+    evento?.stopPropagation();      // senão o clique também SELECIONA o modelo como ativo
+    if (!modeloId || this.reservas.includes(modeloId)) return;
+    if (this.reservas.length >= this.maxReservas) {
+      this.notificacao.erro(`A lista de reserva aceita no máximo ${this.maxReservas} modelos.`);
+      return;
+    }
+    this.reservas = [...this.reservas, modeloId];
+    this.reservasAberto = true;     // mostra onde o item caiu
+  }
+
+  removerReserva(indice: number): void {
+    this.reservas = this.reservas.filter((_, i) => i !== indice);
+  }
+
+  moverReserva(indice: number, direcao: -1 | 1): void {
+    const destino = indice + direcao;
+    if (destino < 0 || destino >= this.reservas.length) return;
+    const lista = [...this.reservas];
+    [lista[indice], lista[destino]] = [lista[destino], lista[indice]];
+    this.reservas = lista;
+  }
+
+  ehReserva(modeloId: string): boolean {
+    return this.reservas.includes(modeloId);
+  }
+
+  /** Reserva que não aparece no catálogo DESTE provedor: quase sempre um id colado de outro. */
+  reservaForaDoCatalogo(modeloId: string): boolean {
+    return !!this.modelosLLM.length && !this.modelosLLM.some((m) => m.id === modeloId);
+  }
+
+  get reservasMudaram(): boolean {
+    return this.reservas.length !== this.reservasGravadas.length
+      || this.reservas.some((m, i) => m !== this.reservasGravadas[i]);
+  }
+
+  /** Quantas reservas já falharam no teste de saúde — é o que denuncia um modelo aposentado. */
+  get reservasSemResposta(): number {
+    return this.reservas.filter((m) => this.statusModelo(m) === 'sem-resposta').length;
+  }
+
+  /** Nenhuma reserva responde: a cadeia inteira cai junto com o modelo ativo. */
+  get nenhumaReservaResponde(): boolean {
+    return this.reservas.length > 0
+      && this.reservas.every((m) => this.statusModelo(m) === 'sem-resposta');
+  }
+
+  salvarReservas(): void {
+    if (this.salvandoReservas || !this.provedorAtivo) return;
+    this.salvandoReservas = true;
+    this.dashboardService.salvarFallbacksLLM(this.provedorAtivo, this.reservas).subscribe({
+      next: (res) => {
+        this.aplicarProvedores(res);
+        this.salvandoReservas = false;
+        this.notificacao.sucesso('Lista de reserva salva.');
+        this.carregarHistorico(this.pipeAtual);
+      },
+      error: () => { this.salvandoReservas = false; },
+    });
+  }
+
+  restaurarReservasPadrao(): void {
+    if (this.salvandoReservas || !this.provedorAtivo) return;
+    this.salvandoReservas = true;
+    this.dashboardService.restaurarFallbacksLLM(this.provedorAtivo).subscribe({
+      next: (res) => {
+        this.aplicarProvedores(res);
+        this.salvandoReservas = false;
+        this.notificacao.sucesso('Lista de reserva de volta ao padrão do sistema.');
+        this.carregarHistorico(this.pipeAtual);
+      },
+      error: () => { this.salvandoReservas = false; },
+    });
   }
 
   /** Leva para a aba Provedores (índice 2). */
