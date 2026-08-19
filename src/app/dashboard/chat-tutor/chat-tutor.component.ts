@@ -170,6 +170,15 @@ export class ChatTutorComponent implements OnInit, OnDestroy, OnChanges {
       error: (err) => {
         this.carregando = false;
         this.respostaStream = '';
+        // A pergunta que falhou SAI do histórico e volta para a caixa. Se ficasse, a próxima
+        // pergunta reenviaria todas as anteriores sem resposta: o corpo do POST crescia a cada
+        // tentativa (turnos 'user' seguidos, sem 'assistant' entre eles) e o aluno via a mesma
+        // pergunta repetida na tela.
+        const ultima = this.mensagens[this.mensagens.length - 1];
+        if (ultima?.role === 'user' && ultima.content === texto) {
+          this.mensagens.pop();
+        }
+        this.entrada = this.entrada || texto;
         this.erro = err?.message || 'Não consegui falar com o tutor agora. Tente novamente.';
       },
       complete: () => {
