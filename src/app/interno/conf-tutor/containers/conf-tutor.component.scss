@@ -721,6 +721,13 @@
   }
 }
 
+.btn-usar {
+  @extend .btn-testar;
+  border-style: solid; background: $roxo-fundo; font-weight: 700;
+}
+
+.reserva-item.ativo .ordem { background: $roxo-escuro; }
+
 .btn-mover, .btn-remover-reserva {
   border: none; background: transparent; cursor: pointer; color: $cinza-escuro;
   padding: 2px; display: inline-flex; align-items: center;

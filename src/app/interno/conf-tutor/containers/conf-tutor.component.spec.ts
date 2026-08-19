@@ -618,8 +618,11 @@ describe('ConfTutorComponent (aba LLM)', () => {
       comp.reservasAberto = true;
       fixture.detectChanges();
       const itens = fixture.nativeElement.querySelectorAll('.reserva-item');
-      expect(itens.length).toBe(2);
+      // 3 linhas: o modelo ATIVO na posição 1 + as duas reservas — a cadeia real.
+      expect(itens.length).toBe(3);
       expect(itens[0].querySelector('.ordem').textContent.trim()).toBe('1');
+      expect(itens[0].querySelector('.btn-remover-reserva'))
+        .withContext('o ativo não se remove daqui').toBeNull();
       expect(itens[1].querySelector('.btn-remover-reserva')).toBeTruthy();
     });
 
@@ -662,6 +665,70 @@ describe('ConfTutorComponent (aba LLM)', () => {
       comp.novaReserva = '   ';
       comp.adicionarReservaDigitada();
       expect(comp.reservas.length).toBe(antes);
+    });
+
+    // O dono montou uma lista de 3 modelos, salvou, e o chat continuou usando um QUARTO. A lista
+    // numerava as reservas 1,2,3 — mas a posição 1 da cadeia real é o MODELO ATIVO, que não
+    // aparecia no cartão. A numeração mentia sobre a ordem.
+    describe('a cadeia mostrada é a cadeia real', () => {
+      it('posição 1 é o modelo ativo, e as reservas vêm depois', () => {
+        montar();
+        comp.tabAtual({ index: 1 });
+        comp.reservas = ['reserva-a', 'reserva-b'];
+        const cadeia = comp.cadeiaVisivel;
+        expect(cadeia[0]).toEqual({ id: 'meta/llama-3.3-70b-instruct', indice: -1, ativo: true });
+        expect(cadeia.map((l) => l.id).slice(1)).toEqual(['reserva-a', 'reserva-b']);
+      });
+
+      it('o ativo não aparece duas vezes se também estiver na lista salva', () => {
+        montar();
+        comp.tabAtual({ index: 1 });
+        comp.reservas = ['meta/llama-3.3-70b-instruct', 'reserva-b'];
+        // a cadeia do servidor deduplica antes de tentar; mostrar duas vezes mentiria
+        expect(comp.cadeiaVisivel.map((l) => l.id))
+          .toEqual(['meta/llama-3.3-70b-instruct', 'reserva-b']);
+      });
+
+      it('o índice aponta para a posição na lista GRAVADA, não na exibida', () => {
+        montar();
+        comp.tabAtual({ index: 1 });
+        comp.reservas = ['meta/llama-3.3-70b-instruct', 'reserva-b'];
+        // 'reserva-b' está em 1 na lista salva, mas é a 2ª linha na tela
+        const linha = comp.cadeiaVisivel[1];
+        expect(linha.indice).toBe(1);
+      });
+
+      it('o DOM numera a partir do ativo', () => {
+        montar();
+        comp.tabAtual({ index: 1 });
+        comp.reservas = ['reserva-a'];
+        comp.reservasAberto = true;
+        fixture.detectChanges();
+        const itens = fixture.nativeElement.querySelectorAll('.reserva-item');
+        expect(itens.length).toBe(2);
+        expect(itens[0].querySelector('.selo-uso')).withContext('a linha 1 é o ativo').toBeTruthy();
+        expect(itens[1].textContent).toContain('reserva-a');
+      });
+    });
+
+    it('"usar" promove a reserva a modelo ativo e a tira da reserva', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.reservas = ['reserva-a', 'reserva-b'];
+      service.definirModeloLLM.and.returnValue(of({ modelo: 'reserva-b' } as any));
+
+      comp.usarComoAtivo('reserva-b', 1);
+
+      expect(service.definirModeloLLM).toHaveBeenCalledWith('reserva-b');
+      // sai da reserva: virou a posição 1 da cadeia, e ficar nos dois lugares confunde a ordem
+      expect(service.salvarFallbacksLLM).toHaveBeenCalledWith('nvidia', ['reserva-a']);
+    });
+
+    it('não promove o que já é o ativo', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.usarComoAtivo('meta/llama-3.3-70b-instruct', -1);
+      expect(service.definirModeloLLM).not.toHaveBeenCalled();
     });
 
     it('o histórico mostra rótulo legível para as operações novas', () => {

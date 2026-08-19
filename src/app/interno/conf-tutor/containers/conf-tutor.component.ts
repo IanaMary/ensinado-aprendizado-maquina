@@ -718,6 +718,47 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     this.reservas = lista;
   }
 
+  /** A cadeia COMO ELA É: posição 1 é o modelo ativo, e só depois vêm as reservas.
+   *
+   *  O cartão numerava as reservas 1, 2, 3 — o que lê como "esta é a ordem que o tutor usa",
+   *  quando a posição 1 verdadeira é o modelo ativo, que nem aparecia aqui. Foi o que fez o dono
+   *  montar uma lista de três modelos e continuar vendo um quarto responder no chat.
+   *
+   *  O ativo é filtrado das reservas: a cadeia deduplica antes de tentar, então mostrá-lo duas
+   *  vezes seria mentir sobre a ordem. `indice` é a posição na lista GRAVADA, que é o que os
+   *  botões de mover e remover usam. */
+  get cadeiaVisivel(): { id: string; indice: number; ativo: boolean }[] {
+    const linhas: { id: string; indice: number; ativo: boolean }[] = [];
+    if (this.modeloLLMAtual) {
+      linhas.push({ id: this.modeloLLMAtual, indice: -1, ativo: true });
+    }
+    this.reservas.forEach((id, indice) => {
+      if (id !== this.modeloLLMAtual) linhas.push({ id, indice, ativo: false });
+    });
+    return linhas;
+  }
+
+  /** Promove uma reserva a modelo ativo — é o que o admin quer dizer com "quero usar este".
+   *
+   *  Tira da lista de reserva no mesmo movimento: ela passou a ser a posição 1 da cadeia, e
+   *  ficar nos dois lugares só confundiria a numeração. */
+  usarComoAtivo(modeloId: string, indice: number): void {
+    if (this.salvandoModelo || this.saudeEmAndamento || modeloId === this.modeloLLMAtual) return;
+    this.salvandoModelo = true;
+    this.dashboardService.definirModeloLLM(modeloId).subscribe({
+      next: (res) => {
+        this.modeloLLMAtual = res.modelo;
+        this.salvandoModelo = false;
+        const restantes = this.reservas.filter((_, i) => i !== indice);
+        this.dashboardService.salvarFallbacksLLM(this.provedorAtivo, restantes).subscribe({
+          next: (r) => { this.aplicarProvedores(r); this.carregarHistorico(this.pipeAtual); },
+        });
+        this.notificacao.sucesso(`${modeloId} passou a ser o modelo do tutor.`);
+      },
+      error: () => { this.salvandoModelo = false; },
+    });
+  }
+
   ehReserva(modeloId: string): boolean {
     return this.reservas.includes(modeloId);
   }
