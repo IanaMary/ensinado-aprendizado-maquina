@@ -9,6 +9,29 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-18 (chat do tutor: a pergunta que falha não fica, e o contexto deixa de ser um retrato velho)
+
+Bundle publicado: `main-B54MSO3I.js` · backend `7e07bc4`.
+
+Os dois defeitos apareceram juntos porque o tutor estava fora do ar (a causa era do backend: modelo
+aposentado devolvendo 410, ver o CHANGELOG de lá). Com o tutor respondendo, eles teriam passado
+despercebidos — mas são independentes da queda.
+
+### Corrigido
+- **A pergunta que falha volta para a caixa e sai do histórico.** Antes ela ficava em `mensagens`, e
+  a pergunta seguinte reenviava todas as anteriores **sem resposta** no mesmo POST — turnos `user`
+  em sequência, sem `assistant` entre eles —, com a tela mostrando a mesma pergunta repetida. Era o
+  que a captura do usuário registrava: três balões, dois deles idênticos, e o corpo da requisição
+  crescendo a cada tentativa.
+- **`chatContexto` é recomposto toda vez que o painel abre.** Ele era montado uma vez e guardado:
+  quem abria o chat com a área de trabalho ainda vazia continuava enviando `dataset`, `modelo` e
+  `metricas` **nulos** depois de carregar os dados e treinar. O item que abriu o painel é preservado
+  (`chatItem`), então clicar num item e reabrir o chat não perde o `itemSelecionado`.
+
+### Testes
+Primeiro spec do `chat-tutor` (não tinha nenhum): 3 casos — a pergunta que falha volta para a caixa,
+não é reenviada junto com a próxima, e o turno que dá certo continua no histórico. Suíte: 302 casos.
+
 ## 2026-08-04c (o filtro "Minha turma" da galeria volta, funcionando)
 
 Bundle publicado: `main-LROU77IM.js` · backend `d3a5fb9`.
