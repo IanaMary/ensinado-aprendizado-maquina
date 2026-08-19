@@ -9,6 +9,27 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-19c (Google AI Studio e OrcaRouter na aba Provedores)
+
+Bundle publicado: `main-N7XDS6L3.js` · backend `808089f`.
+
+### Adicionado
+- Cartões de **Google AI Studio (Gemini)** e **OrcaRouter** na aba Provedores, com link para obter
+  a chave em cada um (o customizado não tem — é self-hosted).
+
+### Corrigido
+- **URL base e porta só aparecem no provedor customizado.** Nos hospedados o servidor força a URL
+  do catálogo (guarda que impede redirecionar a chave já gravada para outro host), então o campo
+  prometia uma edição que nunca acontecia — e com dois provedores novos essa promessa falsa
+  apareceria em três cartões.
+
+### Nota da tela
+O Gemini não mostra selo "free" nem entra no teste automático: a camada OpenAI do Google não
+informa preço (Flash é gratuito, Pro não), e varrer a lista queimaria a cota diária do nível
+gratuito. Cada modelo tem o botão "testar".
+
+Suíte **327 → 330**.
+
 ## 2026-08-19b (a listagem de modelos: alvos de clique e ordem)
 
 Bundle publicado: `main-BY27KC2K.js` · backend `6a18e56`.
