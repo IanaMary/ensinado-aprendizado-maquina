@@ -9,6 +9,25 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-19e (várias chaves de API por provedor)
+
+Bundle publicado: `main-TZX2MRC3.js` · backend `82a8f3f`.
+
+### Adicionado
+- Bloco **"Chaves de API"** em todo provedor que exige chave: lista as cadastradas **mascaradas e
+  numeradas**, com remover por item e campo para acrescentar (Enter também serve). O servidor
+  rotaciona entre elas quando uma bate no limite de taxa — que é **por chave**.
+- **Inclusive na NVIDIA**, que é `editavel: false`: essa marca vale para URL e nome, que vêm do
+  `.env`. O aviso do cartão foi reescrito para dizer isso, em vez de "não é editável pela tela".
+- Chave que vem do `.env` aparece com o selo `.env` e **sem** botão de remover: para trocá-la é
+  preciso acesso ao servidor.
+
+### Alterado
+O campo único de chave saiu do formulário de URL/nome e virou o bloco acima, onde "salvar" é
+"acrescentar". O placeholder explica para que serve a segunda chave.
+
+Suíte **331 → 336**.
+
 ## 2026-08-19d (agrupamento de modelo sem "/" no id)
 
 Bundle publicado: `main-M7ZQRJNY.js` · backend `039564e`.
