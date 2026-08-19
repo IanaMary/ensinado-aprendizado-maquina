@@ -53,6 +53,8 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   tutorThemeClass = 'theme-default';
   chatAberto = false;
   chatContexto: any = null;
+  /** Item que abriu o painel do tutor — guardado para recompor o contexto ao reabrir o chat. */
+  chatItem: ItemPipeline | null = null;
   chatSugestoes: string[] = [];
   paramsTutor = '';
   etapaAtual = '';
@@ -165,6 +167,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
   voltarAoInicioDoTutor(): void {
     this.tutorItemInfo = null;
     this.tutorPipelineInfo = null;
+    this.chatItem = null;
     this.chatSugestoes = [];
     this.tutorTheme = 'default';
     this.tutorThemeClass = 'theme-default';
@@ -441,6 +444,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     // Busca informacoes do item
     this.tutorItemInfo = this.getItemInfo(item);
     this.tutorPipelineInfo = null;
+    this.chatItem = item;
 
     // Abre o painel: conteudo estruturado vem do <app-tutor>; o chat recebe contexto + sugestoes
     this.chatContexto = this.montarContextoChat(item, this.tutorItemInfo);
@@ -473,8 +477,12 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
 
   toggleChat(): void {
     this.chatAberto = !this.chatAberto;
-    if (this.chatAberto && !this.chatContexto) {
-      this.chatContexto = this.montarContextoChat();
+    if (this.chatAberto) {
+      // Recompõe SEMPRE. O contexto é um retrato do pipeline no instante em que o painel abre,
+      // e guardar o primeiro retrato era o defeito: quem abria o chat com a área de trabalho
+      // ainda vazia continuava enviando dataset/modelo/métricas nulos depois de carregar os
+      // dados e treinar — o tutor respondia sem saber de nada.
+      this.chatContexto = this.montarContextoChat(this.chatItem || undefined, this.tutorItemInfo);
     }
   }
 
@@ -855,6 +863,7 @@ export class ExecucoesComponent implements OnInit, OnDestroy {
     this.preProcessamentoConfig = null;
     this.tutorPipelineInfo = null;
     this.tutorItemInfo = null;
+    this.chatItem = null;
     this.tutorTheme = 'default';
     this.tutorThemeClass = 'theme-default';
     this.dashboardService.limparItensExecucao();
