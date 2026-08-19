@@ -415,11 +415,58 @@
               Nenhum modelo escolhido ainda — ative o provedor e escolha na aba LLM.
             </p>
 
-            <!-- NVIDIA não é editável aqui de propósito: chave e URL vêm do .env do servidor. -->
+            <!-- `editavel: false` (NVIDIA) vale para URL e nome, que vêm do .env. A CHAVE é
+                 gerenciada aqui em todos os provedores desde 19/08. -->
             <p class="provedor-somente-leitura" *ngIf="!p.editavel">
               <mat-icon>info</mat-icon>
-              Configurado pelo <code>.env</code> do servidor ({{ p.env_chave }}) — não é editável pela tela.
+              URL base vem do <code>.env</code> do servidor ({{ p.env_chave }}) e não muda pela tela.
             </p>
+
+            <!-- Chaves de API: várias por provedor. O limite de taxa é POR CHAVE — o nível
+                 gratuito do Google AI Studio dá ~500 requisições/dia, que uma turma consome numa
+                 aula. Com mais de uma, o servidor rotaciona em 429/401/403 em vez de falhar. -->
+            <div class="chaves-bloco" *ngIf="p.exige_chave">
+              <label class="campo-label">
+                Chaves de API
+                <span class="chaves-contagem" *ngIf="p.chaves.length">{{ p.chaves.length }}</span>
+              </label>
+
+              <p class="chaves-vazio" *ngIf="!p.chaves.length">
+                Nenhuma chave — este provedor não funciona até você informar uma.
+              </p>
+
+              <div class="chave-item" *ngFor="let c of p.chaves">
+                <span class="ordem">{{ c.indice + 1 }}</span>
+                <code class="chave-mascara">{{ c.mascarada }}</code>
+                <span class="chave-origem" *ngIf="chaveDoAmbiente(p, c.indice)"
+                      title="Vem do .env do servidor; para trocar, é preciso acesso ao servidor">.env</span>
+                <button class="btn-remover-reserva" type="button"
+                        *ngIf="!chaveDoAmbiente(p, c.indice)"
+                        (click)="removerChave(p, c.indice)" [disabled]="!!salvandoProvedor"
+                        [attr.aria-label]="'Remover chave ' + c.mascarada">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+
+              <div class="chave-nova">
+                <input class="campo-input" type="password" [(ngModel)]="formProvedor[p.id].api_key"
+                       *ngIf="formProvedor[p.id]"
+                       autocomplete="new-password" spellcheck="false"
+                       placeholder="Colar outra chave (rotaciona quando uma bate no limite)"
+                       (keyup.enter)="adicionarChave(p)"
+                       [attr.aria-label]="'Nova chave de API para ' + p.nome">
+                <button class="btn-secundario" type="button" (click)="adicionarChave(p)"
+                        [disabled]="!formProvedor[p.id].api_key || !!salvandoProvedor">
+                  <mat-icon>add</mat-icon> Acrescentar
+                </button>
+                <a class="link-externo" *ngIf="linkDaChave(p.id)" [href]="linkDaChave(p.id)"
+                   target="_blank" rel="noopener">Obter chave</a>
+              </div>
+              <small class="campo-dica">
+                A chave fica no servidor e nunca volta para a tela: só os últimos 4 caracteres
+                aparecem. Várias chaves servem para o limite de taxa, que é por chave.
+              </small>
+            </div>
 
             <div class="provedor-form" *ngIf="p.editavel && formProvedor[p.id]">
               <div class="campo-form" *ngIf="p.id === 'custom'">
@@ -442,19 +489,7 @@
                          placeholder="opcional" min="1" max="65535">
                 </div>
               </div>
-              <div class="campo-form">
-                <label class="campo-label">Chave de API</label>
-                <input class="campo-input" type="password" [(ngModel)]="formProvedor[p.id].api_key"
-                       autocomplete="new-password" spellcheck="false"
-                       [placeholder]="p.chave_fonte === 'banco' ? 'Guardada — deixe vazio para manter' : 'Cole a chave do provedor'">
-                <small class="campo-dica">
-                  Fica no servidor e nunca volta para a tela: só os últimos 4 caracteres aparecem.
-                  Deixar em branco mantém a chave atual.
-                </small>
-              </div>
               <div class="provedor-acoes">
-                <a class="link-externo" *ngIf="linkDaChave(p.id)" [href]="linkDaChave(p.id)"
-                   target="_blank" rel="noopener">Obter chave</a>
                 <button class="btn-primario" type="button" (click)="salvarProvedor(p)"
                         [disabled]="salvandoProvedor === p.id">
                   <mat-icon>save</mat-icon>

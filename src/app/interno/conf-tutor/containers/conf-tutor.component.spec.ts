@@ -28,17 +28,22 @@ const PROVEDORES = [
   { id: 'nvidia', nome: 'NVIDIA NIM', base_url: 'https://integrate.api.nvidia.com/v1',
     modelo: 'meta/llama-3.3-70b-instruct', editavel: false, todos_gratuitos: true,
     chave_fonte: 'env', chave_mascarada: '••••abcd', env_chave: 'NVIDIA_API_KEY', configurado: true,
-    fallbacks: ['meta/llama-3.1-8b-instruct'], fallbacks_origem: 'catalogo' },
+    fallbacks: ['meta/llama-3.1-8b-instruct'], fallbacks_origem: 'catalogo',
+    exige_chave: true, chaves: [{ indice: 0, mascarada: '••••abcd' }], chaves_no_banco: 0 },
   { id: 'openrouter', nome: 'OpenRouter', base_url: 'https://openrouter.ai/api/v1', modelo: '',
     editavel: true, todos_gratuitos: false, chave_fonte: 'ausente', chave_mascarada: '',
-    env_chave: 'OPENROUTER_API_KEY', configurado: false },
+    env_chave: 'OPENROUTER_API_KEY', configurado: false,
+    exige_chave: true, chaves: [], chaves_no_banco: 0 },
   { id: 'gemini', nome: 'Google AI Studio (Gemini)',
     base_url: 'https://generativelanguage.googleapis.com/v1beta/openai', modelo: '',
     editavel: true, todos_gratuitos: null, chave_fonte: 'ausente', chave_mascarada: '',
-    env_chave: 'GEMINI_API_KEY', configurado: false, fallbacks: [], fallbacks_origem: 'catalogo' },
+    env_chave: 'GEMINI_API_KEY', configurado: true, fallbacks: [], fallbacks_origem: 'catalogo',
+    exige_chave: true, chaves_no_banco: 2,
+    chaves: [{ indice: 0, mascarada: '••••sCnA' }, { indice: 1, mascarada: '••••X9k2' }] },
   { id: 'custom', nome: 'Outro provedor (OpenAI-compatible)', base_url: '', modelo: '',
     editavel: true, todos_gratuitos: null, chave_fonte: 'ausente', chave_mascarada: '',
-    env_chave: null, configurado: false },
+    env_chave: null, configurado: false,
+    exige_chave: false, chaves: [], chaves_no_banco: 0 },
 ] as any[];
 
 const PROMPT_PADRAO = {
@@ -57,7 +62,7 @@ describe('ConfTutorComponent (aba LLM)', () => {
       'getTutorEditar', 'putTutorPipe', 'getTutorAudit', 'getSystemPrompt', 'putSystemPrompt',
       'listarModelosLLM', 'verificarSaudeModelos', 'definirModeloLLM',
       'getProvedoresLLM', 'salvarProvedorLLM', 'definirProvedorLLMAtivo',
-      'salvarFallbacksLLM', 'restaurarFallbacksLLM',
+      'salvarFallbacksLLM', 'restaurarFallbacksLLM', 'adicionarChaveLLM', 'removerChaveLLM',
     ]);
     service.getTutorEditar.and.returnValue(of({ texto_pipe: 'oi' } as any));
     service.getTutorAudit.and.returnValue(of([] as any));
@@ -74,6 +79,8 @@ describe('ConfTutorComponent (aba LLM)', () => {
     service.definirProvedorLLMAtivo.and.returnValue(of({ ativo: 'openrouter', provedores: PROVEDORES } as any));
     service.salvarFallbacksLLM.and.returnValue(of({ ativo: 'nvidia', provedores: PROVEDORES } as any));
     service.restaurarFallbacksLLM.and.returnValue(of({ ativo: 'nvidia', provedores: PROVEDORES } as any));
+    service.adicionarChaveLLM.and.returnValue(of({ ativo: 'nvidia', provedores: PROVEDORES } as any));
+    service.removerChaveLLM.and.returnValue(of({ ativo: 'nvidia', provedores: PROVEDORES } as any));
 
     TestBed.configureTestingModule({
       schemas: [NO_ERRORS_SCHEMA],
@@ -689,6 +696,43 @@ describe('ConfTutorComponent (aba LLM)', () => {
       expect(comp.linkDaChave('orcarouter')).toContain('orcarouter');
       expect(comp.linkDaChave('openrouter')).toContain('openrouter');
       expect(comp.linkDaChave('custom')).toBe('');   // self-hosted: não há onde obter
+    });
+
+    // Várias chaves por provedor: o limite de taxa é POR CHAVE (o nível gratuito do AI Studio
+    // dá ~500 requisições/dia, que uma turma consome numa aula).
+    it('lista as chaves mascaradas e numeradas', () => {
+      const itens = cartao('gemini').querySelectorAll<HTMLElement>('.chave-item');
+      expect(itens.length).toBe(2);
+      expect(itens[0].querySelector<HTMLElement>('.ordem')!.textContent!.trim()).toBe('1');
+      expect(itens[0].querySelector<HTMLElement>('.chave-mascara')!.textContent).toContain('••••');
+    });
+
+    it('acrescentar manda a chave e limpa o campo', () => {
+      comp.formProvedor['gemini'].api_key = '  AIzaNOVA  ';
+      comp.adicionarChave(PROVEDORES.find((x: any) => x.id === 'gemini'));
+      expect(service.adicionarChaveLLM).toHaveBeenCalledWith('gemini', 'AIzaNOVA');
+      expect(comp.formProvedor['gemini'].api_key).toBe('');
+    });
+
+    it('remover é por índice, que é tudo que a tela conhece', () => {
+      comp.removerChave(PROVEDORES.find((x: any) => x.id === 'gemini'), 1);
+      expect(service.removerChaveLLM).toHaveBeenCalledWith('gemini', 1);
+    });
+
+    it('chave que vem do .env não pode ser removida pela tela', () => {
+      const nvidia = PROVEDORES.find((x: any) => x.id === 'nvidia');
+      // `chaves_no_banco: 0` e `chave_fonte: 'env'`: a única chave é do servidor.
+      expect(comp.chaveDoAmbiente(nvidia, 0)).toBeTrue();
+      const gemini = PROVEDORES.find((x: any) => x.id === 'gemini');
+      expect(comp.chaveDoAmbiente(gemini, 0)).toBeFalse();
+    });
+
+    it('a NVIDIA também gerencia chave, apesar de não ser editável', () => {
+      // `editavel: false` vale para URL e nome; a chave passou a ser da tela em 19/08.
+      const card = [...fixture.nativeElement.querySelectorAll('.provedor-card')]
+        .find((c: any) => c.textContent.includes('NVIDIA')) as HTMLElement;
+      expect(card.querySelector('.chaves-bloco')).toBeTruthy();
+      expect(card.querySelector('.campo-form.url')).toBeNull();
     });
 
     it('o Gemini aparece na tela e aceita chave', () => {
