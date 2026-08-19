@@ -9,6 +9,26 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-19f (a lista de reserva mostrava uma ordem que não era a real)
+
+Bundle publicado: `main-ZND4NLFZ.js` · backend `82a8f3f`.
+
+O dono montou uma lista com três modelos, salvou, e o chat continuou respondendo com um **quarto**.
+Não havia defeito de execução: a cadeia real é `[modelo ativo, ...reservas]`, e o cartão numerava
+as reservas a partir de **1** sem mostrar o ativo — que é justamente quem responde. A numeração
+afirmava uma ordem que não era a do servidor.
+
+### Corrigido
+- O cartão mostra a **cadeia inteira**: posição 1 é o modelo ativo, com a pílula **em uso** e sem
+  mover/remover; as reservas vêm de 2 em diante.
+- Botão **"usar"** em cada reserva, que é o que o admin quer dizer com "quero que o tutor use
+  este": promove a modelo ativo e a tira da reserva no mesmo movimento.
+- O ativo é filtrado das reservas exibidas — o servidor deduplica a cadeia antes de tentar, então
+  mostrá-lo duas vezes seria mentira. Os botões seguem operando sobre o índice da lista **gravada**,
+  não da exibida (há teste para a distinção).
+
+Suíte **336 → 342**.
+
 ## 2026-08-19e (várias chaves de API por provedor)
 
 Bundle publicado: `main-TZX2MRC3.js` · backend `82a8f3f`.
