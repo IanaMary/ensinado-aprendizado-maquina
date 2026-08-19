@@ -742,6 +742,33 @@
   }
 }
 
+// -------------------------------------------------- chaves de API (várias por provedor)
+.chaves-bloco {
+  margin: 10px 0 4px;
+  .campo-dica { display: block; margin-top: 6px; }
+}
+
+.chaves-contagem {
+  margin-left: 6px; font-size: 11px; font-weight: 700; color: $cinza-escuro;
+  background: rgba($roxo-claro, 0.4); border-radius: 999px; padding: 1px 7px;
+}
+
+.chaves-vazio { margin: 4px 0; font-size: 12px; color: $vermelho-escuro; }
+
+.chave-item {
+  display: flex; align-items: center; gap: 8px; padding: 5px 0;
+  .chave-mascara { flex: 1; font-size: 12px; color: $preto; letter-spacing: 1px; }
+  .chave-origem {
+    font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 999px;
+    background: rgba($roxo-claro, 0.4); color: $roxo-escuro;
+  }
+}
+
+.chave-nova {
+  display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap;
+  .campo-input { flex: 1; min-width: 200px; }
+}
+
 // -------------------------------------------------- aba Provedores
 .provedores-config {
   .provedor-card {

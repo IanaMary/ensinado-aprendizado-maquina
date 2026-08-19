@@ -28,6 +28,8 @@ const OPERACOES_LABEL: Record<string, string> = {
   trocou_provedor: 'Provedor de LLM trocado',
   configurou_provedor: 'Provedor de LLM configurado',
   definiu_fallbacks: 'Lista de reserva do tutor alterada',
+  adicionou_chave: 'Chave de API acrescentada',
+  removeu_chave: 'Chave de API removida',
   restaurou_fallbacks: 'Lista de reserva voltou ao padrão do sistema',
 };
 
@@ -563,6 +565,46 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
         this.formProvedor[p.id] = { nome: p.nome, base_url: p.base_url, porta: null, api_key: '' };
       }
     }
+  }
+
+  // === Chaves de API (várias por provedor) ===
+  // O limite de taxa dos provedores é POR CHAVE: o nível gratuito do Google AI Studio dá ~500
+  // requisições/dia, que uma turma consome numa aula. Com mais de uma, o servidor rotaciona ao
+  // receber 429 (ou 401/403) em vez de derrubar o chat.
+
+  adicionarChave(p: ProvedorLLM): void {
+    const chave = (this.formProvedor[p.id]?.api_key || '').trim();
+    if (!chave || this.salvandoProvedor) return;
+    this.salvandoProvedor = p.id;
+    this.dashboardService.adicionarChaveLLM(p.id, chave).subscribe({
+      next: (res) => {
+        this.aplicarProvedores(res);
+        this.formProvedor[p.id].api_key = '';   // não deixa o segredo no DOM
+        this.salvandoProvedor = '';
+        this.notificacao.sucesso('Chave acrescentada.');
+        this.carregarHistorico(this.pipeAtual);
+      },
+      error: () => { this.salvandoProvedor = ''; },
+    });
+  }
+
+  removerChave(p: ProvedorLLM, indice: number): void {
+    if (this.salvandoProvedor) return;
+    this.salvandoProvedor = p.id;
+    this.dashboardService.removerChaveLLM(p.id, indice).subscribe({
+      next: (res) => {
+        this.aplicarProvedores(res);
+        this.salvandoProvedor = '';
+        this.notificacao.sucesso('Chave removida.');
+        this.carregarHistorico(this.pipeAtual);
+      },
+      error: () => { this.salvandoProvedor = ''; },
+    });
+  }
+
+  /** Chave que veio do `.env` do servidor: aparece na lista, mas não dá para remover pela tela. */
+  chaveDoAmbiente(p: ProvedorLLM, indice: number): boolean {
+    return p.chave_fonte === 'env' && indice >= (p.chaves_no_banco || 0);
   }
 
   salvarProvedor(p: ProvedorLLM): void {

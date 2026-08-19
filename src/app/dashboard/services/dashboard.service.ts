@@ -28,6 +28,12 @@ export interface ProvedorLLM {
   fallbacks: string[];
   /** 'admin' = configurada na tela; 'catalogo' = o padrão que vem no código do servidor. */
   fallbacks_origem: 'admin' | 'catalogo';
+  /** Chaves cadastradas, **mascaradas**. O índice é o que o DELETE usa (a tela não vê o valor). */
+  chaves: { indice: number; mascarada: string }[];
+  /** O provedor precisa de chave? (um endpoint self-hosted normalmente não pede.) */
+  exige_chave: boolean;
+  /** Quantas vêm do banco (as demais, se houver, vêm do `.env` e não dá para remover pela tela). */
+  chaves_no_banco: number;
   chave_mascarada: string;
   env_chave: string | null;
   configurado: boolean;
@@ -362,6 +368,18 @@ export class DashboardService {
   salvarFallbacksLLM(provedor: string, modelos: string[]) {
     return this.http.put<{ ativo: string; provedores: ProvedorLLM[] }>(
       `${this.url}${this.endpointTutor}/provedores/${provedor}/fallbacks`, { modelos });
+  }
+
+  /** Acrescenta uma chave de API ao provedor (o limite de taxa dos provedores é por chave). */
+  adicionarChaveLLM(provedor: string, apiKey: string) {
+    return this.http.post<{ ativo: string; provedores: ProvedorLLM[] }>(
+      `${this.url}${this.endpointTutor}/provedores/${provedor}/chaves`, { api_key: apiKey });
+  }
+
+  /** Remove a chave da posição informada — por índice, porque a tela não conhece o valor. */
+  removerChaveLLM(provedor: string, indice: number) {
+    return this.http.delete<{ ativo: string; provedores: ProvedorLLM[] }>(
+      `${this.url}${this.endpointTutor}/provedores/${provedor}/chaves/${indice}`);
   }
 
   /** Descarta a lista do admin e volta ao padrão do servidor. É DELETE de propósito: "voltar ao
