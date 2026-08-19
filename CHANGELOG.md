@@ -1,12 +1,147 @@
 # Changelog — H2IA Tutor
 
-Histórico de deploys em produção (`https://absapt.tk/h2ia/`). Formato inspirado em
+Histórico de deploys em produção (`https://absapt.tk/h2ia/tutor/`). Formato inspirado em
 [Keep a Changelog](https://keepachangelog.com); datas em AAAA-MM-DD. Cada entrada cita os
-commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Historical Production Reference_.
+commits (frontend/backend) e o bundle publicado. O histórico narrativo completo (incidentes,
+diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 > Frontend: `IanaMary/ensinado-aprendizado-maquina` · Backend: `IanaMary/ensinado-aprendizado-maquina-back`.
 
 ---
+
+## 2026-08-18 (chat do tutor: a pergunta que falha não fica, e o contexto deixa de ser um retrato velho)
+
+Bundle publicado: `main-B54MSO3I.js` · backend `7e07bc4`.
+
+Os dois defeitos apareceram juntos porque o tutor estava fora do ar (a causa era do backend: modelo
+aposentado devolvendo 410, ver o CHANGELOG de lá). Com o tutor respondendo, eles teriam passado
+despercebidos — mas são independentes da queda.
+
+### Corrigido
+- **A pergunta que falha volta para a caixa e sai do histórico.** Antes ela ficava em `mensagens`, e
+  a pergunta seguinte reenviava todas as anteriores **sem resposta** no mesmo POST — turnos `user`
+  em sequência, sem `assistant` entre eles —, com a tela mostrando a mesma pergunta repetida. Era o
+  que a captura do usuário registrava: três balões, dois deles idênticos, e o corpo da requisição
+  crescendo a cada tentativa.
+- **`chatContexto` é recomposto toda vez que o painel abre.** Ele era montado uma vez e guardado:
+  quem abria o chat com a área de trabalho ainda vazia continuava enviando `dataset`, `modelo` e
+  `metricas` **nulos** depois de carregar os dados e treinar. O item que abriu o painel é preservado
+  (`chatItem`), então clicar num item e reabrir o chat não perde o `itemSelecionado`.
+
+### Testes
+Primeiro spec do `chat-tutor` (não tinha nenhum): 3 casos — a pergunta que falha volta para a caixa,
+não é reenviada junto com a próxima, e o turno que dá certo continua no histórico. Suíte: 302 casos.
+
+## 2026-08-04c (o filtro "Minha turma" da galeria volta, funcionando)
+
+Bundle publicado: `main-LROU77IM.js` · backend `d3a5fb9`.
+
+**Verificado na tela, em produção.** Caso negativo: o aluno está na "Turma 1" e o botão **não**
+aparece, porque aquela turma não tem material do professor sem atividade — é o comportamento certo.
+Caso positivo: exercitado no bundle publicado interceptando só a resposta HTTP da galeria (nada foi
+escrito em produção) — o grupo aparece, o selo mostra "🔒 Turma 1", e o filtro deixa 1 de 2 cartões.
+Ali a captura revelou um defeito de rótulo que nenhum teste pegaria: **"Todos" (turma) encostado em
+"Todas" (dificuldade)**. Virou "Toda a galeria".
+
+### Adicionado
+- **Filtro por turma na galeria, de verdade.** Quem decide o pertencimento é o servidor, no campo
+  `da_minha_turma` de `GET /pipelines/galeria`; o nome da turma só chega para quem é membro dela,
+  porque a galeria também lista público de turmas alheias. A galeria passou a mostrar **também o
+  material que o professor deixou nas turmas do aluno sem ter publicado** — com dois recortes de
+  privacidade descritos no CHANGELOG do backend.
+- **Primeiro spec desta tela** (não tinha nenhum): 11 casos.
+
+### Decisões de tela, todas vindas do defeito anterior
+- **Dois botões, não três** — "Públicos" e "Todos" mostravam a mesma lista.
+- **O grupo só aparece quando há item de turma para filtrar** (`temItensDaMinhaTurma`): filtro que só
+  pode devolver lista vazia é exatamente o que esta tela tinha.
+- **O selo do cartão volta com o nome da turma** e nunca renderiza vazio — o selo de cadeado anterior
+  lia um `pipeline.turma` que nunca era preenchido. O ícone distingue material da turma de público.
+- Nenhum CSS novo: `.filtro-tipo` continuava no `.scss`; só o HTML havia saído.
+
+### Paridade
+Portado para a `master` (`9a5c17c`), onde a galeria vive em `src/app/interno/galeria/` com um nível
+menos no import do serviço. Porte por **edição cirúrgica**, não cópia: o `pipeline.service.ts` das
+duas branches já divergia em comentários.
+
+## 2026-08-04b (fecha o resíduo do arrasto, mata o handler morto, mostra o motivo)
+
+Bundle publicado: `main-AAXFAZ3W.js`. Verificado **na tela**, em produção.
+
+### Corrigido
+- **Resíduo do arrasto, fechado.** A primeira versão da guarda só olhava
+  `isPointerOverContainer`, então cancelava quando o aluno soltava de volta sobre a paleta — mas
+  soltar sobre uma **terceira** área (painel do tutor, cabeçalho, aviso de atividades) ainda
+  adicionava o item. A decisão passa a usar também `dropPoint` contra a área das raias: só entra o
+  que cai numa raia. Continua falhando para o lado seguro (sem `dropPoint` ou sem raia medível,
+  adiciona como antes). Verificado na tela: soltar sobre o aviso de atividades não adiciona; soltar
+  na raia adiciona.
+- **O anexo do modelo treinado deixa de falhar em silêncio.** O `catch {}` mudo escondia por que a
+  pasta `modelo/` não vinha no zip. Agora o motivo vai ao console e um `MODELO-AUSENTE.txt` entra no
+  próprio pacote, explicando que o `pipeline.py` não depende dela.
+
+### Removido
+- `onItemDropped` da paleta de **pré-processamento**: código morto. Aquele template não liga
+  `(cdkDropListDropped)` e é o único que declara `cdkDropListConnectedTo`, então o `dropped` sai na
+  raia, que não tem handler — o caminho real dali é o clique.
+
+### Investigado (o zip de agrupamento sem `modelo/`)
+Três registros de histórico traziam isso como "observação não investigada". **Não é o backend:**
+medi em produção que `download_artifacts(run_id, "model")` funciona para `k_means`, `arvore_decisao`
+e `pca`, e que 52 modelos estão logados no store. Duas hipóteses minhas caíram no caminho — que o
+`log_sklearn_model` estivesse falhando (não está: zero exceções no log) e que o leitor procurasse no
+lugar errado (o MLflow 3 resolve `run_id` + `artifact_path` de forma transparente, mesmo com
+`list_artifacts` vazio, porque o modelo virou entidade própria). Por isso a correção foi tornar a
+falha **visível** em vez de adivinhar a causa.
+
+### Paridade
+Portado para a `master` (`fecfe7e`). Copiar o `script-generator.service.ts` inteiro **apagaria** o
+`anexarDadosCsv` público de lá — que existe porque a Trilha tem o segundo montador de zip. O `git
+diff` mostrou 26 remoções, o arquivo foi revertido e só a troca do `catch` foi aplicada.
+
+## 2026-08-04 (dá para desistir de um arrasto; a galeria não inventa dados)
+
+Bundle publicado: `main-MBE3HF7F.js`. Verificado **na tela**, em produção, com o aluno logado.
+
+Os três consertos foram **portados para a `master`** (`a2964b4`), onde os três defeitos também
+existiam — a galeria lá vive em `src/app/interno/galeria/`, caminho diferente e mesmo defeito.
+Junto foi o `coleta-de-dados.component.spec.ts` completo, porte que estava pendente. Suíte na
+`master`: 275, com `npm install` feito nela; build de produção OK. Aquela branch não é implantada.
+
+### Corrigido
+- **Soltar uma métrica apagava o card "Dados".** Achado testando no navegador.
+  `movendoItemExecucao` é chamado pelas QUATRO paletas e desabilitava a paleta de coleta **sem olhar
+  o tipo do item** — a intenção era "dados se carregam uma vez por pipeline". Com a área de trabalho
+  vazia, soltar uma métrica (ou um modelo, ou um pré-processador) deixava o card em
+  `item-desabilitado cdk-drag-disabled`, e o aluno perdia a única forma de carregar dados; só voltava
+  limpando o pipeline inteiro. Quem começasse a montar pela avaliação travava sem entender por quê.
+  Reproduzido em produção do zero e reconferido depois da correção.
+- **Arrastar e desistir adicionava o item.** As paletas do pipeline não declaram
+  `cdkDropListConnectedTo`, então para o CDK o item nunca sai da paleta: o `dropped` é sempre emitido
+  por ela mesma, e o handler tratava isso como "soltou em algum lugar, adiciona". Pegar um item,
+  pensar melhor e largar punha a peça na raia — sem como cancelar, no gesto que é justamente como o
+  aluno monta o pipeline. `desistiuDoArrasto` (`dashboard/pipeline/arrasto-cancelado.ts`) usa
+  `isPointerOverContainer`, que no CDK (`drag-drop.mjs:1169`) compara o ponto de soltura com o rect do
+  container que recebeu o drop — a própria paleta.
+  **Deliberadamente não se decide pela geometria das raias:** a paleta de pré-processamento também
+  roda dentro do `modal-execucao`, onde raia não existe, e medir `.column-content` global cancelaria o
+  arrasto legítimo lá. Falha para o lado seguro: sem o campo, volta a adicionar — o inaceitável seria
+  parar de adicionar.
+- **A galeria do aluno mostrava um filtro impossível.** `GET /pipelines/galeria` devolve só
+  `is_public: true`, e o botão "Minha Turma" filtrava `!publico` sobre essa lista: resultado
+  **sempre vazio**, a galeria sumia ao clicar. "Públicos" e "Todos" eram a mesma lista. O grupo saiu
+  inteiro; filtrar por turma de verdade exige o endpoint devolver o vínculo, o que é feature, não
+  conserto.
+- **E números inventados na tela do aluno.** Cada cartão exibia "0 cópias" e uma nota de **5
+  estrelas**: `totalCopias: 0` e `avaliacao: 5.0` cravados no cliente, não medição do servidor. No
+  lugar deles vão dataset e modelo, que vêm do servidor. Os dois campos saíram da interface
+  `PipelineProfessor`. Também saiu o selo de turma, que lia `pipeline.turma` — campo nunca preenchido,
+  em ramo inalcançável.
+
+### Documentação
+- `docs/DOCUMENTACAO.md` era **cópia byte a byte** da do backend (559 linhas). Virou ponteiro: duas
+  cópias do mesmo texto em repositórios diferentes divergem, e o conteúdo (coleções, endpoints, envs,
+  allowlist do sandbox) é do backend.
 
 ## 2026-08-03g (Titanic com as 13 colunas: o gerador não recorta mais)
 
@@ -23,39 +158,6 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 ### Notas
 - Verificado executando o script com `boat` marcado: `Shape de X: (1309, 13)` e **0.9238** de
   acurácia — contra 0.6585 sem o vazamento. O código exportado reproduz a armadilha, como deve.
-
----
-
-## 2026-08-03 (exportação da Trilha: notebook inválido e zip sem os dados) — não implantada
-
-> A Trilha (`/trilha`) só existe nesta branch e **não está em produção** — medido no bundle
-> publicado: zero ocorrências de `nbformat`, `ipynb`, `cell_type`, `kernelspec` e `'trilha'` nos
-> 54 chunks servidos. Os dois defeitos abaixo, portanto, nunca atingiram aluno; foram achados
-> varrendo as saídas de exportação além do `pipeline.py`. Suíte **262** passed + build.
-
-### Corrigido
-- **O zip da Trilha não anexava `data/*.csv`, e o script morria na primeira linha.** `exportar()`
-  gravava só `pipeline.{py,ipynb}`, o modelo e o `comparacao.csv` — nunca os dados. Com dados do
-  aluno (upload de planilha ou ingestão por URL) o script gerado abre `data/treino.csv`, então
-  **todo** pipeline da Trilha sobre dados próprios exportava algo que terminava em
-  `FileNotFoundError: [Errno 2] No such file or directory: 'data/treino.csv'` — reproduzido antes
-  da correção, e agora o notebook roda até o fim (`Acurácia: 1.0000`, exit 0).
-  A decisão "o script vai ler CSV?" já existia no `ScriptGeneratorService` (`scriptLeCsv`), mas
-  privada e usada só pelo bundle clássico; virou o método público **`anexarDadosCsv(folder, coleta)`**,
-  agora a única fonte da verdade para os DOIS montadores de zip (`generatePipelineBundle` e o
-  `exportar()` da Trilha). Ele também omite o CSV vazio em vez de gravar arquivo sem linhas.
-- **O `.ipynb` violava o schema do nbformat.** `toNotebook` declarava `nbformat_minor: 5` e não
-  emitia `id` em célula nenhuma — o `nbformat.validate` acusava `'id' is a required property` nas
-  duas células (medido: 2 erros no JSON cru → 0 depois). Hoje o Jupyter conserta na leitura e só
-  avisa (`MissingIDFieldWarning`), mas o próprio aviso diz que vai virar erro, e aí o notebook do
-  aluno deixaria de abrir.
-
-### Notas
-- O conteúdo da célula de código é **byte-idêntico** ao `pipeline.py` equivalente (verificado com
-  `diff`), e executa com `python3` sem erro — o `.ipynb` não tem gerador próprio de código.
-- **Gotcha do build nesta branch:** o `node_modules` compartilhado com a `mestrado-iana` poda as
-  deps do TF.js, e aí `leo-visao.service.ts` quebra o build com `TS18046: 'a' is of type 'unknown'`
-  — parece regressão e não é. Requer `npm install` na própria branch.
 
 ---
 
@@ -80,6 +182,32 @@ commits (frontend/backend) e o bundle publicado. Fonte: `CLAUDE.md` → _Histori
 - **Armadilha do próprio teste, registrada:** o script *menciona* `boat`/`body` num comentário que
   explica por que ficaram de fora, então um `expect(script).not.toContain('boat')` falha por causa
   do comentário. A checagem correta é na **linha do recorte**, não no arquivo inteiro.
+
+---
+
+## 2026-08-03e (o arrastar-e-soltar ganha teste — cobertura era zero)
+
+> Levantamento de cobertura por agente: **38 de 77 arquivos sem spec**, **17 de 40 specs apagam o
+> template** (`{ set: { template: '' } }`, então o dashboard roda sem DOM) e o **drag-and-drop tinha
+> cobertura ZERO**. Suíte **273** (era 269).
+
+### Coberto — `onItemDropped`, que é como o aluno monta o pipeline
+
+Os quatro componentes de paleta (`dashboard/pipeline/*`) têm o mesmo `onItemDropped` e todos tinham
+um único `it('should create')`. O de coleta passou a ter 5 casos.
+
+**O mecanismo não é óbvio, e ficou documentado no próprio teste:** a paleta **não** declara
+`cdkDropListConnectedTo`, então soltar o item sobre uma raia **não é um drop válido** para o CDK — o
+evento `dropped` volta a ser emitido pela própria paleta, e é dele que o handler se serve para
+empurrar o item à raia pelo serviço. Funciona por efeito colateral de um drop inválido.
+
+Consequência fixada em teste: o handler **não olha** `isPointerOverContainer` nem o container de
+destino, então **começar a arrastar e desistir no meio do caminho adiciona o item** — não há como
+cancelar um arrasto. Não é regressão nem crash; é comportamento que ninguém tinha escrito. Se algum
+dia passar a depender de onde o ponteiro terminou, o teste falha e a mudança fica explícita.
+
+Também explica por que a automação de browser não conseguia montar pipeline arrastando: sem
+`connectedTo`, o drop precisa de eventos de ponteiro reais na paleta, não de um alvo de soltar.
 
 ---
 
@@ -242,210 +370,603 @@ TypeScript vazada (`/\{[a-z]+[A-Z]\w*\}/`), que é a classe do `{splitPct}`.
 
 ---
 
-## 2026-08-02 (correções da revisão da banca) — porte
+## 2026-08-02h (corrida no atalho de Coleta + blindagem da renovação)
 
-> Branch `master` (não implantada). Porte dos commits da `mestrado-iana` que responderam à
-> revisão da banca em 02/08. Suíte 208 → 229 (estratificação, painel do tutor, renovação de sessão e
-> a blindagem do interceptor trazem specs novos).
-> Detalhe de cada correção nas entradas 2026-08-02 a 2026-08-02e do CHANGELOG da `mestrado-iana`.
+> Correções encontradas **na própria verificação** do deploy 02g. Suíte **242** passed + build.
 
-| Aqui | Origem | O quê |
-|---|---|---|
-| `f8a1b61` | `96a4c89` | Acentuação dos rótulos do painel do tutor (Intuição, Exemplo prático, Fórmula, Hiperparâmetros, Padrão:) |
-| `ed81132` | `0438177` | Acentuação no resto do app (Painel de Administração + textos de fallback do tutor) |
-| `819edda` | `59612fd` | `.conceito-item` sem `}` matava o estilo do bloco de código, que transbordava o card |
-| `f32c617` | `07e599f` | Estratificação some fora de classificação e explica o bloqueio quando se aplica |
-| `cf67519` | `35672f1` | Alvo deixa de ser ofertado como coluna de pré-processamento (o 500 do KNN/Árvore da Imagem 9) |
-| `9050b7c` | `8d2a2de` | Painel do tutor com fonte única (Imagens 7/8), faixa Tutor × Informativo (Imagem 6) e zoom no pairplot (Imagem 5) |
-| `88a9d72` | `79c1d32` | Logout recarrega o app, renovação de sessão e "Gerar avaliações" sem clique morto |
-| `ce71253` | `6730ce2` | Blindagem do gancho de renovação no `AuthInterceptor` (try/catch + 4 specs) |
+### Endurecido — o atalho "Carregar dados" não depende mais do instante do clique
+O fix de 02g lia o catálogo de Coleta com `take(1)`. Como `getItensColetasDados()` é um
+`BehaviorSubject` que **começa vazio**, ler o valor atual é frágil por construção. Agora ele
+**espera** o primeiro valor não-vazio (`filter` + `take(1)`), com `timeout(5000)` para o clique
+nunca morrer em silêncio. Spec novo reproduz a corrida com um `BehaviorSubject` que emite `[]` e
+depois a lista.
 
-> Conflitos resolvidos a favor desta branch quando a feature não existe aqui: ela não tem o link
-> do Yellowbrick nem o realce de sintaxe no `exemplo_codigo`, e **não tem atividade de turma no
-> dashboard** (`atividadeId`). Por isso o porte de `6730ce2` trouxe **apenas** a blindagem do
-> `AuthInterceptor`: o endurecimento do `abrirColetaAtividade` não se aplica onde o método não
-> existe, e os specs dele foram deixados de fora (referenciariam um método inexistente). Por isso o porte de `79c1d32` trouxe **logout com reload**,
-> **renovação de sessão** e o **botão "Gerar avaliações"**, mas NÃO o banner de pipeline nem o
-> `abrirColetaAtividade` — sem o dashboard vinculado à atividade, não haveria para onde levar o
-> aluno. `abrirDesafios` continua indo a `/entrar` (aqui) em vez de `/view-aluno/entrar`.
->
-> Nota: os três primeiros portes foram commitados só com `src/`; esta entrada cobre os quatro de
-> uma vez e recoloca a `master` em dia com a própria convenção de registrar portes.
+**Correção de registro:** eu havia atribuído a essa corrida um sintoma observado em produção
+("1º clique sem efeito, 2º funcionando"). **Provavelmente não era isso.** `carregarDados()` roda no
+`ngOnInit` do `dashboard.component`, então a lista chega em centenas de ms e um clique humano sempre
+a encontra pronta; e o mesmo bundle abriu de primeira quando o clique foi disparado via
+`element.click()` em vez das coordenadas da automação. A proteção acima continua correta — ler o
+estado inicial de um BehaviorSubject é defeito latente —, mas o sintoma que me levou a ela era
+quase certamente **artefato do clique automatizado**, não do produto.
 
-## 2026-07-31 (build e suíte sem avisos) — porte
+### Blindado — a renovação de sessão não pode contaminar a resposta
+O gancho no `AuthInterceptor` roda no caminho de **todas** as respostas. Envolvido em `try/catch`:
+uma exceção na renovação (acessória) transformaria qualquer requisição em erro. Quatro specs novos,
+inclusive um em que `aoUsar()` lança e a resposta **continua chegando**.
 
-> Branch `master` (não implantada). Porte de `5dd8d64` da `mestrado-iana`, mais o que só existe
-> nesta branch. Nenhuma mudança de comportamento: CSS emitido byte a byte igual.
+## 2026-08-02g (sair reinicia a aplicação, sessão se renova e botões que não respondiam)
 
-- Porte: Sass (`@import` → `@use`, `darken` → `color.adjust`), os 7 avisos NG8107 (corrigindo os
-  **tipos** — trocar `?.` por `.`, como o aviso sugere, criaria crash em acesso indexado) e os 2
-  specs que não afirmavam nada.
-- **Só desta branch:** os 7 componentes legados por etapa do conf-tutor faziam `@import` da folha de
-  outro componente → `@use … as *`; e `long`/`node-fetch`/`seedrandom`/`string_decoder` (arrastados
-  pelo TensorFlow.js da entrada "Léo no Mundo Real") entraram na allowlist de CommonJS.
+> 2ª leva da revisão da banca (Imagens 9-botão, 10, 11, 12, 14). Suíte **234** passed (6 novos) +
+> build. **As capturas da banca são de 01/08 15:45**, anteriores aos deploys de hoje — a parte da
+> Imagem 9 sobre "KNN/árvore/PCA/K-Means falham" já havia sido corrigida em 02b/02e.
 
-### Verificação
-Os **62** `.scss` compilados antes e depois: **0 diferenças**. Build com 0 avisos (eram 78). 208/208.
+### Corrigido — sair não reiniciava nada (Imagens 9-botão, 10 e 11)
+`logout()` limpava só o `sessionStorage` e navegava por rota. Numa SPA isso **não reinicia nada**:
+os `BehaviorSubject` do `DashboardService` seguiam com o pipeline montado, e modais e drawers
+continuavam abertos. No login seguinte a Área de Trabalho reaparecia completa, mas
+`idColeta`/`configuracaoTreinamento` tinham ido embora com o `sessionStorage` — daí **"IDs
+ausentes: faça upload de dados e selecione o modelo"** ao tentar treinar, que a banca leu como
+"o botão não responde".
+
+Agora o logout **recarrega a aplicação**. Um reload zera tudo de uma vez; a alternativa (cada
+serviço registrar a própria limpeza) depende de ninguém esquecer um serviço — e é esse
+esquecimento que traz o defeito de volta em outra forma.
+
+### Adicionado — a sessão se renova enquanto o aluno usa (Imagem 10)
+`SessaoRenovacaoService` + gancho no `AuthInterceptor`: toda resposta bem-sucedida verifica quanto
+falta no `exp` e, abaixo de 15 min, renova em segundo plano (`POST /login/renovar`). **Sem timer**
+de fundo, de propósito: um timer manteria viva a aba esquecida aberta, que é justamente o que a
+expiração deve encerrar. Falha na renovação não desloga — o token atual ainda vale e a próxima
+requisição tenta de novo.
+
+### Corrigido — dois botões que engoliam o clique
+- **"Gerar avaliações"** (Imagem 12) era `(click)="metricaAvaliacao?.postAvaliacao()"`: com o
+  ViewChild ainda nulo, o `?.` fazia o clique **não produzir nada**. Agora um handler explícito
+  avalia ou **diz** que a etapa está carregando.
+- **"Carregar dados"** do aviso de atividade (Imagem 14) fazia
+  `const coleta = this.colunaColeta[0]; if (coleta) …` — e Área de Trabalho vazia é o caso **normal**
+  de quem acabou de abrir a atividade. Agora põe o item de Coleta na raia pelo mesmo caminho do
+  arrastar (`movendoItemExecucao`) e abre o modal.
+
+### Alterado — o pipeline do professor aparece no aviso (Imagem 14)
+O aviso do topo cobria só desafios de montagem; a atividade de pipeline só era encontrada pelo
+avatar → Turmas. Agora cobre os dois, com texto, ícone e destino por tipo (montagem → `/desafio`;
+pipeline → dashboard vinculado, com o dataset sugerido), reusando a navegação do `entrar-turma`.
+
+## 2026-08-02f (painel do tutor: uma fonte de conteúdo, identidade explícita e zoom no pairplot)
+
+> Terceira leva da revisão da banca: Imagens 5, 6, 7 e 8. Suíte **228** passed (6 casos novos) +
+> build. Só frontend.
+
+### Corrigido — repetição de conteúdo (Imagens 7 e 8)
+- **O painel lia o modelo de DUAS fontes**: o `conteudo` do catálogo (banco) e o
+  `src/app/constants/tutor.json`. As duas diziam a mesma coisa com outras palavras — "Como pensar
+  nesse modelo" repetia a **Intuição**, e "Como funciona" repetia o "Passo a passo".
+- Agora existe **uma fonte só**: `TutorComponent.infoExibida` é o que o pai passou **ou** o
+  derivado do `conteudo` do item selecionado (`derivarInfo` → `conteudoParaItemInfo`, o mesmo
+  mapeamento que o card de item já usava). Os blocos "CONTEXTO DO MODELO" e "CONTEXTO DA MÉTRICA"
+  (169 linhas de template) saíram — com uma fonte só, a repetição deixou de ser possível.
+- **A numeração dupla "1. 1." foi embora com eles**: os textos de `passoAPasso` no JSON já vinham
+  numerados ("1. Treina um classificador fraco") e o `<ol>` numerava de novo.
+- `getExplicacaoBasica()` não cai mais na `intuicao` do item — era ela que reaparecia no card
+  Intuição logo abaixo. E `getTituloBasico()` deixou de ter os títulos por tipo, que só existiam
+  para rotular a repetição.
+- **O `tutor.json` NÃO foi aposentado**: ele segue alimentando os hiperparâmetros do
+  `tipos-classificadores` e textos de etapa no `execucoes`/`coleta-dado`. O que mudou é que o
+  painel do tutor não o lê mais para modelo/métrica.
+
+### Adicionado — o painel diz o que está aberto (Imagem 6)
+Faixa de identificação no topo: **Tutor** (roxo, ícone do assistente) × **Informativo** (verde,
+ícone de livro) — mais o **nome do item** ao lado, cortado com elipse. Os dois conteúdos ocupam a
+mesma região, e abrir o informativo escondia o tutor sem aviso. Cor **e** ícone **e** texto, porque
+só a cor não serve a quem não a distingue.
+
+### Adicionado — zoom no pairplot (Imagem 5)
+Botão de lupa sobre a figura (e clique na própria imagem) abre a matriz em **tamanho real com
+rolagem**, com alternância para "Ajustar à tela". Tamanho real é o padrão de propósito: a matriz
+cresce ao quadrado do número de colunas, então "caber na tela" é justamente o que deixa os eixos
+ilegíveis. Mesmo padrão visual do zoom das visualizações Yellowbrick.
+
+### Verificado e não alterado
+A **diagonal do pairplot está correta** — é a densidade (KDE) de cada variável, não "massa ×
+massa". O relato inicial da Imagem 5 era de interpretação; o pedido real era o zoom.
+
+## 2026-08-02e (pré-processamento não aponta mais para o alvo)
+
+> Parte da correção da Imagem 9 (ver changelog do backend, entrada 2026-08-02b, para o conjunto
+> completo — os três defeitos de treinamento eram de servidor). Suíte 222 passed + build.
+
+### Corrigido
+- **`pre-processamento-config`: o alvo deixou de ser ofertado como coluna.** Ele não entra em X no
+  treino, então configurar um pré-processador sobre ele gerava um `ColumnTransformer` apontando
+  para coluna inexistente — e o sklearn quebrava dentro do sandbox (500, visto em produção com
+  KNN e Árvore de Decisão). `carregarColunas` filtrava o alvo em **um** dos dois ramos; pelo ramo
+  de `colunasDetalhes` ele continuava na lista. Agora os dois filtram.
+
+## 2026-08-02d (estratificação: some onde não se aplica, explica onde se aplica)
+
+> Apontado na revisão da banca (Imagem 4): a caixa "Separar treino/teste com estratificação"
+> aparecia desabilitada em situações em que não se aplica, sugerindo funcionalidade bloqueada sem
+> dizer o porquê. Suíte 222 passed (217 + 5 novos) + build.
+
+### Alterado — `coleta-dado`
+- **A caixa some em Regressão e Exploratório** (`*ngIf="tipoPredicao === 'classificacao'"`).
+  Estratificar é manter a proporção das **categorias** — fora de classificação o conceito não
+  existe, e uma caixa cinza sugeria o contrário.
+- **Some também no bloco de upload, antes de carregar o arquivo**, onde era `[disabled]="true"`
+  fixo: sem tarefa e sem coluna alvo ela nunca poderia ser marcada.
+- **Quando se aplica mas está bloqueada, agora diz o que destrava** — novo getter
+  `motivoEstratificacaoIndisponivel`, no mesmo padrão do `getMotivoDesabilitado` que já servia o
+  tooltip da coluna alvo: sem alvo → "Escolha a coluna alvo para poder estratificar."; sem
+  embaralhar → "A estratificação depende do embaralhamento…". Com planilha de teste ele cala de
+  propósito, porque ali já existe uma hint sobre a divisão inteira.
+
+### Sem mudança de comportamento
+Nada no estado nem no servidor: `onTipoPredicaoChange` já zerava `estratificarDados` fora de
+classificação (esconder a caixa não deixa flag ligada por baixo) e `dividir_dataframe` segue sendo
+o único divisor. O `*ngIf` **não** é coberto por teste unitário — o TestBed sobrescreve o template
+com string vazia —, então a regra de visibilidade foi conferida na tela.
+
+## 2026-08-02c (bloco de código do tutor: um `}` que faltava desde 09/07)
+
+> Apontado na revisão da banca (Imagem 2): o "EXEMPLO DE CÓDIGO" vazava para fora do card e da
+> margem do painel, sem quebra nem rolagem. Suíte 217 passed + build.
+
+### Corrigido
+- **`tutor.component.scss`: `.conceito-item` não fechava.** O bloco aberto na linha 807 engolia
+  tudo o que vinha depois de `.conceito-desc` — `.codigo-section`, `.codigo-bloco` (com as 22
+  regras de cor do highlight.js) e `.doc-yellowbrick-link`. Compilado, virava
+  `.conceito-item .codigo-bloco`: seletor que **nunca casa**. O `<pre>` ficava sem estilo nenhum, e
+  `<pre>` sem estilo é `white-space: pre` sem rolagem — daí o transbordo. Fechado o bloco e
+  desaninhadas as regras; **nenhuma regra foi alterada**.
+- **A correção anunciada em 2026-07-09c nunca valeu.** O commit `7184e90`, que dizia entregar
+  "código do tutor com scroll e cores", é o mesmo que introduziu o aninhamento errado: as regras
+  nasceram inertes. Por isso o código aparecia preto no branco em vez do bloco escuro colorido —
+  o tema estava morto junto com o `overflow-x`.
+- Efeito visível: o bloco volta ao desenho previsto (fundo `#1e1e2e`, sintaxe colorida, rolagem
+  horizontal própria), igual ao que o chat do tutor já mostrava. Vale nos três lugares que reusam
+  `<app-tutor>`: painel da Área de Trabalho, drawer do `modal-execucao` e modal `metrica-avaliacao`.
+
+### Como foi provado (repetível)
+`npx sass --load-path=node_modules --no-source-map src/app/dashboard/tutor/tutor.component.scss`
+antes e depois: 22 regras saíam prefixadas por `.conceito-item`, agora 0 — e o diff do CSS emitido,
+removido o prefixo, é **idêntico**, o que garante que só o escopo mudou.
+
+## 2026-08-02b (acentuação — varredura no app inteiro)
+
+> Segunda passada, depois que o Painel de Administração apareceu com o mesmo defeito durante a
+> verificação visual do deploy anterior. A varredura foi feita sobre o **texto visível** dos
+> templates (nós de texto + `placeholder`/`matTooltip`/`aria-label`/`title`/`alt`), ignorando
+> bindings, nomes de classe e interpolações, mais uma checagem cruzada que marca palavra sem acento
+> quando a mesma palavra aparece acentuada em outro ponto do app. Suíte 217 passed + build.
+
+### Corrigido
+- **Painel de Administração** (`interno/view-admin/containers/view-admin.component.html`):
+  "Painel de Administracao" → **Administração**; "as configuracoes do tutor" → **configurações**;
+  "etapas disponiveis" → **disponíveis**; "mensagens e descricoes contextuais" → **descrições**.
+- **Textos de fallback do tutor** (`dashboard/execucoes/execucoes.component.ts`): "Metrica de
+  avaliacao do modelo." → **Métrica de avaliação**; "Selecione as metricas…" → **métricas**;
+  "…configure os hiperparametros" → **hiperparâmetros**. Aparecem quando o item do catálogo não
+  tem `conteudo` no banco.
+
+### Verificado e deliberadamente não alterado
+- **Nomes de variável no código Python gerado** (`script-generator.service.ts`: `previsao`,
+  `precisao`, `metrica`) — são identificadores do script que o aluno exporta e executa.
+- **`placeholder="min"` / `"max"`** no editor de hiperparâmetros: abreviações técnicas que
+  espelham os campos `h.min`/`h.max`, não português abreviado.
+- **`console.error('Erro ao gerar metricas…')`** (`modal-execucao.component.ts`): log, não interface.
+- Demonstrativos corretos que a checagem cruzada marcou como suspeitos ("**esta** avaliação",
+  "se **esta** é a sua conta", "já **vem** ligada") e o e-mail de exemplo `joao@email.com`.
+
+## 2026-08-02 (acentuação dos rótulos do painel do tutor)
+
+> Apontado na revisão da banca (Imagem 1): os cards do tutor exibiam **"INTUICAO"** e
+> **"EXEMPLO PRATICO"**. A causa era o texto-fonte: os rótulos estão hardcoded sem acento no
+> template; o `text-transform: uppercase` do SCSS só põe em caixa alta (ele preservaria o acento
+> se existisse). Suíte 217 passed + build de produção ok.
+
+### Corrigido
+- **5 rótulos sem acentuação** em `dashboard/tutor/tutor.component.html` (11 ocorrências):
+  `Intuicao` → **Intuição** (3×), `Exemplo pratico` → **Exemplo prático** (2×), `Formula` →
+  **Fórmula** (2×, alinhando com o bloco *Fundamentos*, que já usava a forma correta),
+  `Hiperparametros` → **Hiperparâmetros** (2×) e `Padrao:` → **Padrão:** (2×). Como
+  `<app-tutor>` é reusado em três lugares (área de trabalho, modal do wizard e modal de avaliação
+  de métrica), a correção vale para os três.
+- **Não** foram tocadas as chaves de dado `intuicao` (JSONs de `app/conteudo/`, `schema.py`,
+  interfaces TS): são identificadores do contrato backend↔frontend, não texto de UI.
+
+## 2026-08-01b (auditoria Mantis — 2ª passada: telas internas/dashboard)
+
+> Varredura das telas que a 1ª passada não cobriu (`src/app/interno/**`, `src/app/dashboard/**`).
+> Resultado: quase tudo limpo (o pipe de markdown escapa antes de renderizar; a tela de desafio não
+> recebe gabarito/lane/papel; editores do admin tratam a chave de API com segurança). Um achado real.
+> Suíte 217 passed + build ok.
+
+### Corrigido — segurança
+- **CSV/formula injection na exportação de telemetria** (`view-admin/atividades`): `montarCsv` só
+  tratava `" , \n`, não os gatilhos de fórmula (`= + - @`). O aluno controla o próprio nome/e-mail;
+  ao exportar e abrir no Excel/Sheets, uma fórmula/DDE do aluno executaria (exfiltração). Agora
+  células que começam com gatilho recebem prefixo `'` (continuam visíveis, não executam).
+
+## 2026-08-01 (auditoria de segurança Mantis — frontend)
+
+> Parte da campanha de segurança 2026-08-01 (ver changelog do backend para o conjunto completo).
+> Suíte 217 passed + build de produção ok.
+
+### Corrigido — segurança
+- **Token de convite persistido no log de erros.** O `ErrorInterceptor` enviava a URL crua da
+  requisição ao endpoint `/sistema/erro` (visível no painel do admin). Uma ativação que falhava
+  gravava o token do convite (path `/convite/<token>` ou `?token=`). Agora a URL é **sanitizada**
+  antes do envio: remove a query string e redige o token do path (`error.interceptor.ts`).
 
 ---
 
-## 2026-07-30b (testes que pegam os defeitos que só apareceram na tela) — porte
+## 2026-07-31 (build e suíte sem avisos: Sass 3, NG8107 e 2 testes que não afirmavam nada)
 
-> Branch `master` (não implantada). Porte de `606c479` da `mestrado-iana`. Só testes.
+> Frontend `mestrado-iana` **`5dd8d64`**. Nenhuma mudança de comportamento — o CSS emitido é
+> byte a byte o mesmo (provado abaixo).
 
-- **`html-boas-vindas.quill.spec.ts`**: ida e volta pelo editor Quill de verdade, pelo caminho que o
-  `ngx-quill` usa (`clipboard.convert()` / `getSemanticHTML()`), com trecho fiel do texto de
-  produção. Os casos que já existiam alimentavam o conversor com HTML escrito à mão — foi por isso
-  que o `&nbsp;` passou verde e apareceu na tela.
-- **Testes de DOM na aba LLM**: a listagem tem de chegar à *tela* (o defeito estava num `*ngIf`, com
-  o getter devolvendo valor certo). Inclui a regra geral: em nenhum estado do teste de saúde a tela
-  fica em branco.
-- Os dois verificados **vermelhos** com o defeito reintroduzido.
+### Corrigido
+- **2 specs "has no expectations"** (`AtividadeService`): usavam só `httpMock.expectNone()`, que
+  verifica de verdade mas o Jasmine não conta — o runner não os distinguia de um teste vazio, e
+  esvaziá-los não acenderia nada. Passaram a afirmar `match(url).length === 0` e ganharam a metade
+  que faltava: o lote rejeitado com 4xx é descartado **e o evento seguinte ainda sobe** (sem isso,
+  "o flush parou de enviar qualquer coisa" passaria pelo mesmo teste).
+- **7 avisos NG8107** (`?.` tido como redundante). **A sugestão do compilador — trocar `?.` por
+  `.` — introduziria crash:** todos os casos eram acesso indexado a `Record` ou `@ViewChild`, que
+  devolvem `undefined` em runtime. Quem estava errado era o tipo: `saudeModelos` e
+  `historicoDesafio` passaram a admitir `| undefined`, o `@ViewChild` trocou `!` por `?`, o
+  histórico do desafio usa `*ngIf … as h`, e só no diálogo de nomear o `?.` era de fato redundante
+  (o único chamador sempre passa `data`).
+- **60 avisos de Sass** (dois grupos, ambos com remoção marcada para o **Dart Sass 3.0**):
+  `@import` → `@use … as *` em 9 arquivos e `darken($c, N%)` → `color.adjust($c, $lightness: -N%)`
+  em 27 chamadas (equivalência exata da definição de `darken`).
+- **Regressão que a migração causou e a verificação pegou:** `pipeline.component.scss` fazia
+  `@use '../dashboard.component' as *` e recebia as variáveis **de carona** pelo `@import` de lá.
+  O `@use` não repassa membros de terceiros — é o ponto dele — então a dependência virou explícita.
+  Sem o passo de comparação isto teria ido para produção como uma tela sem cor.
+- **CommonJS**: `allowedCommonJsDependencies` no `angular.json` para as libs de exportação
+  (jszip/file-saver/qrcode) e as transitivas de jspdf/canvg/quill. O aviso só alerta bailout de
+  otimização; declará-las deixa o log limpo para o que exige ação.
 
 ### Verificação
-208/208 (11 novos).
+- **Prova da equivalência do CSS:** os **53** `.scss` do projeto compilados com o dart-sass antes e
+  depois — **0 diferenças** e nenhum que deixe de compilar (foi assim que a regressão do
+  `pipeline.component` apareceu).
+- Build de produção com **0 avisos e 0 erros** (eram 78). 217/217. Backend intacto (623 passed).
 
 ---
 
-## 2026-07-30 (provedores de LLM + editor de texto rico no conf-tutor) — porte
+## 2026-07-30b (testes que pegam os dois defeitos que só apareceram na tela)
 
-> Branch `master` (não implantada). Porte de `7d3c6d1`+`56683bb`+`8bdad04` da `mestrado-iana`
-> (implantados em produção nesta data). Backend `master` `2a6de50`.
+> Frontend `mestrado-iana` **`606c479`**. Não requer deploy: só testes, comentários e a
+> extração de uma constante (comportamento idêntico). Produção segue em `main-2KWK6MAL.js`.
 
 ### Adicionado
-- **Aba Provedores** no conf-tutor: NVIDIA NIM, OpenRouter e provedor livre (endereço base, porta e
-  chave). A chave vive no banco e a tela só recebe a forma mascarada (`••••1234`).
-- Modelos **gratuitos primeiro**, com etiqueta `free`; todos os da NVIDIA marcados como gratuitos.
-- **Busca por nome** e listagem **colapsável por fornecedor** (o que vem antes da `/`).
-- Seletor de provedor na aba LLM; botão "retestar" no padrão `.btn-secundario`.
-- **Editor visual** (Quill) nas boas-vindas, no lugar do HTML cru, com modo "Código HTML" e
-  `html-boas-vindas.ts` convertendo a saída do editor para o subconjunto que o painel renderiza.
+- **`html-boas-vindas.quill.spec.ts`** — ida e volta pelo **editor Quill de verdade**, pelo mesmo
+  caminho do `ngx-quill` em `format="html"` (`clipboard.convert()` na escrita, `getSemanticHTML()` na
+  leitura), com um trecho fiel do texto de produção. Os casos que já existiam alimentam o conversor
+  com HTML escrito à mão: provam a conversão, mas só cobrem as armadilhas já conhecidas — e foi por
+  isso que o `&nbsp;` passou verde e apareceu na tela. **Verificado que o caso fica vermelho** sem o
+  `normalizarEspacos`.
+- **Testes de DOM na aba LLM** (`conf-tutor.component.spec.ts`): a listagem tem de chegar à *tela*.
+  O defeito do provedor sem preço estava num `*ngIf`, com `gruposModelos.length` maior que zero o
+  tempo todo — teste de getter passa verde nesse cenário. Inclui a regra geral: **em nenhum estado do
+  teste de saúde** (nada testado / em andamento / parcial / completo) a tela fica em branco — ou há
+  listagem, ou há um progresso explicando a espera. **Verificado que 3 casos ficam vermelhos** com o
+  `total > 0` de volta no getter.
+- `QUILL_MODULOS_BOAS_VINDAS` exportado do `html-boas-vindas.ts`: o teste usa a configuração **real**
+  da barra do editor, não uma cópia que poderia divergir dela sem ninguém notar.
 
-### Nota do porte
-- Nesta branch o `QuillModule.forRoot()` já estava no módulo (os componentes legados por etapa do
-  conf-tutor, que só existem aqui, usam Quill) — mantido como estava, em vez do `QuillModule` que a
-  `mestrado-iana` precisou acrescentar.
+### Corrigido (registro, não código)
+- A entrada de 29/07d afirmava que a lista com marcador "apareceria numerada para o aluno". O teste
+  novo mediu: pelo `getSemanticHTML()` o Quill 2.0.3 já devolve `<ul>`. O `data-list` é a forma do
+  `root.innerHTML`, que esta tela não usa — a conversão é guarda, não correção. Corrigido também no
+  `CLAUDE.md`.
 
 ### Verificação
-197/197 + build de produção.
+217/217 (11 novos).
 
 ---
 
-## 2026-07-29b (marca H2IA Tutor no material exportado) — porte
+## 2026-07-30 (correções da revisão: provedor sem preço, colapso na busca, prévia)
 
-> Branch `master` (não implantada). Backend `master` `8abf375`.
+> **Implantado em 30/07/2026 12h10.** Frontend `mestrado-iana` **`8bdad04`** · bundle
+> **`main-2KWK6MAL.js`**. Backup `/home/ubuntu/backups/deploy-20260730-121006`.
+> Portado para a `master` em `6e2d550`.
 
-- O `.zip` do pipeline e o `.ipynb` da Trilha (só desta branch) diziam "gerado pelo Iana".
-- Card da galeria: "Professor Iana" → "Professor" no fallback.
-- Preservados o nome da autora e as entradas históricas da mudança de marca.
+### Corrigido
+- **Bloqueador:** com provedor que não informa preço (endpoint customizado) nada entra no teste
+  automático, e a listagem exigia `total > 0` — 300 modelos carregados e tela vazia, sem como
+  escolher o primeiro. A lista aparece assim que não há teste em curso, com "teste sob demanda" e
+  o botão "testar" por item.
+- O **seletor de provedor** da aba LLM não existia na primeira visita (só a aba Provedores carregava
+  a lista); agora as duas carregam.
+- **Recolher grupo** não respondia com busca ativa (a busca forçava aberto).
+- **Ordem dos grupos** empatava em "tem ≥1 gratuito" — um fornecedor com 1 vinha antes de um com 40.
+- **Pré-visualização** das boas-vindas mostrava a saída crua do editor (lista numerada, `&nbsp;`) em
+  vez do HTML convertido que será gravado.
+- Toast duplicado nos handlers de provedor (o `ErrorInterceptor` já mostra o `detail`).
+- `package-lock.json` restaurado (o diff removia entradas sem mudança no `package.json`).
+
+### Verificação
+206/206 (5 novos) + build. Verificado no navegador contra um endpoint OpenAI-compatible local.
 
 ---
 
-## 2026-07-29 (aba LLM mostra o estado de versão da instrução) — porte
+## 2026-07-29d (editor de texto rico nas boas-vindas do tutor)
 
-> Branch `master` (não implantada; produção roda a `mestrado-iana`).
-> Backend `master` `dd55271`: instrução de sistema persistida e versionada.
+> Frontend `mestrado-iana` **`56683bb`** · bundle **`main-PJ3RSM34.js`**. Backend inalterado.
 
-- Aviso de "o padrão do sistema mudou desde a sua edição" + selo "não persistido" (o seed não
-  rodou) + `confirm()` antes de tirar do ar a instrução do admin.
-- Corrigidos: guarda de lazy-load pelo conteúdo do textarea (refazia o GET por cima da edição em
-  curso) e contador de caracteres sem trim, que discordava do servidor perto do teto.
-- `conf-tutor.component.spec.ts` (novo, 6 casos).
+### Adicionado
+- **Editor visual** (Quill) no lugar do `<textarea>` de HTML cru da aba Início. Barra limitada ao
+  que o painel do tutor renderiza: título, negrito, itálico, listas e link — oferecer formatação
+  que desaparece na tela do aluno seria pior que não oferecer. Modo **Código HTML** para quem
+  quiser conferir ou colar o texto exato.
+- `html-boas-vindas.ts`: converte a saída do editor para o subconjunto suportado (16 testes).
+- **Nenhuma dependência nova:** `quill`/`ngx-quill` já estavam no `package.json` e o
+  `quill.snow.css` no `angular.json`, sobrando da versão antiga desta tela. Cai no chunk do admin.
+
+### Corrigido / evitado
+- **Lista com marcador convertida para `<ul><li>`:** o `data-list` do Quill só desenha marcador com
+  o CSS dele, que o painel do aluno não carrega. **Corrigido o relato em 30/07:** esta entrada dizia
+  que a lista "apareceria numerada para o aluno"; medindo pelo caminho real do `ngx-quill`
+  (`getSemanticHTML()`), o Quill 2.0.3 já devolve `<ul>` — a conversão é guarda para HTML colado de
+  outra origem e para lista mista, não correção de defeito observado.
+- **`&nbsp;` em todo espaço:** o Quill converte os espaços vizinhos de quebra de linha do HTML de
+  origem, e o texto versionado é quebrado em ~95 colunas. Com espaço inquebrável o parágrafo
+  deixaria de quebrar linha e transbordaria. **Encontrado na tela, não nos testes.**
+- **Abrir a aba não conta como edição:** o editor reserializa o HTML ao carregar, então um Salvar
+  sem intenção marcaria o texto como "do admin" — o que o faz parar de receber as atualizações dos
+  deploys (mecanismo de 29/07b). O Salvar só habilita quando o conteúdo muda, com aviso explicando.
+- O botão Salvar era `mat-flat-button` (span de foco que destoa) → `.btn-primario`.
+
+### Verificação
+201/201 + build de produção. Verificado no navegador com o texto real de produção.
 
 ---
 
-## 2026-07-28 (a tela do desafio não corrige mais a raia errada) — porte
+## 2026-07-29c (aba Provedores, busca de modelo e listagem por fornecedor)
 
-> Branch `master` (não implantada; produção roda a `mestrado-iana`).
-> Backend `master` `1898d2d`: nova regra da rubrica e tabuleiro sem `lane`.
+> **Implantado em 29/07/2026 17h53.** Frontend `mestrado-iana` **`7d3c6d1`** · bundle
+> **`main-Y4RSIG3U.js`**.
+> Backend: provedores de LLM (ver changelog do backend).
+
+### Adicionado
+- **Aba Provedores** no conf-tutor: um card por provedor (NVIDIA NIM, OpenRouter, "outro provedor")
+  com URL base, porta, chave e botão Ativar. A NVIDIA é somente-leitura — a chave dela vem do
+  `.env`. O campo de chave nasce **vazio**: a tela não conhece o segredo, e pré-preenchê-lo com
+  asteriscos convidaria a gravar lixo por cima.
+- **Seletor de provedor** na aba LLM, com atalho para a aba de configuração.
+- **Busca** por nome de modelo ou fornecedor; grupos com resultado abrem automaticamente.
+- **Listagem colapsável por fornecedor** (o que vem antes da "/"), com contagem, quantos gratuitos
+  e quantos respondem. Fechados por padrão — no OpenRouter são 367 modelos em ~40 fornecedores —,
+  exceto o grupo do modelo em uso.
+- **Selo `free`** por modelo e por grupo; grupos com gratuito vêm primeiro.
+- Botão **testar** por item nos modelos que ficam fora do teste automático (os pagos).
+
+### Corrigido
+- O botão "Re-testar" era `mat-stroked-button`, que nesta versão do Material renderiza o span de
+  foco e destoa dos demais botões da tela; passou a usar `.btn-secundario` (global).
+
+### Verificação
+185/185 (10 novos) + build de produção. Verificado no navegador contra o OpenRouter real.
+
+---
+
+## 2026-07-29b (o material que o aluno baixa não diz mais "Iana")
+
+> Frontend `mestrado-iana` **`c61acd0`** · bundle **`main-GSFLR7TL.js`**.
+> Backend: seed do conf-pipeline com guarda + marca (ver changelog do backend).
+
+### Alterado
+- O `.zip` do pipeline levava o nome antigo da plataforma em quatro lugares (título e rodapé do
+  `README.md`, duas docstrings dos `.py` gerados) — agora dizem **H2IA Tutor**.
+- O card da galeria mostrava "Professor Iana" quando o pipeline não tinha professor; virou só
+  "Professor" (o fallback é sobre a pessoa ausente, não sobre a plataforma).
+- H1 deste changelog e de `PRODUCT.md`/`docs/DOCUMENTACAO.md`.
+
+**Preservados:** o nome da autora em `/sobre` e as entradas históricas que narram a própria mudança
+de marca — reescrevê-las contradiria os commits daquela data.
+
+### Verificação
+175/175 + build de produção.
+
+---
+
+## 2026-07-29 (aba LLM mostra o estado de versão da instrução do tutor)
+
+> Frontend `mestrado-iana` **`fd7e836`** · bundle **`main-CGLQE76V.js`**.
+> Backend: a instrução passou a ser persistida e versionada (ver changelog do backend).
+
+### Adicionado
+- Aviso na aba LLM quando **o padrão do sistema mudou depois da edição do admin**, com botão
+  "Usar o novo padrão". A instrução dele continua no ar até decidir.
+- Selo **"não persistido"** quando o backend responde `fonte: 'versionado'` — ou seja, o tutor está
+  usando o texto do código porque o seed não rodou. Em regime normal nunca aparece; é o indicador
+  de que a persistência falhou, em vez de o problema passar batido.
+- `confirm()` antes de "Voltar ao padrão": o botão fica ao lado de "Salvar" e tira do ar a
+  instrução escrita pelo admin. A copy diz que o texto fica registrado no histórico (não se perde).
+- `conf-tutor.component.spec.ts`, que não existia (6 casos).
+
+### Corrigido
+- A aba LLM buscava o prompt com a guarda `!promptTexto`, isto é, pelo **conteúdo**: se o admin
+  limpasse o textarea e trocasse de aba, a volta refazia o GET por cima do que ele estava
+  editando — e o estado de versão só era lido uma vez por carga de página. Agora a guarda é um
+  booleano de "já carregou".
+- O contador de caracteres usava `promptTexto.length` enquanto o servidor valida o texto sem
+  espaço nas pontas: perto do teto, tela e servidor discordavam. Passou a contar o texto trimado,
+  no contador e nas guardas dos botões.
+
+### Verificação
+175/175 (eram 169) + build de produção. Verificado no navegador sobre o build, com o banco no
+estado "admin editou e o padrão mudou": aviso, selos, contador e o histórico com os rótulos novos
+("Padrão do sistema aplicado no deploy"). O `confirm` não foi clicado no navegador de propósito —
+diálogo modal travaria a automação; está coberto no spec.
+
+---
+
+## 2026-07-28 (a tela do desafio não corrige mais a raia errada)
+
+> **Implantado em 28/07/2026 14h57.** Frontend `mestrado-iana` **`ec3680c`** · bundle
+> **`main-EARQSDDB.js`**. Backup `/home/ubuntu/backups/deploy-20260728-145721`.
+> Backend: nova regra da rubrica e tabuleiro sem `lane` (ver changelog do backend).
 
 ### Corrigido
 - **A peça fica na coluna em que o aluno a colocou.** Saíram as duas correções automáticas da
-  tela do desafio: o realce laranja + ícone de alerta ("Esta peça não é desta etapa"), que
-  apontava o erro na hora, e o clique único, que mandava a peça para a coluna correta sozinho
-  — ou seja, respondia a pergunta que o desafio faz. Quem avalia é a rubrica, depois do envio.
+  tela do desafio: o **realce laranja + ícone de alerta** ("Esta peça não é desta etapa"), que
+  apontava o erro na hora, e o **clique único**, que mandava a peça para a coluna correta
+  sozinho — ou seja, respondia a pergunta que o desafio faz. Quem avalia agora é só a rubrica,
+  depois do envio.
 
 ### Alterado
-- A alternativa ao arrastar (importante no celular) virou de dois toques: peça, depois coluna.
-  As quatro colunas oferecem "Colocar … aqui", sem pista de qual é a certa.
-- `PecaDesafio` não tem mais `lane` (o backend não envia a etapa da peça).
+- A alternativa ao arrastar (importante no celular) virou de **dois toques**: o primeiro escolhe
+  a peça, o segundo diz a coluna. Todas as quatro colunas oferecem "Colocar … aqui", sem
+  distinção — nenhuma pista de qual é a certa.
+- `PecaDesafio` não tem mais `lane`: o backend não envia a etapa da peça, então nem a tela nem o
+  DevTools têm a resposta. `MatTooltipModule` saiu do componente (ficou órfão com o alerta).
+
+### Verificação
+- 169/169 + build de produção. **Verificado no navegador** sobre o build (Mongo em Docker +
+  API local): k-NN colocado na coluna Métrica permanece lá, sem aviso; o envio devolve 4,4/10
+  com as duas regras explicando o erro. Sem erros no console.
 
 ---
 
-## 2026-07-27c (nível do aluno nos hiperparâmetros avançados) — porte
+## 2026-07-27c (nível do aluno nos hiperparâmetros avançados + limpezas)
 
-> Branch `master` (não implantada). O fallback do card de gráfico não se aplica aqui: a dica do
-> gráfico via `<app-tutor>` nunca foi portada para esta branch.
+> Frontend `mestrado-iana` **`72ca7e5`** (bundle `main-Q6M4OQ5U.js`) / Backend `master` `823e4b4`.
 
-- Seção "Avançado" dos hiperparâmetros abre sozinha para quem escolheu o nível Avançado.
-- `Router` órfão fora do `AuthInterceptor` (o toast de 403 é do `ErrorInterceptor`).
+### Corrigido
+- A seção recolhível **"Avançado (n)"** dos hiperparâmetros (modal de seleção do modelo) tinha
+  a própria noção de "avançado" e ignorava a preferência do aluno: vinha sempre fechada. Agora
+  abre sozinha para quem escolheu o nível Avançado no tutor.
+- O **fallback do card de gráfico** preenchia `descricao` e `resumo_basico` com o mesmo texto,
+  fingindo dois registros de linguagem que não existem ali.
+- `Router` não usado no `AuthInterceptor` (removido também do spec) e o comentário do schema que
+  dizia que `exemplo_codigo` era só do Avançado — ele aparece nos dois níveis.
 
----
-
-## 2026-07-27b (manual descreve o Avançado atual) — porte
-
-> Frontend `master` (não implantado). O manual passa a descrever os blocos Fundamentos e Na
-> prática e a preferência de nível guardada no perfil.
-
----
-
-
-> Frontend `master` (não implantado; produção roda a `mestrado-iana`). Backend `master` `a9c2eba`.
-
-- Toggle Básico/Avançado vira preferência de perfil (`NivelTutorService`): vale nos painéis,
-  sobrevive ao recarregar e vai no contexto do chat.
-- Card ganha **Fundamentos** e **Na prática** no modo Avançado; editor do admin idem.
+### Notas
+- Testes: 168/168 + build de produção.
+- Os `data: { breadcrumb }` das rotas seguem sem consumidor (o BreadcrumbComponent saiu em
+  2026-07-26i). Mantidos de propósito: são metadados inertes e removê-los tocaria 12 arquivos
+  nas duas branches sem mudar comportamento.
 
 ---
 
+## 2026-07-27b (manual descreve o Avançado atual)
 
-> Frontend `master` (não implantado; produção roda a `mestrado-iana`). Backend `master` `7d40bed`.
+> Frontend `mestrado-iana` **`6a7267f`** (bundle `main-7ITTBJMV.js`). Backend `master` `ee69abf`.
 
-- Editor da **instrução de sistema** do chat na aba LLM do conf-tutor (texto vigente, selo
-  padrão/personalizado, contador, Salvar e Voltar ao padrão).
+- O manual do aluno dizia apenas "Avançado (técnico, com fórmula e hiperparâmetros)". Agora
+  descreve os blocos **Fundamentos** e **Na prática** e explica que a escolha do nível fica
+  guardada no perfil e vale também para o chat.
+
+---
+
+## 2026-07-27 (nível do tutor no perfil + blocos Fundamentos / Na prática)
+
+> Frontend `mestrado-iana` **`8e4e774`** / Backend `master` `a9c2eba`.
+
+### Alterado
+- O toggle **Básico/Avançado** deixou de ser estado de tela: `NivelTutorService` guarda a
+  escolha no perfil do aluno, ela vale nos três painéis do tutor, **sobrevive ao recarregar** e
+  vai no **contexto do chat** — o tutor responde na profundidade que o aluno está lendo.
+
+### Adicionado
+- Dois blocos no card, só em Avançado: **Fundamentos** (fórmula, o que otimiza, pressupostos,
+  complexidade, leitura de referência) e **Na prática** (pipeline sklearn completo com
+  highlight, ordem de ajuste, armadilhas, diagnóstico). Editáveis no conf-pipeline.
+
+### Notas
+- `nivel_tutor` chega no login e é gravado na sessão; falha ao salvar não derruba a escolha.
+- Testes: 167/167 (novo `nivel-tutor.service.spec.ts`) + build de produção.
+
+---
+
+## 2026-07-26k (editor da instrução do tutor no conf-tutor)
+
+> Frontend `mestrado-iana` **`53f1853`** (bundle `main-E6W5LFEI.js`) / Backend `master` `7d40bed`.
+
+### Adicionado
+- **Editor da instrução de sistema** do chat na aba **LLM** do conf-tutor, abaixo da escolha do
+  modelo: textarea com o texto vigente, selo "padrão do sistema"/"personalizado", contador com o
+  teto de 6000 caracteres, **Salvar** e **Voltar ao padrão**. A edição aparece no histórico da
+  própria aba.
 - `DashboardService.getSystemPrompt()` / `putSystemPrompt(texto)`.
-- Testes: 153/153 + build de produção.
+
+### Notas
+- O texto é enviado ao modelo em toda pergunta, antes do contexto do pipeline e da base de
+  conhecimento — a tela diz isso, para o admin saber o que está mexendo.
+- Testes: 162/162 + build de produção.
 
 ---
 
+## 2026-07-26j (criar desafio a partir de um dataset de exemplo)
 
-> Frontend `master` (não implantado; produção roda a `mestrado-iana`). Backend `master` `a1f6f61`.
+> Frontend `mestrado-iana` **`09b419e`** (bundle `main-A75CCYTF.js`) / Backend `master` `a1f6f61`.
 
-- Criação do desafio começa pela **base de dados** (dataset de exemplo): tarefa derivada,
-  enunciado sugerido e as três características da base lidas do dataframe (ajustáveis).
-- **Peças**: sortear (padrão) ou escolher uma a uma, filtradas pela tarefa da base.
-- Aluno vê a base como chip no tabuleiro.
-- Testes: 153/153 + build de produção.
+### Adicionado
+- **A criação do desafio começa pela base**: novo campo "Base de dados do desafio" (datasets de
+  exemplo) como primeiro passo. Ao escolher, a tela mostra um bloco com a **tarefa derivada**, a
+  pergunta-guia, a descrição, o alvo e as pistas — e pré-preenche título e enunciado (editáveis).
+- **Peças do tabuleiro**: "Sortear as peças" (padrão) ou "Escolher as peças", com lista agrupada
+  por lane e filtrada pela tarefa da base (só modelos/métricas compatíveis).
+- As três caixas "o que a base exige" vêm **lidas do dataset** e seguem ajustáveis; o select de
+  tarefa saiu (é derivado). A lista de atividades mostra a base do desafio.
+- Tela do aluno: chip **"Base: Iris"** no tabuleiro, ao lado de "Tentativa N".
 
----
-
-
-> Frontend `master` (não implantado; produção roda a `mestrado-iana`).
-
-- **"Voltar ao início"** no painel do tutor (as boas-vindas não voltavam depois do primeiro
-  clique num item).
-- **Um toast por erro**: o aviso do 403 ficou só no `ErrorInterceptor`; novo
-  `error.interceptor.spec.ts`.
-- **Removidos** `ShellComponent` e `BreadcrumbComponent` — sem consumidor nesta branch.
-- Testes 147/147.
+### Notas
+- `DashboardService.getPerfilDesafioDataset`; `GabaritoMontagem` ganhou `dataset` e
+  `sortear_pecas`; `TabuleiroDesafio` ganhou `dataset_nome`.
+- Testes: 162/162 (novos casos no spec de `turma-detalhe`) + build de produção.
 
 ---
 
-## 2026-07-26h (aviso de desafio + boas-vindas do tutor) — porte da `mestrado-iana`
+## 2026-07-26i (voltar às boas-vindas, um toast por erro, código morto removido)
 
-> Frontend `master` **`d9c4c59`** (não implantado; produção roda a `mestrado-iana`).
-> Backend `master` `c3faae2` (implantado).
+> Frontend `mestrado-iana` **`fb784c8`** (bundle `main-JE2Q5PDD.js`). Backend inalterado.
 
-- **Aviso de desafio pendente** na Área de Trabalho, indo direto ao desafio quando é o único
-  (aqui a lista de turmas é `/entrar`, não `/view-aluno/entrar`); nesta branch o dashboard não
-  tem banner de atividade de turma, então o estilo `.atividade-banner` foi adicionado ao SCSS.
-- Lista de turmas: **desafios primeiro** + "N tentativas · melhor nota X"; menu do avatar e
-  título da tela viraram **"Turmas e desafios"**.
-- **Boas-vindas do tutor** vêm do backend (pipe `inicio`); no componente ficou só um fallback
-  curto.
-- **`/atividades`** não mostra mais "Acesso negado" para professor (`GET /usuario/` só admin).
-- Testes: 144/144 + build de produção (exigiu `npm install`: o `package.json` da `master` tem
-  tfjs e a instalação vinha da outra branch).
+### Corrigido
+- **As boas-vindas do tutor não voltavam.** O primeiro clique num item as escondia para sempre
+  (`tutorGeral` exige `!contexto && !tutorItemInfo`, e nada revertia esses estados — selecionar
+  um modelo já bastava). Novo botão **"Voltar ao início"** no painel: o componente limpa o
+  `contexto` que ele mesmo constrói e o pai limpa item/pipeline/sugestões e recarrega o pipe
+  `inicio` (zerando a guarda de dedupe do `getTutor`).
+- **Dois toasts para o mesmo erro.** `AuthInterceptor` e `ErrorInterceptor` avisavam o mesmo
+  403 com textos diferentes. O aviso ficou só no `ErrorInterceptor` (com a mensagem melhor);
+  o `AuthInterceptor` cuida apenas do logout no 401. Novo `error.interceptor.spec.ts`.
+
+### Removido
+- `ShellComponent` (barra lateral) e `BreadcrumbComponent`: **código morto** — só o
+  `InternoComponent` os renderizava e ele nunca foi roteado. `InternoComponent` saiu junto.
+  Os `data: { breadcrumb }` das rotas ficaram sem consumidor (mantidos).
+
+### Notas
+- Testes 156/156; bundle 571,17 kB (−0,83 kB).
+
+---
+
+## 2026-07-26h (aviso de desafio + boas-vindas do tutor + contas da banca)
+
+> Frontend `mestrado-iana` **`ac512ff`** (bundle `main-5ZEHBTUF.js`) / Backend `master` `c3faae2`.
+
+### Corrigido
+- **Boas-vindas do tutor**: o painel mostrava uma frase só. O texto longo saiu do
+  `execucoes.component.ts` (ficou um fallback curto) e a fonte passou a ser o backend
+  (pipe `inicio`, versionado e editável pelo admin em conf-tutor).
+- **`/atividades` como professor** não mostra mais o toast "Acesso negado" ao abrir:
+  `GET /usuario/` (admin-only) era chamado só para preencher o seletor do filtro.
+
+### Adicionado
+- **Aviso de desafio pendente** na Área de Trabalho (uma chamada a
+  `GET /turmas/minhas/desafios`, falha silenciosa); com um único desafio, o botão abre direto.
+- Lista de turmas: **desafios primeiro**, com "N tentativas · melhor nota X" e botão
+  "Tentar de novo"; a tela e o item do menu do avatar viraram **"Turmas e desafios"**.
+
+### Notas
+- `ShellComponent` (barra lateral Home/Pipeline/Resultados) é **código morto** nesta branch:
+  `InternoComponent` (`<app-shell>`) não é roteado. Não foi removido — só registrado.
 
 ---
 
@@ -694,16 +1215,23 @@ Revisão do que subiu horas antes, contra as *karpathy-guidelines*.
 
 ## 2026-07-22 (marca H2IA Tutor + terminologia "Aprendizado de Máquina" + redesign do cadastro)
 
-> Porte para `master` das correções implantadas via `mestrado-iana`. Backend: e-mail de convite.
+> Frontend `mestrado-iana`, portado p/ `master`. Backend: e-mail de convite (repo back).
 
 ### Corrigido
-- **Marca desatualizada:** a página aberta pelo link do e-mail (`/ativar-conta`) e o `shell`
-  mostravam "Iana" com um logo de texto "IA"; agora usam a **logo oficial** (`<app-brand-logo>`)
-  e **"H2IA Tutor"**, espelhando a tela de login.
-- **Terminologia:** "Machine Learning" → **"Aprendizado de Máquina"** nas telas e no conteúdo
-  exportado (scripts `.py`/`.ipynb` e nome do PDF). Preservado **"UCI Machine Learning Repository"**.
+- **Marca desatualizada:** a página aberta pelo link do e-mail (`/ativar-conta`) mostrava
+  "Mestrado Iana" com um logo de texto "IA"; agora usa a **logo oficial** (`<app-brand-logo>`)
+  e **"H2IA Tutor"**, espelhando a tela de login. Mesma limpeza no `shell` (sidebar).
+- **Terminologia:** "Machine Learning" → **"Aprendizado de Máquina"** nas telas (login,
+  ativação, admin, início, conf-tutor, meus-projetos, manual, área de trabalho, `tutor.json`)
+  e no conteúdo exportado (scripts `.py`/`.ipynb` e nome do PDF). Preservado o nome próprio
+  **"UCI Machine Learning Repository"**.
 - **Redesign do cadastro (`/autenticacao/login/cadastro-usuario`):** trocada a caixa Material
-  genérica pelo padrão da tela de login (duas colunas, marca, campos custom, botões em gradiente).
+  genérica pelo padrão da tela de login (duas colunas com gradiente roxo, coluna de marca,
+  campos custom com ícones, botões em gradiente). Lógica do componente intacta.
+
+### Observação
+- O deploy incluiu também trabalho em andamento não relacionado (chat-tutor, conf-pipeline,
+  global-error-handler) por decisão de publicar toda a árvore de trabalho.
 
 ---
 
