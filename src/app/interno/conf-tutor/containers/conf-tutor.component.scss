@@ -62,43 +62,6 @@
 }
 
 // Mantem compatibilidade com SCSS dos child components que usam .box-formulario / .editor / .linha
-.box-formulario {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-
-  .box-titulo {
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-
-    .titulo h2 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 700;
-      color: $roxo-escuro;
-    }
-
-    .bloco { justify-content: flex-end; }
-  }
-
-  form { width: 100%; }
-
-  .editor { width: 100%; height: 400px; }
-
-  .linha { margin: 12px 0; }
-}
-
-.texto-label {
-  color: $roxo-escuro;
-  margin: 12px 0;
-  font-size: 14px;
-  font-weight: 600;
-}
-
 // =========================
 // Historico de edicoes
 // =========================
@@ -308,7 +271,6 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  cursor: pointer;
   border-bottom: 1px solid rgba($roxo-claro, 0.5);
   transition: background 0.15s ease;
 
@@ -329,21 +291,18 @@
   min-width: 0;
 }
 
-.modelo-icon {
-  color: $cinza-medio;
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
+// Slot fixo da esquerda: "em uso" | "reserva" | botão `+`, nunca dois. Largura fixa para os
+// nomes ficarem alinhados entre as linhas, seja qual for o estado de cada uma.
+.modelo-acao { flex-shrink: 0; width: 74px; display: flex; align-items: center; }
 
-  .ativo & { color: $roxo-medio; }
-}
+.selo-uso { @extend .selo-free; background: $roxo-medio; color: $branco; margin-left: 0; }
 
+// Único alvo que TROCA o modelo do tutor. Antes era a linha inteira: errar o `+` por poucos
+// pixels trocava o modelo em produção. `button` também para responder ao teclado.
 .modelo-detalhes {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1;
+  border: none; background: none; padding: 0; font: inherit; text-align: left; cursor: pointer;
+  &:hover .modelo-id { text-decoration: underline; }
 }
 
 .modelo-id {
@@ -437,37 +396,6 @@
 }
 
 /* ---- títulos dos grupos Ativos / Inativos ---- */
-.grupo-modelos-titulo {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 12px 0 6px;
-  font-size: 13px;
-  font-weight: 700;
-
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
-
-  &.ativos { color: #15803D; }
-  &.inativos { color: #B91C1C; }
-
-  &.toggle {
-    width: 100%;
-    background: none;
-    border: none;
-    padding: 6px 4px;
-    cursor: pointer;
-    text-align: left;
-    border-radius: 8px;
-    transition: background 0.15s ease;
-
-    &:hover { background: rgba($roxo-claro, 0.3); }
-
-    .caret { color: $cinza-medio; }
-  }
-}
-
-.grupo-inativos { margin-top: 4px; }
-
 .vazio-grupo {
   margin: 0 0 8px;
   padding: 8px 12px;
@@ -739,7 +667,7 @@
 
 .selo-reserva {
   @extend .selo-free;
-  background: rgba($roxo-medio, 0.12); color: $roxo-escuro;
+  background: rgba($roxo-medio, 0.12); color: $roxo-escuro; margin-left: 0;
 }
 
 .reservas-card {

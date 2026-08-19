@@ -202,31 +202,38 @@
             <span>Carregando modelos disponíveis...</span>
           </div>
 
-          <!-- Item de modelo reutilizado nas listas Ativos e Inativos -->
+          <!-- Item de modelo reutilizado nas listas Ativos e Inativos.
+               A linha TODA era clicável e selecionava o modelo do tutor; o `+` ficava lá na
+               direita, colado no selo de saúde. Errar o alvo por poucos pixels trocava o modelo
+               em produção — foi assim que um classificador de segurança virou o tutor. Agora o
+               que seleciona é só a área do NOME, e o `+` mora num slot próprio à esquerda. -->
           <ng-template #modeloItemTpl let-m>
-            <div class="modelo-item"
-                 [class.ativo]="m.id === modeloLLMAtual"
-                 (click)="selecionarModeloLLM(m.id)">
+            <div class="modelo-item" [class.ativo]="m.id === modeloLLMAtual">
               <div class="modelo-info">
-                <mat-icon class="modelo-icon">{{ m.id === modeloLLMAtual ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
-                <div class="modelo-detalhes">
+                <!-- Slot da esquerda: estado OU ação, nunca os dois, sempre na mesma posição. -->
+                <span class="modelo-acao">
+                  <span class="selo-uso" *ngIf="m.id === modeloLLMAtual"
+                        title="É este que responde o chat">em uso</span>
+                  <span class="selo-reserva" *ngIf="m.id !== modeloLLMAtual && ehReserva(m.id)"
+                        title="Já está na lista de reserva">reserva</span>
+                  <button class="btn-reserva" type="button" (click)="adicionarReserva(m.id, $event)"
+                          *ngIf="m.id !== modeloLLMAtual && !ehReserva(m.id)"
+                          [attr.aria-label]="'Usar ' + m.id + ' como reserva'"
+                          matTooltip="Acrescentar à lista de reserva">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </span>
+                <button class="modelo-detalhes" type="button" (click)="selecionarModeloLLM(m.id)"
+                        [attr.aria-label]="'Usar ' + m.id + ' como modelo do tutor'"
+                        matTooltip="Usar este modelo no tutor">
                   <span class="modelo-id">
                     {{ m.id }}
                     <span class="selo-free" *ngIf="m.gratuito === true" title="Sem custo por token">free</span>
                   </span>
                   <span class="modelo-own" *ngIf="m.owned_by">{{ m.owned_by }}</span>
-                </div>
+                </button>
               </div>
               <div class="modelo-direita">
-                <!-- Acrescenta à lista de reserva. `stopPropagation` no método: sem isso o
-                     clique também trocaria o modelo ATIVO. -->
-                <button class="btn-reserva" type="button" (click)="adicionarReserva(m.id, $event)"
-                        *ngIf="m.id !== modeloLLMAtual && !ehReserva(m.id)"
-                        [attr.aria-label]="'Usar ' + m.id + ' como reserva'"
-                        matTooltip="Usar como reserva">
-                  <mat-icon>add</mat-icon>
-                </button>
-                <span class="selo-reserva" *ngIf="ehReserva(m.id)" title="Já está na lista de reserva">reserva</span>
                 <!-- Modelo pago fica fora do teste automático: dá para testar um a um -->
                 <button class="btn-testar" type="button" *ngIf="naoTestado(m.id) && !saudeEmAndamento"
                         (click)="testarModelo(m.id, $event)" [disabled]="!!testandoModelo">
