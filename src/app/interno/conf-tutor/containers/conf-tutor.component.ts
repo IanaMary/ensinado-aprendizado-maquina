@@ -444,12 +444,32 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
       (m) => m.id.toLowerCase().includes(termo) || (m.owned_by || '').toLowerCase().includes(termo));
   }
 
+  /** Ordem de utilidade de um modelo: quem responde primeiro, quem já falhou por último.
+   *
+   *  O não-testado fica no MEIO, não no fim: "ainda não sei" é melhor notícia que "testei e não
+   *  respondeu" — e o provedor que não informa preço não tem teste automático nenhum, então lá
+   *  todos caem neste degrau e a ordem do backend (gratuitos na frente) prevalece. */
+  private ordemSaude(id: string): number {
+    const s = this.saudeModelos[id];
+    if (!s) return 1;
+    return s.responde ? 0 : 2;
+  }
+
   /**
    * Listagem agrupada pelo fornecedor do modelo (o que vem antes da "/").
    *
-   * Com 367 modelos no OpenRouter, uma lista plana é inutilizável. Grupos com modelo gratuito vêm
-   * primeiro (mesma regra do backend, que já entrega os gratuitos na frente dentro de cada
-   * fornecedor); dentro do grupo, a ordem do backend é preservada.
+   * Com 367 modelos no OpenRouter, uma lista plana é inutilizável. A ordem responde à pergunta que
+   * o admin traz para esta tela — *qual modelo eu posso escolher agora?*:
+   *
+   * 1. **fornecedores com mais modelos que RESPONDEM primeiro** (quem não tem nenhum vivo desce);
+   * 2. empatados, mais gratuitos primeiro (não só "tem ≥1": um fornecedor com 40 gratuitos vinha
+   *    depois de um com 1);
+   * 3. alfabético para desempatar — a lista não pode dançar entre recarregamentos.
+   *
+   * Dentro do grupo, mesma lógica por modelo (`ordemSaude`), preservando a ordem do backend entre
+   * iguais: o `sort` do JS é estável, então gratuito continua vindo antes de pago dentro de cada
+   * degrau. A reordenação só acontece com o teste de saúde CONCLUÍDO (a listagem nem é renderizada
+   * antes disso), então a lista não se mexe sob o cursor enquanto os resultados chegam.
    */
   get gruposModelos(): GrupoModelos[] {
     const porFornecedor = new Map<string, ModeloLLM[]>();
@@ -460,13 +480,14 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     const grupos: GrupoModelos[] = [];
     porFornecedor.forEach((modelos, fornecedor) => grupos.push({
       fornecedor,
-      modelos,
+      // Cópia implícita: estes arrays são construídos aqui, então ordenar não mexe em `modelosLLM`
+      // (que `modelosFiltrados` devolve por referência quando não há busca).
+      modelos: modelos.sort((a, b) => this.ordemSaude(a.id) - this.ordemSaude(b.id)),
       gratuitos: modelos.filter((m) => m.gratuito === true).length,
       respondem: modelos.filter((m) => this.saudeModelos[m.id]?.responde).length,
     }));
-    // Mais gratuitos primeiro (não só "tem ≥1": um fornecedor com 40 gratuitos vinha depois de um
-    // com 1), e alfabético para desempatar — a lista não pode dançar entre recarregamentos.
-    grupos.sort((a, b) => (b.gratuitos - a.gratuitos)
+    grupos.sort((a, b) => (b.respondem - a.respondem)
+      || (b.gratuitos - a.gratuitos)
       || a.fornecedor.localeCompare(b.fornecedor));
     return grupos;
   }
