@@ -515,6 +515,17 @@ describe('ConfTutorComponent (aba LLM)', () => {
       expect(comp.novaReserva).toBe('');    // campo limpo para o próximo
     });
 
+    it('avisa na tela que o modelo entrou e que falta salvar', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      const notificacao = TestBed.inject(NotificacaoService) as jasmine.SpyObj<NotificacaoService>;
+      comp.adicionarReserva('z-ai/glm-4.5-air:free');
+      // O cartão fica acima da listagem: sem aviso, quem rolou até os modelos não vê nada mudar.
+      expect(notificacao.sucesso).toHaveBeenCalled();
+      expect((notificacao.sucesso as jasmine.Spy).calls.mostRecent().args[0])
+        .toContain('Salvar ordem');
+    });
+
     it('campo vazio não acrescenta nada', () => {
       montar();
       comp.tabAtual({ index: 1 });
