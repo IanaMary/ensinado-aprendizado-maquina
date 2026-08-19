@@ -363,6 +363,64 @@ describe('ConfTutorComponent (aba LLM)', () => {
     });
   });
 
+  // A tela responde a uma pergunta só: *qual modelo eu posso escolher agora?* Quem responde vem
+  // primeiro; quem já falhou no teste de saúde desce.
+  describe('ordem por saúde', () => {
+    function comSaude(resultados: any) {
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.saudeModelos = resultados;
+      comp.saudeEmAndamento = false;
+    }
+
+    it('fornecedor com modelo que responde vem antes de quem não tem nenhum vivo', () => {
+      // `openai/gpt-5-pro` responde; os dois da `meta` foram testados e não respondem.
+      comSaude({
+        'openai/gpt-5-pro': { responde: true },
+        'meta/llama-3.3-70b-instruct': { responde: false, erro: 'HTTP 410' },
+        'meta/llama-3.1-8b-instruct': { responde: false, erro: 'HTTP 404' },
+      });
+      const ordem = comp.gruposModelos.map((g) => g.fornecedor);
+      expect(ordem[0]).toBe('openai');
+      // a `meta` tem 2 gratuitos e mesmo assim desce: gratuito que não responde não serve
+      expect(ordem.indexOf('meta')).toBeGreaterThan(0);
+    });
+
+    it('dentro do fornecedor, quem responde primeiro e quem falhou por último', () => {
+      comSaude({
+        'meta/llama-3.3-70b-instruct': { responde: false, erro: 'HTTP 410' },
+        'meta/llama-3.1-8b-instruct': { responde: true },
+      });
+      const meta = comp.gruposModelos.find((g) => g.fornecedor === 'meta')!;
+      expect(meta.modelos.map((m) => m.id))
+        .toEqual(['meta/llama-3.1-8b-instruct', 'meta/llama-3.3-70b-instruct']);
+    });
+
+    it('não-testado fica entre o que responde e o que falhou', () => {
+      comSaude({
+        'meta/llama-3.3-70b-instruct': { responde: false, erro: 'HTTP 410' },
+        // `llama-3.1-8b` sem entrada: ainda não testado
+      });
+      const meta = comp.gruposModelos.find((g) => g.fornecedor === 'meta')!;
+      expect(meta.modelos[0].id).toBe('meta/llama-3.1-8b-instruct');
+    });
+
+    it('ordenar não mexe na lista de origem', () => {
+      const antes = ['z-ai/glm-4.5-air:free', 'meta/llama-3.3-70b-instruct',
+                     'meta/llama-3.1-8b-instruct', 'openai/gpt-5-pro'];
+      comSaude({ 'meta/llama-3.1-8b-instruct': { responde: true } });
+      comp.gruposModelos;                       // força o getter
+      expect(comp.modelosLLM.map((m) => m.id)).toEqual(antes);
+    });
+
+    it('sem nenhum teste, a ordem antiga (mais gratuitos primeiro) continua valendo', () => {
+      comSaude({});
+      const ordem = comp.gruposModelos.map((g) => g.fornecedor);
+      expect(ordem[0]).toBe('meta');            // 2 gratuitos
+      expect(ordem[ordem.length - 1]).toBe('openai');   // nenhum
+    });
+  });
+
   // A lista de reserva é a ordem de tentativa quando o modelo ativo não atende. Até 19/08 ela
   // era fixa no código do servidor — quando um reserva atingiu fim de vida, só um deploy podia
   // consertá-la, e o tutor passou 11 dias devolvendo erro.
