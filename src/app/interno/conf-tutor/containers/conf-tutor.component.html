@@ -103,7 +103,9 @@
             <button type="button" class="reservas-titulo" (click)="toggleReservas()"
                     [attr.aria-expanded]="reservasAberto">
               <mat-icon class="caret">{{ reservasAberto ? 'expand_less' : 'expand_more' }}</mat-icon>
-              <span class="reservas-nome">Se o modelo escolhido falhar, tentar nesta ordem</span>
+              <span class="reservas-nome">
+                Lista de reserva (fallback) — se o modelo escolhido falhar, tentar nesta ordem
+              </span>
               <span class="reservas-contagem">{{ reservas.length }}</span>
               <span class="selo-prompt padrao" *ngIf="reservasOrigem === 'catalogo'">padrão do sistema</span>
               <span class="selo-prompt" *ngIf="reservasOrigem === 'admin'">definida por você</span>
@@ -117,6 +119,24 @@
                 para o próximo desta lista — sem o aluno perceber. Use o
                 <mat-icon class="icone-inline">add</mat-icon> na listagem abaixo para acrescentar.
               </p>
+
+              <!-- Reusa o visual da busca de modelos. O `+` da listagem continua existindo, mas
+                   não pode ser o único caminho: a listagem some enquanto o teste de saúde roda e
+                   quando o catálogo do provedor falha — que é quando isto aqui mais importa. -->
+              <div class="busca-modelo">
+                <mat-icon class="busca-icone">playlist_add</mat-icon>
+                <input class="campo-input" list="reservas-modelos" [(ngModel)]="novaReserva"
+                       placeholder="Adicionar modelo à reserva (escolha da lista ou cole o id)"
+                       (keyup.enter)="adicionarReservaDigitada()"
+                       aria-label="Adicionar modelo à lista de reserva">
+                <button class="btn-limpar" type="button" (click)="adicionarReservaDigitada()"
+                        [disabled]="!novaReserva" aria-label="Adicionar à lista de reserva">
+                  <mat-icon>add_circle</mat-icon>
+                </button>
+              </div>
+              <datalist id="reservas-modelos">
+                <option *ngFor="let m of modelosLLM" [value]="m.id"></option>
+              </datalist>
 
               <p class="reservas-vazio" *ngIf="!reservas.length">
                 Sem reserva: se o modelo ativo falhar, o chat do tutor falha junto.
