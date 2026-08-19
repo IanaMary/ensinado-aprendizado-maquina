@@ -618,7 +618,13 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
       return;
     }
     this.reservas = [...this.reservas, modeloId];
-    this.reservasAberto = true;     // mostra onde o item caiu
+    this.reservasAberto = true;
+    // O cartão fica ACIMA da listagem: quem rolou até os modelos não vê o item entrar, e o `+`
+    // virando selo "reserva" na linha é sutil demais — o dono clicou e concluiu que não funcionava.
+    // O aviso também diz que ainda é rascunho, porque nada foi ao servidor até "Salvar ordem".
+    this.notificacao.sucesso(
+      `${modeloId} entrou na lista de reserva (${this.reservas.length}). `
+      + 'Clique em "Salvar ordem" para valer.');
   }
 
   /** Adiciona pelo campo do cartão. Existe porque o `+` da listagem NÃO basta: a listagem fica
