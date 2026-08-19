@@ -427,7 +427,10 @@
                 <input class="campo-input" [(ngModel)]="formProvedor[p.id].nome"
                        placeholder="Ex.: Ollama na minha máquina" maxlength="80">
               </div>
-              <div class="provedor-form-linha">
+              <!-- Só o customizado: nos hospedados o servidor IGNORA o que vier aqui e força a
+                   URL do catálogo (é a guarda que impede redirecionar a chave já gravada para um
+                   host qualquer). Mostrar o campo prometia uma edição que nunca acontecia. -->
+              <div class="provedor-form-linha" *ngIf="p.id === 'custom'">
                 <div class="campo-form url">
                   <label class="campo-label">URL base</label>
                   <input class="campo-input" [(ngModel)]="formProvedor[p.id].base_url"
@@ -450,8 +453,8 @@
                 </small>
               </div>
               <div class="provedor-acoes">
-                <a class="link-externo" *ngIf="p.id === 'openrouter'" href="https://openrouter.ai/keys"
-                   target="_blank" rel="noopener">Obter chave no OpenRouter</a>
+                <a class="link-externo" *ngIf="linkDaChave(p.id)" [href]="linkDaChave(p.id)"
+                   target="_blank" rel="noopener">Obter chave</a>
                 <button class="btn-primario" type="button" (click)="salvarProvedor(p)"
                         [disabled]="salvandoProvedor === p.id">
                   <mat-icon>save</mat-icon>
