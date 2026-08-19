@@ -112,7 +112,10 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   // escolhido não atende. Rascunho local — só vira configuração ao salvar.
   reservas: string[] = [];
   reservasOrigem: 'admin' | 'catalogo' = 'catalogo';
-  reservasAberto = false;
+  /** Aberto por padrão: recolhido, ninguém acha — foi o que aconteceu no primeiro deploy. */
+  reservasAberto = true;
+  /** Campo de adicionar direto no cartão (com datalist dos modelos do provedor). */
+  novaReserva = '';
   salvandoReservas = false;
   /** Cópia do que está gravado, para o botão Salvar só habilitar quando a ordem mudou. */
   private reservasGravadas: string[] = [];
@@ -616,6 +619,16 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     }
     this.reservas = [...this.reservas, modeloId];
     this.reservasAberto = true;     // mostra onde o item caiu
+  }
+
+  /** Adiciona pelo campo do cartão. Existe porque o `+` da listagem NÃO basta: a listagem fica
+   *  escondida enquanto o teste de saúde roda e some de vez quando o catálogo do provedor falha —
+   *  que é justamente quando o admin precisa mexer na reserva. Aceita id colado à mão. */
+  adicionarReservaDigitada(): void {
+    const id = (this.novaReserva || '').trim();
+    if (!id) return;
+    this.adicionarReserva(id);
+    this.novaReserva = '';
   }
 
   removerReserva(indice: number): void {

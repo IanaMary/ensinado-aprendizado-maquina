@@ -494,6 +494,36 @@ describe('ConfTutorComponent (aba LLM)', () => {
       expect(itens[1].querySelector('.btn-remover-reserva')).toBeTruthy();
     });
 
+    // O primeiro deploy escondeu o cartão: nascia recolhido e o único jeito de adicionar era um
+    // `+` dentro da listagem de modelos — que some enquanto o teste de saúde roda. O dono não
+    // achou a tela.
+    it('o cartão nasce aberto, para ser encontrado', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      fixture.detectChanges();
+      expect(comp.reservasAberto).toBeTrue();
+      expect(fixture.nativeElement.querySelector('.reservas-corpo')).toBeTruthy();
+    });
+
+    it('dá para adicionar pelo campo do cartão, sem depender da listagem', () => {
+      montar();
+      service.listarModelosLLM.and.returnValue(of({ modelos: [], modelo_atual: '' } as any));
+      comp.tabAtual({ index: 1 });          // catálogo vazio: o `+` da listagem não existe
+      comp.novaReserva = '  colado/a-mao  ';
+      comp.adicionarReservaDigitada();
+      expect(comp.reservas).toContain('colado/a-mao');
+      expect(comp.novaReserva).toBe('');    // campo limpo para o próximo
+    });
+
+    it('campo vazio não acrescenta nada', () => {
+      montar();
+      comp.tabAtual({ index: 1 });
+      const antes = comp.reservas.length;
+      comp.novaReserva = '   ';
+      comp.adicionarReservaDigitada();
+      expect(comp.reservas.length).toBe(antes);
+    });
+
     it('o histórico mostra rótulo legível para as operações novas', () => {
       montar();
       expect(comp.formatarOperacao('definiu_fallbacks')).not.toBe('definiu_fallbacks');
