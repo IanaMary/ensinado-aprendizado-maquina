@@ -31,10 +31,15 @@ const OPERACOES_LABEL: Record<string, string> = {
   restaurou_fallbacks: 'Lista de reserva voltou ao padrão do sistema',
 };
 
-/** Fornecedor do modelo = o que vem antes da "/" no id (nvidia, google, meta, z-ai…). */
-function fornecedorDoModelo(id: string): string {
+/** Fornecedor do modelo = o que vem antes da "/" no id (nvidia, google, meta, z-ai…).
+ *
+ *  Nem todo provedor usa id com "/": o Google AI Studio lista `gemini-3.5-flash`. Aí vale o
+ *  `owned_by` que o catálogo declara (`google`) — sem isso os 51 modelos do Gemini cairiam todos
+ *  num grupo "outros", que não ajuda ninguém a achar nada. */
+function fornecedorDoModelo(id: string, ownedBy?: string): string {
   const corte = (id || '').indexOf('/');
-  return corte > 0 ? id.slice(0, corte) : 'outros';
+  if (corte > 0) return id.slice(0, corte);
+  return (ownedBy || '').trim() || 'outros';
 }
 
 /** Um grupo colapsável da listagem. */
@@ -474,7 +479,7 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
   get gruposModelos(): GrupoModelos[] {
     const porFornecedor = new Map<string, ModeloLLM[]>();
     for (const m of this.modelosFiltrados) {
-      const f = fornecedorDoModelo(m.id);
+      const f = fornecedorDoModelo(m.id, m.owned_by);
       (porFornecedor.get(f) || porFornecedor.set(f, []).get(f)!).push(m);
     }
     const grupos: GrupoModelos[] = [];
@@ -503,7 +508,8 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     const explicito = this.fornecedoresAbertos[fornecedor];
     if (explicito !== undefined) return explicito;
     if (this.buscaModelo.trim()) return true;
-    return fornecedorDoModelo(this.modeloLLMAtual) === fornecedor;
+    const ativo = this.modelosLLM.find((m) => m.id === this.modeloLLMAtual);
+    return fornecedorDoModelo(this.modeloLLMAtual, ativo?.owned_by) === fornecedor;
   }
 
   toggleFornecedor(fornecedor: string): void {

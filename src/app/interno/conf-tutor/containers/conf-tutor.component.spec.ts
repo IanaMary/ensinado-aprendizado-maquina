@@ -467,6 +467,16 @@ describe('ConfTutorComponent (aba LLM)', () => {
       expect(comp.modelosLLM.map((m) => m.id)).toEqual(antes);
     });
 
+    it('modelo sem "/" no id agrupa pelo fornecedor declarado, não em "outros"', () => {
+      // O Google AI Studio lista `gemini-3.5-flash`, sem prefixo. Sem o `owned_by`, os 51
+      // modelos do Gemini cairiam todos num grupo "outros".
+      montar();
+      comp.tabAtual({ index: 1 });
+      comp.modelosLLM = [{ id: 'gemini-3.5-flash', owned_by: 'google', gratuito: null } as any];
+      comp.saudeEmAndamento = false;
+      expect(comp.gruposModelos.map((g) => g.fornecedor)).toEqual(['google']);
+    });
+
     it('sem nenhum teste, a ordem antiga (mais gratuitos primeiro) continua valendo', () => {
       comSaude({});
       const ordem = comp.gruposModelos.map((g) => g.fornecedor);
