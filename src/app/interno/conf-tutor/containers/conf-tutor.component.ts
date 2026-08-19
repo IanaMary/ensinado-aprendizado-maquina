@@ -723,6 +723,16 @@ export class ConfTutorComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Onde o admin cria a chave de cada provedor hospedado (o customizado é self-hosted). */
+  linkDaChave(pid: string): string {
+    return {
+      openrouter: 'https://openrouter.ai/keys',
+      orcarouter: 'https://www.orcarouter.ai/register',
+      gemini: 'https://aistudio.google.com/app/api-keys',
+      nvidia: 'https://build.nvidia.com/',
+    }[pid] || '';
+  }
+
   /** Leva para a aba Provedores (índice 2). */
   irParaProvedores(): void {
     this.tabs[2] = true;

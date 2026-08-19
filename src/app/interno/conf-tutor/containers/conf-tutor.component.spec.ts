@@ -32,6 +32,10 @@ const PROVEDORES = [
   { id: 'openrouter', nome: 'OpenRouter', base_url: 'https://openrouter.ai/api/v1', modelo: '',
     editavel: true, todos_gratuitos: false, chave_fonte: 'ausente', chave_mascarada: '',
     env_chave: 'OPENROUTER_API_KEY', configurado: false },
+  { id: 'gemini', nome: 'Google AI Studio (Gemini)',
+    base_url: 'https://generativelanguage.googleapis.com/v1beta/openai', modelo: '',
+    editavel: true, todos_gratuitos: null, chave_fonte: 'ausente', chave_mascarada: '',
+    env_chave: 'GEMINI_API_KEY', configurado: false, fallbacks: [], fallbacks_origem: 'catalogo' },
   { id: 'custom', nome: 'Outro provedor (OpenAI-compatible)', base_url: '', modelo: '',
     editavel: true, todos_gratuitos: null, chave_fonte: 'ausente', chave_mascarada: '',
     env_chave: null, configurado: false },
@@ -314,14 +318,14 @@ describe('ConfTutorComponent (aba LLM)', () => {
       montar();
       comp.tabAtual({ index: 1 });
       expect(service.getProvedoresLLM).toHaveBeenCalled();
-      expect(comp.provedores.length).toBe(3);
+      expect(comp.provedores.length).toBe(PROVEDORES.length);
     });
 
     it('carrega a lista ao abrir a aba', () => {
       montar();
       comp.tabAtual({ index: 2 });
       expect(service.getProvedoresLLM).toHaveBeenCalled();
-      expect(comp.provedores.length).toBe(3);
+      expect(comp.provedores.length).toBe(PROVEDORES.length);
       expect(comp.provedorAtivo).toBe('nvidia');
     });
 
@@ -647,6 +651,39 @@ describe('ConfTutorComponent (aba LLM)', () => {
       montar();
       expect(comp.formatarOperacao('definiu_fallbacks')).not.toBe('definiu_fallbacks');
       expect(comp.formatarOperacao('restaurou_fallbacks')).not.toBe('restaurou_fallbacks');
+    });
+  });
+
+  // Provedores hospedados têm URL fixa no catálogo do servidor (guarda anti-exfiltração: sem
+  // ela, mudar a base_url levaria a chave já gravada para outro host). O campo de URL na tela
+  // prometia uma edição que o servidor descartava.
+  describe('formulário de provedor', () => {
+    function cartao(pid: string): HTMLElement {
+      return [...fixture.nativeElement.querySelectorAll('.provedor-card')]
+        .find((c: any) => c.textContent.includes(pid === 'custom' ? 'Outro provedor' : 'Gemini')) as HTMLElement;
+    }
+
+    beforeEach(() => {
+      montar();
+      comp.tabAtual({ index: 2 });
+      fixture.detectChanges();
+    });
+
+    it('só o customizado mostra URL base e porta', () => {
+      expect(cartao('gemini').querySelector('.campo-form.url')).toBeNull();
+      expect(cartao('custom').querySelector('.campo-form.url')).toBeTruthy();
+    });
+
+    it('todo provedor hospedado tem link para obter a chave', () => {
+      expect(comp.linkDaChave('gemini')).toContain('aistudio.google.com');
+      expect(comp.linkDaChave('orcarouter')).toContain('orcarouter');
+      expect(comp.linkDaChave('openrouter')).toContain('openrouter');
+      expect(comp.linkDaChave('custom')).toBe('');   // self-hosted: não há onde obter
+    });
+
+    it('o Gemini aparece na tela e aceita chave', () => {
+      const campo = cartao('gemini').querySelector('input[type=password]');
+      expect(campo).withContext('o cartão do Gemini precisa aceitar a chave').toBeTruthy();
     });
   });
 
