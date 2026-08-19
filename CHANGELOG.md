@@ -9,6 +9,16 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-19d (agrupamento de modelo sem "/" no id)
+
+Bundle publicado: `main-M7ZQRJNY.js` · backend `039564e`.
+
+O Google AI Studio lista `gemini-3.5-flash`, sem prefixo de fornecedor, e a tela agrupa pelo que
+vem antes da "/": os 51 modelos do Gemini cairiam num grupo "outros". Agora, sem "/", vale o
+`owned_by` declarado pelo catálogo (`google`).
+
+Suíte **330 → 331**.
+
 ## 2026-08-19c (Google AI Studio e OrcaRouter na aba Provedores)
 
 Bundle publicado: `main-N7XDS6L3.js` · backend `808089f`.
