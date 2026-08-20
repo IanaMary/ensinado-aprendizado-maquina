@@ -465,6 +465,109 @@ describe('ScriptGeneratorService', () => {
     expect(comCsv).not.toContain('teste.csv');
   });
 
+  // O `pip install mlflow` do pacote era redundante: o `modelo/requirements.txt` escrito pelo
+  // MLflow no servidor já começa com `mlflow==<versão>`. Pior, ele aparecia mesmo quando o
+  // servidor caía no fallback e NÃO mandava formato MLflow nenhum.
+
+  it('README: o pacote não manda instalar mlflow em lugar nenhum', () => {
+    const variacoes = [
+      (service as any).generateReadme(modeloKnn, datasetSklearn, undefined, true, true),
+      (service as any).generateReadme(modeloKnn, datasetSklearn, undefined, true, false),
+      (service as any).generateReadme(modeloKnn, datasetSklearn, undefined, false),
+      (service as any).generateReadme(undefined, datasetSklearn,
+        [{ nome_modelo: 'k-NN' }, { nome_modelo: 'Árvore' }], true, true),
+    ];
+    // o requirements do modelo já traz o mlflow; instalar de novo sugere que falta algo
+    variacoes.forEach((r) => expect(r).not.toContain('pip install mlflow'));
+    // e o comando que de fato instala continua lá
+    expect(variacoes[0]).toContain('pip install -r modelo/requirements.txt');
+  });
+
+  it('a docstring do usar_modelo_mlflow.py também não pede o install extra', () => {
+    const codigo = (service as any).gerarUsarModeloMlflow({ nome_modelo: 'k-NN' }, datasetSklearn);
+    expect(codigo).not.toContain('pip install mlflow');
+    expect(codigo).toContain('pip install -r modelo/requirements.txt');
+    expect(codigo).toContain('Python 3.10');   // exigência do próprio mlflow
+  });
+
+  // Quando o MLflow está desligado no servidor, o zip do modelo vem só com `model.pkl` — sem o
+  // arquivo `MLmodel`, `mlflow.sklearn.load_model()` falha sempre. O pacote não pode prometer
+  // um atalho que não funciona.
+
+  it('temFormatoMlflow reconhece o MLmodel, na raiz ou em subpasta', () => {
+    expect(service.temFormatoMlflow(['MLmodel', 'model.pkl'])).toBeTrue();
+    expect(service.temFormatoMlflow(['model/MLmodel'])).toBeTrue();
+    expect(service.temFormatoMlflow(['model.pkl', 'requirements.txt'])).toBeFalse();
+    expect(service.temFormatoMlflow(['MLmodel.txt'])).toBeFalse();   // não é o arquivo
+    expect(service.temFormatoMlflow([])).toBeFalse();
+  });
+
+  it('README: sem formato MLflow, não oferece o caminho do MLflow', () => {
+    const semMlflow = (service as any).generateReadme(modeloKnn, datasetSklearn, undefined, true, false);
+
+    expect(semMlflow).not.toContain('usar_modelo_mlflow.py');
+    expect(semMlflow).not.toContain('MLmodel');
+    expect(semMlflow).not.toContain('Opção 2');
+    // o joblib funciona nos dois caminhos: `model.pkl` sempre vem
+    expect(semMlflow).toContain('python usar_modelo_joblib.py');
+    expect(semMlflow).toContain('model.pkl');
+  });
+
+  it('README: com formato MLflow, as duas opções continuam', () => {
+    const comMlflow = (service as any).generateReadme(modeloKnn, datasetSklearn, undefined, true, true);
+
+    expect(comMlflow).toContain('usar_modelo_mlflow.py');
+    expect(comMlflow).toContain('Opção 1');
+    expect(comMlflow).toContain('Opção 2');
+  });
+
+  // Como executar: o pacote não dizia nada sobre ambiente virtual, e prometia "Python 3.7+" —
+  // falso, porque as versões que o modelo fixa (scikit-learn 1.4, pandas 2.2) exigem >=3.9.
+
+  it('README: ensina ambiente virtual e a versão de Python que de fato funciona', () => {
+    const readme = (service as any).generateReadme(modeloKnn, datasetSklearn, undefined, true, true);
+
+    expect(readme).toContain('python3 -m venv .venv');
+    expect(readme).toContain('py -m venv .venv');            // Windows
+    expect(readme).toContain('Python 3.9');
+    expect(readme).not.toContain('Python 3.7');
+  });
+
+  it('README: diz o que o script faz, o que imprime e que não grava arquivo', () => {
+    const readme = (service as any).generateReadme(
+      modeloKnn, datasetSklearn, undefined, true, true, metricas);
+
+    expect(readme).toContain('treina o modelo do zero');
+    expect(readme).toContain('não usa a');                    // ...a pasta modelo/
+    expect(readme).toContain('Não grava arquivo nenhum');
+    expect(readme).toContain('python pipeline.py > resultado.txt');
+    // cita as métricas que o aluno escolheu, que é o que aparece no terminal
+    expect(readme).toContain(metricas[0].label);
+  });
+
+  it('README: explica quando re-treinar e quando reusar o modelo', () => {
+    const comModelo = (service as any).generateReadme(modeloKnn, datasetSklearn, undefined, true, true);
+    expect(comModelo).toContain('Re-treinar ou reusar');
+
+    // sem modelo anexado não há o que reusar, e a seção não faz sentido
+    const semModelo = (service as any).generateReadme(modeloKnn, datasetSklearn, undefined, false);
+    expect(semModelo).not.toContain('Re-treinar ou reusar');
+  });
+
+  it('o cabeçalho do script gerado traz como executá-lo', () => {
+    const single = service.generatePythonScript(datasetSklearn, modeloKnn, metricas, {});
+    const multi = (service as any).generateMultiModelScript(
+      datasetSklearn, [{ nome_modelo: 'k-NN' }, { nome_modelo: 'Árvore' }], metricas, undefined);
+
+    // o aluno abre o .py sozinho no editor, e aí o README fica para trás
+    [single, multi].forEach((codigo) => {
+      expect(codigo).toContain('Como executar (Python 3.9+)');
+      expect(codigo).toContain('python3 -m venv .venv');
+      expect(codigo).toContain('TREINA o modelo do zero');
+    });
+    expect(multi).toContain('Modelos: k-NN, Árvore');   // o extra do multi continua
+  });
+
   it('sem semente do servidor, fixa uma e diz que os números não serão idênticos', () => {
     const blobs: ResultadoColetaDado = {
       ...resultadoArquivo,

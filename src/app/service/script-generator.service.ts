@@ -52,13 +52,27 @@ export class ScriptGeneratorService {
     }
   }
 
+  /** O zip do modelo veio no formato MLflow? (é a presença do arquivo `MLmodel`)
+   *
+   *  O servidor tem DOIS caminhos: com MLflow ligado manda a pasta `model/` completa
+   *  (`MLmodel`, `model.pkl`, `requirements.txt` já com `mlflow==…`); no fallback manda só
+   *  `model.pkl` + um requirements fixo SEM mlflow. `mlflow.sklearn.load_model()` precisa do
+   *  `MLmodel`, então no fallback o `usar_modelo_mlflow.py` falharia sempre — e é por isso que
+   *  ele não vai no pacote nesse caso. Puro de propósito: a decisão fica testável sem HTTP. */
+  temFormatoMlflow(nomes: string[]): boolean {
+    return nomes.some((n) => n.split('/').pop() === 'MLmodel');
+  }
+
   /** Baixa o modelo treinado (id) e o mescla no bundle sob `<subpasta>/modelo/`,
-   *  escrevendo também os exemplos `usar_modelo_mlflow.py` e `usar_modelo_joblib.py`.
-   *  Best-effort: se o download falhar (modelo indisponível), o bundle segue sem o modelo. */
+   *  escrevendo também os exemplos de uso.
+   *  Best-effort: se o download falhar (modelo indisponível), o bundle segue sem o modelo.
+   *
+   *  Devolve `true` quando o formato MLflow veio — o README precisa saber, para não prometer
+   *  um `usar_modelo_mlflow.py` que não está lá. */
   async anexarModeloTreinado(
     folder: JSZip, entry: any, coleta: ResultadoColetaDado | undefined, subpasta?: string,
-  ): Promise<void> {
-    if (!entry?.id) return;
+  ): Promise<boolean> {
+    if (!entry?.id) return false;
     try {
       const blob = await firstValueFrom(
         this.http.get(`${environment.apiUrl}classificador/modelo/${entry.id}/artefato`, { responseType: 'blob' })
@@ -66,6 +80,7 @@ export class ScriptGeneratorService {
       const dest = subpasta ? folder.folder(subpasta)! : folder;
       const modeloDir = dest.folder('modelo')!;
       const zipModelo = await JSZip.loadAsync(blob as Blob);
+      const comMlflow = this.temFormatoMlflow(Object.keys(zipModelo.files));
       for (const nome of Object.keys(zipModelo.files)) {
         const f = zipModelo.files[nome];
         if (f.dir) continue;
@@ -75,8 +90,12 @@ export class ScriptGeneratorService {
         if (nome.split('/').pop() === 'environment_variables.txt') continue;
         modeloDir.file(nome, await f.async('uint8array'));
       }
-      dest.file('usar_modelo_mlflow.py', this.gerarUsarModeloMlflow(entry, coleta));
+      // O joblib sempre: `model.pkl` existe nos dois caminhos do servidor.
+      if (comMlflow) {
+        dest.file('usar_modelo_mlflow.py', this.gerarUsarModeloMlflow(entry, coleta));
+      }
       dest.file('usar_modelo_joblib.py', this.gerarUsarModeloJoblib(entry, coleta));
+      return comMlflow;
     } catch (erro: any) {
       // Best-effort de propósito (o `pipeline.py` treina do zero e não depende da pasta), mas o
       // `catch {}` mudo de antes escondia POR QUE a pasta não veio: a ausência do `modelo/` no zip
@@ -98,6 +117,7 @@ export class ScriptGeneratorService {
           'o registro foi apagado do servidor, ou houve falha de rede durante a exportação.',
         ].join('\n'));
       } catch { /* nem a nota deu: o zip segue sem ela */ }
+      return false;
     }
   }
 
@@ -131,12 +151,13 @@ export class ScriptGeneratorService {
     return [
       '"""Usa o modelo já treinado para prever um novo exemplo (via MLflow).',
       '',
-      'O modelo está na pasta ./modelo (formato MLflow). Instale as MESMAS versões do',
-      'treino (pickle é sensível à versão do scikit-learn) e o MLflow:',
+      'O modelo está na pasta ./modelo (formato MLflow). Um comando basta: o',
+      'requirements.txt do MLflow já traz o próprio mlflow, junto das MESMAS versões do',
+      'treino (pickle é sensível à versão do scikit-learn).',
       '    pip install -r modelo/requirements.txt',
-      '    pip install mlflow',
       '',
-      'Sem o MLflow instalado? Use o usar_modelo_joblib.py, que carrega o mesmo modelo.',
+      'Precisa de Python 3.10 ou mais novo (exigência do mlflow). Não quer instalar o',
+      'MLflow? Use o usar_modelo_joblib.py, que carrega o mesmo modelo e pede menos.',
       '"""',
       'import pandas as pd',
       'import mlflow.sklearn',
@@ -155,6 +176,8 @@ export class ScriptGeneratorService {
       'Carrega direto o arquivo ./modelo/model.pkl — não precisa do MLflow.',
       'Instale as MESMAS versões do treino (pickle é sensível à versão do scikit-learn):',
       '    pip install -r modelo/requirements.txt',
+      '',
+      'Precisa de Python 3.9 ou mais novo (exigência do scikit-learn 1.4).',
       '"""',
       'import joblib',
       'import pandas as pd',
@@ -163,6 +186,31 @@ export class ScriptGeneratorService {
       '',
       ...this.corpoPrevisao(entry, coleta),
     ].join('\n');
+  }
+
+  /** Cabeçalho do script gerado: título, data e COMO EXECUTAR.
+   *
+   *  A instrução de execução vive no README, mas o aluno abre o `.py` sozinho no editor — e aí o
+   *  README fica para trás. Repetir aqui as três linhas custa nada e é onde ele está olhando. */
+  private cabecalhoScript(titulo: string, extras: string[] = []): string[] {
+    return [
+      '#!/usr/bin/env python3',
+      '# -*- coding: utf-8 -*-',
+      '"""',
+      titulo,
+      'Data: ' + new Date().toLocaleDateString('pt-BR'),
+      ...extras,
+      '',
+      'Como executar (Python 3.9+):',
+      '    python3 -m venv .venv && source .venv/bin/activate   # Windows: py -m venv .venv',
+      '    pip install pandas numpy scikit-learn',
+      '    python ' + 'pipeline.py',
+      '',
+      'Este script TREINA o modelo do zero a partir dos dados e imprime as métricas no',
+      'terminal. Ele não usa a pasta modelo/ (o modelo já treinado) e não grava arquivos.',
+      '"""',
+      '',
+    ];
   }
 
   /** Script Python completo de UM modelo (dados → split → X|y → modelo → métricas).
@@ -207,14 +255,20 @@ export class ScriptGeneratorService {
 
     this.anexarDadosCsv(folder, resultadoColetaDado);
 
-    folder.file('README.md', this.generateReadme(modeloSelecionado, resultadoColetaDado, isMultiModelo ? modelosTreinados : undefined, modelosTreinados.length > 0));
-
-    // Modelo(s) já treinado(s) + `usar_modelo_{mlflow,joblib}.py` (best-effort; requer que o modelo
-    // ainda exista no backend). Single: `modelo/` na raiz; multi: `modelos/<nome>/`.
+    // Modelo(s) já treinado(s) + os exemplos de uso (best-effort; requer que o modelo ainda
+    // exista no backend). Single: `modelo/` na raiz; multi: `modelos/<nome>/`.
+    let temMlflow = false;
     for (const entry of modelosTreinados) {
       const subpasta = isMultiModelo ? `modelos/${slugificarNome(entry?.nome_modelo) || 'modelo'}` : undefined;
-      await this.anexarModeloTreinado(folder, entry, resultadoColetaDado, subpasta);
+      temMlflow = (await this.anexarModeloTreinado(folder, entry, resultadoColetaDado, subpasta)) || temMlflow;
     }
+
+    // O README vem DEPOIS do anexo de propósito: só aqui se sabe se o formato MLflow veio, e
+    // prometer um `usar_modelo_mlflow.py` que não está no zip mandaria o aluno rodar um arquivo
+    // inexistente. Antes ele era escrito antes do laço e afirmava "formato MLflow" sempre.
+    folder.file('README.md', this.generateReadme(
+      modeloSelecionado, resultadoColetaDado, isMultiModelo ? modelosTreinados : undefined,
+      modelosTreinados.length > 0, temMlflow, metricasSelecionadas));
 
     // PDF promocional do Hub de Inovação em IA (best-effort: o zip segue sem ele em caso de falha).
     try {
@@ -238,14 +292,9 @@ export class ScriptGeneratorService {
   ): string {
     const lines: string[] = [];
 
-    lines.push('#!/usr/bin/env python3');
-    lines.push('# -*- coding: utf-8 -*-');
-    lines.push('"""');
-    lines.push('Comparação de Modelos de Aprendizado de Máquina — gerado pelo H2IA Tutor');
-    lines.push('Data: ' + new Date().toLocaleDateString('pt-BR'));
-    lines.push('Modelos: ' + modelosTreinados.map(m => m.nome_modelo).join(', '));
-    lines.push('"""');
-    lines.push('');
+    lines.push(...this.cabecalhoScript(
+      'Comparação de Modelos de Aprendizado de Máquina — gerado pelo H2IA Tutor',
+      ['Modelos: ' + modelosTreinados.map(m => m.nome_modelo).join(', ')]));
 
     // Imports
     lines.push('import pandas as pd');
@@ -440,7 +489,12 @@ export class ScriptGeneratorService {
     return `Dataset de exemplo '${resultado.nomeDataset}', com os dados incluídos em \`data/\``;
   }
 
-  private generateReadme(modelo: ItemPipeline | undefined, resultado: ResultadoColetaDado | undefined, modelosTreinados?: any[], temModelo = false): string {
+  /** `temMlflow`: o zip do modelo trouxe o formato MLflow (ver `temFormatoMlflow`). Sem ele o
+   *  README não pode oferecer o caminho do MLflow — o arquivo não vai no pacote.
+   *  `metricas`: só para dizer ao aluno o que o script imprime. */
+  private generateReadme(modelo: ItemPipeline | undefined, resultado: ResultadoColetaDado | undefined,
+                         modelosTreinados?: any[], temModelo = false, temMlflow = false,
+                         metricas: ItemPipeline[] = []): string {
     const lines: string[] = [];
     // No modo comparação o zip põe cada modelo em `modelos/<slug>/` (ver `anexarModeloTreinado`),
     // então a árvore e os comandos precisam desse prefixo. Sem isto o README mandava rodar
@@ -468,9 +522,11 @@ export class ScriptGeneratorService {
       }
     }
     if (temModelo) {
-      lines.push(`├── ${prefixoModelo}modelo/              # Modelo JÁ treinado (formato MLflow)`);
-      lines.push(`├── ${prefixoModelo}usar_modelo_mlflow.py # Carrega o modelo via MLflow e faz uma previsão`);
-      lines.push(`├── ${prefixoModelo}usar_modelo_joblib.py # Carrega o modelo via joblib (sem MLflow) e faz uma previsão`);
+      lines.push(`├── ${prefixoModelo}modelo/              # Modelo JÁ treinado ${temMlflow ? '(formato MLflow)' : '(model.pkl)'}`);
+      if (temMlflow) {
+        lines.push(`├── ${prefixoModelo}usar_modelo_mlflow.py # Carrega o modelo via MLflow e faz uma previsão`);
+      }
+      lines.push(`├── ${prefixoModelo}usar_modelo_joblib.py # Carrega o modelo via joblib e faz uma previsão`);
     }
     lines.push('├── hub-ia.pdf           # Conheça o Hub de Inovação em IA (ia.ufpel.edu.br)');
     lines.push('└── README.md            # Este arquivo');
@@ -478,25 +534,83 @@ export class ScriptGeneratorService {
     lines.push('');
     lines.push('## Como Executar');
     lines.push('');
-    lines.push('1. Certifique-se de ter Python 3.7+ instalado');
-    lines.push('2. Instale as dependências:');
-    lines.push('   ```bash');
+    // "3.7+" era falso: as versões que o modelo treinado fixa (scikit-learn 1.4, pandas 2.2,
+    // numpy 1.26) exigem >=3.9, e o mlflow, >=3.10. Seguir o README à risca no 3.7 dava erro de
+    // resolução do pip.
+    lines.push('**1. Python 3.9 ou mais novo.** Confira com `python --version`'
+      + ' (no Windows, `py --version`).');
+    lines.push('');
+    lines.push('**2. Crie um ambiente virtual** dentro desta pasta. Ele isola as versões deste');
+    lines.push('pipeline das de outros trabalhos — sem isso, instalar aqui pode quebrar outro');
+    lines.push('projeto seu.');
+    lines.push('');
+    lines.push('```bash');
+    lines.push('# Linux / macOS');
+    lines.push('python3 -m venv .venv');
+    lines.push('source .venv/bin/activate');
+    lines.push('');
+    lines.push('# Windows (PowerShell)');
+    lines.push('py -m venv .venv');
+    lines.push('.venv\\Scripts\\Activate.ps1');
+    lines.push('```');
+    lines.push('');
+    lines.push('O nome do ambiente aparece no início da linha do terminal: `(.venv)`.');
+    lines.push('');
+    lines.push('**3. Instale as dependências:**');
+    lines.push('');
+    lines.push('```bash');
     // `ucimlrepo` é obrigatório quando o script baixa do UCI — sem ela o aluno segue o README à
     // risca e recebe `ModuleNotFoundError: No module named 'ucimlrepo'`.
     const precisaUci = resultado?.fonteDados === 'dataset'
       && this.getUciDatasetId(resultado.datasetId ?? resultado.nomeDataset ?? '') !== null;
-    lines.push(`   pip install pandas numpy scikit-learn${precisaUci ? ' ucimlrepo' : ''}`);
-    lines.push('   ```');
-    lines.push('3. Execute o pipeline:');
-    lines.push('   ```bash');
-    lines.push('   python pipeline.py');
-    lines.push('   ```');
+    lines.push(`pip install pandas numpy scikit-learn${precisaUci ? ' ucimlrepo' : ''}`);
+    lines.push('```');
     lines.push('');
+    lines.push('**4. Execute:**');
+    lines.push('');
+    lines.push('```bash');
+    lines.push('python pipeline.py');
+    lines.push('```');
+    lines.push('');
+    lines.push('### O que esperar');
+    lines.push('');
+    lines.push('O `pipeline.py` **treina o modelo do zero** a partir dos dados — ele não usa a');
+    lines.push('pasta `modelo/`, então dá para alterá-lo à vontade e treinar de novo.');
+    const nomesMetricas = (metricas || []).map((m) => m?.label).filter(Boolean);
+    lines.push(nomesMetricas.length
+      ? `Ele imprime no terminal as métricas que você escolheu (${nomesMetricas.join(', ')}).`
+      : 'Ele imprime os resultados no terminal.');
+    lines.push('**Não grava arquivo nenhum.** Para guardar a saída:');
+    lines.push('');
+    lines.push('```bash');
+    lines.push('python pipeline.py > resultado.txt');
+    lines.push('```');
+    lines.push('');
+    lines.push('Em bases pequenas o treino leva segundos. Se demorar muito mais, quase sempre é');
+    lines.push('download de dados, não o treino.');
+    lines.push('');
+    if (temModelo) {
+      lines.push('### Re-treinar ou reusar o modelo?');
+      lines.push('');
+      lines.push('São coisas diferentes, e o pacote traz as duas:');
+      lines.push('');
+      lines.push('- **`pipeline.py`** — treina de novo, do zero. Use para estudar o pipeline,');
+      lines.push('  mudar hiperparâmetros ou trocar o modelo e ver o efeito.');
+      lines.push('- **`usar_modelo_*.py`** — carrega o modelo que você **já treinou** na');
+      lines.push('  plataforma (pasta `modelo/`) e só faz a previsão. Use para aplicar o modelo a');
+      lines.push('  um exemplo novo, sem re-treinar e sem depender dos CSVs.');
+      lines.push('');
+    }
     if (temModelo) {
       lines.push('## Como usar o modelo JÁ treinado (sem re-treinar)');
       lines.push('');
-      lines.push('A pasta `modelo/` contém o modelo salvo no formato MLflow (com `MLmodel`,');
-      lines.push('`model.pkl` e `requirements.txt`). Há DUAS formas de usá-lo:');
+      if (temMlflow) {
+        lines.push('A pasta `modelo/` contém o modelo salvo no formato MLflow (com `MLmodel`,');
+        lines.push('`model.pkl` e `requirements.txt`). Há DUAS formas de usá-lo:');
+      } else {
+        lines.push('A pasta `modelo/` contém o modelo salvo (`model.pkl`) e o `requirements.txt`');
+        lines.push('com as versões do treino.');
+      }
       lines.push('');
       lines.push('```bash');
       if (isMulti) {
@@ -504,14 +618,19 @@ export class ScriptGeneratorService {
         lines.push('cd modelos/<nome-do-modelo>');
         lines.push('');
       }
+      // Um comando só: o requirements.txt escrito pelo MLflow começa com `mlflow==<versão>`, então
+      // um `pip install mlflow` depois dele seria repetição — e sugeriria que falta alguma coisa.
       lines.push('pip install -r modelo/requirements.txt   # mesmas versões do treino');
       lines.push('');
-      lines.push('# Opção 1 — via joblib (mais simples, sem dependência extra):');
-      lines.push('python usar_modelo_joblib.py');
-      lines.push('');
-      lines.push('# Opção 2 — via MLflow (usa os metadados do formato MLmodel):');
-      lines.push('pip install mlflow');
-      lines.push('python usar_modelo_mlflow.py');
+      if (temMlflow) {
+        lines.push('# Opção 1 — via joblib (mais simples, sem dependência extra):');
+        lines.push('python usar_modelo_joblib.py');
+        lines.push('');
+        lines.push('# Opção 2 — via MLflow (usa os metadados do formato MLmodel):');
+        lines.push('python usar_modelo_mlflow.py');
+      } else {
+        lines.push('python usar_modelo_joblib.py');
+      }
       lines.push('```');
       lines.push('');
       lines.push('> Edite os valores de exemplo nos `usar_modelo_*.py` para os seus dados.');
@@ -568,14 +687,7 @@ export class ScriptGeneratorService {
   ): string {
     const lines: string[] = [];
 
-    // Header
-    lines.push('#!/usr/bin/env python3');
-    lines.push('# -*- coding: utf-8 -*-');
-    lines.push('"""');
-    lines.push('Pipeline de Aprendizado de Máquina gerado pelo H2IA Tutor');
-    lines.push('Data: ' + new Date().toLocaleDateString('pt-BR'));
-    lines.push('"""');
-    lines.push('');
+    lines.push(...this.cabecalhoScript('Pipeline de Aprendizado de Máquina gerado pelo H2IA Tutor'));
 
     // Imports
     const imports = this.collectImports(modeloSelecionado, metricasSelecionadas, preProcessamentoConfig, resultadoColetaDado);
