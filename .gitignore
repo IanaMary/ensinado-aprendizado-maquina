@@ -43,3 +43,11 @@ Thumbs.db
 
 # PDFs que o Karma salva ao rodar o gerador de relatório de verdade no browser
 relatorio-*.pdf
+
+# Variáveis de ambiente. Hoje o Angular não usa `.env` (a configuração vive em
+# `src/environments/`), então isto é rede de segurança e não regra em uso: o dia em que alguém
+# criar um, ele não vai junto sem querer. O `.env.example` continua podendo ser versionado.
+.env
+*.env
+.env.*
+!.env.example
