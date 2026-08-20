@@ -9,6 +9,36 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-19g (o pacote baixado: instruções de execução e um atalho que não funcionava)
+
+Bundle publicado: `main-XXFYDLDH.js`.
+
+### Corrigido
+- **`pip install mlflow` era redundante** — no README (a linha 42 do arquivo gerado) e na docstring
+  do `usar_modelo_mlflow.py`. O passo anterior já é `pip install -r modelo/requirements.txt`, e esse
+  arquivo, escrito pelo `mlflow.sklearn.log_model` no servidor, **começa com `mlflow==<versão>`**.
+- **"Python 3.7+" era falso.** As versões que o modelo fixa exigem **>=3.9** (scikit-learn 1.4.2,
+  pandas 2.2.2, numpy 1.26.4) e o mlflow, **>=3.10** — medido nos metadados dos pacotes. Seguir o
+  README à risca no 3.7 dava erro de resolução do pip.
+- **Atalho que não funcionava:** com o MLflow desligado no servidor, o endpoint do artefato cai no
+  fallback e manda só `model.pkl` — **sem o arquivo `MLmodel`**. O pacote embarcava
+  `usar_modelo_mlflow.py` assim mesmo, e `mlflow.sklearn.load_model("modelo")` falha sempre sem ele.
+  Agora o script só entra quando o formato MLflow veio de fato, e o README (que passou a ser escrito
+  **depois** do anexo, para saber disso) adapta árvore, texto e comandos.
+
+### Adicionado — como executar
+O pacote não dizia nada sobre **ambiente virtual**; agora o README ensina (Linux/macOS e Windows),
+explica que o `pipeline.py` **treina do zero e não usa a pasta `modelo/`**, diz **quais métricas ele
+imprime** (pelo nome, as que o aluno escolheu), que **não grava arquivo** (com a dica do
+`> resultado.txt`), e traz a seção **"Re-treinar ou reusar o modelo?"** — as duas coisas existiam no
+pacote sem nada explicar quando usar cada uma. O cabeçalho do `pipeline.py` (single e multi) repete
+as três linhas de execução, porque o aluno abre o `.py` sozinho no editor.
+
+### Verificação
+Além dos testes, o README das duas variantes foi **renderizado e lido** — o zip é montado no
+navegador, então nenhum teste unitário garante o texto final. Suíte **342 → 351**, com os casos
+novos conferidos falhando antes da correção.
+
 ## 2026-08-19f (a lista de reserva mostrava uma ordem que não era a real)
 
 Bundle publicado: `main-ZND4NLFZ.js` · backend `82a8f3f`.
