@@ -1,3 +1,4 @@
+import { isStandalone, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
@@ -23,8 +24,17 @@ describe('ChatTutorComponent — turno que falha', () => {
       chatHistoricoAtualizar: () => of({}),
     };
 
+    // O componente é `standalone: true` na branch de produção e `standalone: false` (declarado
+    // no `DashboardModule`) na branch com Trilha/Léo. Um spec com `imports:` fixo quebra na
+    // segunda com "Unexpected directive imported by the module" — foi o que aconteceu, e só
+    // apareceu ao rodar a suíte da outra branch num clone limpo. Perguntar ao Angular qual é o
+    // caso mantém UM spec servindo às duas.
+    const declaracao = isStandalone(ChatTutorComponent)
+      ? { imports: [ChatTutorComponent] }
+      : { declarations: [ChatTutorComponent], schemas: [NO_ERRORS_SCHEMA] };
+
     await TestBed.configureTestingModule({
-      imports: [ChatTutorComponent],
+      ...declaracao,
       providers: [
         { provide: DashboardService, useValue: dashboard },
         { provide: AtividadeService, useValue: { registrar: () => { } } },
