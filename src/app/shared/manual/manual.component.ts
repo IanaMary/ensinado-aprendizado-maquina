@@ -290,16 +290,40 @@ export class ManualComponent implements OnInit {
               <li><strong>pipeline.py</strong> — script Python completo e executável do seu pipeline (no modo
                 comparação, um script que treina e compara todos os modelos)</li>
               <li><strong>data/treino.csv</strong> e <strong>data/teste.csv</strong> — seus dados (quando vieram de arquivo)</li>
-              <li><strong>modelo/</strong> — o modelo <em>já treinado</em> (formato MLflow)</li>
-              <li><strong>usar_modelo_joblib.py</strong> — carrega o modelo salvo e faz uma previsão (opção simples)</li>
-              <li><strong>usar_modelo_mlflow.py</strong> — o mesmo, via MLflow</li>
+              <li><strong>modelo/</strong> — o modelo <em>já treinado</em>, para reusar sem treinar de novo</li>
+              <li><strong>usar_modelo_joblib.py</strong> — carrega o modelo salvo e faz uma previsão</li>
+              <li><strong>usar_modelo_mlflow.py</strong> — o mesmo, via MLflow (só vem quando o modelo
+                foi salvo nesse formato; o README do ZIP diz o que veio no seu caso)</li>
               <li><strong>hub-ia.pdf</strong> — conheça o Hub de Inovação em IA (ia.ufpel.edu.br)</li>
-              <li><strong>README.md</strong> — instruções de execução</li>
+              <li><strong>README.md</strong> — instruções de execução, no detalhe</li>
             </ul>
             <h3>Como executar</h3>
+            <p>Você precisa do <strong>Python 3.9 ou mais novo</strong>. Crie um ambiente virtual dentro
+            da pasta do ZIP — ele isola as versões deste pipeline das de outros trabalhos:</p>
+            <pre><code># Linux / macOS
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Windows (PowerShell)
+py -m venv .venv
+.venv\\Scripts\\Activate.ps1</code></pre>
+            <p>Com o ambiente ativo (aparece <strong>(.venv)</strong> no início da linha do terminal),
+            instale e rode:</p>
             <pre><code>pip install pandas numpy scikit-learn
-python pipeline.py            # re-treina do zero
-python usar_modelo_joblib.py  # usa o modelo já treinado</code></pre>
+python pipeline.py</code></pre>
+            <p>O <strong>pipeline.py treina o modelo do zero</strong> a partir dos dados e imprime as
+            métricas no terminal — ele não usa a pasta modelo/, então dá para alterá-lo à vontade.
+            Não grava arquivo nenhum; para guardar a saída, use
+            <strong>python pipeline.py &gt; resultado.txt</strong>.</p>
+            <h3>Re-treinar ou reusar o modelo?</h3>
+            <p>São coisas diferentes, e o ZIP traz as duas:</p>
+            <ul>
+              <li><strong>pipeline.py</strong> — treina de novo, do zero. Use para estudar o pipeline,
+                mudar hiperparâmetros ou trocar o modelo e ver o efeito.</li>
+              <li><strong>usar_modelo_*.py</strong> — carrega o modelo que você já treinou aqui na
+                plataforma e só faz a previsão, sem re-treinar. Antes, instale as mesmas versões do
+                treino com <strong>pip install -r modelo/requirements.txt</strong>.</li>
+            </ul>
             <h2>Relatório em PDF</h2>
             <p>Na etapa de avaliação, <strong>Baixar relatório (PDF)</strong> gera um documento com o experimento:
             dataset, modelos, tabela de métricas, o que observar e os gráficos com discussão — pronto para
