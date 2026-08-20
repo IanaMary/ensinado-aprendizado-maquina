@@ -34,6 +34,12 @@ imprime** (pelo nome, as que o aluno escolheu), que **não grava arquivo** (com 
 pacote sem nada explicar quando usar cada uma. O cabeçalho do `pipeline.py` (single e multi) repete
 as três linhas de execução, porque o aluno abre o `.py` sozinho no editor.
 
+### O manual do aluno acompanhou
+`shared/manual/manual.component.ts` repete essas instruções e teria ficado defasado na mesma hora:
+mandava instalar no Python do sistema, não falava de venv nem de versão mínima, e anunciava o
+`usar_modelo_mlflow.py` como se ele sempre viesse. Agora diz o mesmo que o README gerado, e trata o
+script do MLflow como condicional.
+
 ### Verificação
 Além dos testes, o README das duas variantes foi **renderizado e lido** — o zip é montado no
 navegador, então nenhum teste unitário garante o texto final. Suíte **342 → 351**, com os casos
