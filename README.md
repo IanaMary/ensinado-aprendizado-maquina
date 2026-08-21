@@ -4,7 +4,7 @@ Interface da plataforma educacional **H2IA Tutor**, onde estudantes do ensino fu
 médio montam um **pipeline de Aprendizado de Máquina** completo — dos dados à avaliação — com
 um tutor que explica cada etapa.
 
-Produção: <https://absapt.tk/h2ia/tutor/> · API: [`ensinado-aprendizado-maquina-back`](https://github.com/IanaMary/ensinado-aprendizado-maquina-back)
+Produção: <https://codingmusketeers.com/h2ia/tutor/> · API: [`ensinado-aprendizado-maquina-back`](https://github.com/IanaMary/ensinado-aprendizado-maquina-back)
 
 ## O que o app faz
 
@@ -46,7 +46,7 @@ O `environment.ts` (desenvolvimento) aponta para `http://localhost:8000/`; o
 ### Verificação
 
 ```bash
-npx ng test --watch=false --browsers=ChromeHeadless   # 147 testes
+npx ng test --watch=false --browsers=ChromeHeadless   # 156 testes
 npx ng build --configuration production
 ```
 
@@ -64,10 +64,6 @@ src/app/
 │   ├── tutor/            #   painel didático (Básico/Avançado, código colorido)
 │   └── chat-tutor/       #   chat com o LLM, ciente do contexto
 ├── interno/              # Telas autenticadas
-│   ├── inicio/           #   seletor de experiência do aluno
-│   ├── trilha/           #   Trilha de ML (ramos paralelos, estilo Orange)
-│   ├── treine-robo/      #   wizard lúdico de treino
-│   ├── leo-mundo-real/   #   classificação de imagens no navegador (TF.js)
 │   ├── view-aluno/       #   pipeline, projetos, galeria, turmas e desafios
 │   ├── view-professor/   #   turmas, atividades, ranking, progresso
 │   ├── view-admin/       #   usuários, artefatos, telemetria, logs
@@ -97,8 +93,8 @@ Convenções que economizam retrabalho:
 
 | Branch | Papel |
 |---|---|
-| **`master`** | **Esta branch.** Traz as experiências extras do aluno: **Trilha de ML** (`/trilha`), **Treine seu Robô** (`/treine-robo`) e **Léo no Mundo Real** (`/leo-mundo-real`, classificação de imagens no navegador com TensorFlow.js). |
-| `mestrado-iana` | **Produção**: é ela que é publicada em `/var/www/h2ia/tutor`. Não tem as experiências acima. |
+| **`mestrado-iana`** | **Produção.** É esta que é publicada em `/var/www/h2ia/tutor`. |
+| `master` | Linha divergente com experiências extras (Trilha de ML, "Treine seu Robô", "Léo no Mundo Real"). |
 
 As duas compartilham quase tudo, mas **divergiram** (inclusive no `package.json`): mudanças
 comuns entram nas duas, normalmente por `cherry-pick` com conflitos pequenos, e é preciso
