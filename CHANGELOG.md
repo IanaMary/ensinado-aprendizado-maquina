@@ -9,6 +9,29 @@ diagnósticos, armadilhas) vive no `HISTORICO.md` do workspace de trabalho.
 
 ---
 
+## 2026-08-21 (auditoria Mantis — 2 resíduos de segurança)
+
+Backend `90d1fe0` · frontend `6641455` · bundle `main-DKCLWQYN.js`.
+
+Fecha os dois findings que ainda estavam abertos no HEAD depois das 26 correções de
+`93f73d5` (a maioria já estava no ar):
+
+- **31bd271a (backend, `treinamento_base.py`)** — o processo pai fazia `joblib.load`
+  (unpickle) da saída do processo filho do sandbox só para logar o flavor sklearn no
+  MLflow. Com MLflow desligado (produção) o log já era no-op, então o load só expunha o
+  pai a desserializar bytes do sandbox à toa. Agora só desserializa com
+  `mlflow_enabled() and mlflow_run_id` — em produção o pai não desserializa mais.
+- **9b44f32e (frontend, `atividade.interceptor.ts`)** — o payload de telemetria mandava a
+  URL crua (com `?token=`); uma requisição de ativação/convite gravava o token no
+  `dados.url` visível ao admin. Passa a usar `rotaCurta` (path sanitizado), como o rótulo
+  já fazia e como o ErrorInterceptor já havia sido corrigido.
+
+Testes: backend 754/1 skip · frontend 351 · build limpo. Mudanças espelhadas no fluxo
+privado `H2IA/tutor-h2ia` (front + backend). **Não toca a senha demo da banca (605bd897),
+mantida ativa por decisão até depois da defesa.**
+
+---
+
 ## 2026-08-19g (o pacote baixado: instruções de execução e um atalho que não funcionava)
 
 Bundle publicado: `main-XXFYDLDH.js`.
