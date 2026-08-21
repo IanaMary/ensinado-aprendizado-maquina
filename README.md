@@ -4,7 +4,7 @@ Interface da plataforma educacional **H2IA Tutor**, onde estudantes do ensino fu
 médio montam um **pipeline de Aprendizado de Máquina** completo — dos dados à avaliação — com
 um tutor que explica cada etapa.
 
-Produção: <https://absapt.tk/h2ia/tutor/> · API: [`ensinado-aprendizado-maquina-back`](https://github.com/IanaMary/ensinado-aprendizado-maquina-back)
+Produção: <https://codingmusketeers.com/h2ia/tutor/> · API: [`ensinado-aprendizado-maquina-back`](https://github.com/IanaMary/ensinado-aprendizado-maquina-back)
 
 ## O que o app faz
 
