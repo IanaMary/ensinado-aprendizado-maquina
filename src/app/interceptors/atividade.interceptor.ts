@@ -44,7 +44,11 @@ export class AtividadeInterceptor implements HttpInterceptor {
     }
 
     const inicio = performance.now();
-    const base = { url: req.url, metodo: req.method };
+    // URL SANITIZADA no payload de telemetria (finding 9b44f32e): antes ia `req.url`
+    // cru, com query string — uma requisição de ativação/convite gravava o token
+    // (?token=, /ativar-conta/<token>) no `dados.url` visível ao admin. `rotaCurta`
+    // já normaliza o path e mascara ids/tokens, o mesmo valor exibido no rótulo.
+    const base = { url: this.rotaCurta(req.url), metodo: req.method };
 
     return next.handle(req).pipe(
       tap((event) => {
